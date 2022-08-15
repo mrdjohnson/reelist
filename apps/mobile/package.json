@@ -1,0 +1,22 @@
+{
+  "name": "mobile",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "nx run mobile:start",
+    "test": "jest",
+    "lint": "nx run mobile:lint"
+  },
+
+  "dependencies": {
+    "@testing-library/jest-native": "*",
+    "@testing-library/react-native": "*",
+    "react": "*",
+    "react-native": "*",
+    "react-native-config": "*",
+    "react-native-svg": "*",
+    "@react-native-async-storage/async-storage": "*"
+  }
+}

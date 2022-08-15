@@ -1,0 +1,10 @@
+{
+  "$schema": "./node_modules/nx/schemas/workspace-schema.json",
+  "version": 2,
+  "projects": {
+    "e2e-mobile": "apps/e2e/mobile",
+    "e2e-server": "apps/e2e/server",
+    "mobile": "apps/mobile",
+    "server": "apps/server"
+  }
+}
