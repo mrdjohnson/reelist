@@ -1,5 +1,6 @@
 {
   "extends": [
+    "plugin:@nrwl/nx/react",
     "plugin:@nrwl/nx/react-typescript",
     "next",
     "next/core-web-vitals",
@@ -10,9 +11,7 @@
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
       "rules": {
-        "@next/next/no-html-link-for-pages": ["error", "apps/server/pages"],
-        "semi": ["error", "never"],
-        "no-unexpected-multiline": "error"
+        "@next/next/no-html-link-for-pages": ["error", "apps/server/pages"]
       }
     },
     {

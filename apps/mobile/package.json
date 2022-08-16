@@ -9,7 +9,6 @@
     "test": "jest",
     "lint": "nx run mobile:lint"
   },
-
   "dependencies": {
     "@testing-library/jest-native": "*",
     "@testing-library/react-native": "*",
@@ -17,6 +16,24 @@
     "react-native": "*",
     "react-native-config": "*",
     "react-native-svg": "*",
-    "@react-native-async-storage/async-storage": "*"
+    "@react-native-async-storage/async-storage": "*",
+    "@supabase/supabase-js": "*",
+    "react-native-notifications": "*",
+    "react-native-safe-area-view": "*",
+    "native-base": "*",
+    "mobx-react-lite": "*",
+    "react-native-inappbrowser-reborn": "*",
+    "react-native-url-polyfill": "*",
+    "axios": "*",
+    "humps": "*",
+    "@react-navigation/native": "*",
+    "@react-navigation/native-stack": "*",
+    "react-native-screens": "*",
+    "react-native-safe-area-context": "*",
+    "mobx-utils": "*",
+    "react-native-vector-icons": "*",
+    "@react-native-clipboard/clipboard": "*",
+    "mobx": "*",
+    "short-unique-id": "*"
   }
 }

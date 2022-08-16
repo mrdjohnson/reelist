@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../node_modules/@tsconfig/react-native/tsconfig.json",
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "jsx": "react-native",
@@ -7,7 +7,10 @@
     "moduleResolution": "node",
     "noEmit": true,
     "skipLibCheck": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "paths": {
+      "~/*": ["apps/mobile/src/*"]
+    },
   },
   "files": ["../../node_modules/@nrwl/react-native/typings/svg.d.ts"],
   "include": [],

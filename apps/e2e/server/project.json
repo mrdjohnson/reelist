@@ -20,7 +20,8 @@
       "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["apps/e2e/server/**/*.{js,ts}"]
+        "lintFilePatterns": ["apps/e2e/server/**/*.{js,ts}"],
+        "fix": true
       }
     }
   },

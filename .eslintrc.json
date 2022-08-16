@@ -2,36 +2,33 @@
   "root": true,
   "ignorePatterns": ["**/*"],
   "plugins": ["@nrwl/nx"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended",
+    "plugin:react/recommended"
+  ],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
       "rules": {
-        "@nrwl/nx/enforce-module-boundaries": [
+        "prettier/prettier": [
           "error",
           {
-            "enforceBuildableLibDependency": true,
-            "allow": [],
-            "depConstraints": [
-              {
-                "sourceTag": "*",
-                "onlyDependOnLibsWithTags": ["*"]
-              }
-            ]
+            "tabWidth": 2,
+            "semi": false,
+            "singleQuote": true,
+            "quoteProps": "as-needed",
+            "trailingComma": "all",
+            "bracketSpacing": true,
+            "bracketSameLine": false,
+            "arrowParens": "avoid",
+            "printWidth": 100
           }
         ],
-        "semi": ["error", "never"],
-        "no-unexpected-multiline": "error"
+        "react/react-in-jsx-scope": "off"
       }
-    },
-    {
-      "files": ["*.ts", "*.tsx"],
-      "extends": ["plugin:@nrwl/nx/typescript"],
-      "rules": {}
-    },
-    {
-      "files": ["*.js", "*.jsx"],
-      "extends": ["plugin:@nrwl/nx/javascript"],
-      "rules": {}
     }
   ]
 }

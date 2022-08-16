@@ -1,5 +1,6 @@
 apply plugin: "com.android.application"
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
+apply plugin: 'com.google.gms.google-services'
 
 import com.android.build.OutputFile
 
@@ -82,6 +83,7 @@ project.ext.react = [
     // the entry file for bundle generation
     entryFile: "src/main.tsx",
     enableHermes: false,  // clean and rebuild if changing
+    extraPackagerArgs: [ '--minify=false' ],
 ]
 
 apply from: "../../node_modules/react-native/react.gradle"
@@ -137,7 +139,7 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
-        applicationId "com.mobile"
+        applicationId "com.reelist"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -269,6 +271,11 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
+    
+    implementation project(':react-native-inappbrowser-reborn')
+    implementation('com.google.firebase:firebase-core:16.0.0')
+    implementation project(':react-native-notifications')
+    
 
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"  // From node_modules
@@ -327,6 +334,7 @@ task copyDownloadableDepsToLibs(type: Copy) {
 }
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
+apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 
 def isNewArchitectureEnabled() {
     // To opt-in for the New Architecture, you can either:

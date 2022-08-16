@@ -1,11 +1,12 @@
-const { withNxMetro } = require('@nrwl/react-native');
-const { getDefaultConfig } = require('metro-config');
-const exclusionList = require('metro-config/src/defaults/exclusionList');
+/* eslint-disable @typescript-eslint/no-var-requires */
+const { withNxMetro } = require('@nrwl/react-native')
+const { getDefaultConfig } = require('metro-config')
+const exclusionList = require('metro-config/src/defaults/exclusionList')
 
 module.exports = (async () => {
   const {
     resolver: { sourceExts, assetExts },
-  } = await getDefaultConfig();
+  } = await getDefaultConfig()
   return withNxMetro(
     {
       transformer: {
@@ -18,7 +19,7 @@ module.exports = (async () => {
         babelTransformerPath: require.resolve('react-native-svg-transformer'),
       },
       resolver: {
-        assetExts: assetExts.filter((ext) => ext !== 'svg'),
+        assetExts: assetExts.filter(ext => ext !== 'svg'),
         sourceExts: [...sourceExts, 'svg'],
         blockList: exclusionList([/^(?!.*node_modules).*\/dist\/.*/]),
       },
@@ -33,6 +34,6 @@ module.exports = (async () => {
       projectRoot: __dirname,
       // Specify folders to watch, in addition to Nx defaults (workspace libraries and node_modules)
       watchFolders: [],
-    }
-  );
-})();
+    },
+  )
+})()

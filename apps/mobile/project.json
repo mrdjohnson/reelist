@@ -30,7 +30,9 @@
     },
     "run-android": {
       "executor": "@nrwl/react-native:run-android",
-      "options": {}
+      "options": {
+        "verbose": true
+      }
     },
     "build-android": {
       "executor": "@nrwl/react-native:build-android",

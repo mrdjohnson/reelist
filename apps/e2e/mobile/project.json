@@ -55,7 +55,8 @@
       "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["apps/e2e/mobile/**/*.{ts,tsx,js,jsx}"]
+        "lintFilePatterns": ["apps/e2e/mobile/**/*.{ts,tsx,js,jsx}"],
+        "fix": true
       }
     }
   },

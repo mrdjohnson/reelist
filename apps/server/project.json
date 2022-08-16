@@ -3,6 +3,49 @@
   "sourceRoot": "apps/server",
   "projectType": "application",
   "targets": {
+    "prep-dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "./apps/server/",
+        "command": "cp envs/.env.development.local .env.local"
+      }
+    },
+    "prep-stage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "./apps/server/",
+        "command": "cp envs/.env.staging.local .env.local"
+      }
+    },
+    "prep-prod": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "./apps/server/",
+        "command": "cp envs/.env.production.local .env.local"
+      }
+    },
+    "deploy-prod": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "./apps/server/",
+        "command": [
+          "cp envs/.env.production.local .env.local",
+          "node scripts/docker/deploy.mjs"
+        ],
+        "parallel": false
+      }
+    },
+    "deploy-prod-local": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "./apps/server/",
+        "command": [
+          "cp envs/.env.staging.local .env.local",
+          "node scripts/docker/deploy_local.mjs"
+        ],
+        "parallel": false
+      }
+    },
     "build": {
       "executor": "@nrwl/next:build",
       "outputs": ["{options.outputPath}"],
