@@ -15,11 +15,10 @@ import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import VideoList from '~/models/VideoList'
-import { BackHandler, Linking, SectionListData } from 'react-native'
+import { BackHandler, SectionListData } from 'react-native'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import _ from 'lodash'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import Clipboard from '@react-native-clipboard/clipboard'
 
 const VideoListListItem = observer(
   ({
@@ -125,16 +124,6 @@ const VideoListsHomeScreen = observer(({ navigation }: NativeStackScreenProps<an
     return <Text fontSize="lg">{title}</Text>
   }
 
-  const openUrl = async () => {
-    const url = await Clipboard.getString()
-    if (!Linking.canOpenURL(url)) {
-      console.log('unable to load: ', url)
-    }
-    Linking.openURL(url)
-
-    console.log('opened: ', url)
-  }
-
   return (
     <View flex={1} justifyContent="space-between" backgroundColor="white">
       {creatingList ? (
@@ -201,8 +190,6 @@ const VideoListsHomeScreen = observer(({ navigation }: NativeStackScreenProps<an
               </View>
             )}
           />
-
-          <Button onPress={openUrl}>open test url</Button>
 
           <Button onPress={() => setCreatingList(true)}>Create List</Button>
         </>
