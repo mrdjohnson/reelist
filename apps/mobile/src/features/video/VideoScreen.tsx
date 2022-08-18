@@ -74,6 +74,7 @@ const VideoScreen = observer(({ navigation }: NativeStackScreenProps<any>) => {
   const [season, setSeason] = useState<TvSeason | null>(null)
   const [episode, setEpisode] = useState<TvEpisode | null>(null)
   const [manageLists, setManageLists] = useState<true | null>(null)
+  const [minimizeVideoOverview, setMinimizeVideoOverview] = useState(true)
 
   useEffect(() => {
     if (!videoId) return
@@ -132,7 +133,9 @@ const VideoScreen = observer(({ navigation }: NativeStackScreenProps<any>) => {
       <Center padding="10px" paddingTop="0">
         <Text fontSize="2xl">{name + ': ' + video.videoId}</Text>
 
-        <Text>{video.overview}</Text>
+        <Pressable onPress={() => setMinimizeVideoOverview(!minimizeVideoOverview)}>
+          <Text numberOfLines={minimizeVideoOverview ? 3 : 0}>{video.overview}</Text>
+        </Pressable>
       </Center>
 
       {manageLists ? (
