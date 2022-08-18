@@ -35,4 +35,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-cotup-server.tar
+reelist-server.tar
+
+dist

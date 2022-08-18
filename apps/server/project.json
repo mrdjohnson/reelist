@@ -28,8 +28,9 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "./apps/server/",
-        "command": [
+        "commands": [
           "cp envs/.env.production.local .env.local",
+          "cd ../../ && nx run server:build:production",
           "node scripts/docker/deploy.mjs"
         ],
         "parallel": false
@@ -39,8 +40,9 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "./apps/server/",
-        "command": [
+        "commands": [
           "cp envs/.env.staging.local .env.local",
+          "cd ../../ && nx run server:build",
           "node scripts/docker/deploy_local.mjs"
         ],
         "parallel": false
@@ -52,11 +54,11 @@
       "defaultConfiguration": "production",
       "options": {
         "root": "apps/server",
-        "outputPath": "dist/apps/server"
+        "outputPath": "apps/server/dist"
       },
       "configurations": {
         "development": {
-          "outputPath": "apps/server"
+          "outputPath": "apps/server/dist"
         },
         "production": {}
       }
