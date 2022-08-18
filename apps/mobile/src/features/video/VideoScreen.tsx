@@ -67,6 +67,11 @@ const IndeterminateIcon = <Icon as={<MaterialIcons name="indeterminate-check-box
 const CAN_GO_BACK = false
 const CANNOT_GO_BACK = true
 
+const ascendingSort = (episodeA: TvEpisode, episodeB: TvEpisode) =>
+  episodeA.episodeNumber - episodeB.episodeNumber
+const descendingSort = (episodeB: TvEpisode, episodeA: TvEpisode) =>
+  episodeA.episodeNumber - episodeB.episodeNumber
+
 const VideoScreen = observer(({ navigation }: NativeStackScreenProps<any>) => {
   const { auth, videoStore, videoListStore } = useStore()
   const videoId = videoStore.currentVideoId
@@ -75,6 +80,7 @@ const VideoScreen = observer(({ navigation }: NativeStackScreenProps<any>) => {
   const [episode, setEpisode] = useState<TvEpisode | null>(null)
   const [manageLists, setManageLists] = useState<true | null>(null)
   const [minimizeVideoOverview, setMinimizeVideoOverview] = useState(true)
+  const [ascendingOrder, setAscendingOrder] = useState<boolean>(true)
 
   useEffect(() => {
     if (!videoId) return
@@ -121,6 +127,11 @@ const VideoScreen = observer(({ navigation }: NativeStackScreenProps<any>) => {
 
     return () => BackHandler.removeEventListener('hardwareBackPress', onBackButtonPressed)
   }, [season, episode, manageLists])
+
+  const episodes = useMemo(() => {
+    if (!season?.episodes) return
+    return season.episodes.slice().sort(ascendingOrder ? ascendingSort : descendingSort)
+  }, [season?.episodes, ascendingOrder])
 
   if (!video || !videoId) {
     return <Text>Loading, there may have been an error for: {videoId}</Text>
@@ -265,8 +276,21 @@ const VideoScreen = observer(({ navigation }: NativeStackScreenProps<any>) => {
             />
           </View>
 
+          <Row flexDirection="row-reverse">
+            <Button onPress={() => setAscendingOrder(!ascendingOrder)} size="lg">
+              <Icon
+                as={
+                  <MaterialCommunityIcons
+                    name={ascendingOrder ? 'sort-ascending' : 'sort-descending'}
+                  />
+                }
+                color="white"
+              />
+            </Button>
+          </Row>
+
           <FlatList
-            data={season.episodes!}
+            data={episodes}
             keyExtractor={item => item.id}
             renderItem={({ item: episode }) => (
               <View key={episode.id} flexDirection="row" alignItems="center" marginBottom={2}>
