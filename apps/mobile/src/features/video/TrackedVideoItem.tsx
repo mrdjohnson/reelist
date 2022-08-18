@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import _ from 'lodash'
 import Video from '~/models/Video'
 import { useStore } from '~/hooks/useStore'
-import { Button, Icon, Image, Pressable, Text, View } from 'native-base'
+import { Button, Column, Icon, Image, Pressable, Row, Text, View } from 'native-base'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
 import { NavigatorParamList } from '../../../from_ignite_template/app-navigator'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -44,49 +44,62 @@ const TrackedVideoItem = observer(({ video }: VideoItemProps) => {
   }
 
   return (
-    <Pressable flexDirection="row" margin="10px" onPress={goToMediaPage}>
+    <Pressable
+      flexDirection="row"
+      margin="10px"
+      onPress={goToMediaPage}
+      opacity={video.watched ? '50' : '100'}
+    >
       <View flexShrink={1}>
         {imageSource && (
           <Image
             source={{ uri: IMAGE_PATH + imageSource }}
             alt={imageSource}
             minWidth="80px"
+            minHeight="120px"
             flex={1}
             marginRight="8px"
             resizeMode="contain"
             backgroundColor="black"
+            rounded="sm"
           />
         )}
       </View>
 
-      <View flex={1}>
-        <Text fontSize="lg" color={'black'}>
-          {name}
-        </Text>
-
-        {video.originalName && (
-          <Text fontSize="sm" color="light.500">
-            {video.originalName}
+      <View flex={1} backgroundColor={null} roundedLeft="sm" roundedRight="md">
+        <Column flex={1}>
+          <Text fontSize="lg" color={'black'}>
+            {name}
           </Text>
-        )}
 
-        {video.releaseDate && (
-          <Text fontSize="sm" color="light.500">
-            {video.releaseDate}
-          </Text>
-        )}
+          {video.originalName && (
+            <Text fontSize="sm" color="light.500">
+              {video.originalName}
+            </Text>
+          )}
 
-        <View flexDirection="row" justifyContent="space-between" alignItems="center">
-          <View>
-            <Text>Season: {video.nextEpisode?.seasonNumber}</Text>
+          {video.releaseDate && (
+            <Text fontSize="sm" color="light.500">
+              {video.releaseDate}
+            </Text>
+          )}
+        </Column>
 
-            <Text>Episode: {video.nextEpisode?.episodeNumber}</Text>
+        {video.watched ? (
+          <Text alignSelf="flex-end">Completed</Text>
+        ) : (
+          <View flexDirection="row" justifyContent="space-between" alignItems="center">
+            <View>
+              <Text>Season: {video.nextEpisode?.seasonNumber}</Text>
+
+              <Text>Episode: {video.nextEpisode?.episodeNumber}</Text>
+            </View>
+
+            <Button onPress={video.watchNextEpisode} size="lg">
+              <Icon as={<MaterialCommunityIcons name="eye-plus" />} color="white" />
+            </Button>
           </View>
-
-          <Button onPress={video.watchNextEpisode}>
-            <Icon as={<MaterialCommunityIcons name="eye-plus" />} color="white" />
-          </Button>
-        </View>
+        )}
       </View>
     </Pressable>
   )
