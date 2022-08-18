@@ -177,20 +177,21 @@ class Video {
     }
   }
 
-  toggleWatched = async () => {
-    const nextWatched = !this.watched
+  toggleWatched = async (watchedOverride: boolean | undefined = undefined) => {
+    const nextWatched = watchedOverride ?? !this.watched
 
     await this.updateWatched({
-      id: this.serverId,
-      video_id: this.videoId,
-      video_info: { ...this.videoInfo, watched: nextWatched },
+      video_info: { watched: nextWatched },
       // todo, if unmarking a video... what should happen here?
-      current_season: 0,
-      current_episode: 0,
+      current_season: 1,
+      current_episode: 1,
     })
   }
 
-  toggleSeasonWatched = async (seasonNumber: number) => {
+  toggleSeasonWatched = async (
+    seasonNumber: number,
+    seasonWatchedOverride: boolean | undefined = undefined,
+  ) => {
     const seasonWatched = this.getSeasonWatched(seasonNumber)
     const seasonPartiallyWatched = this.getSeasonPartiallyWatched(seasonNumber)
 
@@ -200,15 +201,32 @@ class Video {
       nextSeasonWatched = true
     }
 
-    const seasons = {
+    // if there is an override, ignore everything else and just say its whatever the override is
+    nextSeasonWatched = seasonWatchedOverride ?? nextSeasonWatched
+
+    const seasons: Record<string, WatchedSeasonJson> = {
       ...this.videoInfo?.seasons,
       // watch or unwatch all episodes
       [seasonNumber]: { watched: nextSeasonWatched },
     }
 
+    const totalSeasons = _.size(this.seasonMap)
+    const totalSeasonOverrides = _.size(seasons)
+
+    const getAllSeasonsWatched = (watched: boolean) => {
+      if (totalSeasons !== totalSeasonOverrides) return false
+
+      const allSeasonsWatched = _.every(seasons, season => season.watched === watched)
+      return allSeasonsWatched
+    }
+
+    if (getAllSeasonsWatched(true)) {
+      return await this.toggleWatched(true)
+    } else if (getAllSeasonsWatched(false)) {
+      return await this.toggleWatched(false)
+    }
+
     await this.updateWatched({
-      id: this.serverId,
-      video_id: this.videoId,
       video_info: { ...this.videoInfo, seasons },
       // todo, if unmarking a season... what should happen here?
       current_season: seasonNumber + 1,
@@ -219,7 +237,7 @@ class Video {
   toggleEpisodeWatched = async (episode: TvEpisode) => {
     const { seasonNumber, episodeNumber } = episode
 
-    let season = { ...this.getSeason(seasonNumber) }
+    const season = { ...this.getSeason(seasonNumber) }
     const episodes = season.episodes || {}
     const episodeWatched = this.getEpisodeWatched(episode)
 
@@ -236,9 +254,9 @@ class Video {
     }
 
     if (getAllEpisodesWatched(true)) {
-      season = { watched: true }
+      return await this.toggleSeasonWatched(seasonNumber, true)
     } else if (getAllEpisodesWatched(false)) {
-      season = { watched: false }
+      return await this.toggleSeasonWatched(seasonNumber, false)
     }
 
     const seasons = {
@@ -247,8 +265,6 @@ class Video {
     }
 
     await this.updateWatched({
-      id: this.serverId,
-      video_id: this.videoId,
       video_info: { ...this.videoInfo, seasons },
       // todo, if unmarking an episode... what should happen here?
       current_season: episode.seasonNumber,
