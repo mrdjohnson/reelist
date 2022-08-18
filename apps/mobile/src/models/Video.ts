@@ -281,7 +281,7 @@ class Video {
 
     let seasonNumber = this.currentSeason - 1
 
-    while (seasonNumber > 1) {
+    while (seasonNumber >= 1) {
       nextVideoInfo.seasons[String(seasonNumber)] = { watched: true }
 
       seasonNumber -= 1
