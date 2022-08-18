@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import _ from 'lodash'
 import Video from '~/models/Video'
 import { useStore } from '~/hooks/useStore'
-import { Divider, HStack, Image, Pressable, Text, View } from 'native-base'
+import { Column, Divider, HStack, Image, Pressable, Row, Skeleton, Text, View } from 'native-base'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
 import { NavigatorParamList } from '../../../from_ignite_template/app-navigator'
 
@@ -54,6 +54,7 @@ const VideoItem = observer(({ video }: VideoItemProps) => {
             marginRight="8px"
             resizeMode="contain"
             backgroundColor="black"
+            rounded="sm"
           />
         )}
       </View>
@@ -78,5 +79,17 @@ const VideoItem = observer(({ video }: VideoItemProps) => {
     </Pressable>
   )
 })
+
+export const videoItemSkeleton = (
+  <Row margin="10px">
+    <Column marginRight="8px">
+      <Skeleton minWidth="80px" height="110px" rounded="sm" endColor="light.300" flexShrink={1} />
+    </Column>
+
+    <Column flex={1}>
+      <Skeleton.Text size="sm" endColor="light.600" lines={4} paddingY="4px" />
+    </Column>
+  </Row>
+)
 
 export default VideoItem

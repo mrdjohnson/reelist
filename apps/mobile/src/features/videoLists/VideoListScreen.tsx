@@ -3,13 +3,17 @@ import {
   Actionsheet,
   Box,
   Button,
+  Center,
+  Column,
   FlatList,
   FormControl,
   HStack,
   Input,
   Pressable,
+  Row,
   ScrollView,
   SectionList,
+  Skeleton,
   Switch,
   Text,
   useDisclose,
@@ -22,7 +26,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import VideoList from '~/models/VideoList'
 import { BackHandler, SectionListData } from 'react-native'
 import Video from '~/models/Video'
-import VideoItem from '~/features/video/VideoItem'
+import VideoItem, { videoItemSkeleton } from '~/features/video/VideoItem'
 import Clipboard from '@react-native-clipboard/clipboard'
 import { NavigatorParamList } from '../../../from_ignite_template/app-navigator'
 
@@ -199,6 +203,20 @@ const VideoListScreen = observer(({ navigation }: NativeStackScreenProps<Navigat
           <Button onPress={openMembership} margin="10px">
             Membership
           </Button>
+
+          {currentVideoList.videoIds.length === 0 && (
+            <Center>
+              <Text>Nothing has been added here yet</Text>
+            </Center>
+          )}
+
+          {currentVideoList.videos.length === 0 && (
+            <FlatList
+              data={currentVideoList.videoIds}
+              keyExtractor={videoId => videoId}
+              renderItem={() => videoItemSkeleton}
+            />
+          )}
 
           <FlatList
             data={currentVideoList.videos}
