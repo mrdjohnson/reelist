@@ -65,6 +65,16 @@ const ProfileScreen = observer(({ navigation }: NativeStackScreenProps<Navigator
     setLoading(false)
   }
 
+  const logout = async () => {
+    const { error } = await supabase.auth.signOut()
+
+    if (error) {
+      toast.show({
+        description: 'Unable to logout at this time, please try again later',
+      })
+    }
+  }
+
   const toggleNotifications = () => {
     // todo
   }
@@ -144,7 +154,7 @@ const ProfileScreen = observer(({ navigation }: NativeStackScreenProps<Navigator
         </Button>
       </Row>
 
-      <Button onPress={auth.logout} marginTop="30px" backgroundColor="error.500" color="white">
+      <Button onPress={logout} marginTop="30px" backgroundColor="error.500" color="white">
         Logout
       </Button>
     </View>

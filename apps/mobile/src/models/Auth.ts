@@ -54,8 +54,6 @@ export default class Auth {
   }
 
   logout = () => {
-    supabase.auth.signOut().catch(console.error)
-
     this.setUser(LoggedOutUser)
   }
 

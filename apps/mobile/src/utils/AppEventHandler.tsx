@@ -1,12 +1,16 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native'
+import { useToast } from 'native-base'
 import { useEffect } from 'react'
 import { Linking } from 'react-native'
 import { useStore } from '~/hooks/useStore'
+import supabase from '~/supabase'
 import { NavigatorParamList } from '../../from_ignite_template/app-navigator'
 
 export const AppEventHandler = () => {
-  const { appState } = useStore()
+  const { appState, auth } = useStore()
   const navigation = useNavigation<NavigationProp<NavigatorParamList>>()
+
+  const toast = useToast()
 
   useEffect(() => {
     const { remove } = Linking.addEventListener('url', ({ url }) => {
@@ -28,6 +32,23 @@ export const AppEventHandler = () => {
 
     return remove
   }, [appState, navigation])
+
+  // handle supabase signout / sign out
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(async event => {
+      if (event !== 'SIGNED_OUT') return
+
+      auth.logout()
+
+      navigation.navigate('welcome')
+
+      toast.show({
+        description: 'You have been logged out',
+      })
+    })
+
+    return () => authListener?.unsubscribe()
+  }, [])
 
   return null
 }
