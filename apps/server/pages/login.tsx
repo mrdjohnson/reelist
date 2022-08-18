@@ -2,11 +2,9 @@ import { supabaseClient } from '../utils/supabaseClient'
 import { useEffect } from 'react'
 import { Box, CircularProgress } from '@mui/material'
 
-const LoginPage = () => {
+const LoginPage = ({ path }: { path: string }) => {
   useEffect(() => {
-    supabaseClient.auth.signIn({
-      provider: 'google',
-    })
+    supabaseClient.auth.signIn({ provider: 'google' }, { redirectTo: path + '/account' })
   }, [])
 
   return (
@@ -17,3 +15,11 @@ const LoginPage = () => {
 }
 
 export default LoginPage
+
+export const getStaticProps = async () => {
+  return {
+    props: {
+      path: process.env.NEXT_BASE_PATH,
+    },
+  }
+}
