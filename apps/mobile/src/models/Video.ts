@@ -178,7 +178,7 @@ class Video {
   }
 
   toggleWatched = async () => {
-    const nextWatched = !this.watched || this.partiallyWatched
+    const nextWatched = !this.watched
 
     await this.updateWatched({
       id: this.serverId,
@@ -256,10 +256,47 @@ class Video {
     })
   }
 
+  backfillWatched = async () => {
+    const nextVideoInfo: VideoInfoType = {
+      ...this.videoInfo,
+    }
+
+    nextVideoInfo.seasons = nextVideoInfo.seasons || {}
+
+    let seasonNumber = this.currentSeason - 1
+
+    while (seasonNumber > 1) {
+      nextVideoInfo.seasons[String(seasonNumber)] = { watched: true }
+
+      seasonNumber -= 1
+    }
+
+    let episodeNumber = this.currentEpisode - 1
+
+    // init the current episodes if they do not exist,
+    // should be impossible-ish because this was assinged somehow
+    const currentSeason = nextVideoInfo.seasons[this.currentSeason]
+    if (!currentSeason.episodes) currentSeason.episodes = {}
+
+    while (episodeNumber >= 1) {
+      currentSeason.episodes[episodeNumber] = true
+
+      episodeNumber -= 1
+    }
+
+    this.updateWatched({
+      video_info: nextVideoInfo,
+    })
+  }
+
   updateWatched = async (upsertData: Partial<VideoTableType>) => {
     const { data: videoJson, error } = await supabase
       .from<VideoTableType>('videos')
-      .upsert(upsertData)
+      .upsert({
+        ...upsertData,
+        id: this.serverId,
+        video_id: this.videoId,
+      })
       .single()
 
     if (error) {

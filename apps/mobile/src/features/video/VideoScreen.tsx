@@ -15,6 +15,7 @@ import {
   Actionsheet,
   HStack,
   Switch,
+  Row,
 } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
@@ -79,6 +80,12 @@ const VideoScreen = observer(({ navigation }: NativeStackScreenProps<any>) => {
 
     videoStore.getVideo(videoId).then(setVideo)
   }, [videoId])
+
+  useEffect(() => {
+    if (!video) return
+
+    video.fetchSeasons()
+  }, [video])
 
   useEffect(() => {
     if (!season || !videoId) return
@@ -159,6 +166,24 @@ const VideoScreen = observer(({ navigation }: NativeStackScreenProps<any>) => {
             Manage Lists
           </Button>
 
+          <Row margin="10px" justifyContent="space-between">
+            <Row>
+              <Text marginRight="10px">
+                You are on:
+                {'\n'}
+                Season:{video.currentSeason} Episode: {video.currentEpisode}
+              </Text>
+
+              <Button onPress={video.watchNextEpisode}>
+                <Icon as={<MaterialCommunityIcons name="eye-plus" />} color="white" />
+              </Button>
+            </Row>
+
+            <Button size="sm" onPress={video.backfillWatched}>
+              Backfill?
+            </Button>
+          </Row>
+
           <HStack alignItems="center" space="8px" margin="10px">
             <Text>Show in Tracked</Text>
 
@@ -175,10 +200,9 @@ const VideoScreen = observer(({ navigation }: NativeStackScreenProps<any>) => {
             <Checkbox
               size="sm"
               value={video.id}
-              isChecked={video.watched || video.partiallyWatched}
+              isChecked={video.watched}
               onChange={video.toggleWatched}
               accessibilityLabel={video.name}
-              icon={video.partiallyWatched ? IndeterminateIcon : undefined}
             />
           </View>
 
