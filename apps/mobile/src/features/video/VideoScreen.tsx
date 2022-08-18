@@ -34,6 +34,7 @@ import { callTmdb } from '~/api/api'
 import _ from 'lodash'
 import VideoItem from '~/features/video/VideoItem'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import moment from 'moment'
 
 const VideoListListItem = observer(
   ({
@@ -81,6 +82,7 @@ const VideoScreen = observer(({ navigation }: NativeStackScreenProps<any>) => {
   const [manageLists, setManageLists] = useState<true | null>(null)
   const [minimizeVideoOverview, setMinimizeVideoOverview] = useState(true)
   const [ascendingOrder, setAscendingOrder] = useState<boolean>(true)
+  const [hideFutureEpisodes, setHideFutureEpisodes] = useState(true)
 
   useEffect(() => {
     if (!videoId) return
@@ -130,8 +132,15 @@ const VideoScreen = observer(({ navigation }: NativeStackScreenProps<any>) => {
 
   const episodes = useMemo(() => {
     if (!season?.episodes) return
-    return season.episodes.slice().sort(ascendingOrder ? ascendingSort : descendingSort)
-  }, [season?.episodes, ascendingOrder])
+
+    let episodeChain = _.chain(season.episodes)
+
+    if (hideFutureEpisodes) {
+      episodeChain = episodeChain.filter(episode => moment(episode.airDate).isBefore())
+    }
+
+    return episodeChain.sort(ascendingOrder ? ascendingSort : descendingSort).value()
+  }, [season?.episodes, ascendingOrder, hideFutureEpisodes])
 
   if (!video || !videoId) {
     return <Text>Loading, there may have been an error for: {videoId}</Text>
@@ -276,7 +285,11 @@ const VideoScreen = observer(({ navigation }: NativeStackScreenProps<any>) => {
             />
           </View>
 
-          <Row flexDirection="row-reverse">
+          <Row justifyContent="space-between">
+            <Row alignItems="center">
+              <Text>Hide future shows:</Text>
+              <Switch size="sm" value={hideFutureEpisodes} onValueChange={setHideFutureEpisodes} />
+            </Row>
             <Button onPress={() => setAscendingOrder(!ascendingOrder)} size="lg">
               <Icon
                 as={
@@ -292,25 +305,35 @@ const VideoScreen = observer(({ navigation }: NativeStackScreenProps<any>) => {
           <FlatList
             data={episodes}
             keyExtractor={item => item.id}
-            renderItem={({ item: episode }) => (
-              <View key={episode.id} flexDirection="row" alignItems="center" marginBottom={2}>
-                <Pressable flex={1} onPress={() => setEpisode(episode)}>
-                  <Text fontSize="sm" color="gray.400">
-                    Episode {episode.episodeNumber}
-                  </Text>
+            renderItem={({ item: episode }) => {
+              const aired = moment(episode.airDate).isBefore()
 
-                  <Text fontSize="md">{episode.name.trim()}</Text>
-                </Pressable>
+              return (
+                <View
+                  key={episode.id}
+                  flexDirection="row"
+                  alignItems="center"
+                  marginBottom={2}
+                  opacity={aired ? '100' : '50'}
+                >
+                  <Pressable flex={1} onPress={() => setEpisode(episode)} disabled={!aired}>
+                    <Text fontSize="sm" color="gray.400">
+                      Episode {episode.episodeNumber}
+                    </Text>
 
-                <Checkbox
-                  value={season.seasonNumber + ''}
-                  isChecked={video.getEpisodeWatched(episode)}
-                  onChange={() => video.toggleEpisodeWatched(episode)}
-                  accessibilityLabel={'Episode ' + episode.episodeNumber}
-                  size="md"
-                />
-              </View>
-            )}
+                    <Text fontSize="md">{episode.name.trim()}</Text>
+                  </Pressable>
+
+                  <Checkbox
+                    value={season.seasonNumber + ''}
+                    isChecked={video.getEpisodeWatched(episode)}
+                    onChange={() => video.toggleEpisodeWatched(episode)}
+                    accessibilityLabel={'Episode ' + episode.episodeNumber}
+                    size="md"
+                  />
+                </View>
+              )
+            }}
           />
         </View>
       )}
