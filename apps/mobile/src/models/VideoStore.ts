@@ -17,6 +17,7 @@ type TrackedVideoJson = {
 class VideoStore {
   storeAuth: Auth
   currentVideoId: string | null = null
+  videoCache: Record<string, Video> = {}
 
   constructor(auth: Auth) {
     makeAutoObservable(this, {
@@ -49,6 +50,8 @@ class VideoStore {
   }
 
   getVideo = async (videoId: string, videoTableData: VideoTableType = null) => {
+    if (this.videoCache[videoId]) return this.videoCache[videoId]
+
     const path = this.getVideoPath(videoId)
 
     if (!path) return null
@@ -65,7 +68,13 @@ class VideoStore {
     //   })
     //   .then(item => _.get(item, 'data.data') as VideoJsonType | null)
 
-    return video && new Video(video, this.storeAuth, videoTableData, videoId)
+    const uiVideo = video && new Video(video, this.storeAuth, videoTableData, videoId)
+
+    if (uiVideo) {
+      this.videoCache[videoId] = uiVideo
+    }
+
+    return uiVideo
   }
 
   getVideosForVideoList = async (videoList: VideoList) => {
