@@ -22,7 +22,6 @@ import {
 } from 'react-native/Libraries/NewAppScreen'
 
 import { NativeBaseProvider, Text, Box, ScrollView, Button } from 'native-base'
-import { DATA } from './data'
 import AnimatedHeader from './AnimatedHeader'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import Store from '~/models/Store'
