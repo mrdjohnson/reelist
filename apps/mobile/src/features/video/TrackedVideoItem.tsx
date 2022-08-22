@@ -7,6 +7,7 @@ import { Button, Column, Icon, Image, Pressable, Row, Text, View } from 'native-
 import { NavigationProp, useNavigation } from '@react-navigation/native'
 import { NavigatorParamList } from '../../../from_ignite_template/app-navigator'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import moment from 'moment'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
@@ -24,19 +25,53 @@ const TrackedVideoItem = observer(({ video }: VideoItemProps) => {
   const imageSource = video.posterPath || video.backdropPath
   const inPlaylist = false // add to play list somehow
 
-  // const handlePlayListButton = async () => {
-  //   console.log('setting video:', video)
-  //   videoListStore.setCurrentVideo(video)
-  //   appState.openDialog('addToVideoList')
-  //   console.log('video set:', video)
-  //   // if (video.mediaType === 'movie') {
-  //   //   let { data: videoResponse, error } = await supabase
-  //   //     .from('videos')
-  //   //     .insert({ movie_id: video.id, user_id: auth.user.id })
-  //   //     .single()
-  //   //   if (error) console.error('failed to create video', error.message)
-  //   // }
-  // }
+  let bottomRow
+
+  if (video.mediaType === 'movie') {
+    bottomRow = (
+      <View flexDirection="row-reverse">
+        <Button onPress={() => video.toggleWatched()} size="lg">
+          <Icon as={<MaterialCommunityIcons name="eye-plus" />} color="white" />
+        </Button>
+      </View>
+    )
+  } else if (video.isCompleted) {
+    bottomRow = (
+      <View flexDirection="row-reverse">
+        <Text alignSelf="flex-end">Completed</Text>
+      </View>
+    )
+  } else if (video.isLatestEpisodeWatched) {
+    bottomRow = (
+      <View flexDirection="row-reverse">
+        <Column>
+          <Text alignSelf="flex-end">Currently Live</Text>
+
+          {video.nextEpisodeToAir && (
+            <Text alignSelf="flex-end">
+              {/* Friday, Aug 19th 22 */}
+              Next Air Date:
+              {moment(video.nextEpisodeToAir.airDate).format(' dddd, MMM Do')}
+            </Text>
+          )}
+        </Column>
+      </View>
+    )
+  } else {
+    bottomRow = (
+      <View flexDirection="row" justifyContent="space-between" alignItems="center">
+        <View>
+          <Text>Season: {video.nextEpisode?.seasonNumber}</Text>
+
+          <Text>Episode: {video.nextEpisode?.episodeNumber}</Text>
+        </View>
+
+        <Button onPress={video.watchNextEpisode} size="lg">
+          <Icon as={<MaterialCommunityIcons name="eye-plus" />} color="white" />
+        </Button>
+      </View>
+    )
+  }
 
   const goToMediaPage = () => {
     videoStore.setCurrentVideoId(video.videoId)
@@ -48,7 +83,7 @@ const TrackedVideoItem = observer(({ video }: VideoItemProps) => {
       flexDirection="row"
       margin="10px"
       onPress={goToMediaPage}
-      opacity={video.watched ? '50' : '100'}
+      opacity={video.isWatched || video.isCompleted || video.isLatestEpisodeWatched ? '50' : '100'}
     >
       <View flexShrink={1}>
         {imageSource && (
@@ -85,21 +120,7 @@ const TrackedVideoItem = observer(({ video }: VideoItemProps) => {
           )}
         </Column>
 
-        {video.watched ? (
-          <Text alignSelf="flex-end">Completed</Text>
-        ) : (
-          <View flexDirection="row" justifyContent="space-between" alignItems="center">
-            <View>
-              <Text>Season: {video.nextEpisode?.seasonNumber}</Text>
-
-              <Text>Episode: {video.nextEpisode?.episodeNumber}</Text>
-            </View>
-
-            <Button onPress={video.watchNextEpisode} size="lg">
-              <Icon as={<MaterialCommunityIcons name="eye-plus" />} color="white" />
-            </Button>
-          </View>
-        )}
+        {bottomRow}
       </View>
     </Pressable>
   )

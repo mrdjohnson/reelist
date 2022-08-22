@@ -7,12 +7,15 @@ import { InAppBrowser } from 'react-native-inappbrowser-reborn'
 import { NavigatorParamList } from '../../../from_ignite_template/app-navigator'
 
 const WelcomeScreen = observer(({ navigation }: NativeStackScreenProps<NavigatorParamList>) => {
-  const { auth } = useStore()
+  const { auth, videoStore } = useStore()
   const { loggedIn } = auth.user
 
   useEffect(() => {
     if (loggedIn) {
-      navigation.navigate('videoListsHome')
+      // navigation.navigate('videoListsHome')
+
+      videoStore.setCurrentVideoId('tv37854')
+      navigation.navigate('videoScreen')
     }
   }, [loggedIn, navigation])
 

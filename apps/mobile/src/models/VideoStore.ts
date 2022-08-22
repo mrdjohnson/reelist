@@ -49,7 +49,7 @@ class VideoStore {
     return path
   }
 
-  getVideo = async (videoId: string, videoTableData: VideoTableType = null) => {
+  getVideo = async (videoId: string, videoTableData: VideoTableType | null = null) => {
     if (this.videoCache[videoId]) return this.videoCache[videoId]
 
     const path = this.getVideoPath(videoId)

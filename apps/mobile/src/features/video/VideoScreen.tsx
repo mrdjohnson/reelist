@@ -16,6 +16,7 @@ import {
   HStack,
   Switch,
   Row,
+  Column,
 } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
@@ -130,8 +131,8 @@ const VideoScreen = observer(({ navigation }: NativeStackScreenProps<any>) => {
     return () => BackHandler.removeEventListener('hardwareBackPress', onBackButtonPressed)
   }, [season, episode, manageLists])
 
-  const episodes = useMemo(() => {
-    if (!season?.episodes) return
+  const episodes: TvEpisode[] | undefined = useMemo(() => {
+    if (!season?.episodes || !video) return
 
     let episodeChain = _.chain(season.episodes)
 
@@ -139,11 +140,75 @@ const VideoScreen = observer(({ navigation }: NativeStackScreenProps<any>) => {
       episodeChain = episodeChain.filter(episode => moment(episode.airDate).isBefore())
     }
 
-    return episodeChain.sort(ascendingOrder ? ascendingSort : descendingSort).value()
+    episodeChain = episodeChain.sort(ascendingOrder ? ascendingSort : descendingSort)
+
+    return episodeChain.value()
   }, [season?.episodes, ascendingOrder, hideFutureEpisodes])
 
   if (!video || !videoId) {
     return <Text>Loading, there may have been an error for: {videoId}</Text>
+  }
+
+  const renderEpisode = (episode: TvEpisode) => {
+    const aired = moment(episode.airDate).isBefore()
+
+    return (
+      <View
+        key={episode.id}
+        flexDirection="row"
+        alignItems="center"
+        marginBottom={2}
+        opacity={aired ? '100' : '50'}
+      >
+        <Pressable flex={1} onPress={() => setEpisode(episode)} disabled={!aired}>
+          <Text fontSize="sm" color="gray.400">
+            Episode {episode.episodeNumber}
+          </Text>
+
+          <Text fontSize="md">{episode.name}</Text>
+        </Pressable>
+
+        <Checkbox
+          value={season?.seasonNumber + ''}
+          isChecked={video.getIsEpisodeWatched(episode)}
+          onChange={() => video.toggleEpisodeWatched(episode)}
+          accessibilityLabel={'Episode ' + episode.episodeNumber}
+          size="md"
+        />
+      </View>
+    )
+  }
+
+  let videoStatus
+
+  if (video.isCompleted) {
+    videoStatus = <Text>Completed</Text>
+  } else if (video.isLatestEpisodeWatched) {
+    videoStatus = (
+      <Column>
+        <Text>Currently Live</Text>
+
+        {video.nextEpisodeToAir && (
+          <Text>
+            {/* Friday, Aug 19th 22 */}
+            Next Air Date:
+            {moment(video.nextEpisodeToAir.airDate).format(' dddd, MMM Do')}
+          </Text>
+        )}
+      </Column>
+    )
+  } else {
+    videoStatus = (
+      <Row alignItems="center">
+        <Text marginRight="10px">
+          Season:{video.nextEpisode?.seasonNumber} Episode: {video.nextEpisode?.episodeNumber}
+        </Text>
+
+        <Button onPress={video.watchNextEpisode}>
+          <Icon as={<MaterialCommunityIcons name="eye-plus" />} color="white" />
+        </Button>
+      </Row>
+    )
   }
 
   const name = video.name || video.title
@@ -190,19 +255,9 @@ const VideoScreen = observer(({ navigation }: NativeStackScreenProps<any>) => {
           </Button>
 
           <Row margin="10px" justifyContent="space-between">
-            <Row>
-              <Text marginRight="10px">
-                You are on:
-                {'\n'}
-                Season:{video.currentSeason} Episode: {video.currentEpisode}
-              </Text>
+            {videoStatus}
 
-              <Button onPress={video.watchNextEpisode}>
-                <Icon as={<MaterialCommunityIcons name="eye-plus" />} color="white" />
-              </Button>
-            </Row>
-
-            <Button size="sm" onPress={video.backfillWatched}>
+            <Button size="sm" onPress={() => video.backfillWatched()}>
               Backfill?
             </Button>
           </Row>
@@ -215,50 +270,52 @@ const VideoScreen = observer(({ navigation }: NativeStackScreenProps<any>) => {
         </>
       )}
 
-      <ScrollView display={(season || manageLists) && 'none'}>
-        <View paddingRight="10px" paddingLeft="10px">
-          <View flexDirection="row" justifyContent="space-between" borderBottomWidth={1}>
-            <Text fontSize="lg">Seasons: </Text>
-
-            <Checkbox
-              size="sm"
-              value={video.id}
-              isChecked={video.watched}
-              onChange={video.toggleWatched}
-              accessibilityLabel={video.name}
-            />
-          </View>
-
-          {video.seasons?.map(season => (
-            <View
-              key={season.id}
-              flexDirection="row"
-              alignItems="center"
-              marginBottom="10px"
-              marginTop="10px"
-            >
-              <Pressable onPress={() => setSeason(season)} flex={1}>
-                <Text fontSize="md">{season.name}</Text>
-              </Pressable>
+      {!season && !manageLists && (
+        <ScrollView>
+          <View paddingRight="10px" paddingLeft="10px">
+            <View flexDirection="row" justifyContent="space-between" borderBottomWidth={1}>
+              <Text fontSize="lg">Seasons: </Text>
 
               <Checkbox
-                value={season.seasonNumber + ''}
-                isChecked={
-                  video.getSeasonWatched(season.seasonNumber) ||
-                  video.getSeasonPartiallyWatched(season.seasonNumber)
-                }
-                onChange={() => video.toggleSeasonWatched(season.seasonNumber)}
-                accessibilityLabel={'Season ' + season.seasonNumber}
-                icon={
-                  video.getSeasonPartiallyWatched(season.seasonNumber)
-                    ? IndeterminateIcon
-                    : undefined
-                }
+                size="sm"
+                value={video.id}
+                isChecked={video.isWatched}
+                onChange={() => video.toggleWatched()}
+                accessibilityLabel={video.name}
               />
             </View>
-          ))}
-        </View>
-      </ScrollView>
+
+            {video.seasons?.map(season => (
+              <View
+                key={season.id}
+                flexDirection="row"
+                alignItems="center"
+                marginBottom="10px"
+                marginTop="10px"
+              >
+                <Pressable onPress={() => setSeason(season)} flex={1}>
+                  <Text fontSize="md">{season.name}</Text>
+                </Pressable>
+
+                <Checkbox
+                  value={season.seasonNumber + ''}
+                  isChecked={
+                    video.getIsSeasonWatched(season.seasonNumber) ||
+                    video.getIsSeasonPartiallyWatched(season.seasonNumber)
+                  }
+                  onChange={() => video.toggleSeasonWatched(season.seasonNumber)}
+                  accessibilityLabel={'Season ' + season.seasonNumber}
+                  icon={
+                    video.getIsSeasonPartiallyWatched(season.seasonNumber)
+                      ? IndeterminateIcon
+                      : undefined
+                  }
+                />
+              </View>
+            ))}
+          </View>
+        </ScrollView>
+      )}
 
       {season && (
         <View paddingLeft="10px" paddingRight="10px" flex={1}>
@@ -274,13 +331,15 @@ const VideoScreen = observer(({ navigation }: NativeStackScreenProps<any>) => {
             <Checkbox
               value={season.seasonNumber + ''}
               isChecked={
-                video.getSeasonWatched(season.seasonNumber) ||
-                video.getSeasonPartiallyWatched(season.seasonNumber)
+                video.getIsSeasonWatched(season.seasonNumber) ||
+                video.getIsSeasonPartiallyWatched(season.seasonNumber)
               }
               onChange={() => video.toggleSeasonWatched(season.seasonNumber)}
               accessibilityLabel={'Season ' + season.seasonNumber}
               icon={
-                video.getSeasonPartiallyWatched(season.seasonNumber) ? IndeterminateIcon : undefined
+                video.getIsSeasonPartiallyWatched(season.seasonNumber)
+                  ? IndeterminateIcon
+                  : undefined
               }
             />
           </View>
@@ -288,7 +347,11 @@ const VideoScreen = observer(({ navigation }: NativeStackScreenProps<any>) => {
           <Row justifyContent="space-between">
             <Row alignItems="center">
               <Text>Hide future shows:</Text>
-              <Switch size="sm" value={hideFutureEpisodes} onValueChange={setHideFutureEpisodes} />
+              <Switch
+                size="sm"
+                value={hideFutureEpisodes}
+                onChange={() => setHideFutureEpisodes(!hideFutureEpisodes)}
+              />
             </Row>
             <Button onPress={() => setAscendingOrder(!ascendingOrder)} size="lg">
               <Icon
@@ -302,39 +365,15 @@ const VideoScreen = observer(({ navigation }: NativeStackScreenProps<any>) => {
             </Button>
           </Row>
 
-          <FlatList
+          <ScrollView flex={1}>{episodes?.map(renderEpisode)}</ScrollView>
+
+          {/* using flatlist even with smaller values takes a long time to render */}
+          {/* <FlatList
             data={episodes}
             keyExtractor={item => item.id}
-            renderItem={({ item: episode }) => {
-              const aired = moment(episode.airDate).isBefore()
-
-              return (
-                <View
-                  key={episode.id}
-                  flexDirection="row"
-                  alignItems="center"
-                  marginBottom={2}
-                  opacity={aired ? '100' : '50'}
-                >
-                  <Pressable flex={1} onPress={() => setEpisode(episode)} disabled={!aired}>
-                    <Text fontSize="sm" color="gray.400">
-                      Episode {episode.episodeNumber}
-                    </Text>
-
-                    <Text fontSize="md">{episode.name.trim()}</Text>
-                  </Pressable>
-
-                  <Checkbox
-                    value={season.seasonNumber + ''}
-                    isChecked={video.getEpisodeWatched(episode)}
-                    onChange={() => video.toggleEpisodeWatched(episode)}
-                    accessibilityLabel={'Episode ' + episode.episodeNumber}
-                    size="md"
-                  />
-                </View>
-              )
-            }}
-          />
+            initialNumToRender={15}
+            renderItem={episodeRenderer}
+          /> */}
         </View>
       )}
 

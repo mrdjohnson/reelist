@@ -18,6 +18,8 @@ export type TvEpisode = {
   stillPath: string
   voteAverage: 7.6
   voteCount: number
+  next?: TvEpisode
+  previous?: TvEpisode
 }
 
 export type TvSeason = {
@@ -33,20 +35,20 @@ export type TvSeason = {
 
 type WatchedSeasonJson = {
   watched?: boolean
-  episodes?: Record<string, boolean>
+  episodes?: Record<number, boolean>
 }
 
-export type VideoInfoType = null | {
+export type VideoInfoType = {
   watched?: boolean
-  seasons?: Record<string, WatchedSeasonJson>
+  seasons?: Record<number, WatchedSeasonJson>
 }
 
 export type VideoTableType = {
   id: string
   video_id: string
   tracked: boolean
-  current_season: number
-  current_episode: number
+  last_watched_season_number: number | null
+  last_watched_episode_number: number | null
   video_info: VideoInfoType
 }
 
@@ -71,15 +73,17 @@ class Video {
   voteAverage!: number
   voteCount!: number
   seasons?: TvSeason[] | undefined
+  lastEpisodeToAir?: TvEpisode
+  nextEpisodeToAir?: TvEpisode
 
   tracked = false
-  videoInfo: VideoInfoType = null
+  videoInfo: VideoInfoType = {}
   serverId: string | undefined
 
   storeAuth: Auth
 
-  currentSeason = -1
-  currentEpisode = 0
+  lastWatchedSeasonNumber: number | null = null
+  lastWatchedEpisodeNumber: number | null = null
   seasonMap: Record<number, TvSeason | null> = {}
 
   constructor(
@@ -139,8 +143,8 @@ class Video {
     this.serverId = videoTable.id
     this.videoInfo = videoTable.video_info
     this.tracked = videoTable.tracked
-    this.currentSeason = videoTable.current_season
-    this.currentEpisode = videoTable.current_episode
+    this.lastWatchedSeasonNumber = videoTable.last_watched_season_number
+    this.lastWatchedEpisodeNumber = videoTable.last_watched_episode_number
   }
 
   _lazyLoadVideoFromVideoTable = async () => {
@@ -157,155 +161,208 @@ class Video {
     }
   }
 
-  toggleTracked = async () => {
-    const nextTracked = !this.tracked
+  _linkEpisodes = () => {
+    let season = this.seasonMap[1]
+    let previousEpisode: TvEpisode
 
-    const { data: videoJson, error } = await supabase
-      .from<VideoTableType>('videos')
-      .upsert({
-        id: this.serverId,
-        video_id: this.videoId,
-        video_info: { ...this.videoInfo },
-        tracked: nextTracked,
-      })
-      .single()
+    const assignPreviousAndNextEpisode = (nextEpisode: TvEpisode) => {
+      if (!previousEpisode) {
+        // this should only happen for the very first episode
+        previousEpisode = nextEpisode
+        return
+      }
 
-    if (error) {
-      console.error('failed to toggle watched for video', error.message)
-    } else if (videoJson) {
-      this._assignFromVideoTable(videoJson)
+      if (nextEpisode.episodeNumber === this.lastEpisodeToAir?.episodeNumber) {
+        this.lastEpisodeToAir = nextEpisode
+      }
+
+      nextEpisode.previous = previousEpisode
+      previousEpisode.next = nextEpisode
+      previousEpisode = nextEpisode
+    }
+
+    while (season) {
+      season.episodes?.forEach(assignPreviousAndNextEpisode)
+
+      season = this.seasonMap[season.seasonNumber + 1]
     }
   }
 
-  toggleWatched = async (watchedOverride: boolean | undefined = undefined) => {
-    const nextWatched = watchedOverride ?? !this.watched
+  toggleTracked = async () => {
+    const nextTracked = !this.tracked
 
-    await this.updateWatched({
-      video_info: { watched: nextWatched },
-      // todo, if unmarking a video... what should happen here?
-      current_season: 1,
-      current_episode: 1,
+    await this.updateWatched('toggle tracked', {
+      tracked: nextTracked,
+    })
+  }
+
+  toggleWatched = async (isWatchedOverride: boolean | null = null) => {
+    let nextIsWatched = isWatchedOverride
+
+    if (nextIsWatched === null) {
+      const seasonIsWatchedOrPartiallyWatched = (season: TvSeason | null) => {
+        if (season === null) return false
+        if (this.getIsSeasonPartiallyWatched(season.seasonNumber)) return true
+        return this.getIsSeasonWatched(season.seasonNumber)
+      }
+
+      const hasWatchedData = _.some(this.seasonMap, seasonIsWatchedOrPartiallyWatched)
+
+      nextIsWatched = !hasWatchedData
+    }
+
+    // if the show has been watched; mark the last aired episode as watched
+    // if the show has been unwatched; set to null
+    let lastWatchedEpisodeData
+
+    if (nextIsWatched) {
+      // mark the most recent episode, and all the previous ones as watched
+      if (this.nextEpisodeToAir) {
+        this.backfillWatched(this.lastEpisodeToAir)
+
+        // leave episode as un-watched
+        return
+      }
+
+      // mark last episode at this time as watched
+      lastWatchedEpisodeData = episodeToEpisodeWatchedData(this.lastEpisodeToAir)
+    } else {
+      // reset any watched episode data
+      lastWatchedEpisodeData = episodeToEpisodeWatchedData(null)
+      nextIsWatched = false
+    }
+
+    await this.updateWatched('toggle watched', {
+      video_info: { watched: nextIsWatched },
+      ...lastWatchedEpisodeData,
     })
   }
 
   toggleSeasonWatched = async (
     seasonNumber: number,
-    seasonWatchedOverride: boolean | undefined = undefined,
+    isSeasonWatchedOverride: boolean | undefined = undefined,
   ) => {
-    const seasonWatched = this.getSeasonWatched(seasonNumber)
-    const seasonPartiallyWatched = this.getSeasonPartiallyWatched(seasonNumber)
+    const isSeasonWatched = this.getIsSeasonWatched(seasonNumber)
+    const isSeasonPartiallyWatched = this.getIsSeasonPartiallyWatched(seasonNumber)
+    const lastEpisodeInSeason = seasonNumber === this.lastEpisodeToAir?.seasonNumber
 
-    let nextSeasonWatched = !seasonWatched
-
-    if (seasonPartiallyWatched) {
-      nextSeasonWatched = true
-    }
+    let seasonWillBeWatched = !(isSeasonWatched || isSeasonPartiallyWatched)
 
     // if there is an override, ignore everything else and just say its whatever the override is
-    nextSeasonWatched = seasonWatchedOverride ?? nextSeasonWatched
+    seasonWillBeWatched = isSeasonWatchedOverride ?? seasonWillBeWatched
 
-    const seasons: Record<string, WatchedSeasonJson> = {
-      ...this.videoInfo?.seasons,
-      // watch or unwatch all episodes
-      [seasonNumber]: { watched: nextSeasonWatched },
+    const watchedSeasons = this.getWatchedSeasons()
+
+    let lastWatchedEpisodeData
+
+    if (seasonWillBeWatched) {
+      let episode
+
+      if (lastEpisodeInSeason) {
+        episode = this.lastEpisodeToAir
+      } else {
+        episode = _.last(this.seasonMap[seasonNumber]?.episodes)
+      }
+
+      if (!episode) throw new Error('unable to find last episode for season')
+
+      this.backfillSeason(episode)
+
+      if (this.getIsAllSeasonsWatched(true)) {
+        return await this.toggleWatched(true)
+      }
+
+      lastWatchedEpisodeData = episodeToEpisodeWatchedData(episode)
+    } else {
+      watchedSeasons[seasonNumber] = { watched: false }
+
+      if (this.getIsAllSeasonsWatched(false)) {
+        return await this.toggleWatched(false)
+      }
+
+      lastWatchedEpisodeData = episodeToEpisodeWatchedData(this.lastWatchedEpisodeFromEnd)
     }
 
-    const totalSeasons = _.size(this.seasonMap)
-    const totalSeasonOverrides = _.size(seasons)
-
-    const getAllSeasonsWatched = (watched: boolean) => {
-      if (totalSeasons !== totalSeasonOverrides) return false
-
-      const allSeasonsWatched = _.every(seasons, season => season.watched === watched)
-      return allSeasonsWatched
-    }
-
-    if (getAllSeasonsWatched(true)) {
-      return await this.toggleWatched(true)
-    } else if (getAllSeasonsWatched(false)) {
-      return await this.toggleWatched(false)
-    }
-
-    await this.updateWatched({
-      video_info: { ...this.videoInfo, seasons },
-      // todo, if unmarking a season... what should happen here?
-      current_season: seasonNumber + 1,
-      current_episode: 1,
+    await this.updateWatched('toggle season watched', {
+      video_info: this.videoInfo,
+      ...lastWatchedEpisodeData,
     })
   }
 
-  toggleEpisodeWatched = async (episode: TvEpisode) => {
+  toggleEpisodeWatched = async (
+    episode: TvEpisode,
+    isEpisodeWatchedOverride: boolean | undefined = undefined,
+  ) => {
     const { seasonNumber, episodeNumber } = episode
 
-    const season = { ...this.getSeason(seasonNumber) }
-    const episodes = season.episodes || {}
-    const episodeWatched = this.getEpisodeWatched(episode)
+    const watchedEpisodes = this.getWatchedSeasonEpisodes(seasonNumber)
+    const episodeWillBeWatched = isEpisodeWatchedOverride ?? !this.getIsEpisodeWatched(episode)
 
-    season.episodes = { ...episodes, [episodeNumber]: !episodeWatched }
+    watchedEpisodes[episodeNumber] = episodeWillBeWatched
 
-    const totalEpisodes = _.size(this.seasonMap[seasonNumber]?.episodes)
-    const totalEpisodeOverrides = _.size(season.episodes)
-
-    const getAllEpisodesWatched = (watched: boolean) => {
-      if (season.watched !== watched && totalEpisodeOverrides !== totalEpisodes) return false
-
-      const allEpisodes = _.every(season.episodes, episodeWatched => episodeWatched === watched)
-      return allEpisodes
-    }
-
-    if (getAllEpisodesWatched(true)) {
+    if (this.getIsAllEpisodesInSeasonWatched(seasonNumber, true)) {
       return await this.toggleSeasonWatched(seasonNumber, true)
-    } else if (getAllEpisodesWatched(false)) {
+    } else if (this.getIsAllEpisodesInSeasonWatched(seasonNumber, false)) {
       return await this.toggleSeasonWatched(seasonNumber, false)
     }
 
-    const seasons = {
-      ...this.videoInfo?.seasons,
-      [seasonNumber]: season,
+    let lastWatchedEpisodeData: Partial<VideoTableType> = {}
+
+    if (episodeWillBeWatched) {
+      lastWatchedEpisodeData = episodeToEpisodeWatchedData(episode)
+    } else {
+      lastWatchedEpisodeData = episodeToEpisodeWatchedData(this.lastWatchedEpisodeFromEnd)
     }
 
-    await this.updateWatched({
-      video_info: { ...this.videoInfo, seasons },
-      // todo, if unmarking an episode... what should happen here?
-      current_season: episode.seasonNumber,
-      current_episode: episode.episodeNumber + 1,
+    await this.updateWatched('toggle episode watched', {
+      video_info: this.videoInfo,
+      ...lastWatchedEpisodeData,
     })
   }
 
-  backfillWatched = async () => {
-    const nextVideoInfo: VideoInfoType = {
-      ...this.videoInfo,
-    }
+  backfillSeason = (lastEpisodeWatchedInSeason: TvEpisode) => {
+    const seasonNumber = lastEpisodeWatchedInSeason.seasonNumber
+    const currentSeasonEpisodes = this.getWatchedSeasonEpisodes(seasonNumber)
 
-    nextVideoInfo.seasons = nextVideoInfo.seasons || {}
-
-    let seasonNumber = this.currentSeason - 1
-
-    while (seasonNumber >= 1) {
-      nextVideoInfo.seasons[String(seasonNumber)] = { watched: true }
-
-      seasonNumber -= 1
-    }
-
-    let episodeNumber = this.currentEpisode - 1
-
-    // init the current episodes if they do not exist,
-    // should be impossible-ish because this was assinged somehow
-    const currentSeason = nextVideoInfo.seasons[this.currentSeason]
-    if (!currentSeason.episodes) currentSeason.episodes = {}
+    let episodeNumber = lastEpisodeWatchedInSeason.episodeNumber
 
     while (episodeNumber >= 1) {
-      currentSeason.episodes[episodeNumber] = true
+      currentSeasonEpisodes[episodeNumber] = true
 
       episodeNumber -= 1
     }
 
-    this.updateWatched({
-      video_info: nextVideoInfo,
-    })
+    const seasons = this.getWatchedSeasons()
+
+    // there is always at least one episode in the season watched, no need to falsey check
+    if (this.getIsAllEpisodesInSeasonWatched(seasonNumber, true)) {
+      seasons[seasonNumber] = { watched: true }
+    }
   }
 
-  updateWatched = async (upsertData: Partial<VideoTableType>) => {
+  backfillWatched = async (lastWatchedEpisodeOverride: TvEpisode | null = null) => {
+    const lastWatchedEpisode = lastWatchedEpisodeOverride || this.currentBaseEpisode
+
+    if (!lastWatchedEpisode) return
+
+    const lastWatchedSeasonNumber = lastWatchedEpisode.seasonNumber
+
+    let seasonNumber = lastWatchedSeasonNumber - 1
+    const seasons = this.getWatchedSeasons()
+
+    while (seasonNumber >= 1) {
+      seasons[seasonNumber] = { watched: true }
+
+      seasonNumber -= 1
+    }
+
+    this.backfillSeason(lastWatchedEpisode)
+
+    // run through the logic to condense everything as watched
+    await this.toggleEpisodeWatched(lastWatchedEpisode, true)
+  }
+
+  updateWatched = async (type: string, upsertData: Partial<VideoTableType>) => {
     const { data: videoJson, error } = await supabase
       .from<VideoTableType>('videos')
       .upsert({
@@ -316,7 +373,7 @@ class Video {
       .single()
 
     if (error) {
-      console.error('failed to toggle watched for video', error.message)
+      console.error('video failed to ' + type, error.message)
     } else if (videoJson) {
       this._assignFromVideoTable(videoJson)
     }
@@ -353,6 +410,8 @@ class Video {
     if (!this.seasons) return
 
     await Promise.allSettled(this.seasons?.map(season => this.fetchSeason(season.seasonNumber)))
+
+    this._linkEpisodes()
   }
 
   watchNextEpisode = () => {
@@ -361,68 +420,113 @@ class Video {
     }
   }
 
-  getSeason = (seasonNumber: number) => {
-    return this.videoInfo?.seasons?.[seasonNumber] || {}
+  getWatchedSeasons = () => {
+    if (!this.videoInfo.seasons) this.videoInfo.seasons = {}
+
+    return this.videoInfo.seasons
   }
 
-  getSeasonWatched = (seasonNumber: number) => {
-    return this.getSeason(seasonNumber).watched ?? this.watched
+  getWatchedSeason = (seasonNumber: number) => {
+    const seasons = this.getWatchedSeasons()
+
+    if (!seasons[seasonNumber]) seasons[seasonNumber] = {}
+
+    return seasons[seasonNumber]
   }
 
-  getSeasonPartiallyWatched = (seasonNumber: number) => {
+  getWatchedSeasonEpisodes = (seasonNumber: number) => {
+    const season = this.getWatchedSeason(seasonNumber)
+
+    if (!season.episodes) season.episodes = {}
+
+    return season.episodes
+  }
+
+  getIsSeasonWatched = (seasonNumber: number) => {
+    return this.getWatchedSeason(seasonNumber).watched ?? this.isWatched
+  }
+
+  getIsSeasonPartiallyWatched = (seasonNumber: number) => {
     // if there are any episode overrides, the season is partially watched
-    return !_.isEmpty(this.getSeason(seasonNumber).episodes)
+    return !_.isEmpty(this.getWatchedSeason(seasonNumber).episodes)
   }
 
-  getEpisodeWatched = (episode: TvEpisode) => {
+  getIsAllSeasonsWatched = (watched: boolean) => {
+    const watchedSeasons = this.getWatchedSeasons()
+
+    const totalSeasons = _.size(this.seasonMap)
+    const totalWatchedSeasons = _.size(watchedSeasons)
+
+    if (watched) {
+      // fast fail if all of the seasons have not been marked as SOMETHING
+      if (totalSeasons !== totalWatchedSeasons) return false
+
+      return _.every(watchedSeasons, season => season.watched === true)
+    }
+
+    return _.every(watchedSeasons, season => Boolean(season.watched) === false)
+  }
+
+  getIsAllEpisodesInSeasonWatched = (seasonNumber: number, watched: boolean) => {
+    const watchedSeason = this.getWatchedSeason(seasonNumber)
+
+    const totalEpisodes = this.seasonMap[seasonNumber]?.episodeCount
+    const totalEpisodeOverrides = _.size(watchedSeason.episodes)
+
+    if (watchedSeason.watched !== watched && totalEpisodeOverrides !== totalEpisodes) return false
+
+    const allEpisodes = _.every(
+      watchedSeason.episodes,
+      episodeWatched => episodeWatched === watched,
+    )
+
+    return allEpisodes
+  }
+
+  getIsEpisodeWatched = (episode: TvEpisode) => {
     const { seasonNumber, episodeNumber } = episode
 
     return (
-      this.getSeason(seasonNumber).episodes?.[episodeNumber] ?? this.getSeasonWatched(seasonNumber)
+      this.getWatchedSeason(seasonNumber).episodes?.[episodeNumber] ??
+      this.getIsSeasonWatched(seasonNumber)
     )
   }
 
+  condenseVideoInfo = () => {
+    // this.seasonMap.forEach(({seasonNumber}) => {
+    //   // const watchedSeason =
+    // })
+  }
+
+  get currentBaseEpisode(): TvEpisode | undefined {
+    const seasonNumber = this.lastWatchedSeasonNumber || 1
+    const episodeNumber = this.lastWatchedEpisodeNumber || 1
+
+    return _.find(this.seasonMap[seasonNumber]?.episodes, { episodeNumber })
+  }
+
   get nextEpisode() {
-    let seasonNumber = this.currentSeason
-    let episodeNumber = this.currentEpisode
+    const firstEpisode = this.seasonMap[1]?.episodes?.[0]
 
-    console.log('next ep: ', this.name)
+    if (!this.lastWatchedSeasonNumber || !this.lastWatchedEpisodeNumber) return firstEpisode
 
-    if (!this.seasonMap) return
-    console.log(
-      'first_run name: ',
-      this.name,
-      'season:',
-      seasonNumber,
-      'episode:',
-      episodeNumber,
-      _.size(this.seasonMap),
-    )
+    let episodeToWatch = this.currentBaseEpisode?.next || firstEpisode
 
-    while (seasonNumber <= _.size(this.seasonMap)) {
-      const season = this.seasonMap[seasonNumber]
+    while (episodeToWatch && this.getIsEpisodeWatched(episodeToWatch)) {
+      this.lastWatchedSeasonNumber = episodeToWatch.seasonNumber
+      this.lastWatchedEpisodeNumber = episodeToWatch.episodeNumber
 
-      const episodeCount = _.size(season?.episodes)
-
-      const episode = _.find(season?.episodes, { episodeNumber })
-      console.log('while_run name: ', this.name, 'season:', seasonNumber, 'episode:', episodeNumber)
-
-      if (episode) {
-        return episode
-      } else if (episodeNumber < episodeCount) {
-        episodeNumber += 1
-      } else {
-        episodeNumber = 1
-        seasonNumber += 1
-      }
+      episodeToWatch = episodeToWatch.next
     }
+
+    return episodeToWatch
   }
 
   get videoId() {
     return (this.mediaType === 'movie' ? 'mv' : 'tv') + this.id
   }
 
-  get watched() {
+  get isWatched() {
     return !!this.videoInfo?.watched
   }
 
@@ -440,6 +544,53 @@ class Video {
 
   get tmdbPath() {
     return '/' + this.mediaType + '/' + this.id
+  }
+
+  get lastWatchedEpisodeFromEnd() {
+    let lastEpisode = this.lastEpisodeToAir
+
+    while (lastEpisode && !this.getIsEpisodeWatched(lastEpisode)) {
+      lastEpisode = lastEpisode.previous
+    }
+
+    return lastEpisode
+  }
+
+  get isLatestEpisodeWatched() {
+    if (this.mediaType === 'movie' || !this.lastEpisodeToAir) return this.isWatched
+
+    if (!this.lastWatchedSeasonNumber && !this.lastWatchedEpisodeNumber) return false
+    if (!this.currentBaseEpisode) return false
+
+    const lastEpisodeNumber = this.lastEpisodeToAir.episodeNumber
+    const lastSeasonNumber = this.lastEpisodeToAir.seasonNumber
+
+    const currentEpisodeNumber = this.currentBaseEpisode.episodeNumber
+    const currentSeasonNumber = this.currentBaseEpisode.seasonNumber
+
+    return lastEpisodeNumber === currentEpisodeNumber && lastSeasonNumber === currentSeasonNumber
+  }
+
+  get isCompleted() {
+    if (this.mediaType === 'movie' || !this.lastEpisodeToAir) return this.isWatched
+
+    if (this.nextEpisodeToAir) return false
+
+    return this.isLatestEpisodeWatched
+  }
+}
+
+const episodeToEpisodeWatchedData = (episode: TvEpisode | null | undefined) => {
+  if (!episode) {
+    return {
+      last_watched_season_number: null,
+      last_watched_episode_number: null,
+    }
+  }
+
+  return {
+    last_watched_season_number: episode.seasonNumber,
+    last_watched_episode_number: episode.episodeNumber,
   }
 }
 
