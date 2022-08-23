@@ -24,7 +24,7 @@ export type TvEpisode = {
 
 export type TvSeason = {
   airDate: string
-  episodeCount: number
+  episodeCount?: number
   id: string
   name: string
   overview: string
@@ -300,6 +300,10 @@ class Video {
 
     watchedEpisodes[episodeNumber] = episodeWillBeWatched
 
+    if (!episodeWillBeWatched) {
+      this.getWatchedSeason(seasonNumber).watched = false
+    }
+
     if (this.getIsAllEpisodesInSeasonWatched(seasonNumber, true)) {
       return await this.toggleSeasonWatched(seasonNumber, true)
     } else if (this.getIsAllEpisodesInSeasonWatched(seasonNumber, false)) {
@@ -470,7 +474,7 @@ class Video {
   getIsAllEpisodesInSeasonWatched = (seasonNumber: number, watched: boolean) => {
     const watchedSeason = this.getWatchedSeason(seasonNumber)
 
-    const totalEpisodes = this.seasonMap[seasonNumber]?.episodeCount
+    const totalEpisodes = _.size(this.seasonMap[seasonNumber]?.episodes)
     const totalEpisodeOverrides = _.size(watchedSeason.episodes)
 
     if (watchedSeason.watched !== watched && totalEpisodeOverrides !== totalEpisodes) return false
