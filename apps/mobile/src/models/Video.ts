@@ -141,7 +141,7 @@ class Video {
 
   _assignFromVideoTable = (videoTable: VideoTableType) => {
     this.serverId = videoTable.id
-    this.videoInfo = videoTable.video_info
+    this.videoInfo = videoTable.video_info || {}
     this.tracked = videoTable.tracked
     this.lastWatchedSeasonNumber = videoTable.last_watched_season_number
     this.lastWatchedEpisodeNumber = videoTable.last_watched_episode_number
