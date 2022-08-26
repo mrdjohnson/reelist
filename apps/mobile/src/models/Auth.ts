@@ -29,11 +29,11 @@ export default class Auth {
     }
   }
 
-  setUser = (user: User) => {
-    this.user = user
+  setUser = (user: User | null) => {
+    this.user = user || LoggedOutUser
     this.loading = false
 
-    console.log('logged ' + (user.loggedIn ? 'in' : 'out'))
+    console.log('logged ' + (this.user.loggedIn ? 'in' : 'out'))
   }
 
   login = async () => {

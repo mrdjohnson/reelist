@@ -4,7 +4,7 @@ import { PostgrestError } from '@supabase/supabase-js'
 import humps, { Camelized } from 'humps'
 import { IViewModel } from 'mobx-utils'
 
-type ProfileTableType = {
+export type ProfileTableType = {
   id: string
   updated_at: string
   username: string
@@ -49,14 +49,19 @@ class User implements UserType {
     // this.watchedIds = user.watchedIds
   }
 
-  static fromAuthId = async (profileId: string) => {
+  static fromAuthId = async (
+    profileId: string,
+    { loggedIn = true }: { loggedIn?: boolean } = {},
+  ) => {
     let profile: ProfileTableType | null = null
 
-    const maybePrintErrorAndThrow = (error: PostgrestError | null) => {
+    const maybePrintError = (error: PostgrestError | null) => {
       if (error) {
         console.error('profile call was broken?', error.message)
-        throw error
+        return true
       }
+
+      return false
     }
 
     const { data: userProfile, error: findProfileError } = await supabase
@@ -65,7 +70,9 @@ class User implements UserType {
       .match({ id: profileId })
       .maybeSingle()
 
-    maybePrintErrorAndThrow(findProfileError)
+    if (maybePrintError(findProfileError)) {
+      return null
+    }
 
     if (userProfile) {
       profile = userProfile
@@ -75,12 +82,14 @@ class User implements UserType {
         .insert({ id: profileId })
         .maybeSingle()
 
-      maybePrintErrorAndThrow(createProfileError)
+      if (maybePrintError(createProfileError)) {
+        return null
+      }
 
       profile = data
     }
 
-    return new User({ profile: humps.camelizeKeys(profile), loggedIn: true })
+    return new User({ profile: humps.camelizeKeys(profile), loggedIn })
   }
 
   static save = async (userViewModel: User & IViewModel<User>) => {
