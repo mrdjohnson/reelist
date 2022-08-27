@@ -52,7 +52,10 @@ class VideoListStore {
     this.adminVideoLists = videoLists?.map(this.makeUiVideoList) || []
   }
 
-  setCurrentVideoListFromShareId = flow(function* (this: VideoListStore, videoListShareId: string) {
+  setCurrentVideoListFromShareId = flow(function* (
+    this: VideoListStore,
+    videoListShareId: string | null,
+  ) {
     if (!videoListShareId) return
 
     const localVideoLists = [...this.adminVideoLists, ...this.publicVideoLists]
