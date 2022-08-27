@@ -17,7 +17,6 @@ import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import _ from 'lodash'
-import supabase from '~/supabase'
 import { NavigatorParamList } from '../../../from_ignite_template/app-navigator'
 import { createViewModel } from 'mobx-utils'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
@@ -63,16 +62,6 @@ const ProfileScreen = observer(({ navigation }: NativeStackScreenProps<Navigator
     })
 
     setLoading(false)
-  }
-
-  const logout = async () => {
-    const { error } = await supabase.auth.signOut()
-
-    if (error) {
-      toast.show({
-        description: 'Unable to logout at this time, please try again later',
-      })
-    }
   }
 
   const toggleNotifications = () => {
@@ -153,10 +142,6 @@ const ProfileScreen = observer(({ navigation }: NativeStackScreenProps<Navigator
           Reset
         </Button>
       </Row>
-
-      <Button onPress={logout} marginTop="30px" backgroundColor="error.500" color="white">
-        Logout
-      </Button>
     </View>
   )
 })
