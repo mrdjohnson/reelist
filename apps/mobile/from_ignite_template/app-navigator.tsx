@@ -19,6 +19,7 @@ import AppFooter from '~/shared/components/AppFooter'
 import TrackingScreen from '~/features/tracking/TrackingScreen'
 import { AppEventHandler } from '~/utils/AppEventHandler'
 import ProfileScreen from '~/features/profile/ProfileScreen'
+import SettingsScreen from '~/features/settings/SettingsScreen'
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -40,6 +41,7 @@ export type NavigatorParamList = {
   videoScreen: undefined
   tracking: undefined
   profile: undefined
+  settings: undefined
 }
 
 // Documentation: https://reactnavigation.org/docs/stack-navigator/
@@ -82,6 +84,8 @@ const AppStack = () => {
       <Stack.Screen name="tracking" component={withAppFooterHoc(TrackingScreen)} />
 
       <Stack.Screen name="profile" component={withAppFooterHoc(ProfileScreen)} />
+
+      <Stack.Screen name="settings" component={withAppFooterHoc(SettingsScreen)} />
     </Stack.Navigator>
   )
 }

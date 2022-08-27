@@ -16,6 +16,7 @@ import { callTmdb } from '~/api/api'
 import _ from 'lodash'
 import VideoItem from '~/features/video/VideoItem'
 import SearchBar from '~/shared/components/SearchBar'
+import { NavigatorParamList } from '../../../from_ignite_template/app-navigator'
 
 const VideoListListItem = observer(
   ({
@@ -44,7 +45,7 @@ const VideoListListItem = observer(
   },
 )
 
-const SearchScreen = observer(({ navigation }: NativeStackScreenProps<any>) => {
+const SearchScreen = observer(({ navigation }: NativeStackScreenProps<NavigatorParamList>) => {
   const [searchText, setSearchText] = useState('')
   const [videos, setVideos] = useState<Video[]>([])
   const [loadingVideos, setLoadingVideos] = useState(false)
@@ -80,6 +81,8 @@ const SearchScreen = observer(({ navigation }: NativeStackScreenProps<any>) => {
   const handleSearchBarRightIconPressed = (isFocused?: boolean) => {
     if (isFocused) {
       setSearchText('')
+    } else {
+      navigation.navigate('settings')
     }
   }
 
