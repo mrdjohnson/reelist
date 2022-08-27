@@ -42,18 +42,11 @@ const TrackingScreen = observer(({ navigation }: NativeStackScreenProps<any>) =>
     getVideosAndSeasons()
   }, [])
 
-  const handleSearchBarRightIconPressed = (isFocused?: boolean) => {
-    if (isFocused) {
-      setfilterText('')
-    }
-  }
-
   return (
     <View flex={1} backgroundColor="white">
       <SearchBar
         placeholder="Filter Tracked Shows & Movies"
         leftIcon={<MaterialCommunityIcons name="filter-outline" />}
-        onRightIconPress={handleSearchBarRightIconPressed}
         value={filterText}
         onChangeText={setfilterText}
         returnKeyType="search"

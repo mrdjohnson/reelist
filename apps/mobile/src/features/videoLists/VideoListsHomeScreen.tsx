@@ -125,12 +125,6 @@ const VideoListsHomeScreen = observer(({ navigation }: NativeStackScreenProps<an
     return <Text fontSize="lg">{title}</Text>
   }
 
-  const handleSearchBarRightIconPressed = (isFocused?: boolean) => {
-    if (isFocused) {
-      setfilterText('')
-    }
-  }
-
   return (
     <View flex={1} justifyContent="space-between" backgroundColor="white">
       {creatingList ? (
@@ -154,7 +148,6 @@ const VideoListsHomeScreen = observer(({ navigation }: NativeStackScreenProps<an
           <SearchBar
             placeholder="Filter Lists"
             leftIcon={<MaterialCommunityIcons name="filter-outline" />}
-            onRightIconPress={handleSearchBarRightIconPressed}
             value={filterText}
             onChangeText={setfilterText}
             returnKeyType="search"

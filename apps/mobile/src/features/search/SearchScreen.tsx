@@ -78,21 +78,11 @@ const SearchScreen = observer(({ navigation }: NativeStackScreenProps<NavigatorP
     setVideos(nextVideos)
   }
 
-  const handleSearchBarRightIconPressed = (isFocused?: boolean) => {
-    if (isFocused) {
-      setSearchText('')
-    } else {
-      navigation.navigate('settings')
-    }
-  }
-
   return (
     <View flex={1} backgroundColor="white">
       <SearchBar
         placeholder="Search Shows & Movies"
         leftIcon={<MaterialIcons name="search" />}
-        rightIconUnFocused={<MaterialIcons name="settings" />}
-        onRightIconPress={handleSearchBarRightIconPressed}
         value={searchText}
         onChangeText={setSearchText}
         onSubmitEditing={search}
