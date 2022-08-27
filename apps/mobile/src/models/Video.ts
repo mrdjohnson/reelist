@@ -151,7 +151,7 @@ class Video {
     const { data: videoTable, error } = await supabase
       .from<VideoTableType>('videos')
       .select('*')
-      .match({ video_id: this.videoId })
+      .match({ user_id: this.storeAuth.user.id, video_id: this.videoId })
       .maybeSingle()
 
     if (error) {
