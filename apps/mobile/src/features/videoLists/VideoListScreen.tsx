@@ -219,7 +219,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
 
       {/* hidden */}
 
-      <Actionsheet isOpen={isMembershipOpen} onClose={onMemebershipClose}>
+      <Actionsheet isOpen={isMembershipOpen} onClose={closeMemberShipActionSheet}>
         <Actionsheet.Content display={showMembers ? 'none' : null}>
           {!isUserListAdmin && <Actionsheet.Item onPress={join}>Join</Actionsheet.Item>}
 
