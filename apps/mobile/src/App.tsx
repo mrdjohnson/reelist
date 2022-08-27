@@ -32,7 +32,7 @@ import { observer } from 'mobx-react-lite'
 import { AppNavigator } from '../from_ignite_template/app-navigator'
 import WelcomeScreen from '~/features/welcome/WelcomeScreen'
 import { useNavigationPersistence } from '../from_ignite_template/navigation-utilities'
-import * as storage from '../from_ignite_template/storage'
+import * as storage from '~/utils/storage'
 import InAppBrowser from 'react-native-inappbrowser-reborn'
 // import Store from './src/data/Store'
 
