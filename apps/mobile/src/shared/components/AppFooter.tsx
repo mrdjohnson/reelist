@@ -75,14 +75,6 @@ const AppFooter = observer(() => {
         navigation={navigation}
         text="Search"
       />
-
-      <FooterButton
-        routeName={route.name}
-        name="profile"
-        selectedIcon={<Ionicons name="md-person-circle-outline" />}
-        navigation={navigation}
-        text="Profile"
-      />
     </HStack>
   )
 })

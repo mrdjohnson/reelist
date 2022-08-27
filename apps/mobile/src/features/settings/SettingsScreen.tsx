@@ -1,13 +1,11 @@
-import React, { useState } from 'react'
-import { Button, Flex, ScrollView, Text, useToast, View } from 'native-base'
+import React from 'react'
+import { Button, Column, Icon, ScrollView, Text, useToast, View } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import Video from '~/models/Video'
-import { callTmdb } from '~/api/api'
-import _ from 'lodash'
 import { NavigatorParamList } from '../../../from_ignite_template/app-navigator'
 import supabase from '~/supabase'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 
 const SettingsScreen = observer(({ navigation }: NativeStackScreenProps<NavigatorParamList>) => {
   const { auth } = useStore()
@@ -25,11 +23,20 @@ const SettingsScreen = observer(({ navigation }: NativeStackScreenProps<Navigato
 
   return (
     <ScrollView flex={1} paddingX="10px">
-      <Text>SETTINGS SCREEN </Text>
+      <Column space="8px">
+        <Text>SETTINGS SCREEN </Text>
 
-      <Button onPress={logout} marginY="30px" backgroundColor="error.500" color="white">
-        Logout
-      </Button>
+        <Button
+          leftIcon={<Icon as={<MaterialCommunityIcons name="account-edit-outline" />} />}
+          onPress={() => navigation.navigate('profile')}
+        >
+          Edit Profile
+        </Button>
+
+        <Button onPress={logout} marginY="30px" backgroundColor="error.500" color="white">
+          Logout
+        </Button>
+      </Column>
     </ScrollView>
   )
 })
