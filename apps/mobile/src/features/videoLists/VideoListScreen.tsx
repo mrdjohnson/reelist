@@ -30,28 +30,6 @@ import Clipboard from '@react-native-clipboard/clipboard'
 import User from '~/models/User'
 import { ReelistScreen } from '~/utils/navigation'
 
-// const VideoItem = observer(
-//   ({
-//     video,
-//     currentVideoListId,
-//     onVideoListPress,
-//   }: {
-//     videoList: VideoList
-//     currentVideoListId: string | undefined
-//     onVideoListPress: (videoList: VideoList) => void
-//   }) => {
-//     return (
-//       <Pressable
-//         onPress={() => onVideoListPress(videoList)}
-//         backgroundColor={currentVideoListId === videoList.id ? 'amber.200' : undefined}
-//       >
-//         <Text margin={'10px'} fontSize="md">
-//           {videoList.name}
-//         </Text>
-//       </Pressable>
-//     )
-//   },
-// )
 const CAN_GO_BACK = false
 const CANNOT_GO_BACK = true
 

@@ -17,33 +17,6 @@ import VideoItem from '~/features/video/VideoItem'
 import SearchBar from '~/shared/components/SearchBar'
 import { ReelistScreen } from '~/utils/navigation'
 
-const VideoListListItem = observer(
-  ({
-    videoList,
-    currentVideoListId,
-    onVideoListPress,
-  }: {
-    videoList: VideoList
-    currentVideoListId: string | undefined
-    onVideoListPress: (videoList: VideoList) => void
-  }) => {
-    return (
-      <Pressable
-        onPress={() => onVideoListPress(videoList)}
-        backgroundColor={currentVideoListId === videoList.id ? 'amber.200' : undefined}
-        flexDirection="row"
-        alignItems="center"
-      >
-        <Icon name="playlist-star" color="#4F8EF7" size={30} />
-
-        <Text margin={'10px'} fontSize="md" height="auto">
-          {videoList.name}
-        </Text>
-      </Pressable>
-    )
-  },
-)
-
 const SearchScreen = observer(({ navigation }: ReelistScreen) => {
   const [searchText, setSearchText] = useState('')
   const [videos, setVideos] = useState<Video[]>([])
