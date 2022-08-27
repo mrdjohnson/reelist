@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { View, Avatar, Icon, Center, Column, useToast, Text, Button } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
@@ -31,6 +31,10 @@ const ProfileScreen = observer(({ navigation }: ReelistScreen) => {
   if (appState.profileScreen.editing) {
     return <EditProfilePage />
   }
+
+  useEffect(() => {
+    return () => appState.setProfileScreenUser(null)
+  }, [appState])
 
   return (
     <View flex={1} backgroundColor="white" paddingTop="20px" paddingX="10px">
