@@ -29,6 +29,7 @@ import Video from '~/models/Video'
 import VideoItem, { videoItemSkeleton } from '~/features/video/VideoItem'
 import Clipboard from '@react-native-clipboard/clipboard'
 import { NavigatorParamList } from '../../../from_ignite_template/app-navigator'
+import User from '~/models/User'
 
 // const VideoItem = observer(
 //   ({
@@ -65,6 +66,7 @@ const VideoListScreen = observer(({ navigation }: NativeStackScreenProps<Navigat
   const [videoListIsPublic, setVideoListIsPublic] = useState(false)
   const [editing, setEditing] = useState<boolean>(false)
   const [editingErrorMessage, setEditingErrorMessage] = useState<string | null>(null)
+  const [showMembers, setShowMembers] = useState(false)
 
   const {
     isOpen: isMembershipOpen,
@@ -74,6 +76,7 @@ const VideoListScreen = observer(({ navigation }: NativeStackScreenProps<Navigat
 
   useEffect(() => {
     videoListStore.setCurrentVideoListFromShareId(appState.videoListShareId)
+    currentVideoList?.fetchAdmins()
   }, [appState.videoListShareId, videoListStore])
 
   useEffect(() => {
@@ -110,7 +113,7 @@ const VideoListScreen = observer(({ navigation }: NativeStackScreenProps<Navigat
 
   const leave = () => {
     currentVideoList.leave()
-    onMemebershipClose()
+    closeMemberShipActionSheet()
   }
 
   const startEditing = () => {
@@ -118,14 +121,14 @@ const VideoListScreen = observer(({ navigation }: NativeStackScreenProps<Navigat
     setVideoListIsPublic(currentVideoList.isPublic)
 
     setEditing(true)
-    onMemebershipClose()
+    closeMemberShipActionSheet()
   }
 
   const finishEditing = () => {
     currentVideoList
       .update(videoListName, videoListIsPublic)
       .then(() => {
-        onMemebershipClose()
+        closeMemberShipActionSheet()
         setEditing(false)
         setEditingErrorMessage(null)
       })
@@ -151,7 +154,18 @@ const VideoListScreen = observer(({ navigation }: NativeStackScreenProps<Navigat
       duration: 3000,
     })
 
+    closeMemberShipActionSheet()
+  }
+
+  const closeMemberShipActionSheet = () => {
+    setShowMembers(false)
     onMemebershipClose()
+  }
+
+  const openProfile = (user: User) => {
+    appState.setProfileScreenUser(user)
+
+    navigation.push('profile')
   }
 
   return (
@@ -229,8 +243,10 @@ const VideoListScreen = observer(({ navigation }: NativeStackScreenProps<Navigat
       {/* hidden */}
 
       <Actionsheet isOpen={isMembershipOpen} onClose={onMemebershipClose}>
-        <Actionsheet.Content>
+        <Actionsheet.Content display={showMembers ? 'none' : null}>
           {!isUserListAdmin && <Actionsheet.Item onPress={join}>Join</Actionsheet.Item>}
+
+          <Actionsheet.Item onPress={() => setShowMembers(true)}>Members</Actionsheet.Item>
 
           {currentVideoList.adminIds.length > 1 && isUserListAdmin && (
             <Actionsheet.Item onPress={leave}>Leave</Actionsheet.Item>
@@ -241,6 +257,14 @@ const VideoListScreen = observer(({ navigation }: NativeStackScreenProps<Navigat
           <Actionsheet.Item onPress={shareList}>Copy Shareable link</Actionsheet.Item>
 
           <Actionsheet.Item onPress={onMemebershipClose}>Cancel</Actionsheet.Item>
+        </Actionsheet.Content>
+
+        <Actionsheet.Content display={showMembers ? null : 'none'}>
+          {currentVideoList.admins.map(admin => (
+            <Actionsheet.Item key={admin.id} onPress={() => openProfile(admin)}>
+              {admin.name}
+            </Actionsheet.Item>
+          ))}
         </Actionsheet.Content>
       </Actionsheet>
     </View>

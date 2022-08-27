@@ -13,6 +13,7 @@ import VideoListStore from './VideoListStore'
 import Video from './Video'
 import { callTmdb } from '~/api/api'
 import ShortUniqueId from 'short-unique-id'
+import User from '~/models/User'
 
 class VideoList {
   id!: string
@@ -22,6 +23,7 @@ class VideoList {
   isPublic!: boolean
   uniqueId!: string
 
+  admins: User[] = []
   videos: Video[] = []
   videosRetrieved = false
 
@@ -226,6 +228,20 @@ class VideoList {
     }
 
     return uniqueId
+  }
+
+  fetchAdmins = async () => {
+    if (!this.adminIds) return
+
+    const adminPromises = this.adminIds?.map(adminId =>
+      User.fromAuthId(adminId, { loggedIn: false }),
+    )
+
+    const admins: (User | undefined)[] = await Promise.allSettled(adminPromises).then(values =>
+      _.map(values, 'value'),
+    )
+
+    this.admins = _.compact(admins)
   }
 }
 
