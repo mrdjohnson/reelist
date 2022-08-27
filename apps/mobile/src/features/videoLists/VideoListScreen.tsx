@@ -22,14 +22,13 @@ import {
 } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import VideoList from '~/models/VideoList'
 import { BackHandler, SectionListData } from 'react-native'
 import Video from '~/models/Video'
 import VideoItem, { videoItemSkeleton } from '~/features/video/VideoItem'
 import Clipboard from '@react-native-clipboard/clipboard'
-import { NavigatorParamList } from '../../../from_ignite_template/app-navigator'
 import User from '~/models/User'
+import { ReelistScreen } from '~/utils/navigation'
 
 // const VideoItem = observer(
 //   ({
@@ -56,7 +55,7 @@ import User from '~/models/User'
 const CAN_GO_BACK = false
 const CANNOT_GO_BACK = true
 
-const VideoListScreen = observer(({ navigation }: NativeStackScreenProps<NavigatorParamList>) => {
+const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
   const { videoListStore, auth, appState } = useStore()
   const toast = useToast()
 

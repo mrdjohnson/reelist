@@ -4,11 +4,11 @@ import { useEffect } from 'react'
 import { Linking } from 'react-native'
 import { useStore } from '~/hooks/useStore'
 import supabase from '~/supabase'
-import { NavigatorParamList } from '../../from_ignite_template/app-navigator'
+import { useReelistNavigation } from './navigation'
 
 export const AppEventHandler = () => {
   const { appState, auth } = useStore()
-  const navigation = useNavigation<NavigationProp<NavigatorParamList>>()
+  const navigation = useReelistNavigation()
 
   const toast = useToast()
 

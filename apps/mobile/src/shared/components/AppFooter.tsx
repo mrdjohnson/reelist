@@ -1,11 +1,11 @@
-import { NavigationProp, RouteProp, useNavigation, useRoute } from '@react-navigation/native'
+import { NavigationProp, RouteProp, useRoute } from '@react-navigation/native'
 import { observer } from 'mobx-react-lite'
 import { Box, Button, Center, HStack, Icon, Pressable, Text, View } from 'native-base'
 import React, { ReactElement } from 'react'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import { NavigatorParamList } from '../../../from_ignite_template/app-navigator'
+import { NavigatorParamList, useReelistNavigation } from '~/utils/navigation'
 
 type FooterButtonProps = {
   routeName: keyof NavigatorParamList
@@ -44,7 +44,7 @@ const FooterButton = observer(
 )
 
 const AppFooter = observer(() => {
-  const navigation = useNavigation<NavigationProp<NavigatorParamList>>()
+  const navigation = useReelistNavigation()
   const route = useRoute<RouteProp<NavigatorParamList>>()
 
   if (route.name === 'welcome') return null

@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Button, Input, Pressable, ScrollView, SectionList, Text, View, Icon } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import VideoList from '~/models/VideoList'
 import {
   NativeSyntheticEvent,
@@ -16,7 +15,7 @@ import { callTmdb } from '~/api/api'
 import _ from 'lodash'
 import VideoItem from '~/features/video/VideoItem'
 import SearchBar from '~/shared/components/SearchBar'
-import { NavigatorParamList } from '../../../from_ignite_template/app-navigator'
+import { ReelistScreen } from '~/utils/navigation'
 
 const VideoListListItem = observer(
   ({
@@ -45,7 +44,7 @@ const VideoListListItem = observer(
   },
 )
 
-const SearchScreen = observer(({ navigation }: NativeStackScreenProps<NavigatorParamList>) => {
+const SearchScreen = observer(({ navigation }: ReelistScreen) => {
   const [searchText, setSearchText] = useState('')
   const [videos, setVideos] = useState<Video[]>([])
   const [loadingVideos, setLoadingVideos] = useState(false)

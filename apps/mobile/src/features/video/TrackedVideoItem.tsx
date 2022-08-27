@@ -4,10 +4,9 @@ import _ from 'lodash'
 import Video from '~/models/Video'
 import { useStore } from '~/hooks/useStore'
 import { Button, Column, Icon, Image, Pressable, Row, Text, View } from 'native-base'
-import { NavigationProp, useNavigation } from '@react-navigation/native'
-import { NavigatorParamList } from '../../../from_ignite_template/app-navigator'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import moment from 'moment'
+import { useReelistNavigation } from '~/utils/navigation'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
@@ -17,7 +16,7 @@ type VideoItemProps = {
 
 const TrackedVideoItem = observer(({ video }: VideoItemProps) => {
   const { videoListStore, appState, videoStore } = useStore()
-  const navigation = useNavigation<NavigationProp<NavigatorParamList>>()
+  const navigation = useReelistNavigation()
 
   if (!video) return null
 

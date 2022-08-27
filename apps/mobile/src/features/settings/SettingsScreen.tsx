@@ -2,12 +2,11 @@ import React from 'react'
 import { Button, Column, Icon, ScrollView, Text, useToast, View } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { NavigatorParamList } from '../../../from_ignite_template/app-navigator'
 import supabase from '~/supabase'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import { ReelistScreen } from '~/utils/navigation'
 
-const SettingsScreen = observer(({ navigation }: NativeStackScreenProps<NavigatorParamList>) => {
+const SettingsScreen = observer(({ navigation }: ReelistScreen) => {
   const { auth } = useStore()
   const toast = useToast()
 

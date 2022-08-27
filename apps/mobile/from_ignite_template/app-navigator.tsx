@@ -20,6 +20,7 @@ import TrackingScreen from '~/features/tracking/TrackingScreen'
 import { AppEventHandler } from '~/utils/AppEventHandler'
 import ProfileScreen from '~/features/profile/ProfileScreen'
 import SettingsScreen from '~/features/settings/SettingsScreen'
+import { NavigatorParamList } from '~/utils/navigation'
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -33,16 +34,6 @@ import SettingsScreen from '~/features/settings/SettingsScreen'
  *   https://reactnavigation.org/docs/params/
  *   https://reactnavigation.org/docs/typescript#type-checking-the-navigator
  */
-export type NavigatorParamList = {
-  welcome: undefined
-  videoListsHome: undefined
-  videoListScreen: undefined
-  search: undefined
-  videoScreen: undefined
-  tracking: undefined
-  profile: undefined
-  settings: undefined
-}
 
 // Documentation: https://reactnavigation.org/docs/stack-navigator/
 const Stack = createNativeStackNavigator<NavigatorParamList>()

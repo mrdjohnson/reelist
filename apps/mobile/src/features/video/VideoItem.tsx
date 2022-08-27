@@ -3,9 +3,8 @@ import { observer } from 'mobx-react-lite'
 import _ from 'lodash'
 import Video from '~/models/Video'
 import { useStore } from '~/hooks/useStore'
+import { useReelistNavigation } from '~/utils/navigation'
 import { Column, Divider, HStack, Image, Pressable, Row, Skeleton, Text, View } from 'native-base'
-import { NavigationProp, useNavigation } from '@react-navigation/native'
-import { NavigatorParamList } from '../../../from_ignite_template/app-navigator'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
@@ -15,7 +14,7 @@ type VideoItemProps = {
 
 const VideoItem = observer(({ video }: VideoItemProps) => {
   const { videoListStore, appState, videoStore } = useStore()
-  const navigation = useNavigation<NavigationProp<NavigatorParamList>>()
+  const navigation = useReelistNavigation()
 
   if (!video) return null
 

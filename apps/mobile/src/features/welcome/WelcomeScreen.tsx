@@ -2,11 +2,10 @@ import React, { useEffect } from 'react'
 import { Button, Center, Text, View } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { InAppBrowser } from 'react-native-inappbrowser-reborn'
-import { NavigatorParamList } from '../../../from_ignite_template/app-navigator'
+import { ReelistScreen as ReelistScreenProps } from '~/utils/navigation'
 
-const WelcomeScreen = observer(({ navigation }: NativeStackScreenProps<NavigatorParamList>) => {
+const WelcomeScreen = observer(({ navigation }: ReelistScreenProps) => {
   const { auth } = useStore()
   const { loggedIn } = auth.user
 

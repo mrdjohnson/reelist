@@ -3,8 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { Input, Pressable, Icon, IInputProps, IIconProps } from 'native-base'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import _ from 'lodash'
-import { NavigationProp, useNavigation } from '@react-navigation/native'
-import { NavigatorParamList } from '../../../from_ignite_template/app-navigator'
+import { useReelistNavigation } from '~/utils/navigation'
 
 type SearchBarProps = IInputProps & {
   leftIcon: IIconProps['as']
@@ -15,7 +14,7 @@ const clearIcon = <MaterialIcons name="clear" />
 const settingsIcon = <MaterialIcons name="settings" />
 
 const SearchBar = observer(({ leftIcon, onChangeText, value, ...rest }: SearchBarProps) => {
-  const navigation = useNavigation<NavigationProp<NavigatorParamList>>()
+  const navigation = useReelistNavigation()
   const [isFocused, setIsFocused] = useState(false)
 
   let rightIcon

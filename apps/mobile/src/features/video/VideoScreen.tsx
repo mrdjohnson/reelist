@@ -20,7 +20,6 @@ import {
 } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import VideoList from '~/models/VideoList'
 import {
   BackHandler,
@@ -36,6 +35,7 @@ import _ from 'lodash'
 import VideoItem from '~/features/video/VideoItem'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import moment from 'moment'
+import { ReelistScreen } from '~/utils/navigation'
 
 const VideoListListItem = observer(
   ({
@@ -74,7 +74,7 @@ const ascendingSort = (episodeA: TvEpisode, episodeB: TvEpisode) =>
 const descendingSort = (episodeB: TvEpisode, episodeA: TvEpisode) =>
   episodeA.episodeNumber - episodeB.episodeNumber
 
-const VideoScreen = observer(({ navigation }: NativeStackScreenProps<any>) => {
+const VideoScreen = observer(({ navigation }: ReelistScreen) => {
   const { auth, videoStore, videoListStore } = useStore()
   const videoId = videoStore.currentVideoId
   const [video, setVideo] = useState<Video | null>(null)

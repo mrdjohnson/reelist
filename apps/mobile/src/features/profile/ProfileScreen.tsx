@@ -2,12 +2,11 @@ import React, { useMemo, useState } from 'react'
 import { View, Avatar, Icon, Center, Column, useToast, Text, Button } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import _ from 'lodash'
-import { NavigatorParamList } from '../../../from_ignite_template/app-navigator'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import EditProfilePage from './EditProfilePage'
+import { ReelistScreen } from '~/utils/navigation'
 
 const missingIconOptions = [
   'user-astronaut',
@@ -21,7 +20,7 @@ const missingIconOptions = [
   'user-secret',
 ]
 
-const ProfileScreen = observer(({ navigation }: NativeStackScreenProps<NavigatorParamList>) => {
+const ProfileScreen = observer(({ navigation }: ReelistScreen) => {
   const { auth, appState } = useStore()
   const user = appState.profileScreen.user || auth.user
 

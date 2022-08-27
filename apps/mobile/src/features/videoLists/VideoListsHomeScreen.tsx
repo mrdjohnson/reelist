@@ -13,13 +13,13 @@ import {
 } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import VideoList from '~/models/VideoList'
 import { BackHandler, SectionListData } from 'react-native'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import _ from 'lodash'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import SearchBar from '~/shared/components/SearchBar'
+import { ReelistScreen } from '~/utils/navigation'
 
 const VideoListListItem = observer(
   ({
@@ -51,7 +51,7 @@ const VideoListListItem = observer(
 const CAN_GO_BACK = false
 const CANNOT_GO_BACK = true
 
-const VideoListsHomeScreen = observer(({ navigation }: NativeStackScreenProps<any>) => {
+const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
   const { videoListStore } = useStore()
   const publicVideoLists = videoListStore.publicVideoLists
   const adminVideoLists = videoListStore.adminVideoLists
