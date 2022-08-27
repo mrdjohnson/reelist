@@ -19,6 +19,7 @@ import { BackHandler, SectionListData } from 'react-native'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import _ from 'lodash'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import SearchBar from '~/shared/components/SearchBar'
 
 const VideoListListItem = observer(
   ({
@@ -124,6 +125,12 @@ const VideoListsHomeScreen = observer(({ navigation }: NativeStackScreenProps<an
     return <Text fontSize="lg">{title}</Text>
   }
 
+  const handleSearchBarRightIconPressed = (isFocused?: boolean) => {
+    if (isFocused) {
+      setfilterText('')
+    }
+  }
+
   return (
     <View flex={1} justifyContent="space-between" backgroundColor="white">
       {creatingList ? (
@@ -144,31 +151,12 @@ const VideoListsHomeScreen = observer(({ navigation }: NativeStackScreenProps<an
         </>
       ) : (
         <>
-          <Input
+          <SearchBar
             placeholder="Filter Lists"
-            borderRadius="8"
-            color={'gray.600'}
-            margin="10px"
-            py="2"
-            px="1"
-            fontSize="14"
-            InputLeftElement={
-              <Icon
-                m="2"
-                ml="3"
-                size={6}
-                color="gray.400"
-                as={<MaterialCommunityIcons name="filter-outline" />}
-              />
-            }
-            InputRightElement={
-              <Pressable onPress={() => setfilterText('')}>
-                <Icon m="2" ml="3" size={5} color="gray.400" as={<MaterialIcons name="clear" />} />
-              </Pressable>
-            }
+            leftIcon={<MaterialCommunityIcons name="filter-outline" />}
+            onRightIconPress={handleSearchBarRightIconPressed}
             value={filterText}
             onChangeText={setfilterText}
-            // onSubmitEditing={filter}
             returnKeyType="search"
             autoCapitalize="none"
           />

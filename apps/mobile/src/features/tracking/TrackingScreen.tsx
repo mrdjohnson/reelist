@@ -8,6 +8,7 @@ import Video from '~/models/Video'
 import _ from 'lodash'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import TrackedVideoItem from '~/features/video/TrackedVideoItem'
+import SearchBar from '~/shared/components/SearchBar'
 
 const TrackingScreen = observer(({ navigation }: NativeStackScreenProps<any>) => {
   const [filterText, setfilterText] = useState('')
@@ -41,33 +42,20 @@ const TrackingScreen = observer(({ navigation }: NativeStackScreenProps<any>) =>
     getVideosAndSeasons()
   }, [])
 
+  const handleSearchBarRightIconPressed = (isFocused?: boolean) => {
+    if (isFocused) {
+      setfilterText('')
+    }
+  }
+
   return (
     <View flex={1} backgroundColor="white">
-      <Input
+      <SearchBar
         placeholder="Filter Tracked Shows & Movies"
-        borderRadius="8"
-        color={'gray.600'}
-        margin="10px"
-        py="2"
-        px="1"
-        fontSize="14"
-        InputLeftElement={
-          <Icon
-            m="2"
-            ml="3"
-            size={6}
-            color="gray.400"
-            as={<MaterialCommunityIcons name="filter-outline" />}
-          />
-        }
-        InputRightElement={
-          <Pressable onPress={() => setfilterText('')}>
-            <Icon m="2" ml="3" size={5} color="gray.400" as={<MaterialIcons name="clear" />} />
-          </Pressable>
-        }
+        leftIcon={<MaterialCommunityIcons name="filter-outline" />}
+        onRightIconPress={handleSearchBarRightIconPressed}
         value={filterText}
         onChangeText={setfilterText}
-        // onSubmitEditing={filter}
         returnKeyType="search"
       />
 

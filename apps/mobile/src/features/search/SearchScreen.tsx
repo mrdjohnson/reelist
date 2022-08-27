@@ -15,6 +15,7 @@ import Video from '~/models/Video'
 import { callTmdb } from '~/api/api'
 import _ from 'lodash'
 import VideoItem from '~/features/video/VideoItem'
+import SearchBar from '~/shared/components/SearchBar'
 
 const VideoListListItem = observer(
   ({
@@ -76,24 +77,19 @@ const SearchScreen = observer(({ navigation }: NativeStackScreenProps<any>) => {
     setVideos(nextVideos)
   }
 
+  const handleSearchBarRightIconPressed = (isFocused?: boolean) => {
+    if (isFocused) {
+      setSearchText('')
+    }
+  }
+
   return (
     <View flex={1} backgroundColor="white">
-      <Input
+      <SearchBar
         placeholder="Search Shows & Movies"
-        borderRadius="8"
-        color={'gray.600'}
-        margin="10px"
-        py="2"
-        px="1"
-        fontSize="14"
-        InputLeftElement={
-          <Icon m="2" ml="3" size={6} color="gray.400" as={<MaterialIcons name="search" />} />
-        }
-        InputRightElement={
-          <Pressable onPress={() => setSearchText('')}>
-            <Icon m="2" ml="3" size={5} color="gray.400" as={<MaterialIcons name="clear" />} />
-          </Pressable>
-        }
+        leftIcon={<MaterialIcons name="search" />}
+        rightIconUnFocused={<MaterialIcons name="settings" />}
+        onRightIconPress={handleSearchBarRightIconPressed}
         value={searchText}
         onChangeText={setSearchText}
         onSubmitEditing={search}
