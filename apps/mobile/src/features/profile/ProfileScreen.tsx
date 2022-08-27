@@ -28,13 +28,13 @@ const ProfileScreen = observer(({ navigation }: ReelistScreen) => {
     return _.sample(missingIconOptions) || 'user-secret'
   }, [])
 
-  if (appState.profileScreen.editing) {
-    return <EditProfilePage />
-  }
-
   useEffect(() => {
     return () => appState.setProfileScreenUser(null)
   }, [appState])
+
+  if (appState.profileScreen.editing) {
+    return <EditProfilePage />
+  }
 
   return (
     <View flex={1} backgroundColor="white" paddingTop="20px" paddingX="10px">
