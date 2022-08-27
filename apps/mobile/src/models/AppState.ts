@@ -1,10 +1,16 @@
 import { makeAutoObservable, observable } from 'mobx'
 import _ from 'lodash'
+import User from '~/models/User'
 
 type UpdateType = {
   message: string
   onClose: () => void
   id: number
+}
+
+type ProfileScreenType = {
+  user: User | null
+  editing: boolean
 }
 export default class AppState {
   // todo: set to false by default
@@ -12,6 +18,7 @@ export default class AppState {
   updates: UpdateType[] = []
   _updateId = 0
   videoListShareId: string | null = null
+  profileScreen: ProfileScreenType = { user: null, editing: false }
 
   constructor() {
     makeAutoObservable(this)
@@ -53,5 +60,13 @@ export default class AppState {
 
   setVideoListShareId = (videoListShareId: string) => {
     this.videoListShareId = videoListShareId
+  }
+
+  setProfileScreenUser = (user: User | null) => {
+    this.profileScreen.user = user
+  }
+
+  setProfileScreenEditing = (editing: boolean) => {
+    this.profileScreen.editing = editing
   }
 }

@@ -1,26 +1,13 @@
 import React, { useMemo, useState } from 'react'
-import {
-  Button,
-  Input,
-  Image,
-  FormControl,
-  View,
-  Avatar,
-  Icon,
-  Center,
-  Row,
-  useToast,
-  Switch,
-  Text,
-} from 'native-base'
+import { View, Avatar, Icon, Center, Column, useToast, Text, Button } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import _ from 'lodash'
 import { NavigatorParamList } from '../../../from_ignite_template/app-navigator'
-import { createViewModel } from 'mobx-utils'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
-import User from '~/models/User'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import EditProfilePage from './EditProfilePage'
 
 const missingIconOptions = [
   'user-astronaut',
@@ -35,113 +22,55 @@ const missingIconOptions = [
 ]
 
 const ProfileScreen = observer(({ navigation }: NativeStackScreenProps<NavigatorParamList>) => {
-  const { auth } = useStore()
-  const user = auth.user
-  const [loading, setLoading] = useState(false)
-
-  const toast = useToast()
+  const { auth, appState } = useStore()
+  const user = appState.profileScreen.user || auth.user
 
   const missingUserIcon = useMemo(() => {
     return _.sample(missingIconOptions) || 'user-secret'
   }, [])
 
-  const userViewModel = useMemo(() => {
-    return createViewModel(user)
-  }, [user])
-
-  const save = async () => {
-    setLoading(true)
-
-    const errorMessage = await User.save(userViewModel)
-
-    const description = errorMessage || 'Saved'
-
-    toast.show({
-      description,
-      duration: 3000,
-    })
-
-    setLoading(false)
-  }
-
-  const toggleNotifications = () => {
-    // todo
+  if (appState.profileScreen.editing) {
+    return <EditProfilePage />
   }
 
   return (
     <View flex={1} backgroundColor="white" paddingTop="20px" paddingX="10px">
-      <Avatar
-        height="100px"
-        width="100px"
-        alignSelf="center"
-        alignItems="center"
-        source={{ uri: userViewModel.avatarUrl }}
-        backgroundColor="gray.400"
-        display="flex"
-      >
-        <Icon
-          as={
-            <FontAwesome5
-              name={missingUserIcon}
-              size={60}
-              style={{ color: 'white', padding: 0, margin: 0 }}
-            />
-          }
-        />
-      </Avatar>
-
-      <FormControl marginBottom="8px" isDisabled={loading}>
-        <FormControl.Label>Avatar Url</FormControl.Label>
-
-        <Input
-          value={userViewModel.avatarUrl}
-          onChangeText={url => (userViewModel.avatarUrl = url)}
-          marginX="8px"
-        />
-      </FormControl>
-
-      <FormControl marginBottom="15px" isDisabled={loading}>
-        <FormControl.Label>Name</FormControl.Label>
-
-        <Input
-          value={userViewModel.name}
-          onChangeText={name => (userViewModel.name = name)}
-          marginX="8px"
-        />
-      </FormControl>
-
-      <Row alignItems="center" space="8px" marginBottom="15px">
-        <FormControl.Label>Allow Notifications</FormControl.Label>
-
-        <Switch
-          isChecked={!!userViewModel.notificationId}
-          onValueChange={toggleNotifications}
-          marginX="8px"
-        />
-      </Row>
-
-      <Row marginTop="15px">
-        <Button
-          onPress={save}
-          color="white"
-          flex={1}
-          disabled={loading || !userViewModel.isDirty}
-          isLoading={loading}
-          isLoadingText="Saving"
+      <Column space={4} backgroundColor="blue">
+        <Avatar
+          height="100px"
+          width="100px"
+          alignSelf="center"
+          alignItems="center"
+          source={{ uri: user.avatarUrl }}
+          backgroundColor="gray.400"
+          display="flex"
         >
-          Save
-        </Button>
+          <Icon
+            as={
+              <FontAwesome5
+                name={missingUserIcon}
+                size={60}
+                style={{ color: 'white', padding: 0, margin: 0 }}
+              />
+            }
+          />
+        </Avatar>
 
-        <Button
-          onPress={userViewModel.reset}
-          color="white"
-          marginLeft="10px"
-          variant="outline"
-          disabled={loading || !userViewModel.isDirty}
-        >
-          Reset
-        </Button>
-      </Row>
+        <Center>
+          <Text fontSize="xl">{user.name}</Text>
+        </Center>
+
+        <Center>
+          {user === auth.user && (
+            <Button
+              leftIcon={<Icon as={<MaterialCommunityIcons name="account-edit-outline" />} />}
+              onPress={() => appState.setProfileScreenEditing(true)}
+            >
+              Edit Profile
+            </Button>
+          )}
+        </Center>
+      </Column>
     </View>
   )
 })
