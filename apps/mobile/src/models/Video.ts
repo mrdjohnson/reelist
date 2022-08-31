@@ -50,6 +50,7 @@ export type VideoTableType = {
   last_watched_season_number: number | null
   last_watched_episode_number: number | null
   video_info: VideoInfoType
+  user_id: string
 }
 
 class Video {
@@ -116,6 +117,8 @@ class Video {
       storeAuth: false,
     })
 
+    this.storeAuth = auth
+
     if (videoId) {
       this.mediaType = videoId.startsWith('mv') ? 'movie' : 'tv'
       this.id = videoId.substring(2)
@@ -128,8 +131,6 @@ class Video {
     } else {
       this._lazyLoadVideoFromVideoTable()
     }
-
-    this.storeAuth = auth
   }
 
   _assignValuesFromJson = (json: Video) => {
