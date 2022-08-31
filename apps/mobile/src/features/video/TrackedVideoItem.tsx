@@ -50,15 +50,23 @@ const TrackedVideoItem = observer(({ video, isInteractable = true }: VideoItemPr
       </View>
     )
   } else if (!isInteractable) {
-    bottomRow = (
-      <View flexDirection="row-reverse">
-        <View>
-          <Text>Season: {video.nextEpisode?.seasonNumber}</Text>
-
-          <Text>Episode: {video.nextEpisode?.episodeNumber}</Text>
+    if (video.lastWatchedSeasonNumber === null && video.lastWatchedEpisodeNumber === null) {
+      bottomRow = (
+        <View flexDirection="row-reverse">
+          <Text>Has not watched yet</Text>
         </View>
-      </View>
-    )
+      )
+    } else {
+      bottomRow = (
+        <View flexDirection="row-reverse">
+          <View>
+            <Text>Last watched Season: {video.lastWatchedSeasonNumber}</Text>
+
+            <Text>Last watched Episode: {video.lastWatchedEpisodeNumber}</Text>
+          </View>
+        </View>
+      )
+    }
   } else if (video.mediaType === 'movie') {
     bottomRow = (
       <View flexDirection="row-reverse">
