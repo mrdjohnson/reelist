@@ -14,7 +14,6 @@ const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
   const [filterText, setfilterText] = useState('')
   const [videos, setVideos] = useState<Video[]>([])
   const [loadingVideos, setLoadingVideos] = useState(false)
-  const [loadingSeasons, setLoadingSeasons] = useState(false)
   const { auth, videoStore } = useStore()
 
   const filteredVideos = useMemo(() => {
@@ -26,17 +25,8 @@ const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
       setLoadingVideos(true)
       const localVideos = await videoStore.getTrackedVideos()
 
-      setLoadingVideos(false)
-      setLoadingSeasons(true)
-
-      try {
-        await Promise.allSettled(localVideos.map(video => video.fetchSeasons()))
-      } catch (e) {
-        console.error(e)
-      }
-
-      setLoadingSeasons(false)
       setVideos(localVideos)
+      setLoadingVideos(false)
     }
 
     getVideosAndSeasons()
@@ -53,9 +43,7 @@ const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
       />
 
       <ScrollView flex={1} color="white">
-        {loadingVideos && <Text>Loading each video!</Text>}
-
-        {loadingSeasons && <Text>Loading each season!</Text>}
+        {loadingVideos && <Text>Loading videos!</Text>}
 
         <Text>Tracking screen!!!</Text>
 

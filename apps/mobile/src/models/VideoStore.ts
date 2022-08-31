@@ -49,8 +49,12 @@ class VideoStore {
     return path
   }
 
-  getVideo = async (videoId: string, videoTableData: VideoTableType | null = null) => {
-    if (this.videoCache[videoId]) return this.videoCache[videoId]
+  getVideo = async (
+    videoId: string,
+    videoTableData: VideoTableType | null = null,
+    useCache = true,
+  ) => {
+    // if (useCache && this.videoCache[videoId]) return this.videoCache[videoId]
 
     const path = this.getVideoPath(videoId)
 
@@ -70,9 +74,9 @@ class VideoStore {
 
     const uiVideo = video && new Video(video, this.storeAuth, videoTableData, videoId)
 
-    if (uiVideo) {
-      this.videoCache[videoId] = uiVideo
-    }
+    // if (uiVideo) {
+    //   this.videoCache[videoId] = uiVideo
+    // }
 
     return uiVideo
   }
@@ -89,22 +93,26 @@ class VideoStore {
     return this.getVideo(videoTableData.video_id, videoTableData)
   }
 
-  getTrackedVideos = async () => {
+  getTrackedVideos = async (userId: string | null = null): Promise<Video[]> => {
+    console.log('getTrackedVideos for user: ', this.storeAuth.user.id)
+    let videos: Video[] = []
     const { data: videoJsons, error } = await supabase
       .from<VideoTableType>('videos')
       .select('*')
-      .match({ user_id: this.storeAuth.user.id, tracked: true })
+      .match({ user_id: userId || this.storeAuth.user.id, tracked: true })
 
     if (error) {
       console.error('failed to lazy load tracked videos', error.message)
       throw new Error('failed to lazy load tracked videos: ' + error.message)
     } else if (videoJsons) {
-      const videos = await Promise.all(videoJsons.map(this._getTrackedVideo))
+      const videoPromises = await Promise.allSettled(videoJsons.map(this._getTrackedVideo))
 
-      return _.compact(videos)
+      videos = _.chain(videoPromises).map('value').compact().value()
+
+      await Promise.allSettled(videos.map(video => video.fetchSeasons()))
     }
 
-    return []
+    return videos
   }
 }
 

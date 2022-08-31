@@ -12,9 +12,10 @@ const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
 type VideoItemProps = {
   video: Video | null
+  isInteractable?: boolean
 }
 
-const TrackedVideoItem = observer(({ video }: VideoItemProps) => {
+const TrackedVideoItem = observer(({ video, isInteractable = true }: VideoItemProps) => {
   const { videoListStore, appState, videoStore } = useStore()
   const navigation = useReelistNavigation()
 
@@ -26,15 +27,7 @@ const TrackedVideoItem = observer(({ video }: VideoItemProps) => {
 
   let bottomRow
 
-  if (video.mediaType === 'movie') {
-    bottomRow = (
-      <View flexDirection="row-reverse">
-        <Button onPress={() => video.toggleWatched()} size="lg">
-          <Icon as={<MaterialCommunityIcons name="eye-plus" />} color="white" />
-        </Button>
-      </View>
-    )
-  } else if (video.isCompleted) {
+  if (video.isCompleted) {
     bottomRow = (
       <View flexDirection="row-reverse">
         <Text alignSelf="flex-end">Completed</Text>
@@ -54,6 +47,24 @@ const TrackedVideoItem = observer(({ video }: VideoItemProps) => {
             </Text>
           )}
         </Column>
+      </View>
+    )
+  } else if (!isInteractable) {
+    bottomRow = (
+      <View flexDirection="row-reverse">
+        <View>
+          <Text>Season: {video.nextEpisode?.seasonNumber}</Text>
+
+          <Text>Episode: {video.nextEpisode?.episodeNumber}</Text>
+        </View>
+      </View>
+    )
+  } else if (video.mediaType === 'movie') {
+    bottomRow = (
+      <View flexDirection="row-reverse">
+        <Button onPress={() => video.toggleWatched()} size="lg">
+          <Icon as={<MaterialCommunityIcons name="eye-plus" />} color="white" />
+        </Button>
       </View>
     )
   } else {
@@ -77,12 +88,17 @@ const TrackedVideoItem = observer(({ video }: VideoItemProps) => {
     navigation.navigate('videoScreen')
   }
 
+  // only fade for YOUR videos that cant be interacted with.
+  let faded = video.isWatched || video.isCompleted || video.isLatestEpisodeWatched
+
+  if (!isInteractable) faded = false
+
   return (
     <Pressable
       flexDirection="row"
       margin="10px"
       onPress={goToMediaPage}
-      opacity={video.isWatched || video.isCompleted || video.isLatestEpisodeWatched ? '50' : '100'}
+      opacity={faded ? '50' : '100'}
     >
       <View flexShrink={1}>
         {imageSource && (
