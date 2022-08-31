@@ -393,7 +393,7 @@ class Video {
   fetchSeason = async (seasonNumber: number) => {
     if (this.seasonMap[seasonNumber]) return this.seasonMap[seasonNumber]
 
-    console.log('fetching season: ', seasonNumber, 'for', this.name)
+    // console.log('fetching season: ', seasonNumber, 'for', this.name)
 
     const path = this.tmdbPath + '/season/' + seasonNumber
 

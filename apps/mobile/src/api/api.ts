@@ -32,7 +32,7 @@ const localCallTmdb = async (
   query: string | null = null,
   extra: string | null = null,
 ) => {
-  console.log('faux tmdb endpoint')
+  // console.log('faux tmdb endpoint')
 
   try {
     let tmdbUrl = base_url + path + '?api_key=' + apiKey
