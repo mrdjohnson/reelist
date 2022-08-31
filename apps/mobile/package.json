@@ -34,6 +34,7 @@
     "react-native-vector-icons": "*",
     "@react-native-clipboard/clipboard": "*",
     "mobx": "*",
-    "short-unique-id": "*"
+    "short-unique-id": "*",
+    "moment": "*"
   }
 }
