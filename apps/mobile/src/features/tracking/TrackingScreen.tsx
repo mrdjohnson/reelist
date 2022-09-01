@@ -9,28 +9,21 @@ import TrackedVideoItem from '~/features/video/TrackedVideoItem'
 import SearchBar from '~/shared/components/SearchBar'
 import { ReelistScreen } from '~/utils/navigation'
 import { RefreshControl } from 'react-native'
+import useRefresh from '~/hooks/useRefresh'
 
 const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
   const [filterText, setfilterText] = useState('')
   const [videos, setVideos] = useState<Video[]>([])
-  const [loadingVideos, setLoadingVideos] = useState(true)
   const { auth, videoStore } = useStore()
 
   const filteredVideos = useMemo(() => {
     return _.filter(videos, video => video.videoName.includes(filterText))
   }, [videos, filterText])
 
-  const refreshVideos = async () => {
+  const [loadingVideos, refresh] = useRefresh(async () => {
     setVideos([])
     await videoStore.getTrackedVideos().then(setVideos)
-    setLoadingVideos(false)
-  }
-
-  useEffect(() => {
-    if (loadingVideos) {
-      refreshVideos()
-    }
-  }, [loadingVideos])
+  })
 
   return (
     <View flex={1} backgroundColor="white">
@@ -45,9 +38,7 @@ const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
       <ScrollView
         flex={1}
         color="white"
-        refreshControl={
-          <RefreshControl refreshing={loadingVideos} onRefresh={() => setLoadingVideos(true)} />
-        }
+        refreshControl={<RefreshControl refreshing={loadingVideos} onRefresh={refresh} />}
       >
         {filteredVideos.map(video => (
           <TrackedVideoItem video={video} key={video.id} />

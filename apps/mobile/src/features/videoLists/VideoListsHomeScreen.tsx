@@ -20,6 +20,7 @@ import _ from 'lodash'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import SearchBar from '~/shared/components/SearchBar'
 import { ReelistScreen } from '~/utils/navigation'
+import useRefresh from '~/hooks/useRefresh'
 
 const VideoListListItem = observer(
   ({
@@ -61,7 +62,6 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
   const [nextListName, setNextListName] = useState('')
   const [nextListIsPublic, setListIsPublic] = useState(true)
   const [filterText, setfilterText] = useState('')
-  const [refreshing, setRefreshing] = useState(true)
 
   const [filteredAdminLists, filteredPublicLists] = useMemo(() => {
     const lowerFilterCase = filterText.toLowerCase()
@@ -75,24 +75,12 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
     return [filteredAdmin, filteredPublic]
   }, [adminVideoLists, publicVideoLists, filterText])
 
-  const refreshVideoLists = async () => {
+  const [refreshing, refresh] = useRefresh(async () => {
     videoListStore.clearVideoLists()
 
-    try {
-      await Promise.race([
-        videoListStore.getAdminVideoLists(),
-        videoListStore.getPublicVideoLists(),
-      ])
-    } finally {
-      setRefreshing(false)
-    }
-  }
-
-  useEffect(() => {
-    if (refreshing) {
-      refreshVideoLists()
-    }
-  }, [refreshing])
+    videoListStore.getPublicVideoLists()
+    return videoListStore.getAdminVideoLists()
+  })
 
   useEffect(() => {
     const onBackButtonPressed = () => {
@@ -185,9 +173,7 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
                 <Text fontSize="xl">{title} title</Text>
               </View>
             )}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={() => setRefreshing(true)} />
-            }
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
           />
 
           <Button onPress={() => setCreatingList(true)}>Create List</Button>
