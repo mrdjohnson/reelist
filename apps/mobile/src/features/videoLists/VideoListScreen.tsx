@@ -45,6 +45,10 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
   } = useDisclose()
 
   useEffect(() => {
+    return () => videoListStore.setCurrentVideoList(null)
+  }, [])
+
+  useEffect(() => {
     videoListStore.setCurrentVideoListFromShareId(appState.videoListShareId)
     currentVideoList?.fetchAdmins()
   }, [appState.videoListShareId, videoListStore])

@@ -25,17 +25,14 @@ import useRefresh from '~/hooks/useRefresh'
 const VideoListListItem = observer(
   ({
     videoList,
-    currentVideoListId,
     onVideoListPress,
   }: {
     videoList: VideoList
-    currentVideoListId: string | undefined
     onVideoListPress: (videoList: VideoList) => void
   }) => {
     return (
       <Pressable
         onPress={() => onVideoListPress(videoList)}
-        backgroundColor={currentVideoListId === videoList.id ? 'amber.200' : undefined}
         flexDirection="row"
         alignItems="center"
       >
@@ -56,7 +53,6 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
   const { videoListStore } = useStore()
   const publicVideoLists = videoListStore.publicVideoLists
   const adminVideoLists = videoListStore.adminVideoLists
-  const currentVideoListId = videoListStore.currentVideoList?.id
 
   const [creatingList, setCreatingList] = useState<boolean>(false)
   const [nextListName, setNextListName] = useState('')
@@ -162,11 +158,7 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
             sections={data}
             keyExtractor={(item, index) => item.id}
             renderItem={({ item: videoList }) => (
-              <VideoListListItem
-                videoList={videoList}
-                currentVideoListId={currentVideoListId}
-                onVideoListPress={handleVideoListPress}
-              />
+              <VideoListListItem videoList={videoList} onVideoListPress={handleVideoListPress} />
             )}
             renderSectionHeader={({ section: { title } }) => (
               <View backgroundColor="light.300">
