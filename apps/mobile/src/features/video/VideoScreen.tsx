@@ -57,6 +57,7 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
   const [minimizeVideoOverview, setMinimizeVideoOverview] = useState(true)
   const [ascendingOrder, setAscendingOrder] = useState<boolean>(true)
   const [hideFutureEpisodes, setHideFutureEpisodes] = useState(true)
+  const [showVideoId, setShowVideoId] = useState(false)
 
   useEffect(() => {
     if (!videoId) return
@@ -184,12 +185,20 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
     )
   }
 
-  const name = video.name || video.title
-
   return (
     <View flex={1} display="flex">
       <Center padding="10px" paddingTop="0">
-        <Text fontSize="2xl">{name + ': ' + video.videoId}</Text>
+        <Pressable onLongPress={() => setShowVideoId(!showVideoId)}>
+          <Text fontSize="2xl" textAlign="center">
+            {video.videoName}
+          </Text>
+
+          {showVideoId && (
+            <Text color="gray.400" fontSize="sm" textAlign="center">
+              {video.videoId}
+            </Text>
+          )}
+        </Pressable>
 
         <Pressable onPress={() => setMinimizeVideoOverview(!minimizeVideoOverview)}>
           <Text numberOfLines={minimizeVideoOverview ? 3 : 0}>{video.overview}</Text>
