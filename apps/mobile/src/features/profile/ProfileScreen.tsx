@@ -9,7 +9,8 @@ import { ReelistScreen } from '~/utils/navigation'
 import Video from '~/models/Video'
 import TrackedVideoItem from '~/features/video/TrackedVideoItem'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import { Pressable } from 'react-native'
+import { Pressable, RefreshControl } from 'react-native'
+import useRefresh from '~/hooks/useRefresh'
 
 const missingIconOptions = [
   'user-astronaut',
@@ -28,7 +29,10 @@ const ProfileScreen = observer(({ navigation }: ReelistScreen) => {
   const user = appState.profileScreen.user || auth.user
   const isCurrentUser = user.id === auth.user.id
   const [trackedVideos, setTrackedVideos] = useState<Video[]>([])
-  const [loadingTrackedVideos, setLoadingTrackedVideos] = useState(false)
+
+  const [loadingTrackedVideos, refresh] = useRefresh(async () => {
+    return videoStore.getTrackedVideos(user.id).then(setTrackedVideos)
+  })
 
   const missingUserIcon = useMemo(() => {
     return _.sample(missingIconOptions) || 'user-secret'
@@ -41,12 +45,7 @@ const ProfileScreen = observer(({ navigation }: ReelistScreen) => {
   }, [appState])
 
   useEffect(() => {
-    setLoadingTrackedVideos(true)
-
-    videoStore
-      .getTrackedVideos(user.id)
-      .then(setTrackedVideos)
-      .then(() => setLoadingTrackedVideos(false))
+    refresh()
   }, [user.id])
 
   if (appState.profileScreen.editing) {
@@ -56,7 +55,10 @@ const ProfileScreen = observer(({ navigation }: ReelistScreen) => {
   const content = loadingTrackedVideos ? (
     <Spinner size="lg" />
   ) : (
-    <ScrollView flex={1}>
+    <ScrollView
+      flex={1}
+      refreshControl={<RefreshControl refreshing={loadingTrackedVideos} onRefresh={refresh} />}
+    >
       <Text>Tracked Videos:</Text>
 
       {trackedVideos.map(video => (
