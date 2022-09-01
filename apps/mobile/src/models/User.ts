@@ -53,43 +53,32 @@ class User implements UserType {
     profileId: string,
     { loggedIn = true }: { loggedIn?: boolean } = {},
   ) => {
-    let profile: ProfileTableType | null = null
-
-    const maybePrintError = (error: PostgrestError | null) => {
-      if (error) {
-        console.error('profile call was broken?', error.message)
-        return true
-      }
-
-      return false
-    }
-
     const { data: userProfile, error: findProfileError } = await supabase
       .from<ProfileTableType>('profiles')
       .select('*')
       .match({ id: profileId })
       .maybeSingle()
 
-    if (maybePrintError(findProfileError)) {
+    const profile = humps.camelizeKeys<ProfileTableType | null>(userProfile)
+
+    if (maybePrintError(findProfileError) || !profile) {
       return null
     }
 
-    if (userProfile) {
-      profile = userProfile
-    } else {
-      const { data, error: createProfileError } = await supabase
-        .from<ProfileTableType>('profiles')
-        .insert({ id: profileId })
-        .maybeSingle()
+    return new User({ profile, loggedIn })
+  }
 
-      if (maybePrintError(createProfileError)) {
-        return null
-      }
+  static fromAuthIdOrCreate = async (authId: string) => {
+    const { data: profile, error: createProfileError } = await supabase
+      .from<ProfileTableType>('profiles')
+      .upsert({ id: authId })
+      .single()
 
-      profile = data
+    if (maybePrintError(createProfileError)) {
+      return null
     }
 
-    return new User({ profile: humps.camelizeKeys(profile), loggedIn })
+    return new User({ profile: humps.camelizeKeys(profile), loggedIn: true })
   }
 
   static save = async (userViewModel: User & IViewModel<User>) => {
@@ -121,5 +110,14 @@ export const LoggedOutUser = new User({
 
   loggedIn: false,
 })
+
+const maybePrintError = (error: PostgrestError | null) => {
+  if (error) {
+    console.error('profile call was broken?', error.message)
+    return true
+  }
+
+  return false
+}
 
 export default User

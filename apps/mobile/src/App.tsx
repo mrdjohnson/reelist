@@ -90,7 +90,7 @@ const App = observer(() => {
 
   useEffect(() => {
     const logInUser = async (authId: string) => {
-      const user = await User.fromAuthId(authId)
+      const user = await User.fromAuthIdOrCreate(authId)
 
       auth.setUser(user)
     }
