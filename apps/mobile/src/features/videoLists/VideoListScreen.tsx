@@ -1,20 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import {
   Actionsheet,
-  Box,
   Button,
   Center,
-  Column,
   FlatList,
-  FormControl,
-  HStack,
-  Input,
-  Pressable,
-  Row,
-  ScrollView,
-  SectionList,
-  Skeleton,
-  Switch,
   Text,
   useDisclose,
   useToast,
@@ -22,13 +11,12 @@ import {
 } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
-import VideoList from '~/models/VideoList'
-import { BackHandler, SectionListData } from 'react-native'
-import Video from '~/models/Video'
+import { BackHandler } from 'react-native'
 import VideoItem, { videoItemSkeleton } from '~/features/video/VideoItem'
 import Clipboard from '@react-native-clipboard/clipboard'
 import User from '~/models/User'
 import { ReelistScreen } from '~/utils/navigation'
+import EditVideoListPage from './EditVideoListPage'
 
 const CAN_GO_BACK = false
 const CANNOT_GO_BACK = true
@@ -145,77 +133,47 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
     navigation.push('profile')
   }
 
+  if (editing)
+    return (
+      <EditVideoListPage
+        currentVideoList={currentVideoList}
+        onFinishEditing={finishEditing}
+        editingErrorMessage={editingErrorMessage}
+        onCancelEditing={() => setEditing(false)}
+      />
+    )
+
   return (
     <View flex={1} backgroundColor="light.100">
-      {editing ? (
-        <View margin="10px">
-          <FormControl isInvalid={!!editingErrorMessage} marginBottom="8px">
-            <FormControl.Label>Enter List Name</FormControl.Label>
+      <View backgroundColor="amber.200" flexDirection="row">
+        <Button onPress={() => navigation.navigate('videoListsHome')}>Go Home</Button>
 
-            <Input value={videoListName} onChangeText={setVideoListName} marginLeft="5px" />
+        <Text fontSize="2xl">{currentVideoList.name}</Text>
+      </View>
 
-            <FormControl.HelperText marginLeft="10px">Example helper text</FormControl.HelperText>
+      <Button onPress={openMembership} margin="10px">
+        Membership
+      </Button>
 
-            <FormControl.ErrorMessage marginLeft="10px">
-              {editingErrorMessage}
-            </FormControl.ErrorMessage>
-          </FormControl>
-
-          <FormControl marginBottom="10px">
-            <HStack>
-              <FormControl.Label>Is List Public?</FormControl.Label>
-
-              <Switch
-                size="sm"
-                value={videoListIsPublic}
-                onToggle={() => setVideoListIsPublic(!videoListIsPublic)}
-              />
-            </HStack>
-
-            <FormControl.HelperText marginLeft="10px">
-              Can the list be viewed by everyone?
-            </FormControl.HelperText>
-          </FormControl>
-
-          <Button onPress={finishEditing} marginBottom="10px">
-            Save
-          </Button>
-
-          <Button onPress={() => setEditing(false)}>Cancel</Button>
-        </View>
-      ) : (
-        <>
-          <View backgroundColor="amber.200" flexDirection="row">
-            <Button onPress={() => navigation.navigate('videoListsHome')}>Go Home</Button>
-
-            <Text fontSize="2xl">{currentVideoList.name}</Text>
-          </View>
-
-          <Button onPress={openMembership} margin="10px">
-            Membership
-          </Button>
-
-          {currentVideoList.videoIds.length === 0 && (
-            <Center>
-              <Text>Nothing has been added here yet</Text>
-            </Center>
-          )}
-
-          {currentVideoList.videos.length === 0 && (
-            <FlatList
-              data={currentVideoList.videoIds}
-              keyExtractor={videoId => videoId}
-              renderItem={() => videoItemSkeleton}
-            />
-          )}
-
-          <FlatList
-            data={currentVideoList.videos}
-            keyExtractor={video => video.videoId}
-            renderItem={({ item: video }) => <VideoItem video={video} />}
-          />
-        </>
+      {currentVideoList.videoIds.length === 0 && (
+        <Center>
+          <Text>Nothing has been added here yet</Text>
+        </Center>
       )}
+
+      {currentVideoList.videos.length === 0 && (
+        <FlatList
+          data={currentVideoList.videoIds}
+          keyExtractor={videoId => videoId}
+          renderItem={() => videoItemSkeleton}
+        />
+      )}
+
+      <FlatList
+        data={currentVideoList.videos}
+        keyExtractor={video => video.videoId}
+        renderItem={({ item: video }) => <VideoItem video={video} />}
+      />
 
       {/* hidden */}
 
