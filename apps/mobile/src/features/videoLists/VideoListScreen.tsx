@@ -4,6 +4,10 @@ import {
   Button,
   Center,
   FlatList,
+  Flex,
+  IconButton,
+  Pressable,
+  Row,
   Text,
   useDisclose,
   useToast,
@@ -17,6 +21,7 @@ import Clipboard from '@react-native-clipboard/clipboard'
 import User from '~/models/User'
 import { ReelistScreen } from '~/utils/navigation'
 import EditVideoListPage from './EditVideoListPage'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 
 const CAN_GO_BACK = false
 const CANNOT_GO_BACK = true
@@ -145,15 +150,21 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
 
   return (
     <View flex={1} backgroundColor="light.100">
-      <View backgroundColor="amber.200" flexDirection="row">
-        <Button onPress={() => navigation.navigate('videoListsHome')}>Go Home</Button>
+      <Row marginY="10px">
+        <Center flex={1}>
+          <Text fontSize="2xl">{currentVideoList.name}</Text>
+        </Center>
 
-        <Text fontSize="2xl">{currentVideoList.name}</Text>
-      </View>
-
-      <Button onPress={openMembership} margin="10px">
-        Membership
-      </Button>
+        <Center>
+          <Pressable alignSelf="center" marginRight="10px" onPress={openMembership}>
+            <MaterialCommunityIcons
+              name="dots-vertical"
+              size={23}
+              style={{ color: 'black', padding: 0, margin: 0 }}
+            />
+          </Pressable>
+        </Center>
+      </Row>
 
       {currentVideoList.videoIds.length === 0 && (
         <Center>
