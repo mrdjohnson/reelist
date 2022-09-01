@@ -26,7 +26,7 @@ const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
   })
 
   return (
-    <View flex={1} backgroundColor="white">
+    <View flex={1}>
       <SearchBar
         placeholder="Filter Tracked Shows & Movies"
         leftIcon={<MaterialCommunityIcons name="filter-outline" />}

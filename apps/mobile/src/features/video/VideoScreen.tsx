@@ -187,7 +187,7 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
   const name = video.name || video.title
 
   return (
-    <View flex={1} backgroundColor="white" display="flex">
+    <View flex={1} display="flex">
       <Center padding="10px" paddingTop="0">
         <Text fontSize="2xl">{name + ': ' + video.videoId}</Text>
 

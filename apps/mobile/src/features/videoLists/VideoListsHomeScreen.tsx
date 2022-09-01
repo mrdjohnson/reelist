@@ -125,7 +125,7 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
   }
 
   return (
-    <View flex={1} justifyContent="space-between" backgroundColor="white">
+    <View flex={1} justifyContent="space-between">
       {creatingList ? (
         <>
           <Text>Create List</Text>

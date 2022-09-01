@@ -40,7 +40,7 @@ const Stack = createNativeStackNavigator<NavigatorParamList>()
 
 const withAppFooterHoc = (Component: React.ComponentType<any>) => {
   const ScreenWithFooter = (props: any) => (
-    <View flex={1}>
+    <View flex={1} backgroundColor="white">
       <View flex={1}>
         <Component {...props} />
       </View>

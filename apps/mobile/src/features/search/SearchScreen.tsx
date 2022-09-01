@@ -51,7 +51,7 @@ const SearchScreen = observer(({ navigation }: ReelistScreen) => {
   }
 
   return (
-    <View flex={1} backgroundColor="white">
+    <View flex={1}>
       <SearchBar
         placeholder="Search Shows & Movies"
         leftIcon={<MaterialIcons name="search" />}

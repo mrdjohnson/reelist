@@ -68,7 +68,7 @@ const ProfileScreen = observer(({ navigation }: ReelistScreen) => {
   )
 
   return (
-    <View flex={1} backgroundColor="white" paddingTop="20px" paddingX="10px">
+    <View flex={1} paddingTop="20px" paddingX="10px">
       <Column space={4} backgroundColor="blue">
         <Avatar
           height="100px"

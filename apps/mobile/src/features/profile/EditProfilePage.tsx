@@ -87,7 +87,7 @@ const EditProfilePage = observer(() => {
   }
 
   return (
-    <View flex={1} backgroundColor="white" paddingTop="20px" paddingX="10px">
+    <View flex={1} paddingTop="20px" paddingX="10px">
       <Avatar
         height="100px"
         width="100px"
