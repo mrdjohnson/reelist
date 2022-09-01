@@ -14,7 +14,7 @@ import {
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
 import VideoList from '~/models/VideoList'
-import { BackHandler, SectionListData } from 'react-native'
+import { BackHandler, RefreshControl, SectionListData } from 'react-native'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import _ from 'lodash'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
@@ -61,6 +61,7 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
   const [nextListName, setNextListName] = useState('')
   const [nextListIsPublic, setListIsPublic] = useState(true)
   const [filterText, setfilterText] = useState('')
+  const [refreshing, setRefreshing] = useState(true)
 
   const [filteredAdminLists, filteredPublicLists] = useMemo(() => {
     const lowerFilterCase = filterText.toLowerCase()
@@ -74,10 +75,24 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
     return [filteredAdmin, filteredPublic]
   }, [adminVideoLists, publicVideoLists, filterText])
 
+  const refreshVideoLists = async () => {
+    videoListStore.clearVideoLists()
+
+    try {
+      await Promise.race([
+        videoListStore.getAdminVideoLists(),
+        videoListStore.getPublicVideoLists(),
+      ])
+    } finally {
+      setRefreshing(false)
+    }
+  }
+
   useEffect(() => {
-    videoListStore.getAdminVideoLists()
-    videoListStore.getPublicVideoLists()
-  }, [])
+    if (refreshing) {
+      refreshVideoLists()
+    }
+  }, [refreshing])
 
   useEffect(() => {
     const onBackButtonPressed = () => {
@@ -170,6 +185,9 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
                 <Text fontSize="xl">{title} title</Text>
               </View>
             )}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={() => setRefreshing(true)} />
+            }
           />
 
           <Button onPress={() => setCreatingList(true)}>Create List</Button>

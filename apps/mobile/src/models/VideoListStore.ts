@@ -130,6 +130,11 @@ class VideoListStore {
 
     this.currentVideoList = videoList
   }
+
+  clearVideoLists = () => {
+    this.adminVideoLists = []
+    this.publicVideoLists = []
+  }
 }
 
 export default VideoListStore
