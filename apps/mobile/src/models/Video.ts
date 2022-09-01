@@ -518,6 +518,7 @@ class Video {
     let episodeToWatch = this.currentBaseEpisode?.next || firstEpisode
 
     while (episodeToWatch && this.getIsEpisodeWatched(episodeToWatch)) {
+      // todo: revisit this, assignments should not happen in a getter
       this.lastWatchedSeasonNumber = episodeToWatch.seasonNumber
       this.lastWatchedEpisodeNumber = episodeToWatch.episodeNumber
 
