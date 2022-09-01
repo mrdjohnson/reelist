@@ -12,6 +12,7 @@ import React, { useEffect, useRef, type PropsWithChildren } from 'react'
 import { Animated, Linking, StatusBar, StyleSheet, useColorScheme, View } from 'react-native'
 import { Notifications } from 'react-native-notifications'
 import SafeAreaView from 'react-native-safe-area-view'
+import LinearGradient from 'react-native-linear-gradient'
 
 import {
   Colors,
@@ -73,6 +74,12 @@ export const NAVIGATION_PERSISTENCE_KEY = 'NAVIGATION_STATE'
 
 // does nothing for now but verifies imports
 const rootStore = new Store()
+
+const config = {
+  dependencies: {
+    'linear-gradient': LinearGradient,
+  },
+}
 
 const App = observer(() => {
   const { auth, videoListStore, appState } = useStore()
@@ -179,7 +186,7 @@ const App = observer(() => {
   }, [])
 
   return (
-    <NativeBaseProvider>
+    <NativeBaseProvider config={config}>
       <SafeAreaProvider>
         <AppNavigator
           initialState={initialNavigationState}

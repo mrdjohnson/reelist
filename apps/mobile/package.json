@@ -35,6 +35,7 @@
     "@react-native-clipboard/clipboard": "*",
     "mobx": "*",
     "short-unique-id": "*",
-    "moment": "*"
+    "moment": "*",
+    "react-native-linear-gradient": "*"
   }
 }
