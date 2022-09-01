@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Column, Icon, ScrollView, Text, useToast, View } from 'native-base'
+import { Button, Center, Column, Icon, ScrollView, Text, useToast, View } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
 import supabase from '~/supabase'
@@ -23,16 +23,24 @@ const SettingsScreen = observer(({ navigation }: ReelistScreen) => {
   return (
     <ScrollView flex={1} paddingX="10px">
       <Column space="8px">
-        <Text>SETTINGS SCREEN </Text>
+        <Center>
+          <Text fontSize="2xl">Settings</Text>
+        </Center>
 
         <Button
-          leftIcon={<Icon as={<MaterialCommunityIcons name="account-edit-outline" />} />}
+          leftIcon={<Icon as={<MaterialCommunityIcons name="account-outline" />} />}
           onPress={() => navigation.navigate('profile')}
         >
-          Edit Profile
+          Profile
         </Button>
 
-        <Button onPress={logout} marginY="30px" backgroundColor="error.500" color="white">
+        <Button
+          leftIcon={<Icon as={<MaterialCommunityIcons name="power" />} />}
+          onPress={logout}
+          marginY="30px"
+          backgroundColor="error.500"
+          color="white"
+        >
           Logout
         </Button>
       </Column>
