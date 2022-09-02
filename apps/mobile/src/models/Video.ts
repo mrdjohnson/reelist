@@ -53,6 +53,18 @@ export type VideoTableType = {
   user_id: string
 }
 
+type VideoImageType = {
+  aspectRatio: number
+  height: number
+  filePath: string
+  voteAverage: number
+  width: number
+
+  // ignored:
+  // voteCount
+  // iso6391
+}
+
 class Video {
   adult?: boolean | undefined
   backdropPath!: string
@@ -76,6 +88,12 @@ class Video {
   seasons?: TvSeason[] | undefined
   lastEpisodeToAir?: TvEpisode
   nextEpisodeToAir?: TvEpisode
+
+  images?: {
+    backdrops: VideoImageType[]
+    logos: VideoImageType[]
+    posters: VideoImageType[]
+  }
 
   tracked = false
   videoInfo: VideoInfoType = {}

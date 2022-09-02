@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Button,
-  Input,
+  Image,
   Pressable,
   ScrollView,
   SectionList,
@@ -17,6 +17,9 @@ import {
   Switch,
   Row,
   Column,
+  ZStack,
+  Box,
+  AspectRatio,
 } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
@@ -36,7 +39,9 @@ import VideoItem from '~/features/video/VideoItem'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import moment from 'moment'
 import { ReelistScreen } from '~/utils/navigation'
+import LinearGradient from 'react-native-linear-gradient'
 
+const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 const IndeterminateIcon = <Icon as={<MaterialIcons name="indeterminate-check-box" />} />
 
 const CAN_GO_BACK = false
@@ -185,21 +190,53 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
     )
   }
 
+  const imageSource = video.backdropPath
+
   return (
     <View flex={1} display="flex">
+      {imageSource && (
+        <Box maxHeight="500px">
+          <AspectRatio
+            width="100%"
+            ratio={{
+              base: 16 / 9,
+            }}
+          >
+            <Image
+              source={{ uri: IMAGE_PATH + imageSource }}
+              alt={imageSource}
+              resizeMode="contain"
+              backgroundColor="red"
+              rounded="md"
+            />
+          </AspectRatio>
+
+          <Box position="absolute" bottom="0" width="100%" paddingX="10px" zIndex={1}>
+            <Pressable onLongPress={() => setShowVideoId(!showVideoId)}>
+              <Text
+                fontSize="2xl"
+                numberOfLines={1}
+                shadow="2"
+                color="white"
+                style={{ textShadowColor: 'black', textShadowRadius: 5 }}
+                adjustsFontSizeToFit
+              >
+                {video.videoName}
+              </Text>
+
+              {showVideoId && (
+                <View backgroundColor="black">
+                  <Text color="white" fontSize="sm" textAlign="center">
+                    {video.videoId}
+                  </Text>
+                </View>
+              )}
+            </Pressable>
+          </Box>
+        </Box>
+      )}
+
       <Center padding="10px" paddingTop="0">
-        <Pressable onLongPress={() => setShowVideoId(!showVideoId)}>
-          <Text fontSize="2xl" textAlign="center">
-            {video.videoName}
-          </Text>
-
-          {showVideoId && (
-            <Text color="gray.400" fontSize="sm" textAlign="center">
-              {video.videoId}
-            </Text>
-          )}
-        </Pressable>
-
         <Pressable onPress={() => setMinimizeVideoOverview(!minimizeVideoOverview)}>
           <Text numberOfLines={minimizeVideoOverview ? 3 : 0}>{video.overview}</Text>
         </Pressable>
