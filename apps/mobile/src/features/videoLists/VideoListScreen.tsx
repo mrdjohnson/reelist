@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import {
   Actionsheet,
+  Badge,
   Button,
   Center,
   FlatList,
   Flex,
+  IBadgeProps,
   IconButton,
   Pressable,
   Row,
@@ -15,19 +17,50 @@ import {
 } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
-import { BackHandler } from 'react-native'
+import { BackHandler, RefreshControl } from 'react-native'
 import VideoItem, { videoItemSkeleton } from '~/features/video/VideoItem'
 import Clipboard from '@react-native-clipboard/clipboard'
 import User from '~/models/User'
 import { ReelistScreen } from '~/utils/navigation'
 import EditVideoListPage from './EditVideoListPage'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import Video from '~/models/Video'
+import _ from 'lodash'
+import TrackedVideoItem from '../video/TrackedVideoItem'
 
 const CAN_GO_BACK = false
 const CANNOT_GO_BACK = true
 
+type TabProps = {
+  activeTabKey: string | null
+  onPress: (id: string | null) => void
+  text: string
+  id: string | null
+}
+
+const Tab = ({ activeTabKey, onPress, text, id }: TabProps) => {
+  if (!text) return null
+
+  const badgeProps: IBadgeProps = {}
+
+  if (activeTabKey === id) {
+    // for dark mode, try subtle?
+    badgeProps.variant = 'solid'
+    badgeProps.colorScheme = 'info'
+  } else {
+    badgeProps.variant = 'outline'
+    badgeProps.colorScheme = null
+  }
+
+  return (
+    <Pressable onPress={() => onPress(id)}>
+      <Badge {...badgeProps}>{text}</Badge>
+    </Pressable>
+  )
+}
+
 const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
-  const { videoListStore, auth, appState } = useStore()
+  const { videoListStore, auth, appState, videoStore } = useStore()
   const toast = useToast()
 
   const currentVideoList = videoListStore.currentVideoList
@@ -37,6 +70,9 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
   const [editing, setEditing] = useState<boolean>(false)
   const [editingErrorMessage, setEditingErrorMessage] = useState<string | null>(null)
   const [showMembers, setShowMembers] = useState(false)
+  const [activeTabKey, setActiveTabKey] = useState<string | null>(null)
+  const [loadingUserVideos, setLoadingUserVideos] = useState(false)
+  const [trackedVideos, setTrackedVideos] = useState<Video[]>([])
 
   const {
     isOpen: isMembershipOpen,
@@ -56,6 +92,29 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
   useEffect(() => {
     currentVideoList?.getVideos()
   }, [currentVideoList])
+
+  const loadVideosForUser = async () => {
+    setLoadingUserVideos(true)
+
+    const videos = await videoStore.getVideoProgressesForUser(
+      activeTabKey,
+      currentVideoList?.videoIds,
+    )
+
+    setLoadingUserVideos(false)
+    setTrackedVideos(videos)
+  }
+
+  useEffect(() => {
+    if (!activeTabKey) return _.noop
+
+    loadVideosForUser()
+
+    return () => {
+      setLoadingUserVideos(false)
+      setTrackedVideos([])
+    }
+  }, [activeTabKey, currentVideoList])
 
   useEffect(() => {
     const onBackButtonPressed = () => {
@@ -170,6 +229,20 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
         </Center>
       </Row>
 
+      <Row marginLeft="10px" space="8px">
+        <Tab text="Overview" id={null} activeTabKey={activeTabKey} onPress={setActiveTabKey} />
+
+        {currentVideoList.admins.map(admin => (
+          <Tab
+            key={admin.id}
+            text={admin.name}
+            id={admin.id}
+            activeTabKey={activeTabKey}
+            onPress={setActiveTabKey}
+          />
+        ))}
+      </Row>
+
       {currentVideoList.videoIds.length === 0 && (
         <Center>
           <Text>Nothing has been added here yet</Text>
@@ -184,11 +257,24 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
         />
       )}
 
-      <FlatList
-        data={currentVideoList.videos}
-        keyExtractor={video => video.videoId}
-        renderItem={({ item: video }) => <VideoItem video={video} />}
-      />
+      {!activeTabKey ? (
+        <FlatList
+          data={currentVideoList.videos}
+          keyExtractor={video => video.videoId}
+          renderItem={({ item: video }) => <VideoItem video={video} />}
+        />
+      ) : (
+        <FlatList
+          data={trackedVideos}
+          keyExtractor={video => video.videoId}
+          refreshControl={
+            <RefreshControl refreshing={loadingUserVideos} onRefresh={loadVideosForUser} />
+          }
+          renderItem={({ item: video }) => (
+            <TrackedVideoItem video={video} isInteractable={false} />
+          )}
+        />
+      )}
 
       {/* hidden */}
 

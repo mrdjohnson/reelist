@@ -114,6 +114,39 @@ class VideoStore {
 
     return videos
   }
+
+  getVideoProgressesForUser = async (userId: string | null, videoIds: string[] | undefined) => {
+    if (!videoIds || _.isEmpty(videoIds) || !userId) return []
+
+    let videos: Video[] = []
+
+    const { data: videoJsons, error } = await supabase
+      .from<VideoTableType>('videos')
+      .select('*')
+      .match({ user_id: userId || this.storeAuth.user.id })
+      .in('video_id', videoIds)
+
+    if (error) {
+      console.error('failed to lazy load tracked videos', error.message)
+      throw new Error('failed to lazy load tracked videos: ' + error.message)
+    } else if (videoJsons) {
+      const videoJsonMap = _.keyBy(videoJsons, 'id')
+
+      const videoPromises = await Promise.allSettled(
+        videoIds.map(videoId => {
+          const videoJson = videoJsonMap[videoId]
+
+          return this.getVideo(videoId, videoJson)
+        }),
+      )
+
+      videos = _.chain(videoPromises).map('value').compact().value()
+
+      await Promise.allSettled(videos.map(video => video.fetchSeasons()))
+    }
+
+    return videos
+  }
 }
 
 export default VideoStore
