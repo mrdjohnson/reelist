@@ -123,14 +123,14 @@ class VideoStore {
     const { data: videoJsons, error } = await supabase
       .from<VideoTableType>('videos')
       .select('*')
-      .match({ user_id: userId || this.storeAuth.user.id })
+      .match({ user_id: userId })
       .in('video_id', videoIds)
 
     if (error) {
       console.error('failed to lazy load tracked videos', error.message)
       throw new Error('failed to lazy load tracked videos: ' + error.message)
     } else if (videoJsons) {
-      const videoJsonMap = _.keyBy(videoJsons, 'id')
+      const videoJsonMap = _.keyBy(videoJsons, 'video_id')
 
       const videoPromises = await Promise.allSettled(
         videoIds.map(videoId => {
