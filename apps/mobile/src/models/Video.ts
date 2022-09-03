@@ -251,6 +251,11 @@ class Video {
       nextIsWatched = false
     }
 
+    if (this.isMovie) {
+      lastWatchedEpisodeData = episodeToEpisodeWatchedData(null)
+      nextIsWatched = !this.isWatched
+    }
+
     await this.updateWatched('toggle watched', {
       video_info: { watched: nextIsWatched },
       ...lastWatchedEpisodeData,
@@ -544,6 +549,14 @@ class Video {
     }
 
     return episodeToWatch
+  }
+
+  get isTv() {
+    return this.mediaType === 'tv'
+  }
+
+  get isMovie() {
+    return this.mediaType === 'movie'
   }
 
   get videoId() {

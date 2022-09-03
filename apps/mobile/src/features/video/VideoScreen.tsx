@@ -20,6 +20,7 @@ import {
   ZStack,
   Box,
   AspectRatio,
+  Flex,
 } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
@@ -273,13 +274,15 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
             Manage Lists
           </Button>
 
-          <Row margin="10px" justifyContent="space-between">
-            {videoStatus}
+          {video.isMovie || (
+            <Row margin="10px" justifyContent="space-between">
+              {videoStatus}
 
-            <Button size="sm" onPress={() => video.backfillWatched()}>
-              Backfill?
-            </Button>
-          </Row>
+              <Button size="sm" onPress={() => video.backfillWatched()}>
+                Backfill?
+              </Button>
+            </Row>
+          )}
 
           <HStack alignItems="center" space="8px" margin="10px">
             <Text>Show in Tracked</Text>
@@ -289,7 +292,39 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
         </>
       )}
 
-      {!season && !manageLists && (
+      {video.isMovie && (
+        <Flex flexDirection="column-reverse" flex={1}>
+          {video.isWatched ? (
+            <Button
+              margin="10px"
+              variant="outline"
+              borderColor="gray.600"
+              _text={{ color: 'gray.600' }}
+              color="gray.600"
+              colorScheme="gray.600"
+              endIcon={<Icon as={<MaterialCommunityIcons name="eye-check" />} color="gray.600" />}
+              onPress={() => video.toggleWatched()}
+            >
+              Watched
+            </Button>
+          ) : (
+            <Button
+              margin="10px"
+              variant="outline"
+              borderColor="blue.600"
+              _text={{ color: 'blue.600' }}
+              color="blue.600"
+              colorScheme="blue.600"
+              endIcon={<Icon as={<MaterialCommunityIcons name="eye-plus" />} color="blue.600" />}
+              onPress={() => video.toggleWatched()}
+            >
+              Watch
+            </Button>
+          )}
+        </Flex>
+      )}
+
+      {!season && !manageLists && video.isTv && (
         <ScrollView>
           <View paddingRight="10px" paddingLeft="10px">
             <View flexDirection="row" justifyContent="space-between" borderBottomWidth={1}>
