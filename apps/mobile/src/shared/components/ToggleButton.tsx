@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react'
-import { Button, IButtonProps, Icon } from 'native-base'
+import React from 'react'
+import { IButtonProps } from 'native-base'
 import { IconButtonProps } from 'react-native-vector-icons/Icon'
-import _ from 'lodash'
+import ActionButton from './ActionButton'
 
 type ToggleButtonProps = IButtonProps & {
   active: boolean
@@ -34,25 +34,15 @@ const ToggleButton = ({
     buttonColor = activeColor || color
   }
 
-  const colorScheme = useMemo(() => {
-    if (!_.isString(buttonColor)) return buttonColor
-
-    return buttonColor.substring(0, buttonColor.indexOf('.')) || buttonColor
-  }, [buttonColor])
-
   return (
-    <Button
+    <ActionButton
       variant="outline"
-      borderColor={buttonColor}
-      _text={{ color: buttonColor }}
+      icon={startIcon}
+      content={buttonContent}
       color={buttonColor}
-      colorScheme={colorScheme}
-      startIcon={startIcon && <Icon as={startIcon} color={buttonColor} />}
       onPress={() => props.onPress?.(active)}
       {...props}
-    >
-      {buttonContent}
-    </Button>
+    />
   )
 }
 
