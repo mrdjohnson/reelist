@@ -7,6 +7,7 @@ import { Button, Column, Icon, Image, Pressable, Text, View } from 'native-base'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import moment from 'moment'
 import { useReelistNavigation } from '~/utils/navigation'
+import ActionButton from '~/shared/components/ActionButton'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
@@ -83,9 +84,12 @@ const TrackedVideoItem = observer(({ video, isInteractable = true }: VideoItemPr
           <Text>Episode: {video.nextEpisode?.episodeNumber}</Text>
         </View>
 
-        <Button onPress={video.watchNextEpisode} size="lg">
-          <Icon as={<MaterialCommunityIcons name="eye-plus" />} color="white" />
-        </Button>
+        <ActionButton
+          color="blue.600"
+          icon={<MaterialCommunityIcons name="eye-plus" />}
+          onPress={video.watchNextEpisode}
+          content=""
+        />
       </View>
     )
   }
