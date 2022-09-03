@@ -105,6 +105,8 @@ class Video {
   lastWatchedEpisodeNumber: number | null = null
   seasonMap: Record<number, TvSeason | null> = {}
 
+  _selectedSeason: TvSeason | null = null
+
   constructor(
     json: Video,
     auth: Auth,
@@ -549,6 +551,18 @@ class Video {
     }
 
     return episodeToWatch
+  }
+
+  clearSelectedSeason = () => {
+    this.selectedSeason = null
+  }
+
+  set selectedSeason(selectedSeason: TvSeason | null) {
+    this._selectedSeason = selectedSeason
+  }
+
+  get selectedSeason() {
+    return this._selectedSeason
   }
 
   get isTv() {
