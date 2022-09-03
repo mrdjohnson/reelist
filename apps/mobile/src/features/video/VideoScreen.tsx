@@ -26,6 +26,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import moment from 'moment'
 import { ReelistScreen } from '~/utils/navigation'
 import VideoSeasonSection from './VideoSeasonSection'
+import VideoListManagementSection from './VideoListManagementSection'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 const IndeterminateIcon = <Icon as={<MaterialIcons name="indeterminate-check-box" />} />
@@ -34,10 +35,10 @@ const CAN_GO_BACK = false
 const CANNOT_GO_BACK = true
 
 const VideoScreen = observer(({ navigation }: ReelistScreen) => {
-  const { videoStore, videoListStore } = useStore()
+  const { videoStore } = useStore()
   const videoId = videoStore.currentVideoId
   const [video, setVideo] = useState<Video | null>(null)
-  const [manageLists, setManageLists] = useState<true | null>(null)
+  const [manageLists, setManageLists] = useState(false)
   const [minimizeVideoOverview, setMinimizeVideoOverview] = useState(true)
   const [showVideoId, setShowVideoId] = useState(false)
 
@@ -76,7 +77,7 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
       }
 
       if (manageLists) {
-        setManageLists(null)
+        setManageLists(false)
 
         return CANNOT_GO_BACK
       }
@@ -178,30 +179,10 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
       </Center>
 
       {manageLists ? (
-        <View flex={1} padding="10px" paddingTop="0">
-          <Center>
-            <Text>Manage Lists: </Text>
-
-            <Button onPress={() => setManageLists(null)}>Go Back</Button>
-          </Center>
-
-          <ScrollView>
-            {videoListStore.adminVideoLists.map(videoList => (
-              <View flexDirection="row" marginTop="10px" key={videoList.id}>
-                <Text flex={1} fontSize="lg">
-                  {videoList.name}
-                </Text>
-
-                <Checkbox
-                  value={videoList.id}
-                  isChecked={videoList.includes(video)}
-                  onChange={() => videoList.addOrRemoveVideo(video)}
-                  accessibilityLabel={'VideoList: ' + videoList.name}
-                />
-              </View>
-            ))}
-          </ScrollView>
-        </View>
+        <VideoListManagementSection
+          video={video}
+          closeManageListsSection={() => setManageLists(false)}
+        />
       ) : (
         <>
           <Button margin="10px" marginBottom="0px" onPress={() => setManageLists(true)}>
