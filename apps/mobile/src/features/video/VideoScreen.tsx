@@ -27,6 +27,7 @@ import moment from 'moment'
 import { ReelistScreen } from '~/utils/navigation'
 import VideoSeasonSection from './VideoSeasonSection'
 import VideoListManagementSection from './VideoListManagementSection'
+import ToggleButton from '~/shared/components/ToggleButton'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 const IndeterminateIcon = <Icon as={<MaterialIcons name="indeterminate-check-box" />} />
@@ -208,33 +209,17 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
 
       {video.isMovie && (
         <Flex flexDirection="column-reverse" flex={1}>
-          {video.isWatched ? (
-            <Button
-              margin="10px"
-              variant="outline"
-              borderColor="gray.600"
-              _text={{ color: 'gray.600' }}
-              color="gray.600"
-              colorScheme="gray.600"
-              startIcon={<Icon as={<MaterialCommunityIcons name="eye-check" />} color="gray.600" />}
-              onPress={() => video.toggleWatched()}
-            >
-              Watched
-            </Button>
-          ) : (
-            <Button
-              margin="10px"
-              variant="outline"
-              borderColor="blue.600"
-              _text={{ color: 'blue.600' }}
-              color="blue.600"
-              colorScheme="blue.600"
-              startIcon={<Icon as={<MaterialCommunityIcons name="eye-plus" />} color="blue.600" />}
-              onPress={() => video.toggleWatched()}
-            >
-              Watch
-            </Button>
-          )}
+          <ToggleButton
+            margin="10px"
+            active={video.isWatched}
+            color="blue.600"
+            activeColor="gray.600"
+            icon={<MaterialCommunityIcons name="eye-plus" />}
+            activeIcon={<MaterialCommunityIcons name="eye-check" />}
+            content="Watch"
+            activeContent="Watched"
+            onPress={() => video.toggleWatched()}
+          />
         </Flex>
       )}
 
