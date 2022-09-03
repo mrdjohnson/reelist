@@ -138,6 +138,17 @@ class VideoList {
     }
   }
 
+  destroy = async () => {
+    const { error } = await supabase
+      .from<VideoListJsonType>('videoLists')
+      .delete()
+      .match({ id: this.id })
+
+    if (error) {
+      console.error('failed to leave videolist', error.message)
+    }
+  }
+
   includes = (video: Video) => {
     return this.videoIds.includes(video.videoId)
   }
