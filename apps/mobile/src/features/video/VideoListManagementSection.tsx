@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Button, ScrollView, Text, View, Center, Checkbox } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
@@ -11,6 +11,10 @@ type VideoListManagementSectionProps = {
 const VideoListManagementSection = observer(
   ({ video, closeManageListsSection }: VideoListManagementSectionProps) => {
     const { videoListStore } = useStore()
+
+    useEffect(() => {
+      videoListStore.getAdminVideoLists()
+    }, [])
 
     return (
       <View flex={1} padding="10px" paddingTop="0">
