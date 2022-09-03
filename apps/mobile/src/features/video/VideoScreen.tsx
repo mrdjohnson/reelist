@@ -200,9 +200,18 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
           )}
 
           <HStack alignItems="center" space="8px" margin="10px">
-            <Text>Show in Tracked</Text>
-
-            <Switch size="sm" value={video.tracked} onChange={video.toggleTracked} />
+            <ToggleButton
+              size="sm"
+              minWidth="60%"
+              active={video.tracked}
+              color="blue.600"
+              activeColor="gray.600"
+              icon={<MaterialCommunityIcons name="bookmark-plus" />}
+              activeIcon={<MaterialCommunityIcons name="bookmark-check" />}
+              content="Add to Bookmarks"
+              activeContent="Added to Bookmarks"
+              onPress={() => video.toggleTracked()}
+            />
           </HStack>
         </>
       )}

@@ -54,9 +54,9 @@ const AppFooter = observer(() => {
       <FooterButton
         routeName={route.name}
         name="tracking"
-        selectedIcon={<MaterialIcons name="track-changes" />}
+        selectedIcon={<MaterialCommunityIcons name="bookmark-multiple" />}
         navigation={navigation}
-        text="Tracked"
+        text="Bookmarks"
       />
 
       <FooterButton
