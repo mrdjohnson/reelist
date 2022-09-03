@@ -1,46 +1,32 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   Button,
   Image,
   Pressable,
   ScrollView,
-  SectionList,
   Text,
   View,
   Icon,
   Center,
   Checkbox,
-  Hidden,
-  FlatList,
   Actionsheet,
   HStack,
   Switch,
   Row,
   Column,
-  ZStack,
   Box,
   AspectRatio,
   Flex,
 } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
-import VideoList from '~/models/VideoList'
-import {
-  BackHandler,
-  NativeSyntheticEvent,
-  SectionListData,
-  TextInputChangeEventData,
-  TextInputSubmitEditingEventData,
-} from 'react-native'
+import { BackHandler } from 'react-native'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import Video, { TvEpisode, TvSeason } from '~/models/Video'
-import { callTmdb } from '~/api/api'
 import _ from 'lodash'
-import VideoItem from '~/features/video/VideoItem'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import moment from 'moment'
 import { ReelistScreen } from '~/utils/navigation'
-import LinearGradient from 'react-native-linear-gradient'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 const IndeterminateIcon = <Icon as={<MaterialIcons name="indeterminate-check-box" />} />

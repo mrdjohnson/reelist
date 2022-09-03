@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React from 'react'
 import { observer } from 'mobx-react-lite'
 import _ from 'lodash'
 import Video from '~/models/Video'
 import { useStore } from '~/hooks/useStore'
 import { useReelistNavigation } from '~/utils/navigation'
-import { Column, Divider, HStack, Image, Pressable, Row, Skeleton, Text, View } from 'native-base'
+import { Column, Image, Pressable, Row, Skeleton, Text, View } from 'native-base'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
@@ -13,28 +13,13 @@ type VideoItemProps = {
 }
 
 const VideoItem = observer(({ video }: VideoItemProps) => {
-  const { videoListStore, appState, videoStore } = useStore()
+  const { videoStore } = useStore()
   const navigation = useReelistNavigation()
 
   if (!video) return null
 
   const name = video.name || video.title
   const imageSource = video.posterPath || video.backdropPath
-  const inPlaylist = false // add to play list somehow
-
-  // const handlePlayListButton = async () => {
-  //   console.log('setting video:', video)
-  //   videoListStore.setCurrentVideo(video)
-  //   appState.openDialog('addToVideoList')
-  //   console.log('video set:', video)
-  //   // if (video.mediaType === 'movie') {
-  //   //   let { data: videoResponse, error } = await supabase
-  //   //     .from('videos')
-  //   //     .insert({ movie_id: video.id, user_id: auth.user.id })
-  //   //     .single()
-  //   //   if (error) console.error('failed to create video', error.message)
-  //   // }
-  // }
 
   const goToMediaPage = () => {
     videoStore.setCurrentVideoId(video.videoId)

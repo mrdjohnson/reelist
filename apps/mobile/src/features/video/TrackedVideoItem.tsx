@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React from 'react'
 import { observer } from 'mobx-react-lite'
 import _ from 'lodash'
 import Video from '~/models/Video'
 import { useStore } from '~/hooks/useStore'
-import { Button, Column, Icon, Image, Pressable, Row, Text, View } from 'native-base'
+import { Button, Column, Icon, Image, Pressable, Text, View } from 'native-base'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import moment from 'moment'
 import { useReelistNavigation } from '~/utils/navigation'
@@ -16,14 +16,13 @@ type VideoItemProps = {
 }
 
 const TrackedVideoItem = observer(({ video, isInteractable = true }: VideoItemProps) => {
-  const { videoListStore, appState, videoStore } = useStore()
+  const { videoStore } = useStore()
   const navigation = useReelistNavigation()
 
   if (!video) return null
 
   const name = video.name || video.title
   const imageSource = video.posterPath || video.backdropPath
-  const inPlaylist = false // add to play list somehow
 
   let bottomRow
 
