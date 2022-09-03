@@ -143,7 +143,6 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
               alt={imageSource}
               resizeMode="contain"
               backgroundColor="red"
-              rounded="md"
             />
           </AspectRatio>
 
@@ -217,7 +216,7 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
               _text={{ color: 'gray.600' }}
               color="gray.600"
               colorScheme="gray.600"
-              endIcon={<Icon as={<MaterialCommunityIcons name="eye-check" />} color="gray.600" />}
+              startIcon={<Icon as={<MaterialCommunityIcons name="eye-check" />} color="gray.600" />}
               onPress={() => video.toggleWatched()}
             >
               Watched
@@ -230,7 +229,7 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
               _text={{ color: 'blue.600' }}
               color="blue.600"
               colorScheme="blue.600"
-              endIcon={<Icon as={<MaterialCommunityIcons name="eye-plus" />} color="blue.600" />}
+              startIcon={<Icon as={<MaterialCommunityIcons name="eye-plus" />} color="blue.600" />}
               onPress={() => video.toggleWatched()}
             >
               Watch
