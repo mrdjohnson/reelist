@@ -4,6 +4,8 @@ import { observer } from 'mobx-react-lite'
 import VideoList from '~/models/VideoList'
 import { useReelistNavigation } from '~/utils/navigation'
 import { createViewModel } from 'mobx-utils'
+import ToggleButton from '~/shared/components/ToggleButton'
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 
 type EditVideoListPageProps = {
   currentVideoList: VideoList
@@ -49,26 +51,31 @@ const EditVideoListPage = observer(
               marginLeft="5px"
             />
 
-            <FormControl.HelperText marginLeft="10px">Example helper text</FormControl.HelperText>
-
-            <FormControl.ErrorMessage marginLeft="10px">
+            <FormControl.ErrorMessage marginLeft="5px">
               {editingErrorMessage}
             </FormControl.ErrorMessage>
           </FormControl>
 
           <FormControl marginBottom="10px">
-            <Row>
-              <FormControl.Label>Is List Public?</FormControl.Label>
+            <FormControl.Label>Is List Public?</FormControl.Label>
 
-              <Switch
-                size="sm"
-                value={videoListViewModel.isPublic}
-                onToggle={() => (videoListViewModel.isPublic = !videoListViewModel.isPublic)}
-              />
-            </Row>
+            <ToggleButton
+              size="sm"
+              marginLeft="5px"
+              active={videoListViewModel.isPublic}
+              color="gray.600"
+              activeColor="blue.600"
+              content="Private"
+              activeContent="Public"
+              icon={<MaterialIcons name="public-off" />}
+              activeIcon={<MaterialIcons name="public" />}
+              onPress={() => {
+                videoListViewModel.isPublic = !videoListViewModel.isPublic
+              }}
+            />
 
-            <FormControl.HelperText marginLeft="10px">
-              Can the list be viewed by everyone?
+            <FormControl.HelperText marginLeft="5px">
+              Can the list be viewed / followed by everyone?
             </FormControl.HelperText>
           </FormControl>
 
