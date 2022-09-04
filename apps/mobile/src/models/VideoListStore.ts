@@ -85,6 +85,7 @@ class VideoListStore {
     const { data: videoLists, error } = yield supabase
       .from<VideoListJsonType>('videoLists')
       .select('*')
+      .match({ is_public: true })
       .not('admin_ids', 'cs', '{"' + this.storeAuth.user?.id + '"}')
       .order('id', { ascending: false })
 
