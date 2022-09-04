@@ -399,6 +399,7 @@ class Video {
         ...upsertData,
         id: this.serverId,
         video_id: this.videoId,
+        user_id: this.storeAuth.user.id,
       })
       .single()
 
