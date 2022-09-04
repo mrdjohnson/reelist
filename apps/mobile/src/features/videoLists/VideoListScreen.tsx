@@ -65,10 +65,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
 
   const currentVideoList = videoListStore.currentVideoList
 
-  const [videoListName, setVideoListName] = useState<string>('')
-  const [videoListIsPublic, setVideoListIsPublic] = useState(false)
   const [editing, setEditing] = useState<boolean>(false)
-  const [editingErrorMessage, setEditingErrorMessage] = useState<string | null>(null)
   const [showMembers, setShowMembers] = useState(false)
   const [activeTabKey, setActiveTabKey] = useState<string | null>(null)
   const [loadingUserVideos, setLoadingUserVideos] = useState(false)
@@ -120,7 +117,6 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
     const onBackButtonPressed = () => {
       if (editing) {
         setEditing(false)
-        setEditingErrorMessage(null)
 
         return CANNOT_GO_BACK
       }
@@ -150,24 +146,8 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
   }
 
   const startEditing = () => {
-    setVideoListName(currentVideoList.name)
-    setVideoListIsPublic(currentVideoList.isPublic)
-
     setEditing(true)
     closeMemberShipActionSheet()
-  }
-
-  const finishEditing = () => {
-    currentVideoList
-      .update(videoListName, videoListIsPublic)
-      .then(() => {
-        closeMemberShipActionSheet()
-        setEditing(false)
-        setEditingErrorMessage(null)
-      })
-      .catch((e: Error) => {
-        setEditingErrorMessage(e.message)
-      })
   }
 
   const shareList = async () => {
@@ -205,9 +185,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
     return (
       <EditVideoListPage
         currentVideoList={currentVideoList}
-        onFinishEditing={finishEditing}
-        editingErrorMessage={editingErrorMessage}
-        onCancelEditing={() => setEditing(false)}
+        closeEditPage={() => setEditing(false)}
       />
     )
 

@@ -1,28 +1,20 @@
-import React, { useState } from 'react'
-import { Button, FormControl, Row, Input, Switch, View, Popover, AlertDialog } from 'native-base'
+import React, { useMemo, useState } from 'react'
+import { Button, FormControl, Row, Input, Switch, View, AlertDialog } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import VideoList from '~/models/VideoList'
 import { useReelistNavigation } from '~/utils/navigation'
-import { useStore } from '~/hooks/useStore'
+import { createViewModel } from 'mobx-utils'
 
 type EditVideoListPageProps = {
   currentVideoList: VideoList
-  onFinishEditing: () => void
-  onCancelEditing: () => void
-  editingErrorMessage: string | null
+  closeEditPage: () => void
 }
 
 const EditVideoListPage = observer(
-  ({
-    currentVideoList,
-    onFinishEditing,
-    onCancelEditing,
-    editingErrorMessage,
-  }: EditVideoListPageProps) => {
+  ({ currentVideoList, closeEditPage }: EditVideoListPageProps) => {
     const navigation = useReelistNavigation()
 
-    const [videoListName, setVideoListName] = useState<string>(currentVideoList.name)
-    const [videoListIsPublic, setVideoListIsPublic] = useState(currentVideoList.isPublic)
+    const [editingErrorMessage, setEditingErrorMessage] = useState<string | null>(null)
     const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState(false)
 
     const cancelRef = React.useRef(null)
@@ -33,13 +25,29 @@ const EditVideoListPage = observer(
       navigation.navigate('videoListsHome')
     }
 
+    const handleSave = () => {
+      VideoList.save(videoListViewModel)
+        .then(closeEditPage)
+        .catch((e: Error) => {
+          setEditingErrorMessage(e.message)
+        })
+    }
+
+    const videoListViewModel = useMemo(() => {
+      return createViewModel(currentVideoList)
+    }, [currentVideoList])
+
     return (
       <View flex={1} backgroundColor="light.100">
         <View margin="10px" flex={1}>
           <FormControl isInvalid={!!editingErrorMessage} marginBottom="8px">
             <FormControl.Label>Enter List Name</FormControl.Label>
 
-            <Input value={videoListName} onChangeText={setVideoListName} marginLeft="5px" />
+            <Input
+              value={videoListViewModel.name}
+              onChangeText={nextName => (videoListViewModel.name = nextName)}
+              marginLeft="5px"
+            />
 
             <FormControl.HelperText marginLeft="10px">Example helper text</FormControl.HelperText>
 
@@ -54,8 +62,8 @@ const EditVideoListPage = observer(
 
               <Switch
                 size="sm"
-                value={videoListIsPublic}
-                onToggle={() => setVideoListIsPublic(!videoListIsPublic)}
+                value={videoListViewModel.isPublic}
+                onToggle={() => (videoListViewModel.isPublic = !videoListViewModel.isPublic)}
               />
             </Row>
 
@@ -64,11 +72,11 @@ const EditVideoListPage = observer(
             </FormControl.HelperText>
           </FormControl>
 
-          <Button onPress={onFinishEditing} marginBottom="10px">
+          <Button onPress={handleSave} marginBottom="10px">
             Save
           </Button>
 
-          <Button onPress={onCancelEditing}>Cancel</Button>
+          <Button onPress={closeEditPage}>Cancel</Button>
         </View>
 
         {currentVideoList.adminIds.length === 1 && (

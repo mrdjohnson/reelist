@@ -14,6 +14,7 @@ import Video from './Video'
 import { callTmdb } from '~/api/api'
 import ShortUniqueId from 'short-unique-id'
 import User from '~/models/User'
+import { IViewModel } from 'mobx-utils'
 
 class VideoList {
   id!: string
@@ -123,18 +124,24 @@ class VideoList {
     }
   }
 
-  update = async (name: string, isPublic: boolean) => {
+  static save = async (videoListViewModel: VideoList & IViewModel<VideoList>) => {
+    const { name, isPublic } = videoListViewModel
+
     if (name.length <= 3) {
       throw new Error('Name must be 3 characters or longer')
     }
-    const { data: videoLists, error } = await supabase
+
+    const { data: videoList, error } = await supabase
       .from('videoLists')
       .update({ name, is_public: isPublic })
-      .match({ id: this.id })
+      .match({ id: videoListViewModel.id })
+      .single()
 
     if (error) {
       console.error('failed to edit videolist', error.message)
       throw error
+    } else if (videoList) {
+      videoListViewModel.submit()
     }
   }
 
