@@ -7,21 +7,21 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "./apps/server/",
-        "command": "cp envs/.env.development.local .env.local"
+        "commands": ["cp envs/.env.development.local .env.local", "cat .env.local"]
       }
     },
     "prep-stage": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "./apps/server/",
-        "command": "cp envs/.env.staging.local .env.local"
+        "commands": ["cp envs/.env.staging.local .env.local", "cat .env.local"]
       }
     },
     "prep-prod": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "./apps/server/",
-        "command": "cp envs/.env.production.local .env.local"
+        "commands": ["cp envs/.env.production.local .env.local", "cat .env.local"]
       }
     },
     "deploy-prod": {
@@ -29,7 +29,8 @@
       "options": {
         "cwd": "./apps/server/",
         "commands": [
-          "cp envs/.env.production.local .env.local",
+          "nx run server:prep-prod",
+          "rm -rf ./dist",
           "cd ../../ && nx run server:build:production",
           "node scripts/docker/deploy.mjs"
         ],
@@ -41,7 +42,8 @@
       "options": {
         "cwd": "./apps/server/",
         "commands": [
-          "cp envs/.env.staging.local .env.local",
+          "nx run server:prep-stage",
+          "rm -rf ./dist",
           "cd ../../ && nx run server:build",
           "node scripts/docker/deploy_local.mjs"
         ],
