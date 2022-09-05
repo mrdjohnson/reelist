@@ -19,6 +19,7 @@ import { IViewModel } from 'mobx-utils'
 class VideoList {
   id!: string
   adminIds!: string[]
+  isJoinable!: boolean
   name!: string
   videoIds!: string[]
   isPublic!: boolean
@@ -125,7 +126,7 @@ class VideoList {
   }
 
   static save = async (videoListViewModel: VideoList & IViewModel<VideoList>) => {
-    const { name, isPublic } = videoListViewModel
+    const { name, isPublic, isJoinable } = videoListViewModel
 
     if (name.length <= 3) {
       throw new Error('Name must be 3 characters or longer')
@@ -133,7 +134,7 @@ class VideoList {
 
     const { data: videoList, error } = await supabase
       .from('videoLists')
-      .update({ name, is_public: isPublic })
+      .update({ name, is_public: isPublic, is_joinable: isJoinable })
       .match({ id: videoListViewModel.id })
       .single()
 

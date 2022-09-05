@@ -136,13 +136,25 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
   if (!currentVideoList) return null
 
   const join = () => {
-    currentVideoList.join()
-    onMemebershipClose()
+    if (currentVideoList.isJoinable) {
+      currentVideoList.join()
+      onMemebershipClose()
+    } else {
+      toast.show({
+        description: 'This list is not joinable.',
+      })
+    }
   }
 
   const leave = () => {
-    currentVideoList.leave()
-    closeMemberShipActionSheet()
+    if (currentVideoList.adminIds.length === 1) {
+      toast.show({
+        description: 'You are the only one in the list, please delete list instead.',
+      })
+    } else {
+      currentVideoList.leave()
+      closeMemberShipActionSheet()
+    }
   }
 
   const startEditing = () => {
@@ -258,12 +270,24 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
 
       <Actionsheet isOpen={isMembershipOpen} onClose={closeMemberShipActionSheet}>
         <Actionsheet.Content display={showMembers ? 'none' : null}>
-          {!isUserListAdmin && <Actionsheet.Item onPress={join}>Join</Actionsheet.Item>}
+          {!isUserListAdmin && currentVideoList.isJoinable && (
+            <Actionsheet.Item
+              onPress={join}
+              _text={{ color: currentVideoList.isJoinable ? undefined : 'gray.600' }}
+            >
+              Join
+            </Actionsheet.Item>
+          )}
 
           <Actionsheet.Item onPress={() => setShowMembers(true)}>Members</Actionsheet.Item>
 
-          {currentVideoList.adminIds.length > 1 && isUserListAdmin && (
-            <Actionsheet.Item onPress={leave}>Leave</Actionsheet.Item>
+          {isUserListAdmin && (
+            <Actionsheet.Item
+              onPress={leave}
+              _text={{ color: currentVideoList.adminIds.length > 1 ? undefined : 'gray.600' }}
+            >
+              Leave
+            </Actionsheet.Item>
           )}
 
           {isUserListAdmin && <Actionsheet.Item onPress={startEditing}>Edit</Actionsheet.Item>}

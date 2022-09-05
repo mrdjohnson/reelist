@@ -79,6 +79,29 @@ const EditVideoListPage = observer(
             </FormControl.HelperText>
           </FormControl>
 
+          <FormControl marginBottom="10px">
+            <FormControl.Label>Is List Joinable?</FormControl.Label>
+
+            <ToggleButton
+              size="sm"
+              marginLeft="5px"
+              active={videoListViewModel.isJoinable}
+              color="gray.600"
+              activeColor="blue.600"
+              content="Not Joinable"
+              activeContent="Joinable"
+              icon={<MaterialIcons name="public-off" />}
+              activeIcon={<MaterialIcons name="public" />}
+              onPress={() => {
+                videoListViewModel.isJoinable = !videoListViewModel.isJoinable
+              }}
+            />
+
+            <FormControl.HelperText marginLeft="5px">
+              Can the list be joined by everyone with a link to it?
+            </FormControl.HelperText>
+          </FormControl>
+
           <Button onPress={handleSave} marginBottom="10px">
             Save
           </Button>
