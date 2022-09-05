@@ -163,7 +163,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
   }
 
   const shareList = async () => {
-    const uniqueId = await currentVideoList.getShareUniqId()
+    const uniqueId = currentVideoList.uniqueId
     let description = 'Unable to generate a unique id for ' + currentVideoList.name
 
     if (uniqueId !== null) {

@@ -209,42 +209,9 @@ class VideoList {
     return new VideoList(videoListResponse, this.storeAuth, this.videoListStore)
   }
 
-  updateUniqueId = async (uniqueId: string) => {
-    const { data: videoListResponse, error } = await supabase
-      .from('videoLists')
-      .update({ unique_id: uniqueId })
-      .match({ id: this.id })
-      .single()
-
-    if (error) {
-      throw error.message
-    }
-
-    return new VideoList(videoListResponse, this.storeAuth, this.videoListStore)
-  }
-
-  getShareUniqId = async () => {
-    if (this.uniqueId) return this.uniqueId
-
-    let generateUniqueIdCount = 1
-    let uniqueId = null
-
-    while (generateUniqueIdCount < 2 && uniqueId === null) {
-      const generateUniqueId = new ShortUniqueId({ length: 10 })
-      const idAttempt = generateUniqueId()
-
-      try {
-        await this.getByUniqueId(idAttempt)
-      } catch (e) {
-        uniqueId = idAttempt
-      }
-
-      generateUniqueIdCount += 1
-    }
-
-    if (uniqueId) {
-      await this.updateUniqueId(uniqueId)
-    }
+  static createUniqueShareId = () => {
+    const generateUniqueId = new ShortUniqueId({ length: 10 })
+    const uniqueId = generateUniqueId()
 
     return uniqueId
   }

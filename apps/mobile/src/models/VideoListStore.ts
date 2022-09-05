@@ -97,11 +97,19 @@ class VideoListStore {
   })
 
   createVideoList = async (name: string, isPublic: boolean, onSuccess: () => void = Function) => {
+    const uniqueShareId = VideoList.createUniqueShareId()
+
     const { data: videoListJson, error } = await supabase
       .from<VideoListJsonType>('videoLists')
-      .insert({ name: name, is_public: isPublic, admin_ids: [this.storeAuth.user.id] })
+      .insert({
+        name: name,
+        is_public: isPublic,
+        admin_ids: [this.storeAuth.user.id],
+        unique_id: uniqueShareId,
+      })
       .single()
 
+    // todo: this might error if the unique_id is not unique
     if (error) {
       console.error('failed to create videolist', error.message)
     } else {
