@@ -70,9 +70,12 @@ const TrackedVideoItem = observer(({ video, isInteractable = true }: VideoItemPr
   } else if (video.mediaType === 'movie') {
     bottomRow = (
       <View flexDirection="row-reverse">
-        <Button onPress={() => video.toggleWatched()} size="lg">
-          <Icon as={<MaterialCommunityIcons name="eye-plus" />} color="white" />
-        </Button>
+        <ActionButton
+          color="blue.600"
+          icon={<MaterialCommunityIcons name="eye-plus" />}
+          onPress={() => video.toggleWatched()}
+          content=""
+        />
       </View>
     )
   } else {
