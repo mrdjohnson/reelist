@@ -8,7 +8,7 @@ import {
   runInAction,
 } from 'mobx'
 import Auth from './Auth'
-import humps from 'humps'
+import humps, { Camelized } from 'humps'
 import VideoListStore from './VideoListStore'
 import Video from './Video'
 import { callTmdb } from '~/api/api'
@@ -16,7 +16,18 @@ import ShortUniqueId from 'short-unique-id'
 import User from '~/models/User'
 import { IViewModel } from 'mobx-utils'
 
-class VideoList {
+export type VideoListTableType = {
+  id: string
+  admin_ids: string[]
+  is_joinable: boolean
+  name: string
+  video_ids: string[]
+  is_public: boolean
+  unique_id: string
+}
+
+type VideoListType = Camelized<VideoListTableType>
+class VideoList implements VideoListType {
   id!: string
   adminIds!: string[]
   isJoinable!: boolean
@@ -32,7 +43,7 @@ class VideoList {
   videoListStore: VideoListStore
   storeAuth: Auth
 
-  constructor(json: VideoListJsonType | null, auth: Auth, videoListStore: VideoListStore) {
+  constructor(json: VideoListTableType | null, auth: Auth, videoListStore: VideoListStore) {
     if (json) {
       this._assignValuesFromJson(json)
     } else {
@@ -56,7 +67,7 @@ class VideoList {
     })
   }
 
-  _assignValuesFromJson = (json: VideoListJsonType) => {
+  _assignValuesFromJson = (json: VideoListTableType) => {
     Object.assign(this, humps.camelizeKeys(json))
   }
 
@@ -105,7 +116,7 @@ class VideoList {
 
   join = async () => {
     const { data: nextVideoList, error } = await supabase
-      .from<VideoListJsonType>('videoLists')
+      .from<VideoListTableType>('videoLists')
       .update({ admin_ids: this.adminIds.concat(this.storeAuth.user.id) })
       .match({ id: this.id })
       .single()
@@ -122,7 +133,7 @@ class VideoList {
 
   leave = async () => {
     const { data: nextVideoList, error } = await supabase
-      .from<VideoListJsonType>('videoLists')
+      .from<VideoListTableType>('videoLists')
       .update({ admin_ids: _.without(this.adminIds, this.storeAuth.user.id) })
       .match({ id: this.id })
       .single()
@@ -161,7 +172,7 @@ class VideoList {
 
   destroy = async () => {
     const { error } = await supabase
-      .from<VideoListJsonType>('videoLists')
+      .from<VideoListTableType>('videoLists')
       .delete()
       .match({ id: this.id })
 
@@ -243,7 +254,5 @@ class VideoList {
     this.admins = _.compact(admins)
   }
 }
-
-export type VideoListJsonType = humps.Decamelized<VideoList>
 
 export default VideoList

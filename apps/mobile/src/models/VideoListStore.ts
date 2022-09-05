@@ -4,7 +4,7 @@ import _ from 'lodash'
 import { flow, flowResult, makeAutoObservable, runInAction } from 'mobx'
 // import { camelizeKeys } from '@utils/camelizeKeys'
 import Auth from './Auth'
-import VideoList, { VideoListJsonType } from './VideoList'
+import VideoList, { VideoListTableType } from './VideoList'
 import { IViewModel } from 'mobx-utils'
 
 class VideoListStore {
@@ -23,7 +23,7 @@ class VideoListStore {
     this.storeAuth = auth
   }
 
-  makeUiVideoList = (videoList: VideoListJsonType) => {
+  makeUiVideoList = (videoList: VideoListTableType) => {
     return new VideoList(videoList, this.storeAuth, this)
   }
 
@@ -41,7 +41,7 @@ class VideoListStore {
     if (!_.isEmpty(this.adminVideoLists)) return this.adminVideoLists
 
     const { data: videoLists, error } = await supabase
-      .from<VideoListJsonType>('videoLists')
+      .from<VideoListTableType>('videoLists')
       .select('*')
       .contains('admin_ids', [this.storeAuth.user?.id])
       .order('id', { ascending: false })
@@ -68,7 +68,7 @@ class VideoListStore {
     }
 
     const { data: videoList } = yield supabase
-      .from<VideoListJsonType>('videoLists')
+      .from<VideoListTableType>('videoLists')
       .select('*')
       .match({ unique_id: videoListShareId })
       .single()
@@ -84,7 +84,7 @@ class VideoListStore {
     if (!_.isEmpty(this.publicVideoLists)) return this.publicVideoLists
 
     const { data: videoLists, error } = yield supabase
-      .from<VideoListJsonType>('videoLists')
+      .from<VideoListTableType>('videoLists')
       .select('*')
       .match({ is_public: true })
       .not('admin_ids', 'cs', '{"' + this.storeAuth.user?.id + '"}')
@@ -108,7 +108,7 @@ class VideoListStore {
     const uniqueShareId = VideoList.createUniqueShareId()
 
     const { data: videoListJson, error } = await supabase
-      .from<VideoListJsonType>('videoLists')
+      .from<VideoListTableType>('videoLists')
       .insert({
         name: name,
         is_public: isPublic,
