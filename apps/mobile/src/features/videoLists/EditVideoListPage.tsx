@@ -6,6 +6,7 @@ import { useReelistNavigation } from '~/utils/navigation'
 import { createViewModel } from 'mobx-utils'
 import ToggleButton from '~/shared/components/ToggleButton'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import { useStore } from '~/hooks/useStore'
 
 type EditVideoListPageProps = {
   currentVideoList: VideoList
@@ -15,6 +16,7 @@ type EditVideoListPageProps = {
 const EditVideoListPage = observer(
   ({ currentVideoList, closeEditPage }: EditVideoListPageProps) => {
     const navigation = useReelistNavigation()
+    const { videoListStore } = useStore()
 
     const [editingErrorMessage, setEditingErrorMessage] = useState<string | null>(null)
     const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState(false)
@@ -28,11 +30,15 @@ const EditVideoListPage = observer(
     }
 
     const handleSave = () => {
-      VideoList.save(videoListViewModel)
-        .then(closeEditPage)
-        .catch((e: Error) => {
-          setEditingErrorMessage(e.message)
-        })
+      if (currentVideoList.id) {
+        videoListStore.createVideoList(videoListViewModel).then(closeEditPage)
+      } else {
+        VideoList.save(videoListViewModel)
+          .then(closeEditPage)
+          .catch((e: Error) => {
+            setEditingErrorMessage(e.message)
+          })
+      }
     }
 
     const videoListViewModel = useMemo(() => {
@@ -43,7 +49,7 @@ const EditVideoListPage = observer(
       <View flex={1} backgroundColor="light.100">
         <View margin="10px" flex={1}>
           <FormControl isInvalid={!!editingErrorMessage} marginBottom="8px">
-            <FormControl.Label>Enter List Name</FormControl.Label>
+            <FormControl.Label>Name</FormControl.Label>
 
             <Input
               value={videoListViewModel.name}
@@ -103,7 +109,7 @@ const EditVideoListPage = observer(
           </FormControl>
 
           <Button onPress={handleSave} marginBottom="10px">
-            Save
+            {currentVideoList.isNewVideoList ? 'Create' : 'Save'}
           </Button>
 
           <Button onPress={closeEditPage}>Cancel</Button>

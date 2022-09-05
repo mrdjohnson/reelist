@@ -32,8 +32,17 @@ class VideoList {
   videoListStore: VideoListStore
   storeAuth: Auth
 
-  constructor(json: VideoListJsonType, auth: Auth, videoListStore: VideoListStore) {
-    this._assignValuesFromJson(json)
+  constructor(json: VideoListJsonType | null, auth: Auth, videoListStore: VideoListStore) {
+    if (json) {
+      this._assignValuesFromJson(json)
+    } else {
+      this.adminIds = []
+      this.isJoinable = true
+      this.name = ''
+      this.videoIds = []
+      this.isPublic = true
+      this.uniqueId = ''
+    }
 
     this.storeAuth = auth
     this.videoListStore = videoListStore
@@ -41,6 +50,9 @@ class VideoList {
     makeAutoObservable(this, {
       id: false,
       storeAuth: false,
+      videoListStore: false,
+      // this is needed because mobx is confused about something that should not exist for blank items
+      createdAt: false,
     })
   }
 
@@ -142,6 +154,7 @@ class VideoList {
       console.error('failed to edit videolist', error.message)
       throw error
     } else if (videoList) {
+      videoListViewModel.isNewVideoList = false
       videoListViewModel.submit()
     }
   }

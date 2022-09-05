@@ -21,6 +21,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import SearchBar from '~/shared/components/SearchBar'
 import { ReelistScreen } from '~/utils/navigation'
 import useRefresh from '~/hooks/useRefresh'
+import EditVideoListPage from './EditVideoListPage'
 
 const VideoListListItem = observer(
   ({
@@ -54,9 +55,7 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
   const publicVideoLists = videoListStore.publicVideoLists
   const adminVideoLists = videoListStore.adminVideoLists
 
-  const [creatingList, setCreatingList] = useState<boolean>(false)
-  const [nextListName, setNextListName] = useState('')
-  const [nextListIsPublic, setListIsPublic] = useState(true)
+  const [nextVideoList, setNextVideoList] = useState<VideoList | null>(null)
   const [filterText, setfilterText] = useState('')
 
   const [filteredAdminLists, filteredPublicLists] = useMemo(() => {
@@ -80,8 +79,8 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
 
   useEffect(() => {
     const onBackButtonPressed = () => {
-      if (creatingList) {
-        setCreatingList(false)
+      if (nextVideoList) {
+        setNextVideoList(null)
 
         return CANNOT_GO_BACK
       }
@@ -92,7 +91,7 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
     BackHandler.addEventListener('hardwareBackPress', onBackButtonPressed)
 
     return () => BackHandler.removeEventListener('hardwareBackPress', onBackButtonPressed)
-  }, [creatingList])
+  }, [nextVideoList])
 
   const data = []
 
@@ -114,63 +113,48 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
     navigation.navigate('videoListScreen')
   }
 
-  const handleCreateList = () => {
-    videoListStore
-      .createVideoList(nextListName, nextListIsPublic)
-      .then(() => setCreatingList(false))
-  }
-
   const renderSectionHeader = ({ section: { title } }: SectionListData<VideoList>) => {
     return <Text fontSize="lg">{title}</Text>
   }
 
+  if (nextVideoList) {
+    return (
+      <EditVideoListPage
+        currentVideoList={nextVideoList}
+        closeEditPage={() => setNextVideoList(null)}
+      />
+    )
+  }
+
   return (
     <View flex={1} justifyContent="space-between">
-      {creatingList ? (
-        <>
-          <Text>Create List</Text>
+      <SearchBar
+        placeholder="Filter Lists"
+        leftIcon={<MaterialCommunityIcons name="filter-outline" />}
+        value={filterText}
+        onChangeText={setfilterText}
+        returnKeyType="search"
+        autoCapitalize="none"
+      />
 
-          <Input placeholder="List name" onChangeText={setNextListName} value={nextListName} />
+      <SectionList
+        padding="10px"
+        sections={data}
+        keyExtractor={(item, index) => item.id}
+        renderItem={({ item: videoList }) => (
+          <VideoListListItem videoList={videoList} onVideoListPress={handleVideoListPress} />
+        )}
+        renderSectionHeader={({ section: { title } }) => (
+          <View backgroundColor="light.300">
+            <Text fontSize="xl">{title} title</Text>
+          </View>
+        )}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
+      />
 
-          <HStack>
-            <Text>Is List Public?</Text>
-
-            <Switch value={nextListIsPublic} onToggle={() => setListIsPublic(!nextListIsPublic)} />
-          </HStack>
-
-          <Button onPress={handleCreateList}>Create List</Button>
-
-          <Button onPress={() => setCreatingList(false)}>Cancel</Button>
-        </>
-      ) : (
-        <>
-          <SearchBar
-            placeholder="Filter Lists"
-            leftIcon={<MaterialCommunityIcons name="filter-outline" />}
-            value={filterText}
-            onChangeText={setfilterText}
-            returnKeyType="search"
-            autoCapitalize="none"
-          />
-
-          <SectionList
-            padding="10px"
-            sections={data}
-            keyExtractor={(item, index) => item.id}
-            renderItem={({ item: videoList }) => (
-              <VideoListListItem videoList={videoList} onVideoListPress={handleVideoListPress} />
-            )}
-            renderSectionHeader={({ section: { title } }) => (
-              <View backgroundColor="light.300">
-                <Text fontSize="xl">{title} title</Text>
-              </View>
-            )}
-            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
-          />
-
-          <Button onPress={() => setCreatingList(true)}>Create List</Button>
-        </>
-      )}
+      <Button onPress={() => setNextVideoList(videoListStore.createBlankVideoList())}>
+        Create List
+      </Button>
     </View>
   )
 })

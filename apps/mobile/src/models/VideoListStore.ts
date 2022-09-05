@@ -5,6 +5,7 @@ import { flow, flowResult, makeAutoObservable, runInAction } from 'mobx'
 // import { camelizeKeys } from '@utils/camelizeKeys'
 import Auth from './Auth'
 import VideoList, { VideoListJsonType } from './VideoList'
+import { IViewModel } from 'mobx-utils'
 
 class VideoListStore {
   adminVideoLists: VideoList[] = []
@@ -96,7 +97,14 @@ class VideoListStore {
     this.publicVideoLists = videoLists?.map(this.makeUiVideoList) || []
   })
 
-  createVideoList = async (name: string, isPublic: boolean, onSuccess: () => void = Function) => {
+  createBlankVideoList = () => {
+    const videoList = new VideoList(null, this.storeAuth, this)
+
+    return videoList
+  }
+
+  createVideoList = async (videoListViewModel: VideoList & IViewModel<VideoList>) => {
+    const { name, isPublic, isJoinable } = videoListViewModel
     const uniqueShareId = VideoList.createUniqueShareId()
 
     const { data: videoListJson, error } = await supabase
@@ -105,6 +113,7 @@ class VideoListStore {
         name: name,
         is_public: isPublic,
         admin_ids: [this.storeAuth.user.id],
+        is_joinable: isJoinable,
         unique_id: uniqueShareId,
       })
       .single()
@@ -115,7 +124,6 @@ class VideoListStore {
     } else {
       const videoList = this.makeUiVideoList(videoListJson!)
       this.addToAdminVideoList(videoList)
-      onSuccess()
     }
   }
 
