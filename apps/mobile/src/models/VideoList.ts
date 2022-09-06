@@ -14,7 +14,7 @@ import Video from './Video'
 import { callTmdb } from '~/api/api'
 import ShortUniqueId from 'short-unique-id'
 import User from '~/models/User'
-import { IViewModel } from 'mobx-utils'
+import { createViewModel, IViewModel } from 'mobx-utils'
 
 export type VideoListTableType = {
   id: string
@@ -115,49 +115,29 @@ class VideoList implements VideoListType {
   }
 
   join = async () => {
-    const { data: nextVideoList, error } = await supabase
-      .from<VideoListTableType>('videoLists')
-      .update({ admin_ids: this.adminIds.concat(this.storeAuth.user.id) })
-      .match({ id: this.id })
-      .single()
+    this.viewModel.adminIds = this.adminIds.concat(this.storeAuth.user.id)
 
-    if (error) {
-      console.error('failed to join videolist', error.message)
-    } else if (nextVideoList) {
-      this._assignValuesFromJson(nextVideoList)
-      this.videoListStore.addToAdminVideoList(this)
-    } else {
-      console.log('nothing happened?')
-    }
+    VideoList.save(this.viewModel)
   }
 
   leave = async () => {
-    const { data: nextVideoList, error } = await supabase
-      .from<VideoListTableType>('videoLists')
-      .update({ admin_ids: _.without(this.adminIds, this.storeAuth.user.id) })
-      .match({ id: this.id })
-      .single()
+    this.viewModel.adminIds = _.without(this.adminIds, this.storeAuth.user.id)
 
-    if (error) {
-      console.error('failed to leave videolist', error.message)
-    } else if (nextVideoList) {
-      this._assignValuesFromJson(nextVideoList)
-      this.videoListStore.removeFromAdminVideoList(this)
-    } else {
-      console.log('nothing happened?')
-    }
+    VideoList.save(this.viewModel)
   }
 
   static save = async (videoListViewModel: VideoList & IViewModel<VideoList>) => {
-    const { name, isPublic, isJoinable } = videoListViewModel
-
-    if (name.length <= 3) {
+    const name = videoListViewModel.changedValues.get('name') as string
+    if (name && name.length <= 3) {
       throw new Error('Name must be 3 characters or longer')
     }
 
+    // Map{'exampleField' -> 'exampleValue'} -> {example_field: 'exampleValue'}
+    const changedFields = humps.decamelizeKeys(Object.fromEntries(videoListViewModel.changedValues))
+
     const { data: videoList, error } = await supabase
       .from('videoLists')
-      .update({ name, is_public: isPublic, is_joinable: isJoinable })
+      .update(changedFields)
       .match({ id: videoListViewModel.id })
       .single()
 
@@ -165,7 +145,6 @@ class VideoList implements VideoListType {
       console.error('failed to edit videolist', error.message)
       throw error
     } else if (videoList) {
-      videoListViewModel.isNewVideoList = false
       videoListViewModel.submit()
     }
   }
@@ -187,36 +166,21 @@ class VideoList implements VideoListType {
 
   addOrRemoveVideo = async (video: Video) => {
     const videoId = video.videoId
-    let addingVideo = false
 
-    const nextList = _.without(this.videoIds, videoId)
-    if (this.videoIds.length === nextList.length) {
-      nextList.push(videoId)
-      addingVideo = true
+    const nextVideoIds = _.without(this.videoIds, videoId)
+    const nextVideos = _.filter(this.videos, listVideo => listVideo.videoId === videoId)
+
+    // if nothing changed when we tried to remove, add instead
+    if (this.videoIds.length === nextVideoIds.length) {
+      nextVideoIds.push(videoId)
+      nextVideos.push(video)
     }
 
-    const { data: _videoListResponse, error } = await supabase
-      .from('videoLists')
-      .update({ video_ids: nextList })
-      .match({ id: this.id })
+    this.viewModel.videoIds = nextVideoIds
 
-    if (error) {
-      console.error(
-        'failed to',
-        addingVideo ? 'add' : 'remove',
-        video.videoName,
-        'to/from',
-        this.name,
-        'error: ',
-        error.message,
-      )
-    } else if (addingVideo) {
-      this.videos.push(video)
-      this.videoIds.push(videoId)
-    } else {
-      _.remove(this.videos, video => video.videoId === videoId)
-      _.pull(this.videoIds, videoId)
-    }
+    VideoList.save(this.viewModel).then(() => {
+      this.videos = nextVideos
+    })
   }
 
   getByUniqueId = async (uniqueId: string) => {
@@ -252,6 +216,10 @@ class VideoList implements VideoListType {
     )
 
     this.admins = _.compact(admins)
+  }
+
+  get viewModel() {
+    return createViewModel<VideoList>(this)
   }
 }
 
