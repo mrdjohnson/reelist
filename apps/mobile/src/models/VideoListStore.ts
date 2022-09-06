@@ -28,13 +28,16 @@ class VideoListStore {
   }
 
   addToAdminVideoList = (videoList: VideoList) => {
-    this.adminVideoLists.push(videoList)
-    _.remove(this.publicVideoLists, publicVideoList => publicVideoList.id === videoList.id)
+    this.adminVideoLists = this.adminVideoLists.concat(videoList)
+    this.publicVideoLists = _.without(this.publicVideoLists, videoList)
   }
 
   removeFromAdminVideoList = (videoList: VideoList) => {
-    _.remove(this.adminVideoLists, adminVideoList => adminVideoList.id === videoList.id)
-    this.publicVideoLists.push(videoList)
+    this.adminVideoLists = _.without(this.adminVideoLists, videoList)
+
+    if (videoList.isPublic) {
+      this.publicVideoLists = this.publicVideoLists.concat(videoList)
+    }
   }
 
   getAdminVideoLists = async () => {

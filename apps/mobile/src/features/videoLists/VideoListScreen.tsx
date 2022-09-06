@@ -153,6 +153,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
       })
     } else {
       currentVideoList.leave()
+      navigation.pop()
       closeMemberShipActionSheet()
     }
   }
