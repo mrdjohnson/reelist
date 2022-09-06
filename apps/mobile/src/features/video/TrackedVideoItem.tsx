@@ -71,10 +71,8 @@ const TrackedVideoItem = observer(({ video, isInteractable = true }: VideoItemPr
     bottomRow = (
       <View flexDirection="row-reverse">
         <ActionButton
-          color="blue.600"
           icon={<MaterialCommunityIcons name="eye-plus" />}
           onPress={() => video.toggleWatched()}
-          content=""
         />
       </View>
     )
@@ -88,10 +86,8 @@ const TrackedVideoItem = observer(({ video, isInteractable = true }: VideoItemPr
         </View>
 
         <ActionButton
-          color="blue.600"
           icon={<MaterialCommunityIcons name="eye-plus" />}
           onPress={video.watchNextEpisode}
-          content=""
         />
       </View>
     )

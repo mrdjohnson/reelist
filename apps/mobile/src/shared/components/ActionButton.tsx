@@ -1,15 +1,13 @@
 import React, { useMemo } from 'react'
 import { Button, IButtonProps, Icon } from 'native-base'
-import { IconButtonProps } from 'react-native-vector-icons/Icon'
 import _ from 'lodash'
 
-type ActionButtonProps = IButtonProps & {
+export type ActionButtonProps = IButtonProps & {
   icon?: IButtonProps['startIcon']
-  color: IButtonProps['color']
-  content: IconButtonProps['children']
+  color?: IButtonProps['color']
 }
 
-const ActionButton = ({ color, icon, content, ...props }: ActionButtonProps) => {
+const ActionButton = ({ color = 'info.600', icon, ...props }: ActionButtonProps) => {
   const colorScheme = useMemo(() => {
     if (!_.isString(color)) return color
 
@@ -18,16 +16,15 @@ const ActionButton = ({ color, icon, content, ...props }: ActionButtonProps) => 
 
   return (
     <Button
-      variant="outline"
+      variant={props.variant || 'outline'}
       borderColor={color}
       _text={{ color }}
       color={color}
       colorScheme={colorScheme}
       startIcon={icon && <Icon as={icon} color={color} />}
+      rounded="full"
       {...props}
-    >
-      {content}
-    </Button>
+    />
   )
 }
 

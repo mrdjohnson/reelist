@@ -36,13 +36,13 @@ const ToggleButton = ({
 
   return (
     <ActionButton
-      variant="outline"
       icon={startIcon}
-      content={buttonContent}
       color={buttonColor}
       onPress={() => props.onPress?.(active)}
       {...props}
-    />
+    >
+      {buttonContent}
+    </ActionButton>
   )
 }
 
