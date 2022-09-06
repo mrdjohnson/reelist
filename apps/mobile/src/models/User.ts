@@ -1,7 +1,7 @@
 import supabase, { SupabaseUser } from '~/supabase'
 import { makeAutoObservable } from 'mobx'
 import { PostgrestError } from '@supabase/supabase-js'
-import humps, { Camelized } from 'humps'
+import humps, { Camelized, Decamelized } from 'humps'
 import { IViewModel } from 'mobx-utils'
 
 export type ProfileTableType = {
@@ -82,9 +82,12 @@ class User implements UserType {
   }
 
   static save = async (userViewModel: User & IViewModel<User>) => {
+    // Map{'exampleField' -> 'exampleValue'} -> {example_field: 'exampleValue'}
+    const changedFields = humps.decamelizeKeys(Object.fromEntries(userViewModel.changedValues))
+
     const { data: profile, error } = await supabase
       .from('profiles')
-      .update({ name: userViewModel.name, avatar_url: userViewModel.avatarUrl })
+      .update(changedFields)
       .match({ id: userViewModel.id })
       .single()
 
