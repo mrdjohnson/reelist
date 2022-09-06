@@ -31,13 +31,13 @@ const EditVideoListPage = observer(
 
     const handleSave = () => {
       if (currentVideoList.id) {
-        videoListStore.createVideoList(videoListViewModel).then(closeEditPage)
-      } else {
         VideoList.save(videoListViewModel)
           .then(closeEditPage)
           .catch((e: Error) => {
             setEditingErrorMessage(e.message)
           })
+      } else {
+        videoListStore.createVideoList(videoListViewModel).then(closeEditPage)
       }
     }
 
