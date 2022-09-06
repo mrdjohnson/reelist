@@ -50,7 +50,7 @@ const AppFooter = observer(() => {
   if (route.name === 'welcome') return null
 
   return (
-    <HStack bg="indigo.600" alignItems="center" safeAreaBottom shadow={6}>
+    <HStack bg="blue.500" alignItems="center" safeAreaBottom shadow={6}>
       <FooterButton
         routeName={route.name}
         name="tracking"
