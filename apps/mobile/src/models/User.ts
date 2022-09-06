@@ -1,15 +1,18 @@
 import supabase, { SupabaseUser } from '~/supabase'
-import { makeAutoObservable } from 'mobx'
+import mobx, { makeAutoObservable } from 'mobx'
 import { PostgrestError } from '@supabase/supabase-js'
 import humps, { Camelized, Decamelized } from 'humps'
-import { IViewModel } from 'mobx-utils'
+import { createViewModel, IViewModel } from 'mobx-utils'
+import VideoList from './VideoList'
+import _ from 'lodash'
 
 export type ProfileTableType = {
   id: string
   updated_at: string
   username: string
   avatar_url: string
-  following_lists: string[]
+  followed_list_ids: string[]
+  followed_user_ids: string[]
   notificationId: string
   name: string
 }
@@ -30,7 +33,8 @@ type UserConstructorType = {
 class User implements UserType {
   id = ''
   loggedIn = false
-  followingLists = []
+  followedListIds: string[] = []
+  followedUserIds: string[] = []
   updatedAt = ''
   username = ''
   avatarUrl = ''
@@ -47,6 +51,26 @@ class User implements UserType {
     // this.name = user.name
     // this.imageUrl = user.imageUrl
     // this.watchedIds = user.watchedIds
+  }
+
+  followVideoList = (videoList: VideoList) => {
+    this.viewModel.followedListIds = [...this.followedListIds, videoList.id]
+
+    User.save(this.viewModel)
+  }
+
+  unFollowVideoList = (videoList: VideoList) => {
+    this.viewModel.followedListIds = _.without(this.viewModel.followedListIds, videoList.id)
+
+    User.save(this.viewModel)
+  }
+
+  isFollowingVideoList = (videoList: VideoList) => {
+    return this.followedListIds.includes(videoList.id)
+  }
+
+  get viewModel() {
+    return createViewModel<User>(this)
   }
 
   static fromAuthId = async (
@@ -103,7 +127,8 @@ class User implements UserType {
 export const LoggedOutUser = new User({
   profile: {
     id: '',
-    followingLists: [],
+    followedListIds: [],
+    followedUserIds: [],
     updatedAt: '',
     username: '',
     avatarUrl: '',

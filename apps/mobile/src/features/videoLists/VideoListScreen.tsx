@@ -292,6 +292,16 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
 
           {isUserListAdmin && <Actionsheet.Item onPress={startEditing}>Edit</Actionsheet.Item>}
 
+          {auth.user.isFollowingVideoList(currentVideoList) ? (
+            <Actionsheet.Item onPress={() => auth.user.unFollowVideoList(currentVideoList)}>
+              UnFollow
+            </Actionsheet.Item>
+          ) : (
+            <Actionsheet.Item onPress={() => auth.user.followVideoList(currentVideoList)}>
+              Follow
+            </Actionsheet.Item>
+          )}
+
           <Actionsheet.Item onPress={shareList}>Copy Shareable link</Actionsheet.Item>
 
           <Actionsheet.Item onPress={onMemebershipClose}>Cancel</Actionsheet.Item>
