@@ -21,6 +21,7 @@ import { AppEventHandler } from '~/utils/AppEventHandler'
 import ProfileScreen from '~/features/profile/ProfileScreen'
 import SettingsScreen from '~/features/settings/SettingsScreen'
 import { NavigatorParamList } from '~/utils/navigation'
+import SplashScreen from '~/features/splash/SplashScreen'
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -60,8 +61,10 @@ const AppStack = () => {
       screenOptions={{
         headerShown: false,
       }}
-      initialRouteName="welcome"
+      initialRouteName="splash"
     >
+      <Stack.Screen name="splash" component={SplashScreen} />
+
       <Stack.Screen name="welcome" component={WelcomeScreen} />
 
       <Stack.Screen name="videoListsHome" component={withAppFooterHoc(VideoListsHomeScreen)} />

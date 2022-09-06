@@ -12,7 +12,10 @@ const WelcomeScreen = observer(({ navigation }: ReelistScreenProps) => {
 
   useEffect(() => {
     if (loggedIn) {
-      navigation.navigate('tracking')
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'tracking' }],
+      })
     }
   }, [loggedIn, navigation])
 

@@ -10,6 +10,7 @@ export type NavigatorParamList = {
   tracking: undefined
   profile: undefined
   settings: undefined
+  splash: undefined
 }
 
 export type ReelistScreen = NativeStackScreenProps<NavigatorParamList>

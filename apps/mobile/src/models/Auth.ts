@@ -4,6 +4,7 @@ import supabase from '~/supabase'
 import { Subscription } from '@supabase/supabase-js'
 
 import secrets from '~/secrets/secrets-index'
+import { save } from '~/utils/storage'
 const { TEST_EMAIL, TEST_PASSWORD } = secrets
 
 export default class Auth {
@@ -33,6 +34,10 @@ export default class Auth {
     this.user = user || LoggedOutUser
     this.loading = false
 
+    if (this.user.loggedIn) {
+      save('has_signed_in', true)
+    }
+
     console.log('logged ' + (this.user.loggedIn ? 'in' : 'out'))
   }
 
@@ -55,6 +60,7 @@ export default class Auth {
 
   logout = () => {
     this.setUser(LoggedOutUser)
+    save('has_signed_in', null)
   }
 
   getCurrentUserProfile = async () => {
