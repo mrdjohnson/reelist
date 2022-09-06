@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import {
-  Button,
   Image,
   Pressable,
   ScrollView,
@@ -28,6 +27,8 @@ import { ReelistScreen } from '~/utils/navigation'
 import VideoSeasonSection from './VideoSeasonSection'
 import VideoListManagementSection from './VideoListManagementSection'
 import ToggleButton from '~/shared/components/ToggleButton'
+import AppButton from '~/shared/components/AppButton'
+import ActionButton from '~/shared/components/ActionButton'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 const IndeterminateIcon = <Icon as={<MaterialIcons name="indeterminate-check-box" />} />
@@ -120,9 +121,10 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
           Season:{video.nextEpisode?.seasonNumber} Episode: {video.nextEpisode?.episodeNumber}
         </Text>
 
-        <Button onPress={video.watchNextEpisode}>
-          <Icon as={<MaterialCommunityIcons name="eye-plus" />} color="white" />
-        </Button>
+        <AppButton
+          onPress={video.watchNextEpisode}
+          icon={<MaterialCommunityIcons name="eye-plus" />}
+        />
       </Row>
     )
   }
@@ -185,17 +187,17 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
         />
       ) : (
         <>
-          <Button margin="10px" marginBottom="0px" onPress={() => setManageLists(true)}>
+          <AppButton margin="10px" marginBottom="0px" onPress={() => setManageLists(true)}>
             Manage Lists
-          </Button>
+          </AppButton>
 
           {video.isMovie || (
             <Row margin="10px" justifyContent="space-between">
               {videoStatus}
 
-              <Button size="sm" onPress={() => video.backfillWatched()}>
+              <ActionButton size="sm" onPress={() => video.backfillWatched()}>
                 Backfill?
-              </Button>
+              </ActionButton>
             </Row>
           )}
 
@@ -204,7 +206,7 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
               size="sm"
               minWidth="60%"
               active={video.tracked}
-              color="blue.600"
+              color="blue.500"
               activeColor="gray.600"
               icon={<MaterialCommunityIcons name="bookmark-plus" />}
               activeIcon={<MaterialCommunityIcons name="bookmark-check" />}
@@ -221,7 +223,7 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
           <ToggleButton
             margin="10px"
             active={video.isWatched}
-            color="blue.600"
+            color="blue.500"
             activeColor="gray.600"
             icon={<MaterialCommunityIcons name="eye-plus" />}
             activeIcon={<MaterialCommunityIcons name="eye-check" />}

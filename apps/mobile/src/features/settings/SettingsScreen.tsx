@@ -1,10 +1,11 @@
 import React from 'react'
-import { Button, Center, Column, Icon, ScrollView, Text, useToast, View } from 'native-base'
+import { Center, Column, ScrollView, Text, useToast } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
 import supabase from '~/supabase'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { ReelistScreen } from '~/utils/navigation'
+import AppButton from '~/shared/components/AppButton'
 
 const SettingsScreen = observer(({ navigation }: ReelistScreen) => {
   const { auth } = useStore()
@@ -27,22 +28,21 @@ const SettingsScreen = observer(({ navigation }: ReelistScreen) => {
           <Text fontSize="2xl">Settings</Text>
         </Center>
 
-        <Button
-          leftIcon={<Icon as={<MaterialCommunityIcons name="account-outline" />} />}
+        <AppButton
+          icon={<MaterialCommunityIcons name="account-outline" />}
           onPress={() => navigation.navigate('profile')}
         >
           Profile
-        </Button>
+        </AppButton>
 
-        <Button
-          leftIcon={<Icon as={<MaterialCommunityIcons name="power" />} />}
+        <AppButton
+          icon={<MaterialCommunityIcons name="power" />}
           onPress={logout}
           marginY="30px"
-          backgroundColor="error.500"
-          color="white"
+          color="red.600"
         >
           Logout
-        </Button>
+        </AppButton>
       </Column>
     </ScrollView>
   )

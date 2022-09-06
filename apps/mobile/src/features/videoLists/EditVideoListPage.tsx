@@ -7,6 +7,7 @@ import { createViewModel } from 'mobx-utils'
 import ToggleButton from '~/shared/components/ToggleButton'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { useStore } from '~/hooks/useStore'
+import AppButton from '~/shared/components/AppButton'
 
 type EditVideoListPageProps = {
   currentVideoList: VideoList
@@ -108,23 +109,21 @@ const EditVideoListPage = observer(
             </FormControl.HelperText>
           </FormControl>
 
-          <Button onPress={handleSave} marginBottom="10px">
+          <AppButton onPress={handleSave} marginBottom="10px">
             {currentVideoList.isNewVideoList ? 'Create' : 'Save'}
-          </Button>
+          </AppButton>
 
-          <Button onPress={closeEditPage}>Cancel</Button>
+          <AppButton onPress={closeEditPage}>Cancel</AppButton>
         </View>
 
         {currentVideoList.adminIds.length === 1 && (
-          <Button
+          <AppButton
             onPress={() => setIsDeleteConfirmationOpen(true)}
-            variant="outline"
-            colorScheme="red"
-            borderColor="red.300"
             margin="10px"
+            color="red.600"
           >
             Delete
-          </Button>
+          </AppButton>
         )}
 
         {/* hidden */}

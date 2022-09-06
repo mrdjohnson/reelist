@@ -7,7 +7,7 @@ import { Button, Column, Icon, Image, Pressable, Text, View } from 'native-base'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import moment from 'moment'
 import { useReelistNavigation } from '~/utils/navigation'
-import ActionButton from '~/shared/components/ActionButton'
+import AppButton from '~/shared/components/AppButton'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
@@ -70,7 +70,7 @@ const TrackedVideoItem = observer(({ video, isInteractable = true }: VideoItemPr
   } else if (video.mediaType === 'movie') {
     bottomRow = (
       <View flexDirection="row-reverse">
-        <ActionButton
+        <AppButton
           icon={<MaterialCommunityIcons name="eye-plus" />}
           onPress={() => video.toggleWatched()}
         />
@@ -85,7 +85,7 @@ const TrackedVideoItem = observer(({ video, isInteractable = true }: VideoItemPr
           <Text>Episode: {video.nextEpisode?.episodeNumber}</Text>
         </View>
 
-        <ActionButton
+        <AppButton
           icon={<MaterialCommunityIcons name="eye-plus" />}
           onPress={video.watchNextEpisode}
         />

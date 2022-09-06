@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import {
-  Button,
   Input,
   Image,
   FormControl,
@@ -20,6 +19,8 @@ import { createViewModel } from 'mobx-utils'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import User from '~/models/User'
 import { BackHandler } from 'react-native'
+import AppButton from '~/shared/components/AppButton'
+import ActionButton from '~/shared/components/ActionButton'
 
 const CAN_GO_BACK = false
 const CANNOT_GO_BACK = true
@@ -139,26 +140,23 @@ const EditProfilePage = observer(() => {
       </Row>
 
       <Row marginTop="15px">
-        <Button
+        <AppButton
           onPress={save}
-          color="white"
           flex={1}
           disabled={loading || !userViewModel.isDirty}
           isLoading={loading}
           isLoadingText="Saving"
         >
           Save
-        </Button>
+        </AppButton>
 
-        <Button
+        <ActionButton
           onPress={userViewModel.reset}
-          color="white"
           marginLeft="10px"
-          variant="outline"
           disabled={loading || !userViewModel.isDirty}
         >
           Reset
-        </Button>
+        </ActionButton>
       </Row>
     </View>
   )

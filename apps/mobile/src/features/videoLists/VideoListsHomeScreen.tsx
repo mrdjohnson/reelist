@@ -22,6 +22,7 @@ import SearchBar from '~/shared/components/SearchBar'
 import { ReelistScreen } from '~/utils/navigation'
 import useRefresh from '~/hooks/useRefresh'
 import EditVideoListPage from './EditVideoListPage'
+import AppButton from '~/shared/components/AppButton'
 
 const VideoListListItem = observer(
   ({
@@ -152,9 +153,12 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
       />
 
-      <Button onPress={() => setNextVideoList(videoListStore.createBlankVideoList())}>
+      <AppButton
+        onPress={() => setNextVideoList(videoListStore.createBlankVideoList())}
+        margin="10px"
+      >
         Create List
-      </Button>
+      </AppButton>
     </View>
   )
 })

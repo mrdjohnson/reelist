@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import {
-  Button,
   ScrollView,
   Text,
   View,
@@ -20,6 +19,8 @@ import _ from 'lodash'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import moment from 'moment'
 import { BackHandler } from 'react-native'
+import AppButton from '~/shared/components/AppButton'
+import ActionButton from '~/shared/components/ActionButton'
 
 const IndeterminateIcon = <Icon as={<MaterialIcons name="indeterminate-check-box" />} />
 
@@ -111,9 +112,9 @@ const VideoSeasonSection = observer(({ video, season }: VideoSeasonSectionProps)
     <View flex={1} display="flex">
       <View paddingLeft="10px" paddingRight="10px" flex={1}>
         <View flexDirection="row" borderBottomWidth={1} marginBottom="10px" alignItems="center">
-          <Button onPress={video.clearSelectedSeason} marginRight="8px" size="sm">
+          <AppButton onPress={video.clearSelectedSeason} marginRight="8px" size="sm">
             Go Back
-          </Button>
+          </AppButton>
 
           <Text fontSize="lg" flex={1}>
             {season.name}
@@ -142,16 +143,14 @@ const VideoSeasonSection = observer(({ video, season }: VideoSeasonSectionProps)
               onChange={() => setHideFutureEpisodes(!hideFutureEpisodes)}
             />
           </Row>
-          <Button onPress={() => setAscendingOrder(!ascendingOrder)} size="lg">
-            <Icon
-              as={
-                <MaterialCommunityIcons
-                  name={ascendingOrder ? 'sort-ascending' : 'sort-descending'}
-                />
-              }
-              color="white"
-            />
-          </Button>
+          <ActionButton
+            onPress={() => setAscendingOrder(!ascendingOrder)}
+            icon={
+              <MaterialCommunityIcons
+                name={ascendingOrder ? 'sort-ascending' : 'sort-descending'}
+              />
+            }
+          />
         </Row>
 
         <ScrollView flex={1}>{episodes?.map(renderEpisode)}</ScrollView>

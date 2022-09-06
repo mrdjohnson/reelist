@@ -7,7 +7,7 @@ export type ActionButtonProps = IButtonProps & {
   color?: IButtonProps['color']
 }
 
-const ActionButton = ({ color = 'info.600', icon, ...props }: ActionButtonProps) => {
+const ActionButton = ({ color = 'blue.500', icon, ...props }: ActionButtonProps) => {
   const colorScheme = useMemo(() => {
     if (!_.isString(color)) return color
 

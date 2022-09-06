@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react'
-import { Button, ScrollView, Text, View, Center, Checkbox } from 'native-base'
+import { ScrollView, Text, View, Center, Checkbox } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
 import Video from '~/models/Video'
+import AppButton from '~/shared/components/AppButton'
 
 type VideoListManagementSectionProps = {
   video: Video
@@ -21,7 +22,7 @@ const VideoListManagementSection = observer(
         <Center>
           <Text>Manage Lists: </Text>
 
-          <Button onPress={closeManageListsSection}>Go Back</Button>
+          <AppButton onPress={closeManageListsSection}>Go Back</AppButton>
         </Center>
 
         <ScrollView>

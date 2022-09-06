@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react'
-import { Button, Center, Text, View } from 'native-base'
+import { Center, Text, View } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
 import { InAppBrowser } from 'react-native-inappbrowser-reborn'
 import { ReelistScreen as ReelistScreenProps } from '~/utils/navigation'
+import AppButton from '~/shared/components/AppButton'
 
 const WelcomeScreen = observer(({ navigation }: ReelistScreenProps) => {
   const { auth } = useStore()
@@ -34,9 +35,9 @@ const WelcomeScreen = observer(({ navigation }: ReelistScreenProps) => {
       </Center>
 
       {!loggedIn && (
-        <Button onPress={login} marginTop="20px" marginX="10px">
+        <AppButton onPress={login} marginTop="20px" marginX="10px">
           Login
-        </Button>
+        </AppButton>
       )}
     </View>
   )
