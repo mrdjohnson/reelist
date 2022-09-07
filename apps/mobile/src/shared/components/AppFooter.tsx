@@ -1,38 +1,40 @@
 import { NavigationProp, RouteProp, useRoute } from '@react-navigation/native'
 import { observer } from 'mobx-react-lite'
-import { Box, Button, Center, HStack, Icon, Pressable, Text, View } from 'native-base'
-import React, { ReactElement } from 'react'
+import { Center, Row, Icon, IIconProps, Pressable, Text } from 'native-base'
+import React, { useState } from 'react'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import Ionicons from 'react-native-vector-icons/Ionicons'
 import { NavigatorParamList, useReelistNavigation } from '~/utils/navigation'
 
 type FooterButtonProps = {
   routeName: keyof NavigatorParamList
   name: keyof NavigatorParamList
-  selectedIcon: ReactElement
-  unSelectedIcon?: ReactElement
+  icon: IIconProps['as']
   navigation: NavigationProp<NavigatorParamList>
   text: string
+  iconSize?: number
 }
 
 const FooterButton = observer(
-  ({ routeName, name, selectedIcon, unSelectedIcon, navigation, text }: FooterButtonProps) => {
-    let icon = selectedIcon
-
-    if (unSelectedIcon && routeName !== name) {
-      icon = unSelectedIcon
-    }
+  ({ routeName, name, icon, navigation, text, iconSize = 5 }: FooterButtonProps) => {
+    const [isPressed, setIsPressed] = useState(false)
 
     return (
       <Pressable
         opacity={routeName === name ? 1 : 0.5}
-        py="3"
-        flex={1}
         onPress={() => navigation.navigate(name)}
+        onPressIn={() => setIsPressed(true)}
+        onPressOut={() => setIsPressed(false)}
+        flex={1}
+        justifyContent="center"
+        alignItems="center"
+        rounded="full"
+        paddingY="3px"
+        marginY="3px"
+        backgroundColor={isPressed ? 'blue.600:alpha.30' : undefined}
       >
         <Center>
-          <Icon mb="1" as={icon} color="white" size={5} />
+          <Icon as={icon} color="white" size={iconSize} />
 
           <Text color="white" fontSize="12">
             {text}
@@ -50,20 +52,27 @@ const AppFooter = observer(() => {
   if (route.name === 'welcome') return null
 
   return (
-    <HStack bg="blue.500" alignItems="center" safeAreaBottom shadow={6}>
+    <Row
+      bg="blue.500"
+      alignItems="center"
+      safeAreaBottom
+      shadow={6}
+      justifyContent="space-between"
+      paddingX="30px"
+    >
       <FooterButton
         routeName={route.name}
         name="tracking"
-        selectedIcon={<MaterialCommunityIcons name="bookmark-multiple" />}
+        icon={<MaterialCommunityIcons name="bookmark-multiple" />}
         navigation={navigation}
         text="Bookmarks"
+        iconSize={4}
       />
 
       <FooterButton
         routeName={route.name}
         name="videoListsHome"
-        selectedIcon={<MaterialCommunityIcons name="format-list-text" />}
-        unSelectedIcon={<MaterialCommunityIcons name="playlist-star" />}
+        icon={<MaterialCommunityIcons name="home-roof" />}
         navigation={navigation}
         text="Home"
       />
@@ -71,11 +80,12 @@ const AppFooter = observer(() => {
       <FooterButton
         routeName={route.name}
         name="search"
-        selectedIcon={<MaterialIcons name="search" />}
+        icon={<MaterialIcons name="search" />}
         navigation={navigation}
         text="Search"
+        iconSize={4}
       />
-    </HStack>
+    </Row>
   )
 })
 
