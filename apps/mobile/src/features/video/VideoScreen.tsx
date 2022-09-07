@@ -8,9 +8,8 @@ import {
   Icon,
   Center,
   Checkbox,
-  HStack,
-  Switch,
   Row,
+  Switch,
   Column,
   Box,
   AspectRatio,
@@ -201,7 +200,7 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
             </Row>
           )}
 
-          <HStack alignItems="center" space="8px" margin="10px">
+          <Row alignItems="center" space="8px" margin="10px">
             <ToggleButton
               size="sm"
               minWidth="60%"
@@ -214,7 +213,7 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
               activeContent="Added to Bookmarks"
               onPress={() => video.toggleTracked()}
             />
-          </HStack>
+          </Row>
         </>
       )}
 
