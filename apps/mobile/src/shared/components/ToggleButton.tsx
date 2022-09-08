@@ -3,25 +3,26 @@ import { IButtonProps } from 'native-base'
 import { IconButtonProps } from 'react-native-vector-icons/Icon'
 import ActionButton from './ActionButton'
 
-type ToggleButtonProps = IButtonProps & {
+type ToggleButtonProps = Omit<IButtonProps, 'onPress'> & {
   active: boolean
   icon?: IButtonProps['startIcon']
   activeIcon?: IButtonProps['startIcon']
-  color: IButtonProps['color']
+  color?: IButtonProps['color']
   activeColor?: IButtonProps['color']
   content: IconButtonProps['children']
   activeContent?: IconButtonProps['children']
-  onPress?: (active?: boolean) => void
+  onPress: (nextActive?: boolean) => void
 }
 
 const ToggleButton = ({
   active,
-  color,
-  activeColor,
+  color = 'gray.600',
+  activeColor = 'blue.500',
   icon,
   activeIcon,
   content,
   activeContent,
+  onPress,
   ...props
 }: ToggleButtonProps) => {
   let startIcon = icon
@@ -35,12 +36,7 @@ const ToggleButton = ({
   }
 
   return (
-    <ActionButton
-      icon={startIcon}
-      color={buttonColor}
-      onPress={() => props.onPress?.(active)}
-      {...props}
-    >
+    <ActionButton icon={startIcon} color={buttonColor} onPress={() => onPress(!active)} {...props}>
       {buttonContent}
     </ActionButton>
   )

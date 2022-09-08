@@ -115,7 +115,7 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
     )
   } else {
     videoStatus = (
-      <Row alignItems="center">
+      <Row alignItems="center" justifyContent="space-between" minWidth="50%">
         <Text marginRight="10px">
           Season:{video.nextEpisode?.seasonNumber} Episode: {video.nextEpisode?.episodeNumber}
         </Text>
@@ -203,10 +203,8 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
           <Row alignItems="center" space="8px" margin="10px">
             <ToggleButton
               size="sm"
-              minWidth="60%"
+              minWidth="50%"
               active={video.tracked}
-              color="blue.500"
-              activeColor="gray.600"
               icon={<MaterialCommunityIcons name="bookmark-plus" />}
               activeIcon={<MaterialCommunityIcons name="bookmark-check" />}
               content="Add to Bookmarks"
