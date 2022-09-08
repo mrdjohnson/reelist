@@ -8,6 +8,7 @@ import ToggleButton from '~/shared/components/ToggleButton'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { useStore } from '~/hooks/useStore'
 import AppButton from '~/shared/components/AppButton'
+import SegmentButton from '~/shared/components/SegmentButton'
 
 type EditVideoListPageProps = {
   currentVideoList: VideoList
@@ -66,18 +67,22 @@ const EditVideoListPage = observer(
           <FormControl marginBottom="10px">
             <FormControl.Label>Is List Public?</FormControl.Label>
 
-            <ToggleButton
+            <SegmentButton
               size="sm"
-              marginLeft="5px"
-              active={videoListViewModel.isPublic}
-              color="gray.600"
-              activeColor="blue.600"
-              content="Private"
-              activeContent="Public"
-              icon={<MaterialIcons name="public-off" />}
-              activeIcon={<MaterialIcons name="public" />}
-              onPress={() => {
-                videoListViewModel.isPublic = !videoListViewModel.isPublic
+              selectedSegmentId={videoListViewModel.isPublic ? 'left' : 'right'}
+              containerProps={{
+                marginLeft: '5px',
+              }}
+              leftSegment={{
+                icon: <MaterialIcons name="public" />,
+                content: 'Public',
+              }}
+              rightSegment={{
+                icon: <MaterialIcons name="public-off" />,
+                content: 'Private',
+              }}
+              onPress={segmentId => {
+                videoListViewModel.isPublic = segmentId === 'left'
               }}
             />
 
@@ -89,16 +94,20 @@ const EditVideoListPage = observer(
           <FormControl marginBottom="10px">
             <FormControl.Label>Is List Joinable?</FormControl.Label>
 
-            <ToggleButton
+            <SegmentButton
               size="sm"
-              marginLeft="5px"
-              active={videoListViewModel.isJoinable}
-              color="gray.600"
-              activeColor="blue.600"
-              content="Not Joinable"
-              activeContent="Joinable"
-              icon={<MaterialIcons name="public-off" />}
-              activeIcon={<MaterialIcons name="public" />}
+              selectedSegmentId={videoListViewModel.isJoinable ? 'left' : 'right'}
+              containerProps={{
+                marginLeft: '5px',
+              }}
+              leftSegment={{
+                icon: <MaterialIcons name="public" />,
+                content: 'Joinable',
+              }}
+              rightSegment={{
+                icon: <MaterialIcons name="public-off" />,
+                content: 'Not Joinable',
+              }}
               onPress={() => {
                 videoListViewModel.isJoinable = !videoListViewModel.isJoinable
               }}
