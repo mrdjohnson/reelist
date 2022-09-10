@@ -102,10 +102,12 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
     })
   }
 
-  data.push({
-    title: 'Public Lists',
-    data: filteredPublicLists,
-  })
+  if (!refreshing) {
+    data.push({
+      title: 'Public Lists',
+      data: filteredPublicLists,
+    })
+  }
 
   const handleVideoListPress = (videoList: VideoList) => {
     console.log('open video list: ', videoList.name)
