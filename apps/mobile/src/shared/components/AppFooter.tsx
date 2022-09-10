@@ -1,7 +1,8 @@
 import { NavigationProp, RouteProp, useRoute } from '@react-navigation/native'
 import { observer } from 'mobx-react-lite'
 import { Center, Row, Icon, IIconProps, Pressable, Text } from 'native-base'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { Keyboard } from 'react-native'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { NavigatorParamList, useReelistNavigation } from '~/utils/navigation'
@@ -49,7 +50,27 @@ const AppFooter = observer(() => {
   const navigation = useReelistNavigation()
   const route = useRoute<RouteProp<NavigatorParamList>>()
 
+  const [isVisible, setIsVisible] = useState(true)
+
   if (route.name === 'welcome') return null
+
+  useEffect(() => {
+    const onKeyboardDidShow = () => {
+      setIsVisible(false)
+    }
+
+    const onKeyboardDidHide = () => {
+      setIsVisible(true)
+    }
+
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', onKeyboardDidShow)
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', onKeyboardDidHide)
+
+    return () => {
+      keyboardDidShowListener.remove()
+      keyboardDidHideListener.remove()
+    }
+  }, [])
 
   return (
     <Row
@@ -59,6 +80,7 @@ const AppFooter = observer(() => {
       shadow={6}
       justifyContent="space-between"
       paddingX="30px"
+      display={isVisible ? null : 'none'}
     >
       <FooterButton
         routeName={route.name}
