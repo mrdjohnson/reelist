@@ -148,7 +148,7 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
         )}
         renderSectionHeader={({ section: { title } }) => (
           <View backgroundColor="light.300">
-            <Text fontSize="xl">{title} title</Text>
+            <Text fontSize="xl">{title}</Text>
           </View>
         )}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
