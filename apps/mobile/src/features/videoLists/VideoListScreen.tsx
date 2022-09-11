@@ -83,13 +83,13 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
 
   useEffect(() => {
     videoListStore.setCurrentVideoListFromShareId(appState.videoListShareId)
-    currentVideoList?.fetchAdmins()
 
     return () => appState.setVideoListShareId(null)
   }, [appState.videoListShareId, videoListStore])
 
   useEffect(() => {
     currentVideoList?.getVideos()
+    currentVideoList?.fetchAdmins()
   }, [currentVideoList])
 
   const loadVideosForUser = async () => {
