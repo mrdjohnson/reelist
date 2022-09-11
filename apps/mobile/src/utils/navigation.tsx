@@ -1,5 +1,5 @@
-import { NavigationProp, useNavigation } from '@react-navigation/native'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { useNavigation } from '@react-navigation/native'
+import { NativeStackScreenProps, NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 export type NavigatorParamList = {
   welcome: undefined
@@ -11,12 +11,13 @@ export type NavigatorParamList = {
   profile: undefined
   settings: undefined
   splash: undefined
+  home: undefined
 }
 
 export type ReelistScreen = NativeStackScreenProps<NavigatorParamList>
 
 export const useReelistNavigation = () => {
-  const navigation = useNavigation<NavigationProp<NavigatorParamList>>()
+  const navigation = useNavigation<NativeStackNavigationProp<NavigatorParamList>>()
 
   return navigation
 }
