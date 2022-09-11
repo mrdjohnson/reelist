@@ -220,7 +220,9 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
     <View flex={1} backgroundColor="light.100">
       <Row marginY="10px">
         <Center flex={1}>
-          <Text fontSize="2xl">{currentVideoList.name}</Text>
+          <Text fontSize="2xl" adjustsFontSizeToFit numberOfLines={1}>
+            {currentVideoList.name}
+          </Text>
         </Center>
 
         <Center>
