@@ -41,6 +41,19 @@ class VideoListStore {
     }
   }
 
+  addToFollowedVideoList = (videoList: VideoList) => {
+    this.followedVideoLists = this.followedVideoLists.concat(videoList)
+    this.publicVideoLists = _.without(this.publicVideoLists, videoList)
+  }
+
+  removeFromFollowedVideoList = (videoList: VideoList) => {
+    this.followedVideoLists = _.without(this.followedVideoLists, videoList)
+
+    if (videoList.isPublic) {
+      this.publicVideoLists = this.publicVideoLists.concat(videoList)
+    }
+  }
+
   getAdminVideoLists = async () => {
     if (!_.isEmpty(this.adminVideoLists)) return this.adminVideoLists
 

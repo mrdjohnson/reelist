@@ -185,6 +185,18 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
     closeMemberShipActionSheet()
   }
 
+  const followOrUnfollowList = (follow: boolean) => {
+    if (follow) {
+      auth.user.followVideoList(currentVideoList)
+      videoListStore.addToFollowedVideoList(currentVideoList)
+    } else {
+      auth.user.unFollowVideoList(currentVideoList)
+      videoListStore.removeFromFollowedVideoList(currentVideoList)
+    }
+
+    closeMemberShipActionSheet()
+  }
+
   const closeMemberShipActionSheet = () => {
     setShowMembers(false)
     onMemebershipClose()
@@ -296,13 +308,11 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
           {isUserListAdmin && <Actionsheet.Item onPress={startEditing}>Edit</Actionsheet.Item>}
 
           {auth.user.isFollowingVideoList(currentVideoList) ? (
-            <Actionsheet.Item onPress={() => auth.user.unFollowVideoList(currentVideoList)}>
+            <Actionsheet.Item onPress={() => followOrUnfollowList(false)}>
               UnFollow
             </Actionsheet.Item>
           ) : (
-            <Actionsheet.Item onPress={() => auth.user.followVideoList(currentVideoList)}>
-              Follow
-            </Actionsheet.Item>
+            <Actionsheet.Item onPress={() => followOrUnfollowList(true)}>Follow</Actionsheet.Item>
           )}
 
           <Actionsheet.Item onPress={shareList}>Copy Shareable link</Actionsheet.Item>
