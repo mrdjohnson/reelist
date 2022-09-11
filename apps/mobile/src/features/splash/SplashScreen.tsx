@@ -49,7 +49,7 @@ const SplashScreen = observer(({ navigation }: ReelistScreenProps) => {
 
   // if nothing has happened after X seconds, navigate to welcome screen
   useEffect(() => {
-    const seconds = 3
+    const seconds = 5
 
     const loginTimeout = setTimeout(() => {
       resetNavigationTo('welcome')
