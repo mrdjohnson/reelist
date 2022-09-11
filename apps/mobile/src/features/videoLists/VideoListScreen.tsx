@@ -86,6 +86,10 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
     return _.chunk(currentVideoList?.videos, 3) as VideoChunk[]
   }, [currentVideoList?.videos])
 
+  const trackedVideoChunks = useMemo(() => {
+    return _.chunk(trackedVideos, 3) as VideoChunk[]
+  }, [trackedVideos])
+
   const renderVideo: ListRenderItem<Video> = ({ item: video }: { item: Video }) => (
     <VideoItem video={video} />
   )
@@ -93,6 +97,16 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
   const renderVideoRow: ListRenderItem<VideoChunk> = ({ item: videos }: { item: VideoChunk }) => (
     <TileRow videos={videos} />
   )
+
+  const renderTrackedVideo: ListRenderItem<Video> = ({ item: video }: { item: Video }) => (
+    <TrackedVideoItem video={video} isInteractable={false} />
+  )
+
+  const renderTrackedVideoRow: ListRenderItem<VideoChunk> = ({
+    item: videos,
+  }: {
+    item: VideoChunk
+  }) => <TileRow videos={videos} isTracked />
 
   useEffect(() => {
     return () => videoListStore.setCurrentVideoList(null)
@@ -322,16 +336,24 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
             ListHeaderComponent={ListHeaderComponent}
           />
         )
-      ) : (
+      ) : listViewType === 'list' ? (
         <FlatList
           data={trackedVideos}
           keyExtractor={video => video.videoId}
+          renderItem={renderTrackedVideo}
+          ListHeaderComponent={ListHeaderComponent}
           refreshControl={
             <RefreshControl refreshing={loadingUserVideos} onRefresh={loadVideosForUser} />
           }
-          renderItem={({ item: video }) => (
-            <TrackedVideoItem video={video} isInteractable={false} />
-          )}
+        />
+      ) : (
+        <FlatList
+          data={trackedVideoChunks}
+          renderItem={renderTrackedVideoRow}
+          ListHeaderComponent={ListHeaderComponent}
+          refreshControl={
+            <RefreshControl refreshing={loadingUserVideos} onRefresh={loadVideosForUser} />
+          }
         />
       )}
 
