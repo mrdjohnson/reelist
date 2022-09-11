@@ -93,7 +93,7 @@ const AppFooter = observer(() => {
 
       <FooterButton
         routeName={route.name}
-        name="videoListsHome"
+        name="home"
         icon={<MaterialCommunityIcons name="home-roof" />}
         navigation={navigation}
         text="Home"

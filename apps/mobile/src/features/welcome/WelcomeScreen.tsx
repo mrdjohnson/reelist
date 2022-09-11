@@ -14,7 +14,7 @@ const WelcomeScreen = observer(({ navigation }: ReelistScreenProps) => {
     if (loggedIn) {
       navigation.reset({
         index: 0,
-        routes: [{ name: 'tracking' }],
+        routes: [{ name: 'home' }],
       })
     }
   }, [loggedIn, navigation])

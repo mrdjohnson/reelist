@@ -19,7 +19,7 @@ const SplashScreen = observer(({ navigation }: ReelistScreenProps) => {
 
   useEffect(() => {
     if (loggedIn) {
-      resetNavigationTo('tracking')
+      resetNavigationTo('home')
     }
   }, [loggedIn, navigation])
 
