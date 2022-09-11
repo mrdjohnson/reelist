@@ -7,10 +7,11 @@ import { Column, Pressable, Row, Skeleton, Text, View } from 'native-base'
 import VideoImage from './VideoImage'
 
 type VideoItemProps = {
-  video: Video | null
+  video: Video | null | undefined
+  isTile?: boolean
 }
 
-const VideoItem = observer(({ video }: VideoItemProps) => {
+const VideoItem = observer(({ video, isTile = false }: VideoItemProps) => {
   const { videoStore } = useStore()
   const navigation = useReelistNavigation()
 
@@ -21,6 +22,14 @@ const VideoItem = observer(({ video }: VideoItemProps) => {
   const goToMediaPage = () => {
     videoStore.setCurrentVideoId(video.videoId)
     navigation.navigate('videoScreen')
+  }
+
+  if (isTile) {
+    return (
+      <Pressable onPress={goToMediaPage}>
+        <VideoImage video={video} />
+      </Pressable>
+    )
   }
 
   return (

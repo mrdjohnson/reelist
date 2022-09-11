@@ -17,7 +17,7 @@ import {
 } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
-import { BackHandler, RefreshControl } from 'react-native'
+import { BackHandler, ListRenderItem, RefreshControl } from 'react-native'
 import VideoItem, { videoItemSkeleton } from '~/features/video/VideoItem'
 import Clipboard from '@react-native-clipboard/clipboard'
 import User from '~/models/User'
@@ -27,6 +27,8 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import Video from '~/models/Video'
 import _ from 'lodash'
 import TrackedVideoItem from '../video/TrackedVideoItem'
+import SegmentButton from '~/shared/components/SegmentButton'
+import TileRow, { VideoChunk } from '~/shared/components/TileRow'
 
 const CAN_GO_BACK = false
 const CANNOT_GO_BACK = true
@@ -59,6 +61,8 @@ const Tab = ({ activeTabKey, onPress, text, id }: TabProps) => {
   )
 }
 
+type ListViewTypes = 'list' | 'grid'
+
 const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
   const { videoListStore, auth, appState, videoStore } = useStore()
   const toast = useToast()
@@ -70,12 +74,25 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
   const [activeTabKey, setActiveTabKey] = useState<string | null>(null)
   const [loadingUserVideos, setLoadingUserVideos] = useState(false)
   const [trackedVideos, setTrackedVideos] = useState<Video[]>([])
+  const [listViewType, setListViewType] = useState<ListViewTypes>('list')
 
   const {
     isOpen: isMembershipOpen,
     onOpen: openMembership,
     onClose: onMemebershipClose,
   } = useDisclose()
+
+  const videoChunks = useMemo(() => {
+    return _.chunk(currentVideoList?.videos, 3) as VideoChunk[]
+  }, [currentVideoList?.videos])
+
+  const renderVideo: ListRenderItem<Video> = ({ item: video }: { item: Video }) => (
+    <VideoItem video={video} />
+  )
+
+  const renderVideoRow: ListRenderItem<VideoChunk> = ({ item: videos }: { item: VideoChunk }) => (
+    <TileRow videos={videos} />
+  )
 
   useEffect(() => {
     return () => videoListStore.setCurrentVideoList(null)
@@ -134,6 +151,30 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
   const isUserListAdmin = useMemo(() => {
     return currentVideoList?.adminIds.includes(auth.user.id)
   }, [currentVideoList?.adminIds])
+
+  const ListHeaderComponent = useMemo(
+    () => (
+      <Row
+        marginBottom="10px"
+        display="flex"
+        justifyContent="flex-end"
+        width="100%"
+        paddingX="10px"
+      >
+        <SegmentButton
+          containerProps={{ width: '75px', height: 'auto' }}
+          selectedSegmentId={listViewType === 'list' ? 'left' : 'right'}
+          leftSegment={{ icon: <MaterialCommunityIcons name="view-list" /> }}
+          rightSegment={{ icon: <MaterialCommunityIcons name="view-grid" /> }}
+          size="sm"
+          onPress={segmentId => {
+            setListViewType(segmentId === 'left' ? 'list' : 'grid')
+          }}
+        />
+      </Row>
+    ),
+    [listViewType],
+  )
 
   if (!currentVideoList) return null
 
@@ -265,11 +306,22 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
       )}
 
       {!activeTabKey ? (
-        <FlatList
-          data={currentVideoList.videos}
-          keyExtractor={video => video.videoId}
-          renderItem={({ item: video }) => <VideoItem video={video} />}
-        />
+        listViewType === 'list' ? (
+          <FlatList
+            data={currentVideoList.videos}
+            keyExtractor={(video: Video) => video.videoId}
+            renderItem={renderVideo}
+            key={listViewType}
+            ListHeaderComponent={ListHeaderComponent}
+          />
+        ) : (
+          <FlatList
+            data={videoChunks}
+            renderItem={renderVideoRow}
+            key={listViewType}
+            ListHeaderComponent={ListHeaderComponent}
+          />
+        )
       ) : (
         <FlatList
           data={trackedVideos}
