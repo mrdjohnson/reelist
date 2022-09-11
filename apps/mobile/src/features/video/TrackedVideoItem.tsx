@@ -3,13 +3,12 @@ import { observer } from 'mobx-react-lite'
 import _ from 'lodash'
 import Video from '~/models/Video'
 import { useStore } from '~/hooks/useStore'
-import { Button, Column, Icon, Image, Pressable, Text, View } from 'native-base'
+import { Column, Pressable, Text, View } from 'native-base'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import moment from 'moment'
 import { useReelistNavigation } from '~/utils/navigation'
 import AppButton from '~/shared/components/AppButton'
-
-const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
+import VideoImage from './VideoImage'
 
 type VideoItemProps = {
   video: Video | null
@@ -23,7 +22,6 @@ const TrackedVideoItem = observer(({ video, isInteractable = true }: VideoItemPr
   if (!video) return null
 
   const name = video.name || video.title
-  const imageSource = video.posterPath || video.backdropPath
 
   let bottomRow
 
@@ -111,19 +109,11 @@ const TrackedVideoItem = observer(({ video, isInteractable = true }: VideoItemPr
       opacity={faded ? '50' : '100'}
     >
       <View flexShrink={1}>
-        {imageSource && (
-          <Image
-            source={{ uri: IMAGE_PATH + imageSource }}
-            alt={imageSource}
-            minWidth="80px"
-            minHeight="120px"
-            flex={1}
-            marginRight="8px"
-            resizeMode="contain"
-            backgroundColor="black"
-            rounded="sm"
-          />
-        )}
+        <VideoImage
+          video={video}
+          containerProps={{ marginRight: '8px', maxHeight: '120px' }}
+          backgroundColor="black"
+        />
       </View>
 
       <View flex={1} backgroundColor={null} roundedLeft="sm" roundedRight="md">
