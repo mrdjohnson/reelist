@@ -4,6 +4,7 @@ import { makeAutoObservable } from 'mobx'
 import Auth from './Auth'
 import { Decamelized } from 'humps'
 import { callTmdb, sendNotifications, UpdateType } from '~/api/api'
+import moment from 'moment'
 
 export type TvEpisode = {
   airDate: string
@@ -614,8 +615,14 @@ class Video {
     if (!this.lastWatchedSeasonNumber && !this.lastWatchedEpisodeNumber) return false
     if (!this.currentBaseEpisode) return false
 
-    const lastEpisodeNumber = this.lastEpisodeToAir.episodeNumber
-    const lastSeasonNumber = this.lastEpisodeToAir.seasonNumber
+    let mostRecentEpisode = this.lastEpisodeToAir
+
+    if (this.nextEpisodeToAir && moment(this.nextEpisodeToAir.airDate).isBefore()) {
+      mostRecentEpisode = this.nextEpisodeToAir
+    }
+
+    const lastEpisodeNumber = mostRecentEpisode.episodeNumber
+    const lastSeasonNumber = mostRecentEpisode.seasonNumber
 
     const currentEpisodeNumber = this.currentBaseEpisode.episodeNumber
     const currentSeasonNumber = this.currentBaseEpisode.seasonNumber
@@ -628,7 +635,7 @@ class Video {
 
     if (this.nextEpisodeToAir) return false
 
-    return this.isLatestEpisodeWatched
+    return false
   }
 }
 
