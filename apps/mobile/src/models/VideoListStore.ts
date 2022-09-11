@@ -10,6 +10,7 @@ import { IViewModel } from 'mobx-utils'
 class VideoListStore {
   adminVideoLists: VideoList[] = []
   publicVideoLists: VideoList[] = []
+  followedVideoLists: VideoList[] = []
   currentVideo: Video | null = null
   currentVideoList: VideoList | null = null
   storeAuth: Auth
@@ -86,11 +87,14 @@ class VideoListStore {
   getPublicVideoLists = flow(function* (this: VideoListStore) {
     if (!_.isEmpty(this.publicVideoLists)) return this.publicVideoLists
 
+    const followedListIds = this.storeAuth.user.followedListIds
+
     const { data: videoLists, error } = yield supabase
       .from<VideoListTableType>('videoLists')
       .select('*')
       .match({ is_public: true })
       .not('admin_ids', 'cs', '{"' + this.storeAuth.user?.id + '"}')
+      .not('id', 'in', '(' + followedListIds + ')')
       .order('id', { ascending: false })
 
     if (error) {
@@ -98,6 +102,23 @@ class VideoListStore {
     }
 
     this.publicVideoLists = videoLists?.map(this.makeUiVideoList) || []
+  })
+
+  getfollowedVideoLists = flow(function* (this: VideoListStore) {
+    if (!_.isEmpty(this.followedVideoLists)) return this.followedVideoLists
+
+    const followedListIds = this.storeAuth.user.followedListIds
+
+    const { data: videoLists, error } = yield supabase
+      .from<VideoListTableType>('videoLists')
+      .select('*')
+      .in('id', followedListIds)
+
+    if (error) {
+      console.log('getfollowedVideoLists error', error)
+    }
+
+    this.followedVideoLists = videoLists?.map(this.makeUiVideoList) || []
   })
 
   createBlankVideoList = () => {
@@ -154,6 +175,7 @@ class VideoListStore {
   clearVideoLists = () => {
     this.adminVideoLists = []
     this.publicVideoLists = []
+    this.followedVideoLists = []
   }
 }
 

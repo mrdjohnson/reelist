@@ -54,11 +54,12 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
   const { videoListStore } = useStore()
   const publicVideoLists = videoListStore.publicVideoLists
   const adminVideoLists = videoListStore.adminVideoLists
+  const followedVideoLists = videoListStore.followedVideoLists
 
   const [nextVideoList, setNextVideoList] = useState<VideoList | null>(null)
   const [filterText, setfilterText] = useState('')
 
-  const [filteredAdminLists, filteredPublicLists] = useMemo(() => {
+  const [filteredAdminLists, filteredPublicLists, filteredFollowedLists] = useMemo(() => {
     const lowerFilterCase = filterText.toLowerCase()
     const containsFilterText = (videoList: VideoList) => {
       return videoList.name.toLowerCase().includes(lowerFilterCase)
@@ -66,15 +67,18 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
 
     const filteredAdmin = _.filter(adminVideoLists, containsFilterText)
     const filteredPublic = _.filter(publicVideoLists, containsFilterText)
+    const filteredFollowed = _.filter(followedVideoLists, containsFilterText)
 
-    return [filteredAdmin, filteredPublic]
-  }, [adminVideoLists, publicVideoLists, filterText])
+    return [filteredAdmin, filteredPublic, filteredFollowed]
+  }, [adminVideoLists, publicVideoLists, followedVideoLists, filterText])
 
   const [refreshing, refresh] = useRefresh(async () => {
     videoListStore.clearVideoLists()
 
-    videoListStore.getPublicVideoLists()
-    return videoListStore.getAdminVideoLists()
+    await videoListStore.getAdminVideoLists()
+
+    await videoListStore.getfollowedVideoLists()
+    await videoListStore.getPublicVideoLists()
   })
 
   useEffect(() => {
@@ -103,6 +107,13 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
   }
 
   if (!refreshing) {
+    if (followedVideoLists.length > 0) {
+      data.push({
+        title: 'Followed Lists',
+        data: filteredFollowedLists,
+      })
+    }
+
     data.push({
       title: 'Public Lists',
       data: filteredPublicLists,
