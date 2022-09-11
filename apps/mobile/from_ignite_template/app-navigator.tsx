@@ -22,6 +22,7 @@ import ProfileScreen from '~/features/profile/ProfileScreen'
 import SettingsScreen from '~/features/settings/SettingsScreen'
 import { NavigatorParamList } from '~/utils/navigation'
 import SplashScreen from '~/features/splash/SplashScreen'
+import HomeScreen from '~/features/videoLists/HomeScreen'
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -80,6 +81,8 @@ const AppStack = () => {
       <Stack.Screen name="profile" component={withAppFooterHoc(ProfileScreen)} />
 
       <Stack.Screen name="settings" component={withAppFooterHoc(SettingsScreen)} />
+
+      <Stack.Screen name="home" component={withAppFooterHoc(HomeScreen)} />
     </Stack.Navigator>
   )
 }
@@ -114,5 +117,5 @@ AppNavigator.displayName = 'AppNavigator'
  *
  * `canExit` is used in ./app/app.tsx in the `useBackButtonHandler` hook.
  */
-const exitRoutes = ['welcome']
+const exitRoutes = ['welcome', 'home']
 export const canExit = (routeName: string) => exitRoutes.includes(routeName)
