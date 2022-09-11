@@ -58,7 +58,7 @@ export default class AppState {
     this.updates = []
   }
 
-  setVideoListShareId = (videoListShareId: string) => {
+  setVideoListShareId = (videoListShareId: string | null) => {
     this.videoListShareId = videoListShareId
   }
 
