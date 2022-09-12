@@ -1,16 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import {
   Actionsheet,
-  Badge,
-  Button,
   Center,
   Divider,
   FlatList,
-  Flex,
-  HamburgerIcon,
-  IBadgeProps,
   Icon,
-  IconButton,
   Menu,
   Pressable,
   Row,
@@ -33,37 +27,10 @@ import _ from 'lodash'
 import TrackedVideoItem from '../video/TrackedVideoItem'
 import SegmentButton from '~/shared/components/SegmentButton'
 import TileRow, { VideoChunk } from '~/shared/components/TileRow'
+import ActionButton from '~/shared/components/ActionButton'
 
 const CAN_GO_BACK = false
 const CANNOT_GO_BACK = true
-
-type TabProps = {
-  activeTabKey: string | null
-  onPress: (id: string | null) => void
-  text: string
-  id: string | null
-}
-
-const Tab = ({ activeTabKey, onPress, text, id }: TabProps) => {
-  if (!text) return null
-
-  const badgeProps: IBadgeProps = {}
-
-  if (activeTabKey === id) {
-    // for dark mode, try subtle?
-    badgeProps.variant = 'solid'
-    badgeProps.colorScheme = 'info'
-  } else {
-    badgeProps.variant = 'outline'
-    badgeProps.colorScheme = null
-  }
-
-  return (
-    <Pressable onPress={() => onPress(id)}>
-      <Badge {...badgeProps}>{text}</Badge>
-    </Pressable>
-  )
-}
 
 type ListViewTypes = 'list' | 'grid'
 type SortTypes = null | 'alphaAsc' | 'alphaDesc' | 'releaseAsc' | 'releaseDesc'
@@ -81,6 +48,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
   const [trackedVideos, setTrackedVideos] = useState<Video[]>([])
   const [listViewType, setListViewType] = useState<ListViewTypes>('list')
   const [sortType, setSortType] = useState<SortTypes>(null)
+  const [isSelectingProgress, setIsSelectingProgress] = useState(false)
 
   const {
     isOpen: isMembershipOpen,
@@ -216,49 +184,70 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
         width="100%"
         paddingX="10px"
       >
-        <Menu
-          trigger={triggerProps => {
-            return (
-              <Pressable {...triggerProps} alignSelf="center" rounded="full">
-                <Icon as={<MaterialCommunityIcons name={iconName} />} />
-              </Pressable>
-            )
-          }}
-          placement="bottom left"
-        >
-          <Menu.Item textAlign="center" onPress={() => setSortType(null)}>
-            <Icon as={<MaterialCommunityIcons name={'sort-variant-remove'} />} />
-            <Text>Clear Sort</Text>
-          </Menu.Item>
-
-          <Divider mt="3" w="100%" />
-
-          <Menu.Group title="Name">
-            <Menu.Item onPress={() => setSortType('alphaAsc')}>
-              <Icon as={<MaterialCommunityIcons name={'sort-alphabetical-ascending'} />} />
-              <Text>Ascending</Text>
+        <Row>
+          <Menu
+            trigger={triggerProps => {
+              return (
+                <Pressable {...triggerProps} alignSelf="center" rounded="full">
+                  <Icon as={<MaterialCommunityIcons name={iconName} />} />
+                </Pressable>
+              )
+            }}
+            placement="bottom left"
+          >
+            <Menu.Item textAlign="center" onPress={() => setSortType(null)}>
+              <Icon as={<MaterialCommunityIcons name={'sort-variant-remove'} />} />
+              <Text>Clear Sort</Text>
             </Menu.Item>
 
-            <Menu.Item onPress={() => setSortType('alphaDesc')}>
-              <Icon as={<MaterialCommunityIcons name={'sort-alphabetical-descending'} />} />
-              <Text>Descending</Text>
-            </Menu.Item>
-          </Menu.Group>
+            <Divider mt="3" w="100%" />
 
-          <Divider mt="3" w="100%" />
+            <Menu.Group title="Name">
+              <Menu.Item onPress={() => setSortType('alphaAsc')}>
+                <Icon as={<MaterialCommunityIcons name={'sort-alphabetical-ascending'} />} />
+                <Text>Ascending</Text>
+              </Menu.Item>
 
-          <Menu.Group title="Release Date">
-            <Menu.Item onPress={() => setSortType('releaseAsc')}>
-              <Icon as={<MaterialCommunityIcons name={'sort-calendar-ascending'} />} />
-              <Text>Ascending</Text>
-            </Menu.Item>
+              <Menu.Item onPress={() => setSortType('alphaDesc')}>
+                <Icon as={<MaterialCommunityIcons name={'sort-alphabetical-descending'} />} />
+                <Text>Descending</Text>
+              </Menu.Item>
+            </Menu.Group>
 
-            <Menu.Item onPress={() => setSortType('releaseDesc')}>
-              <Icon as={<MaterialCommunityIcons name={'sort-calendar-descending'} />} />
-              <Text>Descending</Text>
-            </Menu.Item>
-          </Menu.Group>
-        </Menu>
+            <Divider mt="3" w="100%" />
+
+            <Menu.Group title="Release Date">
+              <Menu.Item onPress={() => setSortType('releaseAsc')}>
+                <Icon as={<MaterialCommunityIcons name={'sort-calendar-ascending'} />} />
+                <Text>Ascending</Text>
+              </Menu.Item>
+
+              <Menu.Item onPress={() => setSortType('releaseDesc')}>
+                <Icon as={<MaterialCommunityIcons name={'sort-calendar-descending'} />} />
+                <Text>Descending</Text>
+              </Menu.Item>
+            </Menu.Group>
+          </Menu>
+
+          <ActionButton
+            marginLeft="10px"
+            size="sm"
+            icon={
+              <MaterialCommunityIcons
+                name={activeTabKey ? 'account-details' : 'account-question-outline'}
+              />
+            }
+            onPress={() => {
+              setShowMembers(true)
+              setIsSelectingProgress(true)
+              openMembership()
+            }}
+          >
+            {activeTabKey
+              ? _.find(currentVideoList?.admins, { id: activeTabKey })?.name || 'Nobody'
+              : 'See Progress'}
+          </ActionButton>
+        </Row>
 
         <SegmentButton
           containerProps={{ width: '75px', height: 'auto' }}
@@ -272,7 +261,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
         />
       </Row>
     )
-  }, [listViewType, sortType])
+  }, [listViewType, sortType, activeTabKey])
 
   if (!currentVideoList) return null
 
@@ -375,20 +364,6 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
         </Center>
       </Row>
 
-      <Row marginLeft="10px" space="8px">
-        <Tab text="Overview" id={null} activeTabKey={activeTabKey} onPress={setActiveTabKey} />
-
-        {currentVideoList.admins.map(admin => (
-          <Tab
-            key={admin.id}
-            text={admin.name}
-            id={admin.id}
-            activeTabKey={activeTabKey}
-            onPress={setActiveTabKey}
-          />
-        ))}
-      </Row>
-
       {currentVideoList.videoIds.length === 0 && (
         <Center>
           <Text>Nothing has been added here yet</Text>
@@ -481,8 +456,32 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
         </Actionsheet.Content>
 
         <Actionsheet.Content display={showMembers ? null : 'none'}>
+          {isSelectingProgress && (
+            <Actionsheet.Item
+              onPress={() => {
+                setActiveTabKey(null)
+                closeMemberShipActionSheet()
+              }}
+              backgroundColor={activeTabKey === null ? 'light.300:alpha.40' : null}
+            >
+              None (video overview)
+            </Actionsheet.Item>
+          )}
+
           {currentVideoList.admins.map(admin => (
-            <Actionsheet.Item key={admin.id} onPress={() => openProfile(admin)}>
+            <Actionsheet.Item
+              key={admin.id}
+              backgroundColor={activeTabKey === admin.id ? 'light.300:alpha.40' : null}
+              onPress={() => {
+                if (isSelectingProgress) {
+                  setActiveTabKey(admin.id)
+                  closeMemberShipActionSheet()
+                  return
+                }
+
+                openProfile(admin)
+              }}
+            >
               {admin.name}
             </Actionsheet.Item>
           ))}
