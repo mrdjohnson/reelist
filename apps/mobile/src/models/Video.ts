@@ -592,7 +592,7 @@ class Video {
   }
 
   get videoReleaseDate() {
-    return this.releaseDate || this.firstAirDate
+    return moment(this.releaseDate || this.firstAirDate)
   }
 
   get tmdbPath() {

@@ -55,7 +55,7 @@ const VideoItem = observer(({ video, isTile = false }: VideoItemProps) => {
               <Text color="light.700">{'  |  '}</Text>
             )}
 
-            {video.videoReleaseDate}
+            {video.videoReleaseDate.format("MMM Do 'YY")}
           </Text>
         </Column>
 
