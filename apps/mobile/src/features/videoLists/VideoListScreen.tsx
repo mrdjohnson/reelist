@@ -4,10 +4,14 @@ import {
   Badge,
   Button,
   Center,
+  Divider,
   FlatList,
   Flex,
+  HamburgerIcon,
   IBadgeProps,
+  Icon,
   IconButton,
+  Menu,
   Pressable,
   Row,
   Text,
@@ -62,6 +66,7 @@ const Tab = ({ activeTabKey, onPress, text, id }: TabProps) => {
 }
 
 type ListViewTypes = 'list' | 'grid'
+type SortTypes = null | 'alphaAsc' | 'alphaDesc' | 'releaseAsc' | 'releaseDesc'
 
 const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
   const { videoListStore, auth, appState, videoStore } = useStore()
@@ -75,6 +80,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
   const [loadingUserVideos, setLoadingUserVideos] = useState(false)
   const [trackedVideos, setTrackedVideos] = useState<Video[]>([])
   const [listViewType, setListViewType] = useState<ListViewTypes>('list')
+  const [sortType, setSortType] = useState<SortTypes>(null)
 
   const {
     isOpen: isMembershipOpen,
@@ -82,13 +88,35 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
     onClose: onMemebershipClose,
   } = useDisclose()
 
+  const formatVideos = (videos: Video[] | null | undefined): Video[] => {
+    if (!videos) return []
+
+    if (sortType === null) return videos
+
+    if (sortType === 'alphaAsc') return _.orderBy(videos, 'videoName', 'asc')
+
+    if (sortType === 'alphaDesc') return _.orderBy(videos, 'videoName', 'desc')
+
+    if (sortType === 'releaseAsc') return _.orderBy(videos, 'videoReleaseDate', 'asc')
+
+    return _.orderBy(videos, 'videoReleaseDate', 'desc')
+  }
+
+  const formattedVideos = useMemo(() => {
+    return formatVideos(currentVideoList?.videos)
+  }, [currentVideoList?.videos, sortType])
+
+  const formattedTrackedVideos = useMemo(() => {
+    return formatVideos(trackedVideos)
+  }, [trackedVideos, sortType])
+
   const videoChunks = useMemo(() => {
-    return _.chunk(currentVideoList?.videos, 3) as VideoChunk[]
-  }, [currentVideoList?.videos])
+    return _.chunk(formattedVideos, 3) as VideoChunk[]
+  }, [formattedVideos])
 
   const trackedVideoChunks = useMemo(() => {
-    return _.chunk(trackedVideos, 3) as VideoChunk[]
-  }, [trackedVideos])
+    return _.chunk(formattedTrackedVideos, 3) as VideoChunk[]
+  }, [formattedTrackedVideos])
 
   const renderVideo: ListRenderItem<Video> = ({ item: video }: { item: Video }) => (
     <VideoItem video={video} />
@@ -166,15 +194,72 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
     return currentVideoList?.adminIds.includes(auth.user.id)
   }, [currentVideoList?.adminIds])
 
-  const ListHeaderComponent = useMemo(
-    () => (
+  const ListHeaderComponent = useMemo(() => {
+    let iconName: string
+    if (sortType === null) {
+      iconName = 'sort-variant'
+    } else if (sortType === 'alphaAsc') {
+      iconName = 'sort-alphabetical-ascending'
+    } else if (sortType === 'alphaDesc') {
+      iconName = 'sort-alphabetical-descending'
+    } else if (sortType === 'releaseAsc') {
+      iconName = 'sort-calendar-ascending'
+    } else {
+      iconName = 'sort-calendar-descending'
+    }
+
+    return (
       <Row
         marginBottom="10px"
         display="flex"
-        justifyContent="flex-end"
+        justifyContent="space-between"
         width="100%"
         paddingX="10px"
       >
+        <Menu
+          trigger={triggerProps => {
+            return (
+              <Pressable {...triggerProps} alignSelf="center" rounded="full">
+                <Icon as={<MaterialCommunityIcons name={iconName} />} />
+              </Pressable>
+            )
+          }}
+          placement="bottom left"
+        >
+          <Menu.Item textAlign="center" onPress={() => setSortType(null)}>
+            <Icon as={<MaterialCommunityIcons name={'sort-variant-remove'} />} />
+            <Text>Clear Sort</Text>
+          </Menu.Item>
+
+          <Divider mt="3" w="100%" />
+
+          <Menu.Group title="Name">
+            <Menu.Item onPress={() => setSortType('alphaAsc')}>
+              <Icon as={<MaterialCommunityIcons name={'sort-alphabetical-ascending'} />} />
+              <Text>Ascending</Text>
+            </Menu.Item>
+
+            <Menu.Item onPress={() => setSortType('alphaDesc')}>
+              <Icon as={<MaterialCommunityIcons name={'sort-alphabetical-descending'} />} />
+              <Text>Descending</Text>
+            </Menu.Item>
+          </Menu.Group>
+
+          <Divider mt="3" w="100%" />
+
+          <Menu.Group title="Release Date">
+            <Menu.Item onPress={() => setSortType('releaseAsc')}>
+              <Icon as={<MaterialCommunityIcons name={'sort-calendar-ascending'} />} />
+              <Text>Ascending</Text>
+            </Menu.Item>
+
+            <Menu.Item onPress={() => setSortType('releaseDesc')}>
+              <Icon as={<MaterialCommunityIcons name={'sort-calendar-descending'} />} />
+              <Text>Descending</Text>
+            </Menu.Item>
+          </Menu.Group>
+        </Menu>
+
         <SegmentButton
           containerProps={{ width: '75px', height: 'auto' }}
           selectedSegmentId={listViewType === 'list' ? 'left' : 'right'}
@@ -186,9 +271,8 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
           }}
         />
       </Row>
-    ),
-    [listViewType],
-  )
+    )
+  }, [listViewType, sortType])
 
   if (!currentVideoList) return null
 
@@ -311,7 +395,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
         </Center>
       )}
 
-      {currentVideoList.videos.length === 0 && (
+      {formattedVideos.length === 0 && (
         <FlatList
           data={currentVideoList.videoIds}
           keyExtractor={videoId => videoId}
@@ -322,7 +406,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
       {!activeTabKey ? (
         listViewType === 'list' ? (
           <FlatList
-            data={currentVideoList.videos}
+            data={formattedVideos}
             keyExtractor={(video: Video) => video.videoId}
             renderItem={renderVideo}
             key={listViewType}
@@ -338,7 +422,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
         )
       ) : listViewType === 'list' ? (
         <FlatList
-          data={trackedVideos}
+          data={formattedTrackedVideos}
           keyExtractor={video => video.videoId}
           renderItem={renderTrackedVideo}
           ListHeaderComponent={ListHeaderComponent}
