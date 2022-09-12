@@ -155,6 +155,8 @@ class VideoList implements VideoListType {
       .delete()
       .match({ id: this.id })
 
+    this.videoListStore.removeFromAllLists(this)
+
     if (error) {
       console.error('failed to leave videolist', error.message)
     }

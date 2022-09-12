@@ -54,6 +54,16 @@ class VideoListStore {
     }
   }
 
+  removeFromAllLists = (videoList: VideoList) => {
+    if (this.adminVideoLists.includes(videoList)) {
+      this.adminVideoLists = _.without(this.adminVideoLists, videoList)
+    } else if (this.publicVideoLists.includes(videoList)) {
+      this.publicVideoLists = _.without(this.publicVideoLists, videoList)
+    } else if (this.followedVideoLists.includes(videoList)) {
+      this.followedVideoLists = _.without(this.followedVideoLists, videoList)
+    }
+  }
+
   getAdminVideoLists = async () => {
     if (!_.isEmpty(this.adminVideoLists)) return this.adminVideoLists
 
