@@ -53,6 +53,10 @@ class User implements UserType {
     // this.watchedIds = user.watchedIds
   }
 
+  isAdminOfList = (videoList: VideoList) => {
+    return videoList.adminIds.includes(this.id)
+  }
+
   followVideoList = (videoList: VideoList) => {
     this.viewModel.followedListIds = [...this.followedListIds, videoList.id]
 

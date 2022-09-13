@@ -107,6 +107,39 @@ class VideoListStore {
     }
   })
 
+  refreshCurrentVideoList = flow(function* (this: VideoListStore) {
+    if (!this.currentVideoList) return
+
+    const { data: videoListJson } = yield supabase
+      .from<VideoListTableType>('videoLists')
+      .select('*')
+      .match({ id: this.currentVideoList.id })
+      .single()
+
+    if (!videoListJson) {
+      throw new Error('unable to find list')
+    }
+
+    this.removeFromAllLists(this.currentVideoList)
+
+    const videoList = this.makeUiVideoList(videoListJson)
+
+    const addToList = (list: VideoList[]) => {
+      const nextList = _.filter(list, { id: videoList.id })
+      return [...nextList, videoList]
+    }
+
+    if (this.storeAuth.user.isAdminOfList(videoList)) {
+      this.adminVideoLists = addToList(this.adminVideoLists)
+    } else if (this.storeAuth.user.isFollowingVideoList(videoList)) {
+      this.followedVideoLists = addToList(this.followedVideoLists)
+    } else if (videoList.isPublic) {
+      this.publicVideoLists = addToList(this.publicVideoLists)
+    }
+
+    this.currentVideoList = videoList
+  })
+
   getPublicVideoLists = flow(function* (this: VideoListStore) {
     if (!_.isEmpty(this.publicVideoLists)) return this.publicVideoLists
 

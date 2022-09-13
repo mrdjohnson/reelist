@@ -44,7 +44,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
   const [editing, setEditing] = useState<boolean>(false)
   const [showMembers, setShowMembers] = useState(false)
   const [activeTabKey, setActiveTabKey] = useState<string | null>(null)
-  const [loadingUserVideos, setLoadingUserVideos] = useState(false)
+  const [isLoadingVideos, setIsLoadingVideos] = useState(false)
   const [trackedVideos, setTrackedVideos] = useState<Video[]>([])
   const [listViewType, setListViewType] = useState<ListViewTypes>('list')
   const [sortType, setSortType] = useState<SortTypes>(null)
@@ -120,14 +120,14 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
   }, [currentVideoList])
 
   const loadVideosForUser = async () => {
-    setLoadingUserVideos(true)
+    setIsLoadingVideos(true)
 
     const videos = await videoStore.getVideoProgressesForUser(
       activeTabKey,
       currentVideoList?.videoIds,
     )
 
-    setLoadingUserVideos(false)
+    setIsLoadingVideos(false)
     setTrackedVideos(videos)
   }
 
@@ -137,7 +137,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
     loadVideosForUser()
 
     return () => {
-      setLoadingUserVideos(false)
+      setIsLoadingVideos(false)
       setTrackedVideos([])
     }
   }, [activeTabKey, currentVideoList])
@@ -265,6 +265,16 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
 
   if (!currentVideoList) return null
 
+  const refreshVideoList = async () => {
+    setIsLoadingVideos(true)
+
+    currentVideoList.clearVideos()
+
+    videoListStore.refreshCurrentVideoList()
+
+    setIsLoadingVideos(false)
+  }
+
   const join = () => {
     if (currentVideoList.isJoinable) {
       currentVideoList.join()
@@ -386,6 +396,9 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
             renderItem={renderVideo}
             key={listViewType}
             ListHeaderComponent={ListHeaderComponent}
+            refreshControl={
+              <RefreshControl refreshing={isLoadingVideos} onRefresh={refreshVideoList} />
+            }
           />
         ) : (
           <FlatList
@@ -393,6 +406,9 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
             renderItem={renderVideoRow}
             key={listViewType}
             ListHeaderComponent={ListHeaderComponent}
+            refreshControl={
+              <RefreshControl refreshing={isLoadingVideos} onRefresh={refreshVideoList} />
+            }
           />
         )
       ) : listViewType === 'list' ? (
@@ -402,7 +418,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
           renderItem={renderTrackedVideo}
           ListHeaderComponent={ListHeaderComponent}
           refreshControl={
-            <RefreshControl refreshing={loadingUserVideos} onRefresh={loadVideosForUser} />
+            <RefreshControl refreshing={isLoadingVideos} onRefresh={loadVideosForUser} />
           }
         />
       ) : (
@@ -411,7 +427,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
           renderItem={renderTrackedVideoRow}
           ListHeaderComponent={ListHeaderComponent}
           refreshControl={
-            <RefreshControl refreshing={loadingUserVideos} onRefresh={loadVideosForUser} />
+            <RefreshControl refreshing={isLoadingVideos} onRefresh={loadVideosForUser} />
           }
         />
       )}

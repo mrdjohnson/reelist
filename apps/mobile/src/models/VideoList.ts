@@ -220,6 +220,10 @@ class VideoList implements VideoListType {
     this.admins = _.compact(admins)
   }
 
+  clearVideos = () => {
+    this.videos = []
+  }
+
   get viewModel() {
     return createViewModel<VideoList>(this)
   }
