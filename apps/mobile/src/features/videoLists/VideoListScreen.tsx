@@ -520,15 +520,27 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
 
         <Actionsheet.Content display={showMembers ? null : 'none'}>
           {isSelectingProgress && (
-            <Actionsheet.Item
-              onPress={() => {
-                setActiveUser(null)
-                closeMemberShipActionSheet()
-              }}
-              backgroundColor={activeUser === null ? 'light.300:alpha.40' : null}
-            >
-              None (video overview)
-            </Actionsheet.Item>
+            <>
+              <Actionsheet.Item
+                onPress={() => {
+                  setActiveUser(null)
+                  closeMemberShipActionSheet()
+                }}
+                backgroundColor={activeUser === null ? 'light.300:alpha.40' : null}
+              >
+                None (video overview)
+              </Actionsheet.Item>
+
+              <Actionsheet.Item
+                onPress={() => {
+                  setActiveUser(auth.user)
+                  closeMemberShipActionSheet()
+                }}
+                backgroundColor={activeUser === auth.user ? 'light.300:alpha.40' : null}
+              >
+                {(auth.user.name || 'Me') + ' (self)'}
+              </Actionsheet.Item>
+            </>
           )}
 
           {currentVideoList.admins.map(admin => (
