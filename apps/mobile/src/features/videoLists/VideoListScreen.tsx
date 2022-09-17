@@ -350,7 +350,15 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
     onMemebershipClose()
   }
 
-  const openProfile = (user: User) => {
+  const handleUserPress = (user: User | null) => {
+    if (isSelectingProgress) {
+      setActiveUser(user)
+      closeMemberShipActionSheet()
+      setIsSelectingProgress(false)
+
+      return
+    }
+
     appState.setProfileScreenUser(user)
 
     navigation.push('profile')
@@ -522,20 +530,14 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
           {isSelectingProgress && (
             <>
               <Actionsheet.Item
-                onPress={() => {
-                  setActiveUser(null)
-                  closeMemberShipActionSheet()
-                }}
+                onPress={() => handleUserPress(null)}
                 backgroundColor={activeUser === null ? 'light.300:alpha.40' : null}
               >
                 None (video overview)
               </Actionsheet.Item>
 
               <Actionsheet.Item
-                onPress={() => {
-                  setActiveUser(auth.user)
-                  closeMemberShipActionSheet()
-                }}
+                onPress={() => handleUserPress(auth.user)}
                 backgroundColor={activeUser === auth.user ? 'light.300:alpha.40' : null}
               >
                 {(auth.user.name || 'Me') + ' (self)'}
@@ -547,15 +549,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
             <Actionsheet.Item
               key={admin.id}
               backgroundColor={activeUser === admin ? 'light.300:alpha.40' : null}
-              onPress={() => {
-                if (isSelectingProgress) {
-                  setActiveUser(admin)
-                  closeMemberShipActionSheet()
-                  return
-                }
-
-                openProfile(admin)
-              }}
+              onPress={() => handleUserPress(admin)}
             >
               {admin.name}
             </Actionsheet.Item>
