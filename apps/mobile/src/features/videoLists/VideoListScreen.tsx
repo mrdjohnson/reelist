@@ -28,6 +28,8 @@ import TrackedVideoItem from '../video/TrackedVideoItem'
 import SegmentButton from '~/shared/components/SegmentButton'
 import TileRow, { VideoChunk } from '~/shared/components/TileRow'
 import ActionButton from '~/shared/components/ActionButton'
+import VideoListDetailsSection from './VideoListDetailsSection'
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 
 const CAN_GO_BACK = false
 const CANNOT_GO_BACK = true
@@ -49,6 +51,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
   const [listViewType, setListViewType] = useState<ListViewTypes>('list')
   const [sortType, setSortType] = useState<SortTypes>(null)
   const [isSelectingProgress, setIsSelectingProgress] = useState(false)
+  const [showDetails, setShowDetails] = useState(false)
 
   const {
     isOpen: isMembershipOpen,
@@ -346,6 +349,19 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
     navigation.push('profile')
   }
 
+  const openDetailsPanel = () => {
+    setShowDetails(true)
+    onMemebershipClose()
+  }
+
+  const handleBackButton = () => {
+    if (showDetails) {
+      setShowDetails(false)
+    } else {
+      navigation.goBack()
+    }
+  }
+
   if (editing)
     return (
       <EditVideoListPage
@@ -354,17 +370,95 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
       />
     )
 
+  let content
+
+  if (showDetails) {
+    content = <VideoListDetailsSection videoList={currentVideoList} />
+  } else {
+    content = (
+      <>
+        {currentVideoList.videoIds.length === 0 && (
+          <Center>
+            <Text>Nothing has been added here yet</Text>
+          </Center>
+        )}
+
+        {formattedVideos.length === 0 && (
+          <FlatList
+            data={currentVideoList.videoIds}
+            keyExtractor={videoId => videoId}
+            renderItem={() => videoItemSkeleton}
+          />
+        )}
+
+        {!activeTabKey ? (
+          listViewType === 'list' ? (
+            <FlatList
+              data={formattedVideos}
+              keyExtractor={(video: Video) => video.videoId}
+              renderItem={renderVideo}
+              key={listViewType}
+              ListHeaderComponent={ListHeaderComponent}
+              refreshControl={
+                <RefreshControl refreshing={isLoadingVideos} onRefresh={refreshVideoList} />
+              }
+            />
+          ) : (
+            <FlatList
+              data={videoChunks}
+              renderItem={renderVideoRow}
+              key={listViewType}
+              ListHeaderComponent={ListHeaderComponent}
+              refreshControl={
+                <RefreshControl refreshing={isLoadingVideos} onRefresh={refreshVideoList} />
+              }
+            />
+          )
+        ) : listViewType === 'list' ? (
+          <FlatList
+            data={formattedTrackedVideos}
+            keyExtractor={video => video.videoId}
+            renderItem={renderTrackedVideo}
+            ListHeaderComponent={ListHeaderComponent}
+            refreshControl={
+              <RefreshControl refreshing={isLoadingVideos} onRefresh={loadVideosForUser} />
+            }
+          />
+        ) : (
+          <FlatList
+            data={trackedVideoChunks}
+            renderItem={renderTrackedVideoRow}
+            ListHeaderComponent={ListHeaderComponent}
+            refreshControl={
+              <RefreshControl refreshing={isLoadingVideos} onRefresh={loadVideosForUser} />
+            }
+          />
+        )}
+      </>
+    )
+  }
+
   return (
     <View flex={1} backgroundColor="light.100">
-      <Row marginY="10px">
-        <Center flex={1}>
+      <Row margin="10px">
+        <Center>
+          <Pressable alignSelf="center" onPress={handleBackButton}>
+            <MaterialIcons
+              name="arrow-back"
+              size={20}
+              style={{ color: 'black', padding: 0, margin: 0 }}
+            />
+          </Pressable>
+        </Center>
+
+        <Center flex={1} marginX="4px">
           <Text fontSize="2xl" adjustsFontSizeToFit numberOfLines={1}>
             {currentVideoList.name}
           </Text>
         </Center>
 
         <Center>
-          <Pressable alignSelf="center" marginRight="10px" onPress={openMembership}>
+          <Pressable alignSelf="center" onPress={openMembership}>
             <MaterialCommunityIcons
               name="dots-vertical"
               size={23}
@@ -374,63 +468,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
         </Center>
       </Row>
 
-      {currentVideoList.videoIds.length === 0 && (
-        <Center>
-          <Text>Nothing has been added here yet</Text>
-        </Center>
-      )}
-
-      {formattedVideos.length === 0 && (
-        <FlatList
-          data={currentVideoList.videoIds}
-          keyExtractor={videoId => videoId}
-          renderItem={() => videoItemSkeleton}
-        />
-      )}
-
-      {!activeTabKey ? (
-        listViewType === 'list' ? (
-          <FlatList
-            data={formattedVideos}
-            keyExtractor={(video: Video) => video.videoId}
-            renderItem={renderVideo}
-            key={listViewType}
-            ListHeaderComponent={ListHeaderComponent}
-            refreshControl={
-              <RefreshControl refreshing={isLoadingVideos} onRefresh={refreshVideoList} />
-            }
-          />
-        ) : (
-          <FlatList
-            data={videoChunks}
-            renderItem={renderVideoRow}
-            key={listViewType}
-            ListHeaderComponent={ListHeaderComponent}
-            refreshControl={
-              <RefreshControl refreshing={isLoadingVideos} onRefresh={refreshVideoList} />
-            }
-          />
-        )
-      ) : listViewType === 'list' ? (
-        <FlatList
-          data={formattedTrackedVideos}
-          keyExtractor={video => video.videoId}
-          renderItem={renderTrackedVideo}
-          ListHeaderComponent={ListHeaderComponent}
-          refreshControl={
-            <RefreshControl refreshing={isLoadingVideos} onRefresh={loadVideosForUser} />
-          }
-        />
-      ) : (
-        <FlatList
-          data={trackedVideoChunks}
-          renderItem={renderTrackedVideoRow}
-          ListHeaderComponent={ListHeaderComponent}
-          refreshControl={
-            <RefreshControl refreshing={isLoadingVideos} onRefresh={loadVideosForUser} />
-          }
-        />
-      )}
+      {content}
 
       {/* hidden */}
 
@@ -446,6 +484,8 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
           )}
 
           <Actionsheet.Item onPress={() => setShowMembers(true)}>Members</Actionsheet.Item>
+
+          {showDetails || <Actionsheet.Item onPress={openDetailsPanel}>Details</Actionsheet.Item>}
 
           {isUserListAdmin && (
             <Actionsheet.Item
