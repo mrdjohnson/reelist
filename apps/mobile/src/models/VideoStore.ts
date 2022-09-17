@@ -7,6 +7,7 @@ import { callTmdb } from '~/api/api'
 import supabase from '~/supabase'
 import humps from 'humps'
 import { findLastValidBreakpoint } from 'native-base/lib/typescript/theme/v33x-theme/tools'
+import User from '~/models/User'
 
 type TrackedVideoJson = {
   video_id: string
@@ -115,15 +116,15 @@ class VideoStore {
     return videos
   }
 
-  getVideoProgressesForUser = async (userId: string | null, videoIds: string[] | undefined) => {
-    if (!videoIds || _.isEmpty(videoIds) || !userId) return []
+  getVideoProgressesForUser = async (user: User | null, videoIds: string[] | undefined) => {
+    if (!videoIds || _.isEmpty(videoIds) || !user) return []
 
     let videos: Video[] = []
 
     const { data: videoJsons, error } = await supabase
       .from<VideoTableType>('videos')
       .select('*')
-      .match({ user_id: userId })
+      .match({ user_id: user.id })
       .in('video_id', videoIds)
 
     if (error) {

@@ -45,7 +45,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
 
   const [editing, setEditing] = useState<boolean>(false)
   const [showMembers, setShowMembers] = useState(false)
-  const [activeTabKey, setActiveTabKey] = useState<string | null>(null)
+  const [activeUser, setActiveUser] = useState<User | null>(null)
   const [isLoadingVideos, setIsLoadingVideos] = useState(false)
   const [trackedVideos, setTrackedVideos] = useState<Video[]>([])
   const [listViewType, setListViewType] = useState<ListViewTypes>('list')
@@ -126,7 +126,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
     setIsLoadingVideos(true)
 
     const videos = await videoStore.getVideoProgressesForUser(
-      activeTabKey,
+      activeUser,
       currentVideoList?.videoIds,
     )
 
@@ -135,7 +135,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
   }
 
   useEffect(() => {
-    if (!activeTabKey) return _.noop
+    if (!activeUser) return _.noop
 
     loadVideosForUser()
 
@@ -143,7 +143,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
       setIsLoadingVideos(false)
       setTrackedVideos([])
     }
-  }, [activeTabKey, currentVideoList])
+  }, [activeUser, currentVideoList])
 
   useEffect(() => {
     const onBackButtonPressed = () => {
@@ -237,7 +237,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
             size="sm"
             icon={
               <MaterialCommunityIcons
-                name={activeTabKey ? 'account-details' : 'account-question-outline'}
+                name={activeUser ? 'account-details' : 'account-question-outline'}
               />
             }
             onPress={() => {
@@ -246,9 +246,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
               openMembership()
             }}
           >
-            {activeTabKey
-              ? _.find(currentVideoList?.admins, { id: activeTabKey })?.name || 'Nobody'
-              : 'See Progress'}
+            {activeUser ? activeUser?.name || 'Nobody' : 'See Progress'}
           </ActionButton>
         </Row>
 
@@ -264,7 +262,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
         />
       </Row>
     )
-  }, [listViewType, sortType, activeTabKey])
+  }, [listViewType, sortType, activeUser])
 
   if (!currentVideoList) return null
 
@@ -391,7 +389,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
           />
         )}
 
-        {!activeTabKey ? (
+        {!activeUser ? (
           listViewType === 'list' ? (
             <FlatList
               data={formattedVideos}
@@ -515,10 +513,10 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
           {isSelectingProgress && (
             <Actionsheet.Item
               onPress={() => {
-                setActiveTabKey(null)
+                setActiveUser(null)
                 closeMemberShipActionSheet()
               }}
-              backgroundColor={activeTabKey === null ? 'light.300:alpha.40' : null}
+              backgroundColor={activeUser === null ? 'light.300:alpha.40' : null}
             >
               None (video overview)
             </Actionsheet.Item>
@@ -527,10 +525,10 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
           {currentVideoList.admins.map(admin => (
             <Actionsheet.Item
               key={admin.id}
-              backgroundColor={activeTabKey === admin.id ? 'light.300:alpha.40' : null}
+              backgroundColor={activeUser === admin ? 'light.300:alpha.40' : null}
               onPress={() => {
                 if (isSelectingProgress) {
-                  setActiveTabKey(admin.id)
+                  setActiveUser(admin)
                   closeMemberShipActionSheet()
                   return
                 }
