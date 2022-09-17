@@ -162,6 +162,9 @@ class Video {
   }
 
   _assignFromVideoTable = (videoTable: VideoTableType) => {
+    // if we already tried to get the data and nothing was there
+    if (!videoTable.id) return
+
     this.serverId = videoTable.id
     this.videoInfo = videoTable.video_info || {}
     this.tracked = videoTable.tracked

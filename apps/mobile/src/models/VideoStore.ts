@@ -135,7 +135,7 @@ class VideoStore {
 
       const videoPromises = await Promise.allSettled(
         videoIds.map(videoId => {
-          const videoJson = videoJsonMap[videoId]
+          const videoJson = videoJsonMap[videoId] || {}
 
           return this.getVideo(videoId, videoJson)
         }),
