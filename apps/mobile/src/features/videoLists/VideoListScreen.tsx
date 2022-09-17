@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import {
   Actionsheet,
   Center,
+  Column,
   Divider,
   FlatList,
   Icon,
@@ -30,6 +31,8 @@ import TileRow, { VideoChunk } from '~/shared/components/TileRow'
 import ActionButton from '~/shared/components/ActionButton'
 import VideoListDetailsSection from './VideoListDetailsSection'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import DetailsPanel from '~/shared/components/DetailsPanel'
+import TotalTimeDetailsPanel from '~/shared/components/TotalTimeDetailsPanel'
 
 const CAN_GO_BACK = false
 const CANNOT_GO_BACK = true
@@ -180,89 +183,95 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
     }
 
     return (
-      <Row
-        marginBottom="10px"
-        display="flex"
-        justifyContent="space-between"
-        width="100%"
-        paddingX="10px"
-      >
-        <Row>
-          <Menu
-            trigger={triggerProps => {
-              return (
-                <Pressable {...triggerProps} alignSelf="center" rounded="full">
-                  <Icon as={<MaterialCommunityIcons name={iconName} />} />
-                </Pressable>
-              )
-            }}
-            placement="bottom left"
-          >
-            <Menu.Item textAlign="center" onPress={() => setSortType(null)}>
-              <Icon as={<MaterialCommunityIcons name={'sort-variant-remove'} />} />
-              <Text>Clear Sort</Text>
-            </Menu.Item>
-
-            <Divider mt="3" w="100%" />
-
-            <Menu.Group title="Name">
-              <Menu.Item onPress={() => setSortType('alphaAsc')}>
-                <Icon as={<MaterialCommunityIcons name={'sort-alphabetical-ascending'} />} />
-                <Text>Ascending</Text>
+      <Column>
+        <Row
+          marginBottom="10px"
+          display="flex"
+          justifyContent="space-between"
+          width="100%"
+          paddingX="10px"
+        >
+          <Row>
+            <Menu
+              trigger={triggerProps => {
+                return (
+                  <Pressable {...triggerProps} alignSelf="center" rounded="full">
+                    <Icon as={<MaterialCommunityIcons name={iconName} />} />
+                  </Pressable>
+                )
+              }}
+              placement="bottom left"
+            >
+              <Menu.Item textAlign="center" onPress={() => setSortType(null)}>
+                <Icon as={<MaterialCommunityIcons name={'sort-variant-remove'} />} />
+                <Text>Clear Sort</Text>
               </Menu.Item>
 
-              <Menu.Item onPress={() => setSortType('alphaDesc')}>
-                <Icon as={<MaterialCommunityIcons name={'sort-alphabetical-descending'} />} />
-                <Text>Descending</Text>
-              </Menu.Item>
-            </Menu.Group>
+              <Divider mt="3" w="100%" />
 
-            <Divider mt="3" w="100%" />
+              <Menu.Group title="Name">
+                <Menu.Item onPress={() => setSortType('alphaAsc')}>
+                  <Icon as={<MaterialCommunityIcons name={'sort-alphabetical-ascending'} />} />
+                  <Text>Ascending</Text>
+                </Menu.Item>
 
-            <Menu.Group title="Release Date">
-              <Menu.Item onPress={() => setSortType('releaseAsc')}>
-                <Icon as={<MaterialCommunityIcons name={'sort-calendar-ascending'} />} />
-                <Text>Ascending</Text>
-              </Menu.Item>
+                <Menu.Item onPress={() => setSortType('alphaDesc')}>
+                  <Icon as={<MaterialCommunityIcons name={'sort-alphabetical-descending'} />} />
+                  <Text>Descending</Text>
+                </Menu.Item>
+              </Menu.Group>
 
-              <Menu.Item onPress={() => setSortType('releaseDesc')}>
-                <Icon as={<MaterialCommunityIcons name={'sort-calendar-descending'} />} />
-                <Text>Descending</Text>
-              </Menu.Item>
-            </Menu.Group>
-          </Menu>
+              <Divider mt="3" w="100%" />
 
-          <ActionButton
-            marginLeft="10px"
+              <Menu.Group title="Release Date">
+                <Menu.Item onPress={() => setSortType('releaseAsc')}>
+                  <Icon as={<MaterialCommunityIcons name={'sort-calendar-ascending'} />} />
+                  <Text>Ascending</Text>
+                </Menu.Item>
+
+                <Menu.Item onPress={() => setSortType('releaseDesc')}>
+                  <Icon as={<MaterialCommunityIcons name={'sort-calendar-descending'} />} />
+                  <Text>Descending</Text>
+                </Menu.Item>
+              </Menu.Group>
+            </Menu>
+
+            <ActionButton
+              marginLeft="10px"
+              size="sm"
+              icon={
+                <MaterialCommunityIcons
+                  name={activeUser ? 'account-details' : 'account-question-outline'}
+                />
+              }
+              onPress={() => {
+                setShowMembers(true)
+                setIsSelectingProgress(true)
+                openMembership()
+              }}
+            >
+              {activeUser ? activeUser?.name || 'Nobody' : 'See Progress'}
+            </ActionButton>
+          </Row>
+
+          <SegmentButton
+            containerProps={{ width: '75px', height: 'auto' }}
+            selectedSegmentId={listViewType === 'list' ? 'left' : 'right'}
+            leftSegment={{ icon: <MaterialCommunityIcons name="view-list" /> }}
+            rightSegment={{ icon: <MaterialCommunityIcons name="view-grid" /> }}
             size="sm"
-            icon={
-              <MaterialCommunityIcons
-                name={activeUser ? 'account-details' : 'account-question-outline'}
-              />
-            }
-            onPress={() => {
-              setShowMembers(true)
-              setIsSelectingProgress(true)
-              openMembership()
+            onPress={segmentId => {
+              setListViewType(segmentId === 'left' ? 'list' : 'grid')
             }}
-          >
-            {activeUser ? activeUser?.name || 'Nobody' : 'See Progress'}
-          </ActionButton>
+          />
         </Row>
 
-        <SegmentButton
-          containerProps={{ width: '75px', height: 'auto' }}
-          selectedSegmentId={listViewType === 'list' ? 'left' : 'right'}
-          leftSegment={{ icon: <MaterialCommunityIcons name="view-list" /> }}
-          rightSegment={{ icon: <MaterialCommunityIcons name="view-grid" /> }}
-          size="sm"
-          onPress={segmentId => {
-            setListViewType(segmentId === 'left' ? 'list' : 'grid')
-          }}
-        />
-      </Row>
+        {activeUser && (
+          <TotalTimeDetailsPanel marginX="10px" user={activeUser} videos={trackedVideos} />
+        )}
+      </Column>
     )
-  }, [listViewType, sortType, activeUser])
+  }, [listViewType, sortType, activeUser, trackedVideos])
 
   if (!currentVideoList) return null
 

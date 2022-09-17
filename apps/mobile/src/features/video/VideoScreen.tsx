@@ -28,6 +28,7 @@ import VideoListManagementSection from './VideoListManagementSection'
 import ToggleButton from '~/shared/components/ToggleButton'
 import AppButton from '~/shared/components/AppButton'
 import ActionButton from '~/shared/components/ActionButton'
+import TotalTimeDetailsPanel from '~/shared/components/TotalTimeDetailsPanel'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 const IndeterminateIcon = <Icon as={<MaterialIcons name="indeterminate-check-box" />} />
@@ -36,7 +37,7 @@ const CAN_GO_BACK = false
 const CANNOT_GO_BACK = true
 
 const VideoScreen = observer(({ navigation }: ReelistScreen) => {
-  const { videoStore } = useStore()
+  const { videoStore, auth } = useStore()
   const videoId = videoStore.currentVideoId
   const [video, setVideo] = useState<Video | null>(null)
   const [manageLists, setManageLists] = useState(false)
@@ -199,6 +200,8 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
               </ActionButton>
             </Row>
           )}
+
+          <TotalTimeDetailsPanel user={auth.user} videos={[video]} />
 
           <Row alignItems="center" space="8px" margin="10px">
             <ToggleButton

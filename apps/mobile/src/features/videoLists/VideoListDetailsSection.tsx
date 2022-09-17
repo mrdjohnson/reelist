@@ -44,6 +44,12 @@ const VideoListDetailsSection = observer(({ videoList }: VideoListDetailsSection
               </Pressable>
             ))}
           </DetailsPanel>
+
+          <DetailsPanel text="Approximate Total Run time">
+            <Text adjustsFontSizeToFit numberOfLines={1}>
+              {videoList ? videoList.totalDuration : 'calculating total time'}
+            </Text>
+          </DetailsPanel>
         </Column>
       </ScrollView>
     </View>

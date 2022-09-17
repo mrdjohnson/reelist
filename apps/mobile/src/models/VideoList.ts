@@ -15,6 +15,7 @@ import { callTmdb } from '~/api/api'
 import ShortUniqueId from 'short-unique-id'
 import User from '~/models/User'
 import { createViewModel, IViewModel } from 'mobx-utils'
+import { humanizedDuration } from '~/utils'
 
 export type VideoListTableType = {
   id: string
@@ -226,6 +227,17 @@ class VideoList implements VideoListType {
 
   get viewModel() {
     return createViewModel<VideoList>(this)
+  }
+
+  get totalDurationMinutes() {
+    return _.chain(this.videos).map('totalDurationMinutes').sum().value()
+  }
+
+  get totalDuration() {
+    console.log('getting total duration')
+    const totalMinutes = _.chain(this.videos).map('totalDurationMinutes').sum().value()
+
+    return humanizedDuration(totalMinutes)
   }
 }
 

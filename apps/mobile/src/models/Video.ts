@@ -5,6 +5,7 @@ import Auth from './Auth'
 import { Decamelized } from 'humps'
 import { callTmdb, sendNotifications, UpdateType } from '~/api/api'
 import moment from 'moment'
+import { humanizedDuration } from '~/utils'
 
 export type TvEpisode = {
   airDate: string
@@ -86,6 +87,9 @@ class Video {
   originalName?: string | undefined
   voteAverage!: number
   voteCount!: number
+  runtime?: number
+  episodeRunTime?: number[]
+  numberOfEpisodes?: number
   seasons?: TvSeason[] | undefined
   lastEpisodeToAir?: TvEpisode
   nextEpisodeToAir?: TvEpisode
@@ -639,6 +643,57 @@ class Video {
     if (this.nextEpisodeToAir) return false
 
     return false
+  }
+
+  get watchedEpisodeCount() {
+    let watchedEpisodeCount = 0
+
+    let episode = this.seasonMap[1]?.episodes?.[0]
+
+    // go through every episode to see if its watched
+    // could be faster by looking at the video list data
+    while (episode) {
+      if (this.getIsEpisodeWatched(episode)) {
+        watchedEpisodeCount += 1
+      }
+
+      episode = episode.next
+    }
+
+    return watchedEpisodeCount
+  }
+
+  get totalWatchedDurationMinutes() {
+    if (this.isCompleted) {
+      return this.totalDurationMinutes
+    }
+
+    if (this.isMovie) {
+      return 0
+    }
+
+    return this.watchedEpisodeCount * _.mean(this.episodeRunTime)
+  }
+
+  get totalWatchedDuration() {
+    return humanizedDuration(this.totalWatchedDurationMinutes)
+  }
+
+  get totalDurationMinutes() {
+    if (this.isMovie) {
+      return this.runtime || 0
+    }
+
+    if (this.numberOfEpisodes !== undefined) {
+      const meanRunTime = _.mean(this.episodeRunTime)
+      return this.numberOfEpisodes * meanRunTime
+    }
+
+    return 0
+  }
+
+  get totalDuration() {
+    return humanizedDuration(this.totalDurationMinutes)
   }
 }
 
