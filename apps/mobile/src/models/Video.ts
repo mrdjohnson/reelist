@@ -6,6 +6,7 @@ import { Decamelized } from 'humps'
 import { callTmdb, sendNotifications, UpdateType } from '~/api/api'
 import moment from 'moment'
 import { humanizedDuration } from '~/utils'
+import VideoStore from './VideoStore'
 
 export type TvEpisode = {
   airDate: string
@@ -105,6 +106,7 @@ class Video {
   serverId: string | undefined
 
   storeAuth: Auth
+  videoStore: VideoStore
 
   seasonMap: Record<number, TvSeason | null> = {}
 
@@ -113,6 +115,7 @@ class Video {
   constructor(
     json: Video,
     auth: Auth,
+    videoStore: VideoStore,
     videoTableData: VideoTableType | null = null,
     videoId: string | null = null,
   ) {
@@ -141,6 +144,7 @@ class Video {
     })
 
     this.storeAuth = auth
+    this.videoStore = videoStore
 
     if (videoId) {
       this.mediaType = videoId.startsWith('mv') ? 'movie' : 'tv'
@@ -444,7 +448,21 @@ class Video {
   fetchSeasons = async () => {
     if (!this.seasons) return
 
-    await Promise.allSettled(this.seasons?.map(season => this.fetchSeason(season.seasonNumber)))
+    const seasonMap = this.videoStore.videoSeasonMapByVideoId[this.videoId]
+
+    if (!_.isUndefined(seasonMap)) {
+      this.seasonMap = seasonMap
+    } else {
+      console.log('fetching seasons')
+      await Promise.allSettled(this.seasons?.map(season => this.fetchSeason(season.seasonNumber)))
+
+      // debugger
+      this.videoStore.videoSeasonMapByVideoId[this.videoId] = this.seasonMap || null
+    }
+
+    // if(_.isUndefined(this.videoStore.videoSeasonMapByVideoId[this.videoId]) {
+    //   return
+    // }
 
     this._linkEpisodes()
   }

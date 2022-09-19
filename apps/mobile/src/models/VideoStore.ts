@@ -18,7 +18,8 @@ type TrackedVideoJson = {
 class VideoStore {
   storeAuth: Auth
   currentVideoId: string | null = null
-  videoCache: Record<string, Video> = {}
+  tmdbJsonByVideoId: Record<string, Video | null> = {}
+  videoSeasonMapByVideoId: Record<string, Record<number, TvSeason | null>> = {}
 
   constructor(auth: Auth) {
     makeAutoObservable(this, {
@@ -50,34 +51,22 @@ class VideoStore {
     return path
   }
 
-  getVideo = async (
-    videoId: string,
-    videoTableData: VideoTableType | null = null,
-    useCache = true,
-  ) => {
-    // if (useCache && this.videoCache[videoId]) return this.videoCache[videoId]
-
+  getVideo = async (videoId: string, videoTableData: VideoTableType | null = null) => {
     const path = this.getVideoPath(videoId)
 
     if (!path) return null
 
-    const video = await callTmdb(path, null, '&append_to_response=images').then(
-      item => _.get(item, 'data.data') as Video | null,
-    )
+    let video: Video | null = this.tmdbJsonByVideoId[videoId]
 
-    // const video = await supabase.functions
-    //   .invoke('tmdb', {
-    //     body: JSON.stringify({
-    //       path,
-    //     }),
-    //   })
-    //   .then(item => _.get(item, 'data.data') as VideoJsonType | null)
+    if (_.isUndefined(video)) {
+      video = await callTmdb(path, null, '&append_to_response=images').then(
+        item => _.get(item, 'data.data') as Video | null,
+      )
 
-    const uiVideo = video && new Video(video, this.storeAuth, videoTableData, videoId)
+      this.tmdbJsonByVideoId[videoId] = video || null
+    }
 
-    // if (uiVideo) {
-    //   this.videoCache[videoId] = uiVideo
-    // }
+    const uiVideo = video && new Video(video, this.storeAuth, this, videoTableData, videoId)
 
     return uiVideo
   }
