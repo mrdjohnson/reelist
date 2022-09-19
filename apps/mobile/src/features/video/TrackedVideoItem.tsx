@@ -50,7 +50,7 @@ const TrackedVideoItem = observer(
         </View>
       )
     } else if (!isInteractable || isTile) {
-      if (video.lastWatchedSeasonNumber === null && video.lastWatchedEpisodeNumber === null) {
+      if (!video.lastWatchedSeasonNumber && !video.lastWatchedEpisodeNumber) {
         bottomRow = (
           <View flexDirection="row-reverse">
             <Text>Not started</Text>

@@ -106,8 +106,6 @@ class Video {
 
   storeAuth: Auth
 
-  lastWatchedSeasonNumber: number | null = null
-  lastWatchedEpisodeNumber: number | null = null
   seasonMap: Record<number, TvSeason | null> = {}
 
   _selectedSeason: TvSeason | null = null
@@ -172,8 +170,6 @@ class Video {
     this.serverId = videoTable.id
     this.videoInfo = videoTable.video_info || {}
     this.tracked = videoTable.tracked
-    this.lastWatchedSeasonNumber = videoTable.last_watched_season_number
-    this.lastWatchedEpisodeNumber = videoTable.last_watched_episode_number
   }
 
   _lazyLoadVideoFromVideoTable = async () => {
@@ -552,10 +548,6 @@ class Video {
     let episodeToWatch = this.currentBaseEpisode?.next || firstEpisode
 
     while (episodeToWatch && this.getIsEpisodeWatched(episodeToWatch)) {
-      // todo: revisit this, assignments should not happen in a getter
-      this.lastWatchedSeasonNumber = episodeToWatch.seasonNumber
-      this.lastWatchedEpisodeNumber = episodeToWatch.episodeNumber
-
       episodeToWatch = episodeToWatch.next
     }
 
@@ -604,6 +596,16 @@ class Video {
 
   get tmdbPath() {
     return '/' + this.mediaType + '/' + this.id
+  }
+
+  // previously these values will still be stored on the server for now
+  // but may just stick to the computed method entirely later
+  get lastWatchedSeasonNumber() {
+    return this.lastWatchedEpisodeFromEnd?.seasonNumber
+  }
+
+  get lastWatchedEpisodeNumber() {
+    return this.lastWatchedEpisodeFromEnd?.episodeNumber
   }
 
   get lastWatchedEpisodeFromEnd() {
