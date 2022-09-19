@@ -6,8 +6,8 @@ import VideoStore from './VideoStore'
 class Store {
   auth = new Auth()
   appState = new AppState()
-  videoListStore = new VideoListStore(this.auth)
   videoStore = new VideoStore(this.auth)
+  videoListStore = new VideoListStore(this.auth, this.videoStore)
 }
 
 export default Store

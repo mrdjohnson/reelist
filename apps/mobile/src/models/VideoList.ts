@@ -16,6 +16,7 @@ import ShortUniqueId from 'short-unique-id'
 import User from '~/models/User'
 import { createViewModel, IViewModel } from 'mobx-utils'
 import { humanizedDuration } from '~/utils'
+import VideoStore from './VideoStore'
 
 export type VideoListTableType = {
   id: string
@@ -43,8 +44,14 @@ class VideoList implements VideoListType {
 
   videoListStore: VideoListStore
   storeAuth: Auth
+  videoStore: VideoStore
 
-  constructor(json: VideoListTableType | null, auth: Auth, videoListStore: VideoListStore) {
+  constructor(
+    json: VideoListTableType | null,
+    auth: Auth,
+    videoListStore: VideoListStore,
+    videoStore: VideoStore,
+  ) {
     if (json) {
       this._assignValuesFromJson(json)
     } else {
@@ -58,6 +65,7 @@ class VideoList implements VideoListType {
 
     this.storeAuth = auth
     this.videoListStore = videoListStore
+    this.videoStore = videoStore
 
     makeAutoObservable(this, {
       id: false,
@@ -72,44 +80,12 @@ class VideoList implements VideoListType {
     Object.assign(this, humps.camelizeKeys(json))
   }
 
-  getVideoPath = (videoId: string, seasonNumber?: string) => {
-    const videoIdMatch = videoId.match(/(..)(.*)/)
-
-    if (!videoIdMatch) return null
-
-    const [_videoId, type, id] = videoIdMatch
-
-    const videoType = type === 'mv' ? 'movie' : type
-
-    let path = `/${videoType}/${id}`
-
-    if (seasonNumber) {
-      path += '/season/' + seasonNumber
-    }
-
-    return path
-  }
-
-  getVideo = async (videoId: string) => {
-    const path = this.getVideoPath(videoId)
-
-    if (!path) return null
-
-    try {
-      const video = await callTmdb(path).then(item => _.get(item, 'data.data') as Video | null)
-
-      return video && new Video(video, this.storeAuth, null, videoId)
-    } catch (e) {
-      console.error('unable to get video:', videoId)
-    }
-
-    return null
-  }
-
   getVideos = async () => {
     if (this.videosRetrieved) return this.videos
 
-    const videos: Array<Video | null> = await Promise.all(this.videoIds.map(this.getVideo))
+    const videos: Array<Video | null> = await Promise.all(
+      this.videoIds.map(videoId => this.videoStore.getVideo(videoId)),
+    )
 
     this.videos = _.compact(videos)
     this.videosRetrieved = true
@@ -197,7 +173,7 @@ class VideoList implements VideoListType {
       throw error.message
     }
 
-    return new VideoList(videoListResponse, this.storeAuth, this.videoListStore)
+    return new VideoList(videoListResponse, this.storeAuth, this.videoListStore, this.videoStore)
   }
 
   static createUniqueShareId = () => {
