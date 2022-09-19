@@ -169,6 +169,12 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
   }, [currentVideoList?.adminIds])
 
   const ListHeaderComponent = useMemo(() => {
+    if (activeUser) {
+      if (formattedTrackedVideos.length === 0) return null
+    } else if (formattedVideos.length === 0) {
+      return null
+    }
+
     let iconName: string
     if (sortType === null) {
       iconName = 'sort-variant'
@@ -271,7 +277,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
         )}
       </Column>
     )
-  }, [listViewType, sortType, activeUser, trackedVideos])
+  }, [listViewType, sortType, activeUser, formattedVideos, formattedTrackedVideos, trackedVideos])
 
   if (!currentVideoList) return null
 
