@@ -5,13 +5,14 @@ import DetailsPanel from './DetailsPanel'
 import User from '~/models/User'
 import Video from '~/models/Video'
 import { humanizedDuration } from '~/utils'
+import { observer } from 'mobx-react-lite'
 
 type TotalTimeDetailsPanelProps = IViewProps & {
   user: User
   videos: Video[]
 }
 
-const TotalTimeDetailsPanel = ({ user, videos, ...props }: TotalTimeDetailsPanelProps) => {
+const TotalTimeDetailsPanel = observer(({ user, videos, ...props }: TotalTimeDetailsPanelProps) => {
   const [totalDuration, totalWatchedDuration] = useMemo(() => {
     let duration = 0
     let watchedDuration = 0
@@ -37,6 +38,6 @@ const TotalTimeDetailsPanel = ({ user, videos, ...props }: TotalTimeDetailsPanel
       </Column>
     </DetailsPanel>
   )
-}
+})
 
 export default TotalTimeDetailsPanel

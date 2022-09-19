@@ -101,6 +101,7 @@ class Video {
     posters: VideoImageType[]
   }
 
+  videoId: string
   tracked = false
   videoInfo: VideoInfoType = {}
   serverId: string | undefined
@@ -149,6 +150,9 @@ class Video {
     if (videoId) {
       this.mediaType = videoId.startsWith('mv') ? 'movie' : 'tv'
       this.id = videoId.substring(2)
+      this.videoId = videoId
+    } else {
+      this.videoId = (json.mediaType === 'movie' ? 'mv' : 'tv') + json.id
     }
 
     this._assignValuesFromJson(json)
@@ -590,10 +594,6 @@ class Video {
 
   get isMovie() {
     return this.mediaType === 'movie'
-  }
-
-  get videoId() {
-    return (this.mediaType === 'movie' ? 'mv' : 'tv') + this.id
   }
 
   get isWatched() {
