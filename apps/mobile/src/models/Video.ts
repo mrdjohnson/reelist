@@ -662,7 +662,7 @@ class Video {
 
     if (this.nextEpisodeToAir) return false
 
-    return false
+    return this.isLatestEpisodeWatched
   }
 
   get watchedEpisodeCount() {
