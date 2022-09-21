@@ -137,11 +137,7 @@ const VideoSeasonSection = observer(({ video, season }: VideoSeasonSectionProps)
         <Row justifyContent="space-between">
           <Row alignItems="center">
             <Text>Hide future shows:</Text>
-            <Switch
-              size="sm"
-              value={hideFutureEpisodes}
-              onChange={() => setHideFutureEpisodes(!hideFutureEpisodes)}
-            />
+            <Switch size="sm" onValueChange={setHideFutureEpisodes} defaultIsChecked />
           </Row>
           <ActionButton
             onPress={() => setAscendingOrder(!ascendingOrder)}
