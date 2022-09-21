@@ -1,47 +1,22 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import {
-  Actionsheet,
-  Center,
-  Column,
-  Divider,
-  FlatList,
-  Icon,
-  Menu,
-  Pressable,
-  Row,
-  Text,
-  useDisclose,
-  useToast,
-  View,
-} from 'native-base'
+import { Actionsheet, Center, Pressable, Row, Text, useDisclose, useToast, View } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
-import { BackHandler, ListRenderItem, RefreshControl } from 'react-native'
-import VideoItem, { videoItemSkeleton } from '~/features/video/VideoItem'
+import { BackHandler } from 'react-native'
 import Clipboard from '@react-native-clipboard/clipboard'
 import User from '~/models/User'
 import { ReelistScreen } from '~/utils/navigation'
 import EditVideoListPage from './EditVideoListPage'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import Video from '~/models/Video'
-import _ from 'lodash'
-import TrackedVideoItem from '../video/TrackedVideoItem'
-import SegmentButton from '~/shared/components/SegmentButton'
-import TileRow, { VideoChunk } from '~/shared/components/TileRow'
-import ActionButton from '~/shared/components/ActionButton'
 import VideoListDetailsSection from './VideoListDetailsSection'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import DetailsPanel from '~/shared/components/DetailsPanel'
-import TotalTimeDetailsPanel from '~/shared/components/TotalTimeDetailsPanel'
+import VideoFlatList from './VideoFlatList'
 
 const CAN_GO_BACK = false
 const CANNOT_GO_BACK = true
 
-type ListViewTypes = 'list' | 'grid'
-type SortTypes = null | 'alphaAsc' | 'alphaDesc' | 'releaseAsc' | 'releaseDesc'
-
 const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
-  const { videoListStore, auth, appState, videoStore } = useStore()
+  const { videoListStore, auth, appState } = useStore()
   const toast = useToast()
 
   const currentVideoList = videoListStore.currentVideoList
@@ -49,10 +24,6 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
   const [editing, setEditing] = useState<boolean>(false)
   const [showMembers, setShowMembers] = useState(false)
   const [activeUser, setActiveUser] = useState<User | null>(null)
-  const [isLoadingVideos, setIsLoadingVideos] = useState(false)
-  const [trackedVideos, setTrackedVideos] = useState<Video[]>([])
-  const [listViewType, setListViewType] = useState<ListViewTypes>('list')
-  const [sortType, setSortType] = useState<SortTypes>(null)
   const [isSelectingProgress, setIsSelectingProgress] = useState(false)
   const [showDetails, setShowDetails] = useState(false)
 
@@ -61,54 +32,6 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
     onOpen: openMembership,
     onClose: onMemebershipClose,
   } = useDisclose()
-
-  const formatVideos = (videos: Video[] | null | undefined): Video[] => {
-    if (!videos) return []
-
-    if (sortType === null) return videos
-
-    if (sortType === 'alphaAsc') return _.orderBy(videos, 'videoName', 'asc')
-
-    if (sortType === 'alphaDesc') return _.orderBy(videos, 'videoName', 'desc')
-
-    if (sortType === 'releaseAsc') return _.orderBy(videos, 'videoReleaseDate', 'asc')
-
-    return _.orderBy(videos, 'videoReleaseDate', 'desc')
-  }
-
-  const formattedVideos = useMemo(() => {
-    return formatVideos(currentVideoList?.videos)
-  }, [currentVideoList?.videos, sortType])
-
-  const formattedTrackedVideos = useMemo(() => {
-    return formatVideos(trackedVideos)
-  }, [trackedVideos, sortType])
-
-  const videoChunks = useMemo(() => {
-    return _.chunk(formattedVideos, 3) as VideoChunk[]
-  }, [formattedVideos])
-
-  const trackedVideoChunks = useMemo(() => {
-    return _.chunk(formattedTrackedVideos, 3) as VideoChunk[]
-  }, [formattedTrackedVideos])
-
-  const renderVideo: ListRenderItem<Video> = ({ item: video }: { item: Video }) => (
-    <VideoItem video={video} />
-  )
-
-  const renderVideoRow: ListRenderItem<VideoChunk> = ({ item: videos }: { item: VideoChunk }) => (
-    <TileRow videos={videos} />
-  )
-
-  const renderTrackedVideo: ListRenderItem<Video> = ({ item: video }: { item: Video }) => (
-    <TrackedVideoItem video={video} isInteractable={false} />
-  )
-
-  const renderTrackedVideoRow: ListRenderItem<VideoChunk> = ({
-    item: videos,
-  }: {
-    item: VideoChunk
-  }) => <TileRow videos={videos} isTracked />
 
   useEffect(() => {
     return () => videoListStore.setCurrentVideoList(null)
@@ -124,29 +47,6 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
     currentVideoList?.getVideos()
     currentVideoList?.fetchAdmins()
   }, [currentVideoList])
-
-  const loadVideosForUser = async () => {
-    setIsLoadingVideos(true)
-
-    const videos = await videoStore.getVideoProgressesForUser(
-      activeUser,
-      currentVideoList?.videoIds,
-    )
-
-    setIsLoadingVideos(false)
-    setTrackedVideos(videos)
-  }
-
-  useEffect(() => {
-    if (!activeUser) return _.noop
-
-    loadVideosForUser()
-
-    return () => {
-      setIsLoadingVideos(false)
-      setTrackedVideos([])
-    }
-  }, [activeUser, currentVideoList])
 
   useEffect(() => {
     const onBackButtonPressed = () => {
@@ -168,127 +68,12 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
     return currentVideoList?.adminIds.includes(auth.user.id)
   }, [currentVideoList?.adminIds])
 
-  const ListHeaderComponent = useMemo(() => {
-    if (activeUser) {
-      if (formattedTrackedVideos.length === 0) return null
-    } else if (formattedVideos.length === 0) {
-      return null
-    }
-
-    let iconName: string
-    if (sortType === null) {
-      iconName = 'sort-variant'
-    } else if (sortType === 'alphaAsc') {
-      iconName = 'sort-alphabetical-ascending'
-    } else if (sortType === 'alphaDesc') {
-      iconName = 'sort-alphabetical-descending'
-    } else if (sortType === 'releaseAsc') {
-      iconName = 'sort-calendar-ascending'
-    } else {
-      iconName = 'sort-calendar-descending'
-    }
-
-    return (
-      <Column>
-        <Row
-          marginBottom="10px"
-          display="flex"
-          justifyContent="space-between"
-          width="100%"
-          paddingX="10px"
-        >
-          <Row>
-            <Menu
-              trigger={triggerProps => {
-                return (
-                  <Pressable {...triggerProps} alignSelf="center" rounded="full">
-                    <Icon as={<MaterialCommunityIcons name={iconName} />} />
-                  </Pressable>
-                )
-              }}
-              placement="bottom left"
-            >
-              <Menu.Item textAlign="center" onPress={() => setSortType(null)}>
-                <Icon as={<MaterialCommunityIcons name={'sort-variant-remove'} />} />
-                <Text>Clear Sort</Text>
-              </Menu.Item>
-
-              <Divider mt="3" w="100%" />
-
-              <Menu.Group title="Name">
-                <Menu.Item onPress={() => setSortType('alphaAsc')}>
-                  <Icon as={<MaterialCommunityIcons name={'sort-alphabetical-ascending'} />} />
-                  <Text>Ascending</Text>
-                </Menu.Item>
-
-                <Menu.Item onPress={() => setSortType('alphaDesc')}>
-                  <Icon as={<MaterialCommunityIcons name={'sort-alphabetical-descending'} />} />
-                  <Text>Descending</Text>
-                </Menu.Item>
-              </Menu.Group>
-
-              <Divider mt="3" w="100%" />
-
-              <Menu.Group title="Release Date">
-                <Menu.Item onPress={() => setSortType('releaseAsc')}>
-                  <Icon as={<MaterialCommunityIcons name={'sort-calendar-ascending'} />} />
-                  <Text>Ascending</Text>
-                </Menu.Item>
-
-                <Menu.Item onPress={() => setSortType('releaseDesc')}>
-                  <Icon as={<MaterialCommunityIcons name={'sort-calendar-descending'} />} />
-                  <Text>Descending</Text>
-                </Menu.Item>
-              </Menu.Group>
-            </Menu>
-
-            <ActionButton
-              marginLeft="10px"
-              size="sm"
-              icon={
-                <MaterialCommunityIcons
-                  name={activeUser ? 'account-details' : 'account-question-outline'}
-                />
-              }
-              onPress={() => {
-                setShowMembers(true)
-                setIsSelectingProgress(true)
-                openMembership()
-              }}
-            >
-              {activeUser ? activeUser?.name || 'Nobody' : 'See Progress'}
-            </ActionButton>
-          </Row>
-
-          <SegmentButton
-            containerProps={{ width: '75px', height: 'auto' }}
-            selectedSegmentId={listViewType === 'list' ? 'left' : 'right'}
-            leftSegment={{ icon: <MaterialCommunityIcons name="view-list" /> }}
-            rightSegment={{ icon: <MaterialCommunityIcons name="view-grid" /> }}
-            size="sm"
-            onPress={segmentId => {
-              setListViewType(segmentId === 'left' ? 'list' : 'grid')
-            }}
-          />
-        </Row>
-
-        {activeUser && (
-          <TotalTimeDetailsPanel marginX="10px" user={activeUser} videos={trackedVideos} />
-        )}
-      </Column>
-    )
-  }, [listViewType, sortType, activeUser, formattedVideos, formattedTrackedVideos, trackedVideos])
-
   if (!currentVideoList) return null
 
-  const refreshVideoList = async () => {
-    setIsLoadingVideos(true)
-
-    currentVideoList.clearVideos()
-
-    videoListStore.refreshCurrentVideoList()
-
-    setIsLoadingVideos(false)
+  const handleProgressPressed = () => {
+    setShowMembers(true)
+    setIsSelectingProgress(true)
+    openMembership()
   }
 
   const join = () => {
@@ -397,65 +182,11 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
     content = <VideoListDetailsSection videoList={currentVideoList} />
   } else {
     content = (
-      <>
-        {currentVideoList.videoIds.length === 0 && (
-          <Center>
-            <Text>Nothing has been added here yet</Text>
-          </Center>
-        )}
-
-        {formattedVideos.length === 0 && (
-          <FlatList
-            data={currentVideoList.videoIds}
-            keyExtractor={videoId => videoId}
-            renderItem={() => videoItemSkeleton}
-          />
-        )}
-
-        {!activeUser ? (
-          listViewType === 'list' ? (
-            <FlatList
-              data={formattedVideos}
-              keyExtractor={(video: Video) => video.videoId}
-              renderItem={renderVideo}
-              key={listViewType}
-              ListHeaderComponent={ListHeaderComponent}
-              refreshControl={
-                <RefreshControl refreshing={isLoadingVideos} onRefresh={refreshVideoList} />
-              }
-            />
-          ) : (
-            <FlatList
-              data={videoChunks}
-              renderItem={renderVideoRow}
-              key={listViewType}
-              ListHeaderComponent={ListHeaderComponent}
-              refreshControl={
-                <RefreshControl refreshing={isLoadingVideos} onRefresh={refreshVideoList} />
-              }
-            />
-          )
-        ) : listViewType === 'list' ? (
-          <FlatList
-            data={formattedTrackedVideos}
-            keyExtractor={video => video.videoId}
-            renderItem={renderTrackedVideo}
-            ListHeaderComponent={ListHeaderComponent}
-            refreshControl={
-              <RefreshControl refreshing={isLoadingVideos} onRefresh={loadVideosForUser} />
-            }
-          />
-        ) : (
-          <FlatList
-            data={trackedVideoChunks}
-            renderItem={renderTrackedVideoRow}
-            ListHeaderComponent={ListHeaderComponent}
-            refreshControl={
-              <RefreshControl refreshing={isLoadingVideos} onRefresh={loadVideosForUser} />
-            }
-          />
-        )}
-      </>
+      <VideoFlatList
+        videoList={currentVideoList}
+        activeUser={activeUser}
+        onProgressPressed={handleProgressPressed}
+      />
     )
   }
 
