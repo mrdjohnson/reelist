@@ -9,6 +9,9 @@
     "test": "jest",
     "lint": "nx run mobile:lint"
   },
+  "jest": {
+    "preset": "react-native"
+  },
   "dependencies": {
     "@testing-library/jest-native": "*",
     "@testing-library/react-native": "*",
