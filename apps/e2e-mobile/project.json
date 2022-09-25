@@ -47,7 +47,7 @@
       "configurations": {
         "production": {
           "detoxConfiguration": "android.emu.release",
-          "buildTarget": "e2e-mobile:build-ios:production"
+          "buildTarget": "e2e-mobile:build-android:production"
         }
       }
     },
