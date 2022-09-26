@@ -1,4 +1,3 @@
-import supabase from '~/supabase'
 import _ from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import Auth from './Auth'
@@ -7,6 +6,7 @@ import { callTmdb, sendNotifications, UpdateType } from '~/api/api'
 import moment from 'moment'
 import { humanizedDuration } from '~/utils'
 import VideoStore from './VideoStore'
+import VideoApi from '~/api/VideoApi'
 
 export type TvEpisode = {
   airDate: string
@@ -84,7 +84,7 @@ class Video {
   name?: string | undefined
   firstAirDate?: string | undefined
   video?: boolean | undefined
-  originCountry?: [string] | undefined
+  originCountry?: string[] | undefined
   originalName?: string | undefined
   voteAverage!: number
   voteCount!: number
@@ -181,11 +181,10 @@ class Video {
   }
 
   _lazyLoadVideoFromVideoTable = async () => {
-    const { data: videoTable, error } = await supabase
-      .from<VideoTableType>('videos')
-      .select('*')
-      .match({ user_id: this.storeAuth.user.id, video_id: this.videoId })
-      .maybeSingle()
+    const { data: videoTable, error } = await VideoApi.loadVideo({
+      userId: this.storeAuth.user.id,
+      videoId: this.videoId,
+    })
 
     if (error) {
       console.error('failed to lazy load video:', error.message)
@@ -405,15 +404,12 @@ class Video {
   }
 
   updateWatched = async (type: string, upsertData: Partial<VideoTableType>) => {
-    const { data: videoJson, error } = await supabase
-      .from<VideoTableType>('videos')
-      .upsert({
-        ...upsertData,
-        id: this.serverId,
-        video_id: this.videoId,
-        user_id: this.storeAuth.user.id,
-      })
-      .single()
+    const { data: videoJson, error } = await VideoApi.updateVideo({
+      ...upsertData,
+      id: this.serverId,
+      video_id: this.videoId,
+      user_id: this.storeAuth.user.id,
+    })
 
     if (error) {
       console.error('video failed to ' + type, error.message)
