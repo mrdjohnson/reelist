@@ -66,12 +66,16 @@ const VideoFlatList = observer(
     }, [trackedVideos, sortType])
 
     const videoChunks = useMemo(() => {
+      if (listViewType !== 'grid') return []
+
       return _.chunk(formattedVideos, 3) as VideoChunk[]
-    }, [formattedVideos])
+    }, [formattedVideos, listViewType])
 
     const trackedVideoChunks = useMemo(() => {
+      if (listViewType !== 'grid') return []
+
       return _.chunk(formattedTrackedVideos, 3) as VideoChunk[]
-    }, [formattedTrackedVideos])
+    }, [formattedTrackedVideos, listViewType])
 
     const loadVideosForUser = async () => {
       setIsLoadingVideos(true)
