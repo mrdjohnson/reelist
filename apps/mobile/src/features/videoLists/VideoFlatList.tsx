@@ -24,6 +24,20 @@ type VideoFlatListProps = {
   onProgressPressed: () => void
 }
 
+const formatVideos = (videos: Video[] | null | undefined, sortType: SortTypes): Video[] => {
+  if (!videos) return []
+
+  if (sortType === null) return videos
+
+  if (sortType === 'alphaAsc') return _.orderBy(videos, 'videoName', 'asc')
+
+  if (sortType === 'alphaDesc') return _.orderBy(videos, 'videoName', 'desc')
+
+  if (sortType === 'releaseAsc') return _.orderBy(videos, 'videoReleaseDate', 'asc')
+
+  return _.orderBy(videos, 'videoReleaseDate', 'desc')
+}
+
 const VideoFlatList = observer(
   ({ videoList, activeUser, onProgressPressed }: VideoFlatListProps) => {
     const { videoListStore, videoStore } = useStore()
@@ -43,26 +57,12 @@ const VideoFlatList = observer(
       setIsLoadingVideos(false)
     }
 
-    const formatVideos = (videos: Video[] | null | undefined): Video[] => {
-      if (!videos) return []
-
-      if (sortType === null) return videos
-
-      if (sortType === 'alphaAsc') return _.orderBy(videos, 'videoName', 'asc')
-
-      if (sortType === 'alphaDesc') return _.orderBy(videos, 'videoName', 'desc')
-
-      if (sortType === 'releaseAsc') return _.orderBy(videos, 'videoReleaseDate', 'asc')
-
-      return _.orderBy(videos, 'videoReleaseDate', 'desc')
-    }
-
     const formattedVideos = useMemo(() => {
-      return formatVideos(videoList?.videos)
+      return formatVideos(videoList?.videos, sortType)
     }, [videoList?.videos, sortType])
 
     const formattedTrackedVideos = useMemo(() => {
-      return formatVideos(trackedVideos)
+      return formatVideos(trackedVideos, sortType)
     }, [trackedVideos, sortType])
 
     const videoChunks = useMemo(() => {
