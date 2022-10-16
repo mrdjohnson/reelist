@@ -16,7 +16,17 @@ import VideoList from '~/models/VideoList'
 import { observer } from 'mobx-react-lite'
 
 type ListViewTypes = 'list' | 'grid'
-type SortTypes = null | 'alphaAsc' | 'alphaDesc' | 'releaseAsc' | 'releaseDesc'
+type SortTypes = 'none' | 'alphaAsc' | 'alphaDesc' | 'releaseAsc' | 'releaseDesc'
+
+const iconNameBySortType: Record<SortTypes, string> = {
+  none: 'sort-variant',
+
+  alphaAsc: 'sort-alphabetical-ascending',
+  alphaDesc: 'sort-alphabetical-descending',
+
+  releaseAsc: 'sort-calendar-ascending',
+  releaseDesc: 'sort-calendar-descending',
+}
 
 type VideoFlatListProps = {
   videoList?: VideoList | null
@@ -27,7 +37,7 @@ type VideoFlatListProps = {
 const formatVideos = (videos: Video[] | null | undefined, sortType: SortTypes): Video[] => {
   if (!videos) return []
 
-  if (sortType === null) return videos
+  if (sortType === 'none') return videos
 
   if (sortType === 'alphaAsc') return _.orderBy(videos, 'videoName', 'asc')
 
@@ -45,7 +55,7 @@ const VideoFlatList = observer(
     const [trackedVideos, setTrackedVideos] = useState<Video[]>([])
     const [isLoadingVideos, setIsLoadingVideos] = useState(false)
     const [listViewType, setListViewType] = useState<ListViewTypes>('list')
-    const [sortType, setSortType] = useState<SortTypes>(null)
+    const [sortType, setSortType] = useState<SortTypes>('none')
 
     const refreshVideoList = async () => {
       setIsLoadingVideos(true)
@@ -115,18 +125,7 @@ const VideoFlatList = observer(
     )
 
     const ListHeaderComponent = useMemo(() => {
-      let iconName: string
-      if (sortType === null) {
-        iconName = 'sort-variant'
-      } else if (sortType === 'alphaAsc') {
-        iconName = 'sort-alphabetical-ascending'
-      } else if (sortType === 'alphaDesc') {
-        iconName = 'sort-alphabetical-descending'
-      } else if (sortType === 'releaseAsc') {
-        iconName = 'sort-calendar-ascending'
-      } else {
-        iconName = 'sort-calendar-descending'
-      }
+      const iconName = iconNameBySortType[sortType]
 
       return (
         <Column>
@@ -148,7 +147,7 @@ const VideoFlatList = observer(
                 }}
                 placement="bottom left"
               >
-                <Menu.Item textAlign="center" onPress={() => setSortType(null)}>
+                <Menu.Item textAlign="center" onPress={() => setSortType('none')}>
                   <Icon as={<MaterialCommunityIcons name={'sort-variant-remove'} />} />
                   <Text>Clear Sort</Text>
                 </Menu.Item>
