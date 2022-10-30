@@ -16,8 +16,12 @@ const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
   const [videos, setVideos] = useState<Video[]>([])
   const { auth, videoStore } = useStore()
 
-  const filteredVideos = useMemo(() => {
-    return _.filter(videos, video => video.videoName.includes(filterText))
+  const sortedVideos = useMemo(() => {
+    const filteredVideos = _.filter(videos, video => video.videoName.includes(filterText))
+
+    return filteredVideos.sort((videoA, videoB) => {
+      return videoB.compareCompletionTo(videoA)
+    })
   }, [videos, filterText])
 
   const [loadingVideos, refresh] = useRefresh(async () => {
@@ -40,7 +44,7 @@ const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
         color="white"
         refreshControl={<RefreshControl refreshing={loadingVideos} onRefresh={refresh} />}
       >
-        {filteredVideos.map(video => (
+        {sortedVideos.map(video => (
           <TrackedVideoItem video={video} key={video.id} />
         ))}
       </ScrollView>

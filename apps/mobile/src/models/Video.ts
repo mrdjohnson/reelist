@@ -559,6 +559,20 @@ class Video {
     // })
   }
 
+  compareCompletionTo = (otherVideo: Video) => {
+    // they cannot watch anymore episodes, can we?
+    if (otherVideo.isCompleted) return this.isCompleted ? 0 : 1
+
+    // they can watch more episodes, we cant.
+    if (this.isCompleted) return -1
+
+    // they cant watch any epsidoes today, can we?
+    if (otherVideo.isLatestEpisodeWatched) return this.isLatestEpisodeWatched ? 0 : 1
+
+    // they can actively watch another episode, can we?
+    return this.isLatestEpisodeWatched ? -1 : 0
+  }
+
   get currentBaseEpisode(): TvEpisode | undefined {
     const seasonNumber = this.lastWatchedSeasonNumber || 1
     const episodeNumber = this.lastWatchedEpisodeNumber || 1
