@@ -204,8 +204,16 @@ class Video {
         return
       }
 
-      if (nextEpisode.episodeNumber === this.lastEpisodeToAir?.episodeNumber) {
+      if (
+        nextEpisode.episodeNumber === this.lastEpisodeToAir?.episodeNumber &&
+        nextEpisode.seasonNumber === this.lastEpisodeToAir?.seasonNumber
+      ) {
         this.lastEpisodeToAir = nextEpisode
+      } else if (
+        nextEpisode.episodeNumber === this.nextEpisodeToAir?.episodeNumber &&
+        nextEpisode.seasonNumber === this.nextEpisodeToAir?.seasonNumber
+      ) {
+        this.nextEpisodeToAir = nextEpisode
       }
 
       nextEpisode.previous = previousEpisode
@@ -623,7 +631,7 @@ class Video {
   }
 
   get lastWatchedEpisodeFromEnd() {
-    let lastEpisode = this.lastEpisodeToAir
+    let lastEpisode = this.nextEpisodeToAir || this.lastEpisodeToAir
 
     while (lastEpisode && !this.getIsEpisodeWatched(lastEpisode)) {
       lastEpisode = lastEpisode.previous
