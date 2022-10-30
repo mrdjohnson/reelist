@@ -1,4 +1,4 @@
-import { NavigationProp, RouteProp, useRoute } from '@react-navigation/native'
+import { RouteProp, useRoute } from '@react-navigation/native'
 import { observer } from 'mobx-react-lite'
 import { Center, Row, Icon, IIconProps, Pressable, Text } from 'native-base'
 import React, { useEffect, useState } from 'react'
@@ -11,13 +11,14 @@ type FooterButtonProps = {
   routeName: keyof NavigatorParamList
   name: keyof NavigatorParamList
   icon: IIconProps['as']
-  navigation: NavigationProp<NavigatorParamList>
   text: string
   iconSize?: number
 }
 
 const FooterButton = observer(
-  ({ routeName, name, icon, navigation, text, iconSize = 5 }: FooterButtonProps) => {
+  ({ routeName, name, icon, text, iconSize = 5 }: FooterButtonProps) => {
+    const navigation = useReelistNavigation()
+
     const [isPressed, setIsPressed] = useState(false)
 
     return (
@@ -47,7 +48,6 @@ const FooterButton = observer(
 )
 
 const AppFooter = observer(() => {
-  const navigation = useReelistNavigation()
   const route = useRoute<RouteProp<NavigatorParamList>>()
 
   const [isVisible, setIsVisible] = useState(true)
@@ -86,7 +86,6 @@ const AppFooter = observer(() => {
         routeName={route.name}
         name="tracking"
         icon={<MaterialCommunityIcons name="bookmark-multiple" />}
-        navigation={navigation}
         text="Bookmarks"
         iconSize={4}
       />
@@ -95,7 +94,6 @@ const AppFooter = observer(() => {
         routeName={route.name}
         name="home"
         icon={<MaterialCommunityIcons name="home-roof" />}
-        navigation={navigation}
         text="Home"
       />
 
@@ -103,7 +101,6 @@ const AppFooter = observer(() => {
         routeName={route.name}
         name="search"
         icon={<MaterialIcons name="search" />}
-        navigation={navigation}
         text="Search"
         iconSize={4}
       />
