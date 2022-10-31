@@ -9,7 +9,7 @@ import Video from '~/models/Video'
 import _ from 'lodash'
 import TrackedVideoItem from '../video/TrackedVideoItem'
 import SegmentButton from '~/shared/components/SegmentButton'
-import TileRow, { VideoChunk } from '~/shared/components/TileRow'
+import ThreeTileRow, { VideoChunk } from '~/shared/components/ThreeTileRow'
 import ActionButton from '~/shared/components/ActionButton'
 import TotalTimeDetailsPanel from '~/shared/components/TotalTimeDetailsPanel'
 import VideoList from '~/models/VideoList'
@@ -113,7 +113,7 @@ const VideoFlatList = observer(
     const renderVideo: ListRenderItem<Video> = ({ item: video }) => <VideoItem video={video} />
 
     const renderVideoRow: ListRenderItem<VideoChunk> = ({ item: videos }) => (
-      <TileRow videos={videos} />
+      <ThreeTileRow videos={videos} />
     )
 
     const renderTrackedVideo: ListRenderItem<Video> = ({ item: video }) => (
@@ -121,7 +121,7 @@ const VideoFlatList = observer(
     )
 
     const renderTrackedVideoRow: ListRenderItem<VideoChunk> = ({ item: videos }) => (
-      <TileRow videos={videos} isTracked />
+      <ThreeTileRow videos={videos} isTracked />
     )
 
     const ListHeaderComponent = useMemo(() => {

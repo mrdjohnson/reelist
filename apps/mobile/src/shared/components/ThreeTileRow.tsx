@@ -6,12 +6,15 @@ import Video from '~/models/Video'
 
 export type VideoChunk = [Video, Video?, Video?]
 
-type TileRowProps = {
+type ThreeTileRowProps = {
   videos: VideoChunk
   isTracked?: boolean
 }
 
-const TileRow = ({ videos: [video1, video2, video3], isTracked = false }: TileRowProps) => {
+const ThreeTileRow = ({
+  videos: [video1, video2, video3],
+  isTracked = false,
+}: ThreeTileRowProps) => {
   const VideoComponent = isTracked ? TrackedVideoItem : VideoItem
 
   return (
@@ -31,4 +34,4 @@ const TileRow = ({ videos: [video1, video2, video3], isTracked = false }: TileRo
   )
 }
 
-export default TileRow
+export default ThreeTileRow
