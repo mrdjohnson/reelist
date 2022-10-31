@@ -50,12 +50,14 @@ const formatVideos = (videos: Video[] | null | undefined, sortType: SortTypes): 
 
 const VideoFlatList = observer(
   ({ videoList, activeUser, onProgressPressed }: VideoFlatListProps) => {
-    const { videoListStore, videoStore } = useStore()
+    const { videoListStore, videoStore, auth } = useStore()
 
     const [trackedVideos, setTrackedVideos] = useState<Video[]>([])
     const [isLoadingVideos, setIsLoadingVideos] = useState(false)
     const [listViewType, setListViewType] = useState<ListViewTypes>('list')
     const [sortType, setSortType] = useState<SortTypes>('none')
+
+    const useInteractibleTiles = activeUser?.id === auth.user.id
 
     const refreshVideoList = async () => {
       setIsLoadingVideos(true)
@@ -117,7 +119,7 @@ const VideoFlatList = observer(
     )
 
     const renderTrackedVideo: ListRenderItem<Video> = ({ item: video }) => (
-      <TrackedVideoItem video={video} isInteractable={false} />
+      <TrackedVideoItem video={video} isInteractable={useInteractibleTiles} />
     )
 
     const renderTrackedVideoRow: ListRenderItem<VideoChunk> = ({ item: videos }) => (
