@@ -10,6 +10,7 @@ import VideoItem from '~/features/video/VideoItem'
 import SearchBar from '~/shared/components/SearchBar'
 import { ReelistScreen } from '~/utils/navigation'
 import useAsyncState from '~/hooks/useAsyncState'
+import { RefreshControl } from 'react-native'
 
 const SearchScreen = observer(({ navigation }: ReelistScreen) => {
   const [searchText, setSearchText] = useState('')
@@ -34,7 +35,13 @@ const SearchScreen = observer(({ navigation }: ReelistScreen) => {
 
   return (
     <View flex={1}>
-      <ScrollView flex={1} color="white" stickyHeaderIndices={[0]} stickyHeaderHiddenOnScroll>
+      <ScrollView
+        flex={1}
+        color="white"
+        refreshControl={<RefreshControl refreshing={loadingVideos} onRefresh={search} />}
+        stickyHeaderIndices={[0]}
+        stickyHeaderHiddenOnScroll
+      >
         <SearchBar
           placeholder="Search Shows & Movies"
           leftIcon={<MaterialIcons name="search" />}
@@ -46,7 +53,6 @@ const SearchScreen = observer(({ navigation }: ReelistScreen) => {
           autoFocus
         />
 
-        {loadingVideos && <Text>Loading Videos</Text>}
         {searchErrors && <Text>{searchErrors}</Text>}
 
         {videos.map(video => (
