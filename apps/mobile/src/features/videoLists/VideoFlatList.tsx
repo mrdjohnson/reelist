@@ -132,11 +132,12 @@ const VideoFlatList = observer(
       return (
         <Column>
           <Row
-            marginBottom="10px"
+            paddingBottom="10px"
             display="flex"
             justifyContent="space-between"
             width="100%"
             paddingX="10px"
+            backgroundColor="light.100"
           >
             <Row>
               <Menu
@@ -241,6 +242,8 @@ const VideoFlatList = observer(
     const flatListProps = {
       ListHeaderComponent,
       refreshControl,
+      stickyHeaderHiddenOnScroll: true,
+      stickyHeaderIndices: [0],
     }
 
     if (activeUser) {
