@@ -1,26 +1,23 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { View, Icon, Center, Column, Text, ScrollView, Spinner, Badge } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
-import _ from 'lodash'
 import EditProfilePage from './EditProfilePage'
 import { ReelistScreen } from '~/utils/navigation'
-import Video from '~/models/Video'
 import TrackedVideoItem from '~/features/video/TrackedVideoItem'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { Pressable, RefreshControl } from 'react-native'
-import useRefresh from '~/hooks/useRefresh'
 import ProfileIcon from '~/shared/components/ProfileIcon'
+import useAsyncState from '~/hooks/useAsyncState'
 
 const ProfileScreen = observer(({ navigation }: ReelistScreen) => {
   const { auth, appState, videoStore } = useStore()
   const user = appState.profileScreen.user || auth.user
   const isCurrentUser = user.id === auth.user.id
-  const [trackedVideos, setTrackedVideos] = useState<Video[]>([])
 
-  const [loadingTrackedVideos, refresh] = useRefresh(async () => {
-    return videoStore.getTrackedVideos(user.id).then(setTrackedVideos)
-  })
+  const [trackedVideos, refresh, loadingTrackedVideos] = useAsyncState([], async () =>
+    videoStore.getTrackedVideos(user.id),
+  )
 
   const startEditing = () => appState.setProfileScreenEditing(true)
 

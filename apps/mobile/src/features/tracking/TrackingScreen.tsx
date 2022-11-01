@@ -1,20 +1,20 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import { Input, Pressable, ScrollView, Text, View, Icon } from 'native-base'
+import React, { useMemo, useState } from 'react'
+import { ScrollView, View } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
-import Video from '~/models/Video'
 import _ from 'lodash'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import TrackedVideoItem from '~/features/video/TrackedVideoItem'
 import SearchBar from '~/shared/components/SearchBar'
 import { ReelistScreen } from '~/utils/navigation'
 import { RefreshControl } from 'react-native'
-import useRefresh from '~/hooks/useRefresh'
+import useAsyncState from '~/hooks/useAsyncState'
 
 const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
   const [filterText, setfilterText] = useState('')
-  const [videos, setVideos] = useState<Video[]>([])
   const { auth, videoStore } = useStore()
+
+  const [videos, refresh, loadingVideos] = useAsyncState([], videoStore.getTrackedVideos)
 
   const sortedVideos = useMemo(() => {
     const filteredVideos = _.filter(videos, video => video.videoName.includes(filterText))
@@ -23,11 +23,6 @@ const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
       return videoB.compareCompletionTo(videoA)
     })
   }, [videos, filterText])
-
-  const [loadingVideos, refresh] = useRefresh(async () => {
-    setVideos([])
-    await videoStore.getTrackedVideos().then(setVideos)
-  })
 
   return (
     <View flex={1}>
