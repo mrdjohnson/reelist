@@ -34,17 +34,18 @@ const SearchScreen = observer(({ navigation }: ReelistScreen) => {
 
   return (
     <View flex={1}>
-      <SearchBar
-        placeholder="Search Shows & Movies"
-        leftIcon={<MaterialIcons name="search" />}
-        value={searchText}
-        onChangeText={setSearchText}
-        onSubmitEditing={search}
-        returnKeyType="search"
-        autoFocus
-      />
+      <ScrollView flex={1} color="white" stickyHeaderIndices={[0]} stickyHeaderHiddenOnScroll>
+        <SearchBar
+          placeholder="Search Shows & Movies"
+          leftIcon={<MaterialIcons name="search" />}
+          value={searchText}
+          onChangeText={setSearchText}
+          onSubmitEditing={search}
+          returnKeyType="search"
+          backgroundColor="white"
+          autoFocus
+        />
 
-      <ScrollView flex={1} color="white">
         {loadingVideos && <Text>Loading Videos</Text>}
         {searchErrors && <Text>{searchErrors}</Text>}
 
