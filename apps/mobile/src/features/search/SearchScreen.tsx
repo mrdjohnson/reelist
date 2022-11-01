@@ -1,14 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import { Button, Input, Pressable, ScrollView, SectionList, Text, View, Icon } from 'native-base'
+import React, { useState } from 'react'
+import { ScrollView, Text, View } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
-import VideoList from '~/models/VideoList'
-import {
-  NativeSyntheticEvent,
-  SectionListData,
-  TextInputChangeEventData,
-  TextInputSubmitEditingEventData,
-} from 'react-native'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import Video from '~/models/Video'
 import { callTmdb } from '~/api/api'
@@ -16,39 +9,28 @@ import _ from 'lodash'
 import VideoItem from '~/features/video/VideoItem'
 import SearchBar from '~/shared/components/SearchBar'
 import { ReelistScreen } from '~/utils/navigation'
+import useAsyncState from '~/hooks/useAsyncState'
 
 const SearchScreen = observer(({ navigation }: ReelistScreen) => {
   const [searchText, setSearchText] = useState('')
-  const [videos, setVideos] = useState<Video[]>([])
-  const [loadingVideos, setLoadingVideos] = useState(false)
-  const { auth } = useStore()
+  const { auth, videoStore } = useStore()
   const [searchErrors, setSearchError] = useState<string>('')
 
-  const search = async (event: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => {
-    console.log('Searched for:', event.nativeEvent.text)
-
-    setLoadingVideos(true)
-    setVideos([])
-
-    const searchResults = await callTmdb('/search/multi', event.nativeEvent.text)
+  const [videos, search, loadingVideos] = useAsyncState([], async () => {
+    const searchResults = await callTmdb('/search/multi', searchText)
       .then(item => _.get(item, 'data.data.results') as Video[] | null)
       .catch(e => {
         setSearchError(JSON.stringify(e))
       })
-      .finally(() => {
-        setLoadingVideos(false)
-      })
 
-    if (!searchResults) return
+    if (!searchResults) return []
 
-    const nextVideos = searchResults
+    return searchResults
       .filter(searchResult => ['movie', 'tv'].includes(searchResult.mediaType))
       .map(video => {
-        return new Video(video, auth)
+        return new Video(video, auth, videoStore)
       })
-
-    setVideos(nextVideos)
-  }
+  })
 
   return (
     <View flex={1}>
