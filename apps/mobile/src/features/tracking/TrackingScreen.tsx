@@ -26,19 +26,22 @@ const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
 
   return (
     <View flex={1}>
-      <SearchBar
-        placeholder="Filter Tracked Shows & Movies"
-        leftIcon={<MaterialCommunityIcons name="filter-outline" />}
-        value={filterText}
-        onChangeText={setfilterText}
-        returnKeyType="search"
-      />
-
       <ScrollView
         flex={1}
         color="white"
         refreshControl={<RefreshControl refreshing={loadingVideos} onRefresh={refresh} />}
+        stickyHeaderIndices={[0]}
+        stickyHeaderHiddenOnScroll
       >
+        <SearchBar
+          placeholder="Filter Tracked Shows & Movies"
+          leftIcon={<MaterialCommunityIcons name="filter-outline" />}
+          value={filterText}
+          onChangeText={setfilterText}
+          returnKeyType="search"
+          backgroundColor="white"
+        />
+
         {sortedVideos.map(video => (
           <TrackedVideoItem video={video} key={video.id} />
         ))}
