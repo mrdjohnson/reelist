@@ -238,6 +238,11 @@ const VideoFlatList = observer(
       <RefreshControl refreshing={isLoadingVideos} onRefresh={refreshVideoList} />
     )
 
+    const flatListProps = {
+      ListHeaderComponent,
+      refreshControl,
+    }
+
     if (activeUser) {
       if (listViewType === 'list') {
         // user - list
@@ -246,20 +251,14 @@ const VideoFlatList = observer(
             data={formattedTrackedVideos}
             keyExtractor={video => video.videoId}
             renderItem={renderTrackedVideo}
-            ListHeaderComponent={ListHeaderComponent}
-            refreshControl={refreshControl}
+            {...flatListProps}
           />
         )
       }
 
       // user - grid
       return (
-        <FlatList
-          data={trackedVideoChunks}
-          renderItem={renderTrackedVideoRow}
-          ListHeaderComponent={ListHeaderComponent}
-          refreshControl={refreshControl}
-        />
+        <FlatList data={trackedVideoChunks} renderItem={renderTrackedVideoRow} {...flatListProps} />
       )
     }
 
@@ -271,8 +270,7 @@ const VideoFlatList = observer(
           keyExtractor={(video: Video) => video.videoId}
           renderItem={renderVideo}
           key={listViewType}
-          ListHeaderComponent={ListHeaderComponent}
-          refreshControl={refreshControl}
+          {...flatListProps}
         />
       )
     }
@@ -283,8 +281,7 @@ const VideoFlatList = observer(
         data={videoChunks}
         renderItem={renderVideoRow}
         key={listViewType}
-        ListHeaderComponent={ListHeaderComponent}
-        refreshControl={refreshControl}
+        {...flatListProps}
       />
     )
   },
