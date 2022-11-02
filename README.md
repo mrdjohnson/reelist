@@ -25,3 +25,7 @@ Imports like `import Example from '@features/Example'` are handled by [craco](ht
 adding new aliases like `~features` can be done via the `/apps/mobile/.babelrc` and `/apps/mobile/tsconfig.json` files.
 
 Currently this maps directly to any directory in the `src` directory: Example: `/apps/mobile/src/feature/FeatureExample`  would be mapped to `~/feature/FeatureExample`
+
+  ## Misc
+
+Google play store feature graphic generated using: http://tools.neko2me.net/efgg/
