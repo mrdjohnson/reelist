@@ -4,13 +4,13 @@ import { observer } from 'mobx-react-lite'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import VideoItem from '~/features/video/VideoItem'
 import SearchBar from '~/shared/components/SearchBar'
-import { ReelistScreen } from '~/utils/navigation'
+import { ReelistScreenFrom } from '~/utils/navigation'
 import useAsyncState from '~/hooks/useAsyncState'
 import { RefreshControl } from 'react-native'
 import useVideoSearch from '~/hooks/useVideoSearch'
 
-const SearchScreen = observer(({ navigation }: ReelistScreen) => {
-  const [searchText, setSearchText] = useState('')
+const SearchScreen = observer(({ route, navigation }: ReelistScreenFrom<'search'>) => {
+  const [searchText, setSearchText] = useState(route.params?.initialSearchValue || '')
   const [searchErrors, setSearchError] = useState<string>('')
   const videoSearch = useVideoSearch()
 

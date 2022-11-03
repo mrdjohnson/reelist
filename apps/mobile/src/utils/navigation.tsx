@@ -5,7 +5,7 @@ export type NavigatorParamList = {
   welcome: undefined
   videoListsHome: undefined
   videoListScreen: undefined
-  search: undefined
+  search?: { initialSearchValue?: string }
   videoScreen: undefined
   tracking: undefined
   profile: undefined
@@ -13,6 +13,11 @@ export type NavigatorParamList = {
   splash: undefined
   home: undefined
 }
+
+export type ReelistScreenFrom<T extends keyof NavigatorParamList> = NativeStackScreenProps<
+  NavigatorParamList,
+  T
+>
 
 export type ReelistScreen = NativeStackScreenProps<NavigatorParamList>
 
