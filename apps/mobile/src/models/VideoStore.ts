@@ -51,6 +51,16 @@ class VideoStore {
     return path
   }
 
+  getVideos = async (videoIds: string[] | undefined) => {
+    if (!videoIds) return []
+
+    const videos: Array<Video | null> = await Promise.all(
+      videoIds.map(videoId => this.getVideo(videoId)),
+    )
+
+    return _.compact(videos)
+  }
+
   getVideo = async (videoId: string, videoTableData: VideoTableType | null = null) => {
     const path = this.getVideoPath(videoId)
 
@@ -72,11 +82,7 @@ class VideoStore {
   }
 
   getVideosForVideoList = async (videoList: VideoList) => {
-    const videos: Array<Video | null> = await Promise.all(
-      videoList.videoIds.map(videoId => this.getVideo(videoId)),
-    )
-
-    return _.compact(videos)
+    return this.getVideos(videoList.videoIds)
   }
 
   _getTrackedVideo = (videoTableData: VideoTableType) => {

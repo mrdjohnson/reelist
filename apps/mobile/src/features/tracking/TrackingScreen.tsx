@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { ScrollView, View } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
@@ -9,12 +9,17 @@ import SearchBar from '~/shared/components/SearchBar'
 import { ReelistScreen } from '~/utils/navigation'
 import { RefreshControl } from 'react-native'
 import useAsyncState from '~/hooks/useAsyncState'
+import useVideoSearch from '~/hooks/useVideoSearch'
+import NamedTileRow from '~/shared/components/NamedTileRow'
+import Video from '~/models/Video'
 
 const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
   const [filterText, setfilterText] = useState('')
   const { auth, videoStore } = useStore()
+  const videoSearch = useVideoSearch()
 
   const [videos, refresh, loadingVideos] = useAsyncState([], videoStore.getTrackedVideos)
+  const [searchedVideos, setSearchedVideos] = useState<Video[]>([])
 
   const sortedVideos = useMemo(() => {
     const filteredVideos = _.filter(videos, video => video.videoName.includes(filterText))
@@ -23,6 +28,11 @@ const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
       return videoB.compareCompletionTo(videoA)
     })
   }, [videos, filterText])
+
+  useEffect(() => {
+    setSearchedVideos([])
+    videoSearch(filterText).then(setSearchedVideos)
+  }, [filterText])
 
   return (
     <View flex={1}>
@@ -45,6 +55,12 @@ const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
         {sortedVideos.map(video => (
           <TrackedVideoItem video={video} key={video.id} />
         ))}
+
+        <NamedTileRow
+          label={`Videos related to ${filterText}:`}
+          videos={searchedVideos}
+          onShowMore={() => navigation.navigate('search', { initialSearchValue: filterText })}
+        />
       </ScrollView>
     </View>
   )
