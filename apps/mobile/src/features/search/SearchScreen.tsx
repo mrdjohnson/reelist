@@ -32,6 +32,7 @@ const SearchScreen = observer(({ route, navigation }: ReelistScreenFrom<'search'
         refreshControl={<RefreshControl refreshing={loadingVideos} onRefresh={search} />}
         stickyHeaderIndices={[0]}
         stickyHeaderHiddenOnScroll
+        keyboardShouldPersistTaps="handled"
       >
         <SearchBar
           placeholder="Search Shows & Movies"

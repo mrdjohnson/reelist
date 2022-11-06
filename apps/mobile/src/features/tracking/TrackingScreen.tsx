@@ -42,6 +42,7 @@ const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
         refreshControl={<RefreshControl refreshing={loadingVideos} onRefresh={refresh} />}
         stickyHeaderIndices={[0]}
         stickyHeaderHiddenOnScroll
+        keyboardShouldPersistTaps="handled"
       >
         <SearchBar
           placeholder="Filter Tracked Shows & Movies"
