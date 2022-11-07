@@ -22,7 +22,10 @@ const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
   const [searchedVideos, setSearchedVideos] = useState<Video[]>([])
 
   const sortedVideos = useMemo(() => {
-    const filteredVideos = _.filter(videos, video => video.videoName.includes(filterText))
+    const lowerCaseText = _.toLower(filterText)
+    const filteredVideos = _.filter(videos, video =>
+      _.toLower(video.videoName).includes(lowerCaseText),
+    )
 
     return filteredVideos.sort((videoA, videoB) => {
       return videoB.compareCompletionTo(videoA)
