@@ -33,8 +33,10 @@ const TotalTimeDetailsPanel = observer(({ user, videos, ...props }: TotalTimeDet
     >
       <Column>
         <Text>Approximate duration: {humanizedDuration(totalDuration)}</Text>
-        <Text>Approximate watched: {humanizedDuration(totalWatchedDuration)}</Text>
-        <Text>Approximate Left: {humanizedDuration(totalDuration - totalWatchedDuration)}</Text>
+        <Text>Approximate watched: {humanizedDuration(totalWatchedDuration, 'Not started')}</Text>
+        <Text>
+          Approximate Left: {humanizedDuration(totalDuration - totalWatchedDuration, 'Up to date!')}
+        </Text>
       </Column>
     </DetailsPanel>
   )

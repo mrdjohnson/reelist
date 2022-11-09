@@ -1,8 +1,8 @@
 import moment from 'moment'
 import _ from 'lodash'
 
-export const humanizedDuration = (totalMinutes: number | null) => {
-  if (totalMinutes === 0) return 'NaN'
+export const humanizedDuration = (totalMinutes: number | null, fallback: string | null = 'NaN') => {
+  if (totalMinutes == null || totalMinutes <= 0) return fallback
 
   const duration = moment.duration(totalMinutes, 'minutes')
 
