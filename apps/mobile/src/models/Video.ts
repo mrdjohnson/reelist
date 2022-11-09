@@ -226,6 +226,12 @@ class Video {
 
       season = this.seasonMap[season.seasonNumber + 1]
     }
+
+    // if the next episode airdate is before right now
+    if (this.nextEpisodeToAir && moment(this.nextEpisodeToAir.airDate).isBefore()) {
+      this.lastEpisodeToAir = this.nextEpisodeToAir
+      this.nextEpisodeToAir = this.nextEpisodeToAir.next
+    }
   }
 
   toggleTracked = async () => {
@@ -645,7 +651,7 @@ class Video {
   }
 
   get lastWatchedEpisodeFromEnd() {
-    let lastEpisode = this.nextEpisodeToAir || this.lastEpisodeToAir
+    let lastEpisode = this.lastEpisodeToAir
 
     while (lastEpisode && !this.getIsEpisodeWatched(lastEpisode)) {
       lastEpisode = lastEpisode.previous
@@ -660,14 +666,8 @@ class Video {
     if (!this.lastWatchedSeasonNumber && !this.lastWatchedEpisodeNumber) return false
     if (!this.currentBaseEpisode) return false
 
-    let mostRecentEpisode = this.lastEpisodeToAir
-
-    if (this.nextEpisodeToAir && moment(this.nextEpisodeToAir.airDate).isBefore()) {
-      mostRecentEpisode = this.nextEpisodeToAir
-    }
-
-    const lastEpisodeNumber = mostRecentEpisode.episodeNumber
-    const lastSeasonNumber = mostRecentEpisode.seasonNumber
+    const lastEpisodeNumber = this.lastEpisodeToAir.episodeNumber
+    const lastSeasonNumber = this.lastEpisodeToAir.seasonNumber
 
     const currentEpisodeNumber = this.currentBaseEpisode.episodeNumber
     const currentSeasonNumber = this.currentBaseEpisode.seasonNumber
