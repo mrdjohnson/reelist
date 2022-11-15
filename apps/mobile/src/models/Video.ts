@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { makeAutoObservable } from 'mobx'
+import { flow, makeAutoObservable } from 'mobx'
 import Auth from './Auth'
 import { Decamelized } from 'humps'
 import { callTmdb, sendNotifications, UpdateType } from '~/api/api'
@@ -438,7 +438,7 @@ class Video {
     await sendNotifications({ ...update })
   }
 
-  fetchSeason = async (seasonNumber: number) => {
+  fetchSeason = flow(function* (this: Video, seasonNumber: number) {
     if (this.seasonMap[seasonNumber]) return this.seasonMap[seasonNumber]
 
     // console.log('fetching season: ', seasonNumber, 'for', this.name)
@@ -448,7 +448,7 @@ class Video {
     let season: TvSeason | null = null
 
     try {
-      season = await callTmdb(path).then(item => _.get(item, 'data.data'))
+      season = yield callTmdb(path).then(item => _.get(item, 'data.data'))
     } catch (e) {
       console.error(e)
       throw e
@@ -457,9 +457,9 @@ class Video {
     }
 
     return this.seasonMap[seasonNumber]
-  }
+  })
 
-  fetchSeasons = async () => {
+  fetchSeasons = flow(function* (this: Video) {
     if (!this.seasons) return
 
     const seasonMap = this.videoStore.videoSeasonMapByVideoId[this.videoId]
@@ -468,7 +468,7 @@ class Video {
       this.seasonMap = seasonMap
     } else {
       console.log('fetching seasons')
-      await Promise.allSettled(this.seasons?.map(season => this.fetchSeason(season.seasonNumber)))
+      yield Promise.allSettled(this.seasons?.map(season => this.fetchSeason(season.seasonNumber)))
 
       // debugger
       this.videoStore.videoSeasonMapByVideoId[this.videoId] = this.seasonMap || null
@@ -479,7 +479,7 @@ class Video {
     // }
 
     this._linkEpisodes()
-  }
+  })
 
   watchNextEpisode = () => {
     if (this.nextEpisode) {
