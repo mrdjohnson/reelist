@@ -105,6 +105,7 @@ class Video {
   tracked = false
   videoInfo: VideoInfoType = {}
   serverId: string | undefined
+  unWatchableEpisodeCount = 0
 
   storeAuth: Auth
   videoStore: VideoStore
@@ -193,6 +194,20 @@ class Video {
     }
   }
 
+  _calculateUnwatchedEpisodes = () => {
+    if (this.isMovie) return
+
+    let episodesAfterLastAired = 0
+    let lastEpisode = this.lastEpisodeToAir
+
+    while (lastEpisode?.next) {
+      episodesAfterLastAired += 1
+      lastEpisode = lastEpisode.next
+    }
+
+    this.unWatchableEpisodeCount = episodesAfterLastAired
+  }
+
   _linkEpisodes = () => {
     let season = this.seasonMap[1]
     let previousEpisode: TvEpisode
@@ -232,6 +247,8 @@ class Video {
       this.lastEpisodeToAir = this.nextEpisodeToAir
       this.nextEpisodeToAir = this.nextEpisodeToAir.next
     }
+
+    this._calculateUnwatchedEpisodes()
   }
 
   toggleTracked = async () => {
@@ -701,6 +718,10 @@ class Video {
     return watchedEpisodeCount
   }
 
+  get minEpisodeRunTime() {
+    return _.min(this.episodeRunTime) || 0
+  }
+
   get totalWatchedDurationMinutes() {
     if (this.isCompleted) {
       return this.totalDurationMinutes
@@ -710,7 +731,7 @@ class Video {
       return 0
     }
 
-    return this.watchedEpisodeCount * _.mean(this.episodeRunTime)
+    return this.watchedEpisodeCount * this.minEpisodeRunTime
   }
 
   get totalWatchedDuration() {
@@ -723,8 +744,7 @@ class Video {
     }
 
     if (this.numberOfEpisodes !== undefined) {
-      const meanRunTime = _.mean(this.episodeRunTime)
-      return this.numberOfEpisodes * meanRunTime
+      return (this.numberOfEpisodes - this.unWatchableEpisodeCount) * this.minEpisodeRunTime
     }
 
     return 0
