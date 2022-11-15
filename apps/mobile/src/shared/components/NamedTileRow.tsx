@@ -4,6 +4,8 @@ import Video from '~/models/Video'
 import _ from 'lodash'
 import VideoImage from '~/features/video/VideoImage'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import { useReelistNavigation } from '~/utils/navigation'
+import { useStore } from '~/hooks/useStore'
 
 type NamedTileRowProps = {
   videos?: Video[]
@@ -13,7 +15,16 @@ type NamedTileRowProps = {
 }
 
 const NamedTileRow = ({ label, videos, size = 10, onShowMore }: NamedTileRowProps) => {
+  const { videoStore } = useStore()
+
+  const navigation = useReelistNavigation()
+
   if (_.isEmpty(videos)) return null
+
+  const navigateToVideoScreen = (video: Video) => {
+    videoStore.setCurrentVideoId(video.videoId)
+    navigation.navigate('videoScreen')
+  }
 
   return (
     <Column marginX="10px" paddingBottom="10px">
@@ -24,11 +35,9 @@ const NamedTileRow = ({ label, videos, size = 10, onShowMore }: NamedTileRowProp
       <ScrollView horizontal>
         <Row space="8px" flex={1}>
           {_.take(videos, size).map(video => (
-            <VideoImage
-              key={video.videoId}
-              video={video}
-              containerProps={{ height: '120px', width: 'auto' }}
-            />
+            <Pressable key={video.videoId} onPress={() => navigateToVideoScreen(video)}>
+              <VideoImage video={video} containerProps={{ height: '120px', width: 'auto' }} />
+            </Pressable>
           ))}
 
           <Pressable backgroundColor="blue.300:alpha.20" rounded="sm" onPress={onShowMore}>
