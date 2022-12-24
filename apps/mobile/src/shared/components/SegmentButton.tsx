@@ -26,6 +26,7 @@ const SegmentButton = ({
   segments,
   containerProps,
   onPress,
+  disabled,
   ...props
 }: SegmentButtonProps) => {
   const onSegmentPress = (segmentIndex: number) => {
@@ -55,11 +56,12 @@ const SegmentButton = ({
     return (
       <ActionButton
         icon={segment.icon}
-        color={selectedSegmentIndex === index ? activeColor : color}
+        color={selectedSegmentIndex === index && !disabled ? activeColor : color}
         onPress={() => onSegmentPress(index)}
         flex={1}
         darkenOnPressIn={selectedSegmentIndex !== index}
         darken={selectedSegmentIndex === index}
+        disabled={disabled}
         {...borderProps}
         {...props}
       >

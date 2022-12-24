@@ -16,6 +16,7 @@ const ActionButton = ({
   variant = 'outline',
   darken = true,
   darkenOnPressIn = true,
+  disabled,
   ...props
 }: ActionButtonProps) => {
   const [pressedIn, setPressedIn] = useState(false)
@@ -27,12 +28,14 @@ const ActionButton = ({
   }, [color])
 
   const backgroundColor = useMemo(() => {
-    if (!darken) return null
+    if (!disabled) {
+      if (!darken) return null
+    }
 
     const alphaValue = darkenOnPressIn && pressedIn ? '30' : '10'
 
     return color + ':alpha.' + alphaValue
-  }, [darken, pressedIn, color, darkenOnPressIn])
+  }, [darken, pressedIn, color, darkenOnPressIn, disabled])
 
   return (
     <Button
@@ -46,6 +49,7 @@ const ActionButton = ({
       onPressIn={() => setPressedIn(true)}
       onPressOut={() => setPressedIn(false)}
       backgroundColor={backgroundColor}
+      disabled={disabled}
       {...props}
     />
   )
