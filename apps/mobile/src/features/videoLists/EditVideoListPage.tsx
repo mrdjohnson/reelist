@@ -69,20 +69,22 @@ const EditVideoListPage = observer(
 
             <SegmentButton
               size="sm"
-              selectedSegmentId={videoListViewModel.isPublic ? 'left' : 'right'}
+              selectedSegmentIndex={videoListViewModel.isPublic ? 0 : 1}
               containerProps={{
                 marginLeft: '5px',
               }}
-              leftSegment={{
-                icon: <MaterialIcons name="public" />,
-                content: 'Public',
-              }}
-              rightSegment={{
-                icon: <MaterialIcons name="public-off" />,
-                content: 'Private',
-              }}
-              onPress={segmentId => {
-                videoListViewModel.isPublic = segmentId === 'left'
+              segments={[
+                {
+                  icon: <MaterialIcons name="public" />,
+                  content: 'Public',
+                },
+                {
+                  icon: <MaterialIcons name="public-off" />,
+                  content: 'Private',
+                },
+              ]}
+              onPress={selectedSegmentIndex => {
+                videoListViewModel.isPublic = selectedSegmentIndex === 0
               }}
             />
 
@@ -96,18 +98,20 @@ const EditVideoListPage = observer(
 
             <SegmentButton
               size="sm"
-              selectedSegmentId={videoListViewModel.isJoinable ? 'left' : 'right'}
+              selectedSegmentIndex={videoListViewModel.isJoinable ? 0 : 1}
               containerProps={{
                 marginLeft: '5px',
               }}
-              leftSegment={{
-                icon: <MaterialIcons name="public" />,
-                content: 'Joinable',
-              }}
-              rightSegment={{
-                icon: <MaterialIcons name="public-off" />,
-                content: 'Not Joinable',
-              }}
+              segments={[
+                {
+                  icon: <MaterialIcons name="public" />,
+                  content: 'Joinable',
+                },
+                {
+                  icon: <MaterialIcons name="public-off" />,
+                  content: 'Not Joinable',
+                },
+              ]}
               onPress={() => {
                 videoListViewModel.isJoinable = !videoListViewModel.isJoinable
               }}

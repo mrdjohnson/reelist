@@ -200,12 +200,14 @@ const VideoFlatList = observer(
 
             <SegmentButton
               containerProps={{ width: '75px', height: 'auto' }}
-              selectedSegmentId={listViewType === 'list' ? 'left' : 'right'}
-              leftSegment={{ icon: <MaterialCommunityIcons name="view-list" /> }}
-              rightSegment={{ icon: <MaterialCommunityIcons name="view-grid" /> }}
+              selectedSegmentIndex={listViewType === 'list' ? 0 : 1}
+              segments={[
+                { icon: <MaterialCommunityIcons name="view-list" /> },
+                { icon: <MaterialCommunityIcons name="view-grid" /> },
+              ]}
               size="sm"
               onPress={segmentId => {
-                setListViewType(segmentId === 'left' ? 'list' : 'grid')
+                setListViewType(segmentId === 0 ? 'list' : 'grid')
               }}
             />
           </Row>

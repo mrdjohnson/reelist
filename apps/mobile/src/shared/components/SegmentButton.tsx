@@ -1,5 +1,5 @@
 import React from 'react'
-import { IButtonProps, Row, View } from 'native-base'
+import { IButtonProps, Row } from 'native-base'
 import { IconButtonProps } from 'react-native-vector-icons/Icon'
 import ActionButton from './ActionButton'
 import { IViewProps } from 'native-base/lib/typescript/components/basic/View/types'
@@ -7,74 +7,70 @@ import { IViewProps } from 'native-base/lib/typescript/components/basic/View/typ
 type Segment = {
   icon?: IButtonProps['startIcon']
   content?: IconButtonProps['children']
+  onPress?: (segmentId: number) => void
 }
 
 type SegmentButtonProps = Omit<IButtonProps, 'onPress'> & {
-  selectedSegmentId: 'left' | 'right'
-  leftSegment: Segment
-  rightSegment: Segment
+  selectedSegmentIndex: number
+  segments: [Segment, Segment, ...Segment[]]
   color?: IButtonProps['color']
   activeColor?: IButtonProps['color']
   containerProps?: IViewProps
-  onPress: (segmentId: string) => void
+  onPress: (segmentId: number) => void
 }
 
 const SegmentButton = ({
-  selectedSegmentId,
+  selectedSegmentIndex,
   color = 'gray.600',
   activeColor = 'blue.500',
-  leftSegment,
-  rightSegment,
+  segments,
   containerProps,
   onPress,
   ...props
 }: SegmentButtonProps) => {
-  const leftSegmentIsActive = selectedSegmentId === 'left'
-  const rightSegmentIsActive = selectedSegmentId === 'right'
+  const onSegmentPress = (segmentIndex: number) => {
+    if (segmentIndex === selectedSegmentIndex) return
 
-  const onLeftPress = () => {
-    if (leftSegmentIsActive) return
-
-    onPress('left')
+    onPress(segmentIndex)
   }
 
-  const onRightPress = () => {
-    if (rightSegmentIsActive) return
+  const segmentToButton = (segment: Segment, index: number) => {
+    const borderProps: IButtonProps = {
+      roundedLeft: index === 0 ? null : 'none',
+      roundedRight: index === segments.length - 1 ? null : 'none',
+      borderLeftWidth: 0,
+    }
 
-    onPress('right')
+    // left segment should have a left (and rounded) border
+    // selected segment should have a left border
+    if (index === 0 || index === selectedSegmentIndex) {
+      borderProps.borderLeftWidth = 1
+    }
+
+    // if the next segment is active, do not double the borders
+    if (index + 1 === selectedSegmentIndex) {
+      borderProps.borderRightWidth = 0
+    }
+
+    return (
+      <ActionButton
+        icon={segment.icon}
+        color={selectedSegmentIndex === index ? activeColor : color}
+        onPress={() => onSegmentPress(index)}
+        flex={1}
+        darkenOnPressIn={selectedSegmentIndex !== index}
+        darken={selectedSegmentIndex === index}
+        {...borderProps}
+        {...props}
+      >
+        {segment.content}
+      </ActionButton>
+    )
   }
 
   return (
     <Row {...containerProps} space="0">
-      <ActionButton
-        icon={leftSegment.icon}
-        color={leftSegmentIsActive ? activeColor : color}
-        onPress={onLeftPress}
-        borderRightWidth="0"
-        roundedRight="none"
-        flex={1}
-        darkenOnPressIn={rightSegmentIsActive}
-        darken={leftSegmentIsActive}
-        {...props}
-      >
-        {leftSegment.content}
-      </ActionButton>
-
-      <View borderLeftColor={activeColor} borderLeftWidth="1" />
-
-      <ActionButton
-        icon={rightSegment.icon}
-        color={rightSegmentIsActive ? activeColor : color}
-        onPress={onRightPress}
-        borderLeftWidth="0"
-        roundedLeft="none"
-        flex={1}
-        darkenOnPressIn={leftSegmentIsActive}
-        darken={rightSegmentIsActive}
-        {...props}
-      >
-        {rightSegment.content}
-      </ActionButton>
+      {segments.map(segmentToButton)}
     </Row>
   )
 }
