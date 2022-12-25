@@ -22,7 +22,7 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen'
 
-import { NativeBaseProvider, Text, Box, ScrollView, Button } from 'native-base'
+import { NativeBaseProvider, Text, Box, ScrollView, Button, extendTheme } from 'native-base'
 import AnimatedHeader from './AnimatedHeader'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import Store from '~/models/Store'
@@ -185,8 +185,26 @@ const App = observer(() => {
     })
   }, [])
 
+  const theme = extendTheme({
+    colors: {
+      // reelist scheme
+      reelist: {
+        // 50: '#3b82f6CC',
+        // 100: '#3b82f6CC',
+        // 200: '#3b82f6CC',
+        // 300: '#3b82f6CC',
+        // 400: '#3b82f6CC',
+        // 500: '#3b82f6CC',
+        600: '#3b82f6CC',
+        // 700: '#3b82f6CC',
+        // 800: '#3b82f6CC',
+        // 900: '#3b82f6CC',
+      },
+    },
+  })
+
   return (
-    <NativeBaseProvider config={config}>
+    <NativeBaseProvider config={config} theme={theme}>
       <SafeAreaProvider>
         <AppNavigator
           initialState={initialNavigationState}
