@@ -18,6 +18,14 @@ import { createViewModel, IViewModel } from 'mobx-utils'
 import { humanizedDuration } from '~/utils'
 import VideoStore from './VideoStore'
 
+export enum AutoSortType {
+  NONE,
+  NAME,
+  FIRST_AIRED,
+  LAST_AIRED,
+  TOTAL_TIME,
+}
+
 export type VideoListTableType = {
   id: string
   admin_ids: string[]
@@ -26,6 +34,8 @@ export type VideoListTableType = {
   video_ids: string[]
   is_public: boolean
   unique_id: string
+  auto_sort_type: AutoSortType
+  auto_sort_is_ascending: boolean
 }
 
 type VideoListType = Camelized<VideoListTableType>
@@ -37,6 +47,8 @@ class VideoList implements VideoListType {
   videoIds!: string[]
   isPublic!: boolean
   uniqueId!: string
+  autoSortType!: AutoSortType
+  autoSortIsAscending!: boolean
 
   admins: User[] = []
   videos: Video[] = []
@@ -104,9 +116,25 @@ class VideoList implements VideoListType {
   }
 
   static save = async (videoListViewModel: VideoList & IViewModel<VideoList>) => {
+    if (!videoListViewModel.isDirty) return
+
     const name = videoListViewModel.changedValues.get('name') as string
     if (name && name.length <= 3) {
       throw new Error('Name must be 3 characters or longer')
+    }
+
+    const autoSortIsAscendingChanged = _.isBoolean(
+      videoListViewModel.changedValues.get('autoSortIsAscending'),
+    )
+    const autoSortTypeChanged = videoListViewModel.changedValues.get('autoSortType')
+    let videos = videoListViewModel.changedValues.get('videos') as Video[]
+
+    if (autoSortIsAscendingChanged || autoSortTypeChanged || videos) {
+      // if videos werent changed, grab the originals; sort videos
+      videos = sortVideos(videoListViewModel, videos || videoListViewModel.model.videos)
+
+      videoListViewModel.videoIds = videos.map(video => video.videoId)
+      videoListViewModel.resetProperty('videos')
     }
 
     // Map{'exampleField' -> 'exampleValue'} -> {example_field: 'exampleValue'}
@@ -122,6 +150,11 @@ class VideoList implements VideoListType {
       console.error('failed to edit videolist', error.message)
       throw error
     } else if (videoList) {
+      if (videos) {
+        // replace the videos
+        videoListViewModel.videos = videos
+      }
+
       videoListViewModel.submit()
     }
   }
@@ -146,20 +179,19 @@ class VideoList implements VideoListType {
   addOrRemoveVideo = async (video: Video) => {
     const videoId = video.videoId
 
-    const nextVideoIds = _.without(this.videoIds, videoId)
-    const nextVideos = _.filter(this.videos, listVideo => listVideo.videoId === videoId)
+    // make sure al lthe videos are loaded so we can compare them when sorting
+    await this.getVideos()
 
-    // if nothing changed when we tried to remove, add instead
-    if (this.videoIds.length === nextVideoIds.length) {
-      nextVideoIds.push(videoId)
-      nextVideos.push(video)
+    let nextVideos
+    if (_.find(this.videos, { videoId })) {
+      nextVideos = _.filter(this.videos, listVideo => listVideo.videoId === videoId)
+    } else {
+      nextVideos = [...this.videos, video]
     }
 
-    this.viewModel.videoIds = nextVideoIds
+    this.viewModel.videos = nextVideos
 
-    VideoList.save(this.viewModel).then(() => {
-      this.videos = nextVideos
-    })
+    return VideoList.save(this.viewModel)
   }
 
   getByUniqueId = async (uniqueId: string) => {
@@ -214,6 +246,27 @@ class VideoList implements VideoListType {
     const totalMinutes = _.chain(this.videos).map('totalDurationMinutes').sum().value()
 
     return humanizedDuration(totalMinutes)
+  }
+}
+
+const sortVideos = (videoListViewModel: IViewModel<VideoList> & VideoList, videos: Video[]) => {
+  const sortDirection = videoListViewModel.autoSortIsAscending ? 'asc' : 'desc'
+
+  switch (videoListViewModel.autoSortType) {
+    case AutoSortType.NONE:
+      return videos
+
+    case AutoSortType.NAME:
+      return _.orderBy(videos, 'videoName', sortDirection)
+
+    case AutoSortType.FIRST_AIRED:
+      return _.orderBy(videos, 'videoReleaseDate', sortDirection)
+
+    case AutoSortType.LAST_AIRED:
+      return _.orderBy(videos, 'lastVideoReleaseDate', sortDirection)
+
+    case AutoSortType.TOTAL_TIME:
+      return _.orderBy(videos, 'totalDurationMinutes', sortDirection)
   }
 }
 

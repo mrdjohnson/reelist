@@ -653,6 +653,12 @@ class Video {
     return moment(this.releaseDate || this.firstAirDate)
   }
 
+  get lastVideoReleaseDate() {
+    if (this.isMovie) return moment(this.releaseDate)
+
+    return moment(this.lastEpisodeToAir?.airDate)
+  }
+
   get tmdbPath() {
     return '/' + this.mediaType + '/' + this.id
   }

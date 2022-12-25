@@ -1,14 +1,15 @@
 import React, { useMemo, useState } from 'react'
-import { Button, FormControl, Row, Input, Switch, View, AlertDialog } from 'native-base'
+import { Button, FormControl, Input, View, AlertDialog } from 'native-base'
 import { observer } from 'mobx-react-lite'
-import VideoList from '~/models/VideoList'
+import VideoList, { AutoSortType } from '~/models/VideoList'
 import { useReelistNavigation } from '~/utils/navigation'
 import { createViewModel } from 'mobx-utils'
-import ToggleButton from '~/shared/components/ToggleButton'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { useStore } from '~/hooks/useStore'
 import AppButton from '~/shared/components/AppButton'
 import SegmentButton from '~/shared/components/SegmentButton'
+import RadioButton from '~/shared/components/RadioButton'
 
 type EditVideoListPageProps = {
   currentVideoList: VideoList
@@ -122,6 +123,51 @@ const EditVideoListPage = observer(
             </FormControl.HelperText>
           </FormControl>
 
+          <FormControl marginBottom="10px">
+            <FormControl.Label>Auto Sort Type</FormControl.Label>
+
+            <RadioButton.Group
+              name="auto-sort-type-group"
+              value={videoListViewModel.autoSortType}
+              onChange={value => (videoListViewModel.autoSortType = value as number)}
+              marginLeft="5px"
+            >
+              <RadioButton value={AutoSortType.NONE}>None</RadioButton>
+              <RadioButton value={AutoSortType.NAME}>Name</RadioButton>
+              <RadioButton value={AutoSortType.FIRST_AIRED}>First Aired</RadioButton>
+              <RadioButton value={AutoSortType.LAST_AIRED}>Last Aired</RadioButton>
+              <RadioButton value={AutoSortType.TOTAL_TIME}>Total Time</RadioButton>
+            </RadioButton.Group>
+
+            <SegmentButton
+              size="sm"
+              marginTop="10px"
+              selectedSegmentIndex={videoListViewModel.autoSortIsAscending ? 0 : 1}
+              disabled={videoListViewModel.autoSortType === 0}
+              containerProps={{
+                marginLeft: '5px',
+              }}
+              segments={[
+                {
+                  content: 'Ascending',
+                  icon: createIconFromSortType(videoListViewModel.autoSortType, 'ascending'),
+                },
+                {
+                  content: 'Descending',
+                  icon: createIconFromSortType(videoListViewModel.autoSortType, 'descending'),
+                },
+              ]}
+              onPress={(selectedSegmentIndex: number) => {
+                console.log('selecting index: ', selectedSegmentIndex)
+                videoListViewModel.autoSortIsAscending = selectedSegmentIndex === 0
+              }}
+            />
+
+            <FormControl.HelperText marginLeft="5px">
+              How should the list be sorted?
+            </FormControl.HelperText>
+          </FormControl>
+
           <AppButton onPress={handleSave} marginBottom="10px">
             {currentVideoList.isNewVideoList ? 'Create' : 'Save'}
           </AppButton>
@@ -174,5 +220,13 @@ const EditVideoListPage = observer(
     )
   },
 )
+
+const createIconFromSortType = (autoSortType: number, namePostfix: 'ascending' | 'descending') => {
+  if (autoSortType === 0) return undefined
+
+  const name = autoSortType === 1 ? 'sort-alphabetical-' : 'sort-calendar-'
+
+  return <MaterialCommunityIcons name={name + namePostfix} />
+}
 
 export default EditVideoListPage
