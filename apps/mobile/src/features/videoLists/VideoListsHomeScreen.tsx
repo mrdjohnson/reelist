@@ -95,9 +95,13 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
     return () => BackHandler.removeEventListener('hardwareBackPress', onBackButtonPressed)
   }, [nextVideoList])
 
+  const isAdminVideoListsEmpty = _.isEmpty(filteredAdminLists)
+  const isFollowedListsEmpty = _.isEmpty(filteredFollowedLists)
+  const isPublicListsEmpty = _.isEmpty(filteredPublicLists)
+
   const data = []
 
-  if (adminVideoLists.length > 0) {
+  if (!isAdminVideoListsEmpty) {
     data.push({
       title: 'Admin Lists',
       data: filteredAdminLists,
@@ -105,17 +109,19 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
   }
 
   if (!refreshing) {
-    if (followedVideoLists.length > 0) {
+    if (!isFollowedListsEmpty) {
       data.push({
         title: 'Followed Lists',
         data: filteredFollowedLists,
       })
     }
 
-    data.push({
-      title: 'Public Lists',
-      data: filteredPublicLists,
-    })
+    if (!isPublicListsEmpty) {
+      data.push({
+        title: 'Public Lists',
+        data: filteredPublicLists,
+      })
+    }
   }
 
   const handleVideoListPress = (videoList: VideoList) => {
@@ -147,6 +153,12 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
         returnKeyType="search"
         autoCapitalize="none"
       />
+
+      {isAdminVideoListsEmpty && isFollowedListsEmpty && isPublicListsEmpty && (
+        <Text fontSize="lg" textAlign="center">
+          There are no lists to show
+        </Text>
+      )}
 
       <SectionList
         paddingY="5px"
