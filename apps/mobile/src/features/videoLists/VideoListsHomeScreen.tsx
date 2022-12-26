@@ -37,8 +37,6 @@ const VideoListListItem = observer(
         flexDirection="row"
         alignItems="center"
       >
-        <Icon name="playlist-star" color="#4F8EF7" size={30} />
-
         <Text margin={'10px'} fontSize="md" height="auto">
           {videoList.name}
         </Text>
@@ -151,7 +149,8 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
       />
 
       <SectionList
-        padding="10px"
+        paddingY="5px"
+        paddingX="10px"
         sections={data}
         keyExtractor={(item, index) => item.id}
         renderItem={({ item: videoList }) => (
@@ -159,7 +158,9 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
         )}
         renderSectionHeader={({ section: { title } }) => (
           <View backgroundColor="light.300">
-            <Text fontSize="xl">{title}</Text>
+            <Text fontSize="xl" marginLeft="10px">
+              {title}
+            </Text>
           </View>
         )}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
