@@ -145,7 +145,7 @@ def getPassword(String currentUser, String keyChain) {
    //noinspection GroovyAssignabilityCheck
       stdout.toString().trim()
 }
- 
+
 def pass = getPassword('djohnson',"reelist_release_keystore")
 
 android {
@@ -157,14 +157,14 @@ android {
         applicationId "com.reelist"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 3 // this needs to update with each update
+        versionCode 4 // this needs to update with each update
         versionName "1.0"
         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
-        
+
         testBuildType System.getProperty('testBuildType', 'debug')  // This will later be used to control the test apk build type
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         missingDimensionStrategy 'detox', 'full'
-        
+
 
         if (isNewArchitectureEnabled()) {
             // We configure the NDK build only if you decide to opt-in for the New Architecture.
@@ -263,10 +263,10 @@ android {
         release {
             minifyEnabled false //enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            
+
             // Detox-specific additions to pro-guard
             proguardFile "${rootProject.projectDir}/../node_modules/detox/android/detox/proguard-rules-app.pro"
-            
+
             signingConfig signingConfigs.release
         }
     }
@@ -290,12 +290,12 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    
+
     implementation project(':react-native-inappbrowser-reborn')
     implementation('com.google.firebase:firebase-core:16.0.0')
     implementation project(':react-native-notifications')
     implementation project(':react-native-linear-gradient')
-    
+
 
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"  // From node_modules
@@ -325,9 +325,9 @@ dependencies {
         implementation jscFlavor
     }
 
-    
+
     androidTestImplementation(project(path: ":detox"))
-    
+
 }
 
 if (isNewArchitectureEnabled()) {
