@@ -2,18 +2,13 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Actionsheet, Center, Pressable, Row, Text, useDisclose, useToast, View } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
-import { BackHandler } from 'react-native'
 import Clipboard from '@react-native-clipboard/clipboard'
 import User from '~/models/User'
 import { ReelistScreen } from '~/utils/navigation'
-import EditVideoListPage from './EditVideoListPage'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import VideoListDetailsSection from './VideoListDetailsSection'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import VideoFlatList from './VideoFlatList'
-
-const CAN_GO_BACK = false
-const CANNOT_GO_BACK = true
 
 const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
   const { videoListStore, auth, appState } = useStore()
@@ -21,7 +16,6 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
 
   const currentVideoList = videoListStore.currentVideoList
 
-  const [editing, setEditing] = useState<boolean>(false)
   const [showMembers, setShowMembers] = useState(false)
   const [activeUser, setActiveUser] = useState<User | null>(null)
   const [isSelectingProgress, setIsSelectingProgress] = useState(false)
@@ -47,22 +41,6 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
     currentVideoList?.getVideos()
     currentVideoList?.fetchAdmins()
   }, [currentVideoList])
-
-  useEffect(() => {
-    const onBackButtonPressed = () => {
-      if (editing) {
-        setEditing(false)
-
-        return CANNOT_GO_BACK
-      }
-
-      return CAN_GO_BACK
-    }
-
-    BackHandler.addEventListener('hardwareBackPress', onBackButtonPressed)
-
-    return () => BackHandler.removeEventListener('hardwareBackPress', onBackButtonPressed)
-  }, [editing])
 
   const isUserListAdmin = useMemo(() => {
     return currentVideoList?.adminIds.includes(auth.user.id)
@@ -99,8 +77,8 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
     }
   }
 
-  const startEditing = () => {
-    setEditing(true)
+  const openEditPage = () => {
+    navigation.push('videoListScreenSettingsModal')
     closeMemberShipActionSheet()
   }
 
@@ -167,14 +145,6 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
       navigation.goBack()
     }
   }
-
-  if (editing)
-    return (
-      <EditVideoListPage
-        currentVideoList={currentVideoList}
-        closeEditPage={() => setEditing(false)}
-      />
-    )
 
   let content
 
@@ -248,7 +218,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
             </Actionsheet.Item>
           )}
 
-          {isUserListAdmin && <Actionsheet.Item onPress={startEditing}>Edit</Actionsheet.Item>}
+          {isUserListAdmin && <Actionsheet.Item onPress={openEditPage}>Edit</Actionsheet.Item>}
 
           {auth.user.isFollowingVideoList(currentVideoList) ? (
             <Actionsheet.Item onPress={() => followOrUnfollowList(false)}>

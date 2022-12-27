@@ -23,6 +23,7 @@ import SettingsScreen from '~/features/settings/SettingsScreen'
 import { NavigatorParamList } from '~/utils/navigation'
 import SplashScreen from '~/features/splash/SplashScreen'
 import HomeScreen from '~/features/videoLists/HomeScreen'
+import EditVideoListPage from '~/features/videoLists/EditVideoListPage'
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -68,21 +69,31 @@ const AppStack = () => {
 
       <Stack.Screen name="welcome" component={WelcomeScreen} />
 
-      <Stack.Screen name="videoListsHome" component={withAppFooterHoc(VideoListsHomeScreen)} />
-
-      <Stack.Screen name="videoListScreen" component={withAppFooterHoc(VideoListScreen)} />
-
-      <Stack.Screen name="search" component={withAppFooterHoc(SearchScreen)} />
-
-      <Stack.Screen name="videoScreen" component={withAppFooterHoc(VideoScreen)} />
-
-      <Stack.Screen name="tracking" component={withAppFooterHoc(TrackingScreen)} />
-
-      <Stack.Screen name="profile" component={withAppFooterHoc(ProfileScreen)} />
-
-      <Stack.Screen name="settings" component={withAppFooterHoc(SettingsScreen)} />
-
       <Stack.Screen name="home" component={withAppFooterHoc(HomeScreen)} />
+
+      <Stack.Group screenOptions={{ animation: 'slide_from_right' }}>
+        <Stack.Screen name="videoListsHome" component={withAppFooterHoc(VideoListsHomeScreen)} />
+
+        <Stack.Screen name="videoListScreen" component={withAppFooterHoc(VideoListScreen)} />
+
+        <Stack.Screen name="search" component={withAppFooterHoc(SearchScreen)} />
+
+        <Stack.Screen name="videoScreen" component={withAppFooterHoc(VideoScreen)} />
+
+        <Stack.Screen name="tracking" component={withAppFooterHoc(TrackingScreen)} />
+
+        <Stack.Screen name="profile" component={withAppFooterHoc(ProfileScreen)} />
+
+        <Stack.Screen name="settings" component={withAppFooterHoc(SettingsScreen)} />
+      </Stack.Group>
+
+      {/* modals here */}
+      <Stack.Group screenOptions={{ animation: 'slide_from_bottom' }}>
+        <Stack.Screen
+          name="videoListScreenSettingsModal"
+          component={withAppFooterHoc(EditVideoListPage)}
+        />
+      </Stack.Group>
     </Stack.Navigator>
   )
 }

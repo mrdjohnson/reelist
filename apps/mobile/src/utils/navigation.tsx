@@ -5,6 +5,7 @@ export type NavigatorParamList = {
   welcome: undefined
   videoListsHome: undefined
   videoListScreen: undefined
+  videoListScreenSettingsModal: undefined
   search?: { initialSearchValue?: string }
   videoScreen: undefined
   tracking: undefined
