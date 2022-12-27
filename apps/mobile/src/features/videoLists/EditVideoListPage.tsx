@@ -10,6 +10,7 @@ import { useStore } from '~/hooks/useStore'
 import AppButton from '~/shared/components/AppButton'
 import SegmentButton from '~/shared/components/SegmentButton'
 import RadioButton from '~/shared/components/RadioButton'
+import FormSection from '~/shared/components/FormSection'
 
 const EditVideoListPage = observer(({ navigation }: ReelistScreen) => {
   const { videoListStore } = useStore()
@@ -50,29 +51,24 @@ const EditVideoListPage = observer(({ navigation }: ReelistScreen) => {
   return (
     <View flex={1} backgroundColor="light.100">
       <View margin="10px" flex={1}>
-        <FormControl isInvalid={!!editingErrorMessage} marginBottom="8px">
-          <FormControl.Label>Name</FormControl.Label>
-
+        <FormSection
+          label="Name"
+          isInvalid={!!editingErrorMessage}
+          errorMessage={editingErrorMessage}
+        >
           <Input
             value={videoListViewModel.name}
             onChangeText={nextName => (videoListViewModel.name = nextName)}
-            marginLeft="5px"
           />
+        </FormSection>
 
-          <FormControl.ErrorMessage marginLeft="5px">
-            {editingErrorMessage}
-          </FormControl.ErrorMessage>
-        </FormControl>
-
-        <FormControl marginBottom="10px">
-          <FormControl.Label>Is List Public?</FormControl.Label>
-
+        <FormSection
+          label="Is List Public?"
+          helperText="Can the list be viewed / followed by everyone?"
+        >
           <SegmentButton
             size="sm"
             selectedSegmentIndex={videoListViewModel.isPublic ? 0 : 1}
-            containerProps={{
-              marginLeft: '5px',
-            }}
             segments={[
               {
                 icon: <MaterialIcons name="public" />,
@@ -87,21 +83,16 @@ const EditVideoListPage = observer(({ navigation }: ReelistScreen) => {
               videoListViewModel.isPublic = selectedSegmentIndex === 0
             }}
           />
+        </FormSection>
 
-          <FormControl.HelperText marginLeft="5px">
-            Can the list be viewed / followed by everyone?
-          </FormControl.HelperText>
-        </FormControl>
-
-        <FormControl marginBottom="10px">
-          <FormControl.Label>Is List Joinable?</FormControl.Label>
-
+        <FormSection
+          label="Is List Joinable?"
+          helperText="Can the list be joined by everyone with a link to it?"
+        >
           <SegmentButton
             size="sm"
             selectedSegmentIndex={videoListViewModel.isJoinable ? 0 : 1}
-            containerProps={{
-              marginLeft: '5px',
-            }}
+            marginBottom="0"
             segments={[
               {
                 icon: <MaterialIcons name="public" />,
@@ -116,20 +107,13 @@ const EditVideoListPage = observer(({ navigation }: ReelistScreen) => {
               videoListViewModel.isJoinable = !videoListViewModel.isJoinable
             }}
           />
+        </FormSection>
 
-          <FormControl.HelperText marginLeft="5px">
-            Can the list be joined by everyone with a link to it?
-          </FormControl.HelperText>
-        </FormControl>
-
-        <FormControl marginBottom="10px">
-          <FormControl.Label>Auto Sort Type</FormControl.Label>
-
+        <FormSection label="Auto Sort Type" helperText="How should the list be sorted?">
           <RadioButton.Group
             name="auto-sort-type-group"
             value={videoListViewModel.autoSortType}
             onChange={value => (videoListViewModel.autoSortType = value as number)}
-            marginLeft="5px"
           >
             <RadioButton value={AutoSortType.NONE}>None</RadioButton>
             <RadioButton value={AutoSortType.NAME}>Name</RadioButton>
@@ -143,9 +127,6 @@ const EditVideoListPage = observer(({ navigation }: ReelistScreen) => {
             marginTop="10px"
             selectedSegmentIndex={videoListViewModel.autoSortIsAscending ? 0 : 1}
             disabled={videoListViewModel.autoSortType === 0}
-            containerProps={{
-              marginLeft: '5px',
-            }}
             segments={[
               {
                 content: 'Ascending',
@@ -161,11 +142,7 @@ const EditVideoListPage = observer(({ navigation }: ReelistScreen) => {
               videoListViewModel.autoSortIsAscending = selectedSegmentIndex === 0
             }}
           />
-
-          <FormControl.HelperText marginLeft="5px">
-            How should the list be sorted?
-          </FormControl.HelperText>
-        </FormControl>
+        </FormSection>
 
         <AppButton onPress={handleSave} marginBottom="10px">
           {currentVideoList.isNewVideoList ? 'Create' : 'Save'}
