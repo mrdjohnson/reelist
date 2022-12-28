@@ -39,6 +39,8 @@
     "mobx": "*",
     "short-unique-id": "*",
     "moment": "*",
-    "react-native-linear-gradient": "*"
+    "react-native-linear-gradient": "*",
+    "@react-navigation/bottom-tabs": "*",
+    "@faker-js/faker": "*"
   }
 }
