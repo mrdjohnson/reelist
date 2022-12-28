@@ -41,6 +41,8 @@ class User implements UserType {
   notificationId = ''
   name = ''
 
+  _viewModel?: User & IViewModel<User>
+
   constructor({ user, loggedIn = true, profile }: UserConstructorType) {
     makeAutoObservable(this)
 
@@ -74,7 +76,7 @@ class User implements UserType {
   }
 
   get viewModel() {
-    return createViewModel<User>(this)
+    return (this._viewModel ||= createViewModel<User>(this))
   }
 
   static fromAuthId = async (

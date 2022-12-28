@@ -57,6 +57,7 @@ class VideoList implements VideoListType {
   videoListStore: VideoListStore
   storeAuth: Auth
   videoStore: VideoStore
+  _viewModel?: VideoList & IViewModel<VideoList>
 
   constructor(
     json: VideoListTableType | null,
@@ -234,7 +235,7 @@ class VideoList implements VideoListType {
   }
 
   get viewModel() {
-    return createViewModel<VideoList>(this)
+    return (this._viewModel ||= createViewModel<VideoList>(this))
   }
 
   get totalDurationMinutes() {
