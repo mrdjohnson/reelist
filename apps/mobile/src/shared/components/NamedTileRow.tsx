@@ -6,15 +6,23 @@ import VideoImage from '~/features/video/VideoImage'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { useReelistNavigation } from '~/utils/navigation'
 import { useStore } from '~/hooks/useStore'
+import LinkButton from '~/shared/components/LinkButton'
 
 type NamedTileRowProps = {
   videos?: Video[]
   label: string
   size?: number
+  showMoreText: string
   onShowMore: () => void
 }
 
-const NamedTileRow = ({ label, videos, size = 10, onShowMore }: NamedTileRowProps) => {
+const NamedTileRow = ({
+  label,
+  videos,
+  size = 10,
+  showMoreText,
+  onShowMore,
+}: NamedTileRowProps) => {
   const { videoStore } = useStore()
 
   const navigation = useReelistNavigation()
@@ -33,7 +41,7 @@ const NamedTileRow = ({ label, videos, size = 10, onShowMore }: NamedTileRowProp
       </Text>
 
       <ScrollView horizontal>
-        <Row space="8px" flex={1}>
+        <Row space="8px" flex={1} paddingLeft="10px">
           {_.take(videos, size).map(video => (
             <Pressable key={video.videoId} onPress={() => navigateToVideoScreen(video)}>
               <VideoImage video={video} containerProps={{ height: '120px', width: 'auto' }} />
@@ -53,6 +61,10 @@ const NamedTileRow = ({ label, videos, size = 10, onShowMore }: NamedTileRowProp
           </Pressable>
         </Row>
       </ScrollView>
+
+      <LinkButton alignSelf="flex-end" onPress={onShowMore}>
+        {showMoreText}
+      </LinkButton>
     </Column>
   )
 }

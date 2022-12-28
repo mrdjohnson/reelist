@@ -63,6 +63,7 @@ const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
         <NamedTileRow
           label={`Videos related to ${filterText}:`}
           videos={searchedVideos}
+          showMoreText="See more"
           onShowMore={() =>
             navigation.navigate('search', {
               screen: 'search',
