@@ -195,72 +195,80 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
       {/* hidden */}
 
       <Actionsheet isOpen={isMembershipOpen} onClose={closeMemberShipActionSheet}>
-        <Actionsheet.Content display={showMembers ? 'none' : null}>
-          {!isUserListAdmin && currentVideoList.isJoinable && (
-            <Actionsheet.Item
-              onPress={join}
-              _text={{ color: currentVideoList.isJoinable ? undefined : 'gray.600' }}
-            >
-              Join
-            </Actionsheet.Item>
-          )}
-
-          <Actionsheet.Item onPress={() => setShowMembers(true)}>Members</Actionsheet.Item>
-
-          {showDetails || <Actionsheet.Item onPress={openDetailsPanel}>Details</Actionsheet.Item>}
-
-          {isUserListAdmin && (
-            <Actionsheet.Item
-              onPress={leave}
-              _text={{ color: currentVideoList.adminIds.length > 1 ? undefined : 'gray.600' }}
-            >
-              Leave
-            </Actionsheet.Item>
-          )}
-
-          {isUserListAdmin && <Actionsheet.Item onPress={openEditPage}>Edit</Actionsheet.Item>}
-
-          {auth.user.isFollowingVideoList(currentVideoList) ? (
-            <Actionsheet.Item onPress={() => followOrUnfollowList(false)}>
-              UnFollow
-            </Actionsheet.Item>
-          ) : (
-            <Actionsheet.Item onPress={() => followOrUnfollowList(true)}>Follow</Actionsheet.Item>
-          )}
-
-          <Actionsheet.Item onPress={shareList}>Copy Shareable link</Actionsheet.Item>
-
-          <Actionsheet.Item onPress={onMemebershipClose}>Cancel</Actionsheet.Item>
-        </Actionsheet.Content>
-
-        <Actionsheet.Content display={showMembers ? null : 'none'}>
-          {isSelectingProgress && (
+        <Actionsheet.Content>
+          {showMembers ? (
             <>
-              <Actionsheet.Item
-                onPress={() => handleUserPress(null)}
-                backgroundColor={activeUser === null ? 'light.300:alpha.40' : null}
-              >
-                None (video overview)
-              </Actionsheet.Item>
+              {isSelectingProgress && (
+                <>
+                  <Actionsheet.Item
+                    onPress={() => handleUserPress(null)}
+                    backgroundColor={activeUser === null ? 'light.300:alpha.40' : null}
+                  >
+                    None (video overview)
+                  </Actionsheet.Item>
 
-              <Actionsheet.Item
-                onPress={() => handleUserPress(auth.user)}
-                backgroundColor={activeUser === auth.user ? 'light.300:alpha.40' : null}
-              >
-                {(auth.user.name || 'Me') + ' (self)'}
-              </Actionsheet.Item>
+                  <Actionsheet.Item
+                    onPress={() => handleUserPress(auth.user)}
+                    backgroundColor={activeUser === auth.user ? 'light.300:alpha.40' : null}
+                  >
+                    {(auth.user.name || 'Me') + ' (self)'}
+                  </Actionsheet.Item>
+                </>
+              )}
+
+              {currentVideoList.admins.map(admin => (
+                <Actionsheet.Item
+                  key={admin.id}
+                  backgroundColor={activeUser === admin ? 'light.300:alpha.40' : null}
+                  onPress={() => handleUserPress(admin)}
+                >
+                  {admin.name}
+                </Actionsheet.Item>
+              ))}
+            </>
+          ) : (
+            <>
+              {!isUserListAdmin && currentVideoList.isJoinable && (
+                <Actionsheet.Item
+                  onPress={join}
+                  _text={{ color: currentVideoList.isJoinable ? undefined : 'gray.600' }}
+                >
+                  Join
+                </Actionsheet.Item>
+              )}
+
+              <Actionsheet.Item onPress={() => setShowMembers(true)}>Members</Actionsheet.Item>
+
+              {showDetails || (
+                <Actionsheet.Item onPress={openDetailsPanel}>Details</Actionsheet.Item>
+              )}
+
+              {isUserListAdmin && (
+                <Actionsheet.Item
+                  onPress={leave}
+                  _text={{ color: currentVideoList.adminIds.length > 1 ? undefined : 'gray.600' }}
+                >
+                  Leave
+                </Actionsheet.Item>
+              )}
+
+              {isUserListAdmin && <Actionsheet.Item onPress={openEditPage}>Edit</Actionsheet.Item>}
+
+              {auth.user.isFollowingVideoList(currentVideoList) ? (
+                <Actionsheet.Item onPress={() => followOrUnfollowList(false)}>
+                  UnFollow
+                </Actionsheet.Item>
+              ) : (
+                <Actionsheet.Item onPress={() => followOrUnfollowList(true)}>
+                  Follow
+                </Actionsheet.Item>
+              )}
+
+              <Actionsheet.Item onPress={shareList}>Copy Shareable link</Actionsheet.Item>
+
+              <Actionsheet.Item onPress={onMemebershipClose}>Cancel</Actionsheet.Item>
             </>
           )}
-
-          {currentVideoList.admins.map(admin => (
-            <Actionsheet.Item
-              key={admin.id}
-              backgroundColor={activeUser === admin ? 'light.300:alpha.40' : null}
-              onPress={() => handleUserPress(admin)}
-            >
-              {admin.name}
-            </Actionsheet.Item>
-          ))}
         </Actionsheet.Content>
       </Actionsheet>
     </View>
