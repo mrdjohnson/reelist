@@ -24,7 +24,6 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import moment from 'moment'
 import { ReelistScreen } from '~/utils/navigation'
 import VideoSeasonSection from './VideoSeasonSection'
-import VideoListManagementSection from './VideoListManagementSection'
 import ToggleButton from '~/shared/components/ToggleButton'
 import AppButton from '~/shared/components/AppButton'
 import ActionButton from '~/shared/components/ActionButton'
@@ -37,10 +36,9 @@ const CAN_GO_BACK = false
 const CANNOT_GO_BACK = true
 
 const VideoScreen = observer(({ navigation }: ReelistScreen) => {
-  const { videoStore, auth } = useStore()
+  const { videoStore, auth, appState } = useStore()
   const videoId = videoStore.currentVideoId
   const [video, setVideo] = useState<Video | null>(null)
-  const [manageLists, setManageLists] = useState(false)
   const [minimizeVideoOverview, setMinimizeVideoOverview] = useState(true)
   const [showVideoId, setShowVideoId] = useState(false)
 
@@ -78,22 +76,21 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
         return CANNOT_GO_BACK
       }
 
-      if (manageLists) {
-        setManageLists(false)
-
-        return CANNOT_GO_BACK
-      }
-
       return CAN_GO_BACK
     }
 
     BackHandler.addEventListener('hardwareBackPress', onBackButtonPressed)
 
     return () => BackHandler.removeEventListener('hardwareBackPress', onBackButtonPressed)
-  }, [season, manageLists])
+  }, [season])
 
   if (!video || !videoId) {
     return <Text>Loading, there may have been an error for: {videoId}</Text>
+  }
+
+  const openVideoListManagementModal = () => {
+    appState.setCurrentVideo(video)
+    navigation.navigate('videoListManagementModal')
   }
 
   let videoStatus
@@ -180,43 +177,34 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
         </Pressable>
       </Center>
 
-      {manageLists ? (
-        <VideoListManagementSection
-          video={video}
-          closeManageListsSection={() => setManageLists(false)}
-        />
-      ) : (
-        <>
-          <AppButton margin="10px" marginBottom="0px" onPress={() => setManageLists(true)}>
-            Manage Lists
-          </AppButton>
+      <AppButton margin="10px" marginBottom="0px" onPress={openVideoListManagementModal}>
+        Manage Lists
+      </AppButton>
 
-          {video.isMovie || (
-            <Row margin="10px" justifyContent="space-between">
-              {videoStatus}
+      {video.isMovie || (
+        <Row margin="10px" justifyContent="space-between">
+          {videoStatus}
 
-              <ActionButton size="sm" onPress={() => video.backfillWatched()}>
-                Backfill?
-              </ActionButton>
-            </Row>
-          )}
-
-          <TotalTimeDetailsPanel user={auth.user} videos={[video]} />
-
-          <Row alignItems="center" space="8px" margin="10px">
-            <ToggleButton
-              size="sm"
-              minWidth="50%"
-              active={video.tracked}
-              icon={<MaterialCommunityIcons name="bookmark-plus" />}
-              activeIcon={<MaterialCommunityIcons name="bookmark-check" />}
-              content="Add to Bookmarks"
-              activeContent="Added to Bookmarks"
-              onPress={() => video.toggleTracked()}
-            />
-          </Row>
-        </>
+          <ActionButton size="sm" onPress={() => video.backfillWatched()}>
+            Backfill?
+          </ActionButton>
+        </Row>
       )}
+
+      <TotalTimeDetailsPanel user={auth.user} videos={[video]} />
+
+      <Row alignItems="center" space="8px" margin="10px">
+        <ToggleButton
+          size="sm"
+          minWidth="50%"
+          active={video.tracked}
+          icon={<MaterialCommunityIcons name="bookmark-plus" />}
+          activeIcon={<MaterialCommunityIcons name="bookmark-check" />}
+          content="Add to Bookmarks"
+          activeContent="Added to Bookmarks"
+          onPress={() => video.toggleTracked()}
+        />
+      </Row>
 
       {video.isMovie && (
         <Flex flexDirection="column-reverse" flex={1}>
@@ -234,7 +222,7 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
         </Flex>
       )}
 
-      {!season && !manageLists && video.isTv && (
+      {!season && video.isTv && (
         <ScrollView>
           <View paddingRight="10px" paddingLeft="10px">
             <View flexDirection="row" justifyContent="space-between" borderBottomWidth={1}>

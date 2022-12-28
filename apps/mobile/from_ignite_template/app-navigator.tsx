@@ -24,6 +24,7 @@ import { NavigatorParamList } from '~/utils/navigation'
 import SplashScreen from '~/features/splash/SplashScreen'
 import HomeScreen from '~/features/videoLists/HomeScreen'
 import EditVideoListPage from '~/features/videoLists/EditVideoListPage'
+import VideoListManagementModal from '~/features/video/VideoListManagementModal'
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -92,6 +93,11 @@ const AppStack = () => {
         <Stack.Screen
           name="videoListScreenSettingsModal"
           component={withAppFooterHoc(EditVideoListPage)}
+        />
+
+        <Stack.Screen
+          name="videoListManagementModal"
+          component={withAppFooterHoc(VideoListManagementModal)}
         />
       </Stack.Group>
     </Stack.Navigator>

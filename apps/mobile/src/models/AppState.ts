@@ -1,6 +1,7 @@
 import { makeAutoObservable, observable } from 'mobx'
 import _ from 'lodash'
 import User from '~/models/User'
+import Video from './Video'
 
 type UpdateType = {
   message: string
@@ -19,6 +20,7 @@ export default class AppState {
   _updateId = 0
   videoListShareId: string | null = null
   profileScreen: ProfileScreenType = { user: null, editing: false }
+  currentVideo?: Video
 
   constructor() {
     makeAutoObservable(this)
@@ -68,5 +70,13 @@ export default class AppState {
 
   setProfileScreenEditing = (editing: boolean) => {
     this.profileScreen.editing = editing
+  }
+
+  setCurrentVideo = (video: Video) => {
+    this.currentVideo = video
+  }
+
+  clearCurrentVideo = () => {
+    this.currentVideo = undefined
   }
 }
