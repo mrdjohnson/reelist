@@ -1,30 +1,29 @@
-import { RouteProp, useRoute } from '@react-navigation/native'
+import { BottomTabBarProps } from '@react-navigation/bottom-tabs'
 import { observer } from 'mobx-react-lite'
 import { Center, Row, Icon, IIconProps, Pressable, Text } from 'native-base'
 import React, { useEffect, useState } from 'react'
 import { Keyboard } from 'react-native'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import { NavigatorParamList, useReelistNavigation } from '~/utils/navigation'
+import { ReelistTabParamList } from '~/utils/navigation'
 
 type FooterButtonProps = {
-  routeName: keyof NavigatorParamList
-  name: keyof NavigatorParamList
+  routeName: string
+  name: keyof ReelistTabParamList
   icon: IIconProps['as']
   text: string
   iconSize?: number
+  navigation: BottomTabBarProps['navigation']
 }
 
 const FooterButton = observer(
-  ({ routeName, name, icon, text, iconSize = 5 }: FooterButtonProps) => {
-    const navigation = useReelistNavigation()
-
+  ({ routeName, name, icon, text, iconSize = 5, navigation }: FooterButtonProps) => {
     const [isPressed, setIsPressed] = useState(false)
 
     return (
       <Pressable
         opacity={routeName === name ? 1 : 0.5}
-        onPress={() => navigation.navigate(name)}
+        onPress={() => navigation.navigate(name, { screen: name })}
         onPressIn={() => setIsPressed(true)}
         onPressOut={() => setIsPressed(false)}
         flex={1}
@@ -47,12 +46,10 @@ const FooterButton = observer(
   },
 )
 
-const AppFooter = observer(() => {
-  const route = useRoute<RouteProp<NavigatorParamList>>()
-
+const AppFooter = observer(({ navigation, state }: BottomTabBarProps) => {
   const [isVisible, setIsVisible] = useState(true)
 
-  if (route.name === 'welcome') return null
+  const routeName = state.routeNames[state.index]
 
   useEffect(() => {
     const onKeyboardDidShow = () => {
@@ -83,26 +80,29 @@ const AppFooter = observer(() => {
       display={isVisible ? null : 'none'}
     >
       <FooterButton
-        routeName={route.name}
+        routeName={routeName}
         name="tracking"
         icon={<MaterialCommunityIcons name="bookmark-multiple" />}
         text="Bookmarks"
         iconSize={4}
+        navigation={navigation}
       />
 
       <FooterButton
-        routeName={route.name}
+        routeName={routeName}
         name="home"
         icon={<MaterialCommunityIcons name="home-roof" />}
         text="Home"
+        navigation={navigation}
       />
 
       <FooterButton
-        routeName={route.name}
+        routeName={routeName}
         name="search"
         icon={<MaterialIcons name="search" />}
         text="Search"
         iconSize={4}
+        navigation={navigation}
       />
     </Row>
   )

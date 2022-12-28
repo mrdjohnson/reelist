@@ -8,13 +8,13 @@ import React from 'react'
 import { useColorScheme } from 'react-native'
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { navigationRef, useBackButtonHandler } from './navigation-utilities'
 import WelcomeScreen from '~/features/welcome/WelcomeScreen'
 import VideoListsHomeScreen from '~/features/videoLists/VideoListsHomeScreen'
 import VideoListScreen from '~/features/videoLists/VideoListScreen'
 import SearchScreen from '~/features/search/SearchScreen'
 import VideoScreen from '~/features/video/VideoScreen'
-import { View } from 'native-base'
 import AppFooter from '~/shared/components/AppFooter'
 import TrackingScreen from '~/features/tracking/TrackingScreen'
 import { AppEventHandler } from '~/utils/AppEventHandler'
@@ -26,38 +26,85 @@ import HomeScreen from '~/features/videoLists/HomeScreen'
 import EditVideoListPage from '~/features/videoLists/EditVideoListPage'
 import VideoListManagementModal from '~/features/video/VideoListManagementModal'
 
-/**
- * This type allows TypeScript to know what routes are defined in this navigator
- * as well as what properties (if any) they might take when navigating to them.
- *
- * If no params are allowed, pass through `undefined`. Generally speaking, we
- * recommend using your MobX-State-Tree store(s) to keep application state
- * rather than passing state through navigation params.
- *
- * For more information, see this documentation:
- *   https://reactnavigation.org/docs/params/
- *   https://reactnavigation.org/docs/typescript#type-checking-the-navigator
- */
-
-// Documentation: https://reactnavigation.org/docs/stack-navigator/
 const Stack = createNativeStackNavigator<NavigatorParamList>()
+const Tab = createBottomTabNavigator<NavigatorParamList>()
 
-const withAppFooterHoc = (Component: React.ComponentType<any>) => {
-  const ScreenWithFooter = (props: any) => (
-    <View flex={1} backgroundColor="white">
-      <View flex={1}>
-        <Component {...props} />
-      </View>
+// this is one way to allow us to access common tabs from any screen
+const createSubStack = (name: string, component: React.ComponentType<any>) => {
+  const Stack = createNativeStackNavigator()
 
-      <View flexShrink={1}>
-        <AppFooter />
-      </View>
-    </View>
+  return (
+    <Stack.Navigator
+      initialRouteName={name}
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Stack.Screen name={name} component={component} />
+
+      <Stack.Group screenOptions={{ animation: 'slide_from_right' }}>
+        <Stack.Screen name="videoListsHome" component={VideoListsHomeScreen} />
+
+        <Stack.Screen name="videoListScreen" component={VideoListScreen} />
+
+        <Stack.Screen name="videoScreen" component={VideoScreen} />
+
+        <Stack.Screen name="profile" component={ProfileScreen} />
+
+        <Stack.Screen name="settings" component={SettingsScreen} />
+      </Stack.Group>
+
+      {/* modals here */}
+      <Stack.Group screenOptions={{ animation: 'slide_from_bottom' }}>
+        <Stack.Screen name="videoListScreenSettingsModal" component={EditVideoListPage} />
+
+        <Stack.Screen name="videoListManagementModal" component={VideoListManagementModal} />
+      </Stack.Group>
+    </Stack.Navigator>
   )
-
-  return ScreenWithFooter
 }
 
+const TrackingTabs = () => createSubStack('tracking', TrackingScreen)
+const HomeTabs = () => createSubStack('home', HomeScreen)
+const SearchTabs = () => createSubStack('search', SearchScreen)
+
+const AppTabs = () => {
+  return (
+    <Tab.Navigator
+      tabBar={props => <AppFooter {...props} />}
+      initialRouteName="home"
+      screenOptions={() => ({
+        headerShown: false,
+      })}
+    >
+      <Tab.Screen
+        name="tracking"
+        component={TrackingTabs}
+        options={{
+          tabBarLabel: 'Bookmarks',
+        }}
+      />
+
+      <Tab.Screen
+        name="home"
+        component={HomeTabs}
+        options={{
+          tabBarLabel: 'Home',
+        }}
+      />
+
+      <Tab.Screen
+        name="search"
+        component={SearchTabs}
+        options={{
+          tabBarLabel: 'Search',
+        }}
+      />
+    </Tab.Navigator>
+  )
+}
+
+// no tabs here
 const AppStack = () => {
   return (
     <Stack.Navigator
@@ -70,36 +117,7 @@ const AppStack = () => {
 
       <Stack.Screen name="welcome" component={WelcomeScreen} />
 
-      <Stack.Screen name="home" component={withAppFooterHoc(HomeScreen)} />
-
-      <Stack.Group screenOptions={{ animation: 'slide_from_right' }}>
-        <Stack.Screen name="videoListsHome" component={withAppFooterHoc(VideoListsHomeScreen)} />
-
-        <Stack.Screen name="videoListScreen" component={withAppFooterHoc(VideoListScreen)} />
-
-        <Stack.Screen name="search" component={withAppFooterHoc(SearchScreen)} />
-
-        <Stack.Screen name="videoScreen" component={withAppFooterHoc(VideoScreen)} />
-
-        <Stack.Screen name="tracking" component={withAppFooterHoc(TrackingScreen)} />
-
-        <Stack.Screen name="profile" component={withAppFooterHoc(ProfileScreen)} />
-
-        <Stack.Screen name="settings" component={withAppFooterHoc(SettingsScreen)} />
-      </Stack.Group>
-
-      {/* modals here */}
-      <Stack.Group screenOptions={{ animation: 'slide_from_bottom' }}>
-        <Stack.Screen
-          name="videoListScreenSettingsModal"
-          component={withAppFooterHoc(EditVideoListPage)}
-        />
-
-        <Stack.Screen
-          name="videoListManagementModal"
-          component={withAppFooterHoc(VideoListManagementModal)}
-        />
-      </Stack.Group>
+      <Stack.Screen name="home" component={AppTabs} />
     </Stack.Navigator>
   )
 }

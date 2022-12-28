@@ -83,7 +83,7 @@ const HomeScreen = observer(({ navigation }: ReelistScreen) => {
           roundedRight="none"
           start={[1, 0]}
           end={[0.5, 0.5]}
-          onPress={() => navigation.push('tracking')}
+          onPress={() => navigation.navigate('tracking', { screen: 'tracking' })}
         >
           My Bookmarks
         </HomeScreenTile>
