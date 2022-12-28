@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react'
-import { ScrollView, Text, View, Center, Checkbox } from 'native-base'
+import { ScrollView, Text, View, Checkbox, Row, Pressable, Icon } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
-import AppButton from '~/shared/components/AppButton'
 import { ReelistScreen } from '~/utils/navigation'
+import FormSection from '~/shared/components/FormSection'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 
 const VideoListManagementModal = observer(({ navigation }: ReelistScreen) => {
   const { videoListStore, appState } = useStore()
@@ -16,28 +17,36 @@ const VideoListManagementModal = observer(({ navigation }: ReelistScreen) => {
 
   return (
     <View flex={1} padding="10px" paddingTop="0">
-      <Center>
-        <Text>Manage Lists: </Text>
+      <Row direction="row-reverse" marginTop="10px">
+        <Pressable onPress={() => navigation.pop()} justifyContent="center">
+          <Icon as={<MaterialCommunityIcons name="close" />} size={6} />
+        </Pressable>
+      </Row>
 
-        <AppButton onPress={() => navigation.pop()}>Go Back</AppButton>
-      </Center>
+      <View justifyContent="center" margin="10px">
+        <Text fontSize="2xl" adjustsFontSizeToFit numberOfLines={2} textAlign="center">
+          {video.videoName}
+        </Text>
+      </View>
 
-      <ScrollView>
-        {videoListStore.adminVideoLists.map(videoList => (
-          <View flexDirection="row" marginTop="10px" key={videoList.id}>
-            <Text flex={1} fontSize="lg">
-              {videoList.name}
-            </Text>
+      <FormSection label="Manage Lists:">
+        <ScrollView>
+          {videoListStore.adminVideoLists.map(videoList => (
+            <View flexDirection="row" marginTop="10px" key={videoList.id}>
+              <Text flex={1} fontSize="lg">
+                {videoList.name}
+              </Text>
 
-            <Checkbox
-              value={videoList.id}
-              isChecked={videoList.includes(video)}
-              onChange={() => videoList.addOrRemoveVideo(video)}
-              accessibilityLabel={'VideoList: ' + videoList.name}
-            />
-          </View>
-        ))}
-      </ScrollView>
+              <Checkbox
+                value={videoList.id}
+                isChecked={videoList.includes(video)}
+                onChange={() => videoList.addOrRemoveVideo(video)}
+                accessibilityLabel={'VideoList: ' + videoList.name}
+              />
+            </View>
+          ))}
+        </ScrollView>
+      </FormSection>
     </View>
   )
 })
