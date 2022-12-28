@@ -63,7 +63,12 @@ const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
         <NamedTileRow
           label={`Videos related to ${filterText}:`}
           videos={searchedVideos}
-          onShowMore={() => navigation.navigate('search', { initialSearchValue: filterText })}
+          onShowMore={() =>
+            navigation.navigate('search', {
+              screen: 'search',
+              params: { initialSearchValue: filterText },
+            })
+          }
         />
       </ScrollView>
     </View>
