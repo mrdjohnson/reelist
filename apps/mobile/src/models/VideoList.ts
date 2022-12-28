@@ -183,8 +183,8 @@ class VideoList implements VideoListType {
     await this.getVideos()
 
     let nextVideos
-    if (_.find(this.videos, { videoId })) {
-      nextVideos = _.filter(this.videos, listVideo => listVideo.videoId === videoId)
+    if (this.includes(video)) {
+      nextVideos = _.reject(this.videos, listVideo => listVideo.videoId === videoId)
     } else {
       nextVideos = [...this.videos, video]
     }
