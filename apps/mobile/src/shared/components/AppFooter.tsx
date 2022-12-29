@@ -23,7 +23,12 @@ const FooterButton = observer(
     return (
       <Pressable
         opacity={routeName === name ? 1 : 0.5}
-        onPress={() => navigation.navigate(name, { screen: name })}
+        onPress={() =>
+          navigation.reset({
+            index: 0,
+            routes: [{ name }],
+          })
+        }
         onPressIn={() => setIsPressed(true)}
         onPressOut={() => setIsPressed(false)}
         flex={1}
