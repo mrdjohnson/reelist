@@ -1,26 +1,14 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import {
-  Button,
-  Input,
-  Pressable,
-  ScrollView,
-  SectionList,
-  Switch,
-  Text,
-  View,
-  Icon,
-} from 'native-base'
+import React, { useMemo, useState } from 'react'
+import { Pressable, SectionList, Text, View } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
 import VideoList from '~/models/VideoList'
-import { BackHandler, RefreshControl, SectionListData } from 'react-native'
+import { RefreshControl, SectionListData } from 'react-native'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import _ from 'lodash'
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import SearchBar from '~/shared/components/SearchBar'
 import { ReelistScreen } from '~/utils/navigation'
 import useRefresh from '~/hooks/useRefresh'
-import EditVideoListPage from './EditVideoListPage'
 import AppButton from '~/shared/components/AppButton'
 
 const VideoListListItem = observer(
@@ -45,16 +33,12 @@ const VideoListListItem = observer(
   },
 )
 
-const CAN_GO_BACK = false
-const CANNOT_GO_BACK = true
-
 const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
   const { videoListStore } = useStore()
   const publicVideoLists = videoListStore.publicVideoLists
   const adminVideoLists = videoListStore.adminVideoLists
   const followedVideoLists = videoListStore.followedVideoLists
 
-  const [nextVideoList, setNextVideoList] = useState<VideoList | null>(null)
   const [filterText, setfilterText] = useState('')
 
   const [filteredAdminLists, filteredPublicLists, filteredFollowedLists] = useMemo(() => {
@@ -78,22 +62,6 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
     await videoListStore.getfollowedVideoLists()
     await videoListStore.getPublicVideoLists()
   })
-
-  useEffect(() => {
-    const onBackButtonPressed = () => {
-      if (nextVideoList) {
-        setNextVideoList(null)
-
-        return CANNOT_GO_BACK
-      }
-
-      return CAN_GO_BACK
-    }
-
-    BackHandler.addEventListener('hardwareBackPress', onBackButtonPressed)
-
-    return () => BackHandler.removeEventListener('hardwareBackPress', onBackButtonPressed)
-  }, [nextVideoList])
 
   const isAdminVideoListsEmpty = _.isEmpty(filteredAdminLists)
   const isFollowedListsEmpty = _.isEmpty(filteredFollowedLists)
@@ -130,17 +98,15 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
     navigation.navigate('videoListScreen')
   }
 
-  const renderSectionHeader = ({ section: { title } }: SectionListData<VideoList>) => {
-    return <Text fontSize="lg">{title}</Text>
+  const openCreatePage = () => {
+    const nextVideoList = videoListStore.createBlankVideoList()
+    videoListStore.setCurrentVideoList(nextVideoList)
+
+    navigation.push('videoListScreenSettingsModal')
   }
 
-  if (nextVideoList) {
-    return (
-      <EditVideoListPage
-        currentVideoList={nextVideoList}
-        closeEditPage={() => setNextVideoList(null)}
-      />
-    )
+  const renderSectionHeader = ({ section: { title } }: SectionListData<VideoList>) => {
+    return <Text fontSize="lg">{title}</Text>
   }
 
   return (
@@ -178,10 +144,7 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
       />
 
-      <AppButton
-        onPress={() => setNextVideoList(videoListStore.createBlankVideoList())}
-        margin="10px"
-      >
+      <AppButton onPress={openCreatePage} margin="10px">
         Create List
       </AppButton>
     </View>

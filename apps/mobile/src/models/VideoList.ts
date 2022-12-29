@@ -74,6 +74,8 @@ class VideoList implements VideoListType {
       this.videoIds = []
       this.isPublic = true
       this.uniqueId = ''
+      this.autoSortType = AutoSortType.NONE
+      this.autoSortIsAscending = true
     }
 
     this.storeAuth = auth
