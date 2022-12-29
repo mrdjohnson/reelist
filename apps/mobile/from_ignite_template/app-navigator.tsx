@@ -25,6 +25,7 @@ import SplashScreen from '~/features/splash/SplashScreen'
 import HomeScreen from '~/features/videoLists/HomeScreen'
 import EditVideoListPage from '~/features/videoLists/EditVideoListPage'
 import VideoListManagementModal from '~/features/video/VideoListManagementModal'
+import AppActionSheets from '~/shared/components/AppActionSheets'
 
 const Stack = createNativeStackNavigator<NavigatorParamList>()
 const Tab = createBottomTabNavigator<NavigatorParamList>()
@@ -34,33 +35,37 @@ const createSubStack = (name: string, component: React.ComponentType<any>) => {
   const Stack = createNativeStackNavigator()
 
   return (
-    <Stack.Navigator
-      initialRouteName={name}
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      <Stack.Screen name={name} component={component} />
+    <>
+      <Stack.Navigator
+        initialRouteName={name}
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen name={name} component={component} />
 
-      <Stack.Group screenOptions={{ animation: 'slide_from_right' }}>
-        <Stack.Screen name="videoListsHome" component={VideoListsHomeScreen} />
+        <Stack.Group screenOptions={{ animation: 'slide_from_right' }}>
+          <Stack.Screen name="videoListsHome" component={VideoListsHomeScreen} />
 
-        <Stack.Screen name="videoListScreen" component={VideoListScreen} />
+          <Stack.Screen name="videoListScreen" component={VideoListScreen} />
 
-        <Stack.Screen name="videoScreen" component={VideoScreen} />
+          <Stack.Screen name="videoScreen" component={VideoScreen} />
 
-        <Stack.Screen name="profile" component={ProfileScreen} />
+          <Stack.Screen name="profile" component={ProfileScreen} />
 
-        <Stack.Screen name="settings" component={SettingsScreen} />
-      </Stack.Group>
+          <Stack.Screen name="settings" component={SettingsScreen} />
+        </Stack.Group>
 
-      {/* modals here */}
-      <Stack.Group screenOptions={{ animation: 'slide_from_bottom' }}>
-        <Stack.Screen name="videoListScreenSettingsModal" component={EditVideoListPage} />
+        {/* modals here */}
+        <Stack.Group screenOptions={{ animation: 'slide_from_bottom' }}>
+          <Stack.Screen name="videoListScreenSettingsModal" component={EditVideoListPage} />
 
-        <Stack.Screen name="videoListManagementModal" component={VideoListManagementModal} />
-      </Stack.Group>
-    </Stack.Navigator>
+          <Stack.Screen name="videoListManagementModal" component={VideoListManagementModal} />
+        </Stack.Group>
+      </Stack.Navigator>
+
+      <AppActionSheets />
+    </>
   )
 }
 

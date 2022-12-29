@@ -21,6 +21,11 @@ export default class AppState {
   videoListShareId: string | null = null
   profileScreen: ProfileScreenType = { user: null, editing: false }
   currentVideo?: Video
+  actionSheets: {
+    video: { isOpen: boolean; video?: Video }
+  } = {
+    video: { isOpen: false },
+  }
 
   constructor() {
     makeAutoObservable(this)
@@ -72,11 +77,19 @@ export default class AppState {
     this.profileScreen.editing = editing
   }
 
-  setCurrentVideo = (video: Video) => {
+  setCurrentVideo = (video?: Video) => {
     this.currentVideo = video
   }
 
   clearCurrentVideo = () => {
     this.currentVideo = undefined
+  }
+
+  setActionSheetVideo = (video: Video) => {
+    this.actionSheets.video = { video, isOpen: true }
+  }
+
+  clearActionSheetVideo = () => {
+    this.actionSheets.video = { ...this.actionSheets.video, isOpen: false }
   }
 }
