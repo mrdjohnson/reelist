@@ -135,7 +135,7 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
           <VideoListListItem videoList={videoList} onVideoListPress={handleVideoListPress} />
         )}
         renderSectionHeader={({ section: { title } }) => (
-          <View backgroundColor="light.300">
+          <View backgroundColor="light.300:alpha.70" rounded="sm">
             <Text fontSize="xl" marginLeft="10px">
               {title}
             </Text>
