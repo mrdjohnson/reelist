@@ -18,7 +18,7 @@ type VideoItemProps = {
 
 const TrackedVideoItem = observer(
   ({ video, isInteractable = true, isTile = false }: VideoItemProps) => {
-    const { videoStore } = useStore()
+    const { appState, videoStore } = useStore()
     const navigation = useReelistNavigation()
 
     if (!video) return null
@@ -123,6 +123,7 @@ const TrackedVideoItem = observer(
           padding="3px"
           backgroundColor={backgroundColor}
           rounded="lg"
+          onLongPress={() => appState.setActionSheetVideo(video)}
         >
           <Column>
             <VideoImage video={video} />
@@ -139,6 +140,7 @@ const TrackedVideoItem = observer(
         margin="10px"
         onPress={goToMediaPage}
         opacity={faded ? '50' : '100'}
+        onLongPress={() => appState.setActionSheetVideo(video)}
       >
         <View flexShrink={1}>
           <VideoImage

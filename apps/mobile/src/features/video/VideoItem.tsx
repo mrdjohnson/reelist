@@ -3,37 +3,50 @@ import { observer } from 'mobx-react-lite'
 import Video from '~/models/Video'
 import { useStore } from '~/hooks/useStore'
 import { useReelistNavigation } from '~/utils/navigation'
-import { Column, Pressable, Row, Skeleton, Text, View } from 'native-base'
+import { Column, IPressableProps, Pressable, Row, Skeleton, Text, View } from 'native-base'
 import VideoImage from './VideoImage'
+import { GestureResponderEvent } from 'react-native'
 
-type VideoItemProps = {
+type VideoItemProps = IPressableProps & {
   video: Video | null | undefined
   isTile?: boolean
 }
 
-const VideoItem = observer(({ video, isTile = false }: VideoItemProps) => {
-  const { videoStore } = useStore()
+const VideoItem = observer(({ video, isTile = false, onPress, ...props }: VideoItemProps) => {
+  const { appState, videoStore } = useStore()
   const navigation = useReelistNavigation()
 
   if (!video) return null
 
   const name = video.name || video.title
 
-  const goToMediaPage = () => {
+  const goToMediaPage = (event: GestureResponderEvent) => {
+    onPress && onPress(event)
+
     videoStore.setCurrentVideoId(video.videoId)
     navigation.navigate('videoScreen')
   }
 
   if (isTile) {
     return (
-      <Pressable onPress={goToMediaPage}>
+      <Pressable
+        onPress={goToMediaPage}
+        onLongPress={() => appState.setActionSheetVideo(video)}
+        {...props}
+      >
         <VideoImage video={video} />
       </Pressable>
     )
   }
 
   return (
-    <Pressable flexDirection="row" margin="10px" onPress={goToMediaPage}>
+    <Pressable
+      flexDirection="row"
+      margin="10px"
+      onPress={goToMediaPage}
+      onLongPress={() => appState.setActionSheetVideo(video)}
+      {...props}
+    >
       <View flexShrink={1}>
         <VideoImage
           video={video}

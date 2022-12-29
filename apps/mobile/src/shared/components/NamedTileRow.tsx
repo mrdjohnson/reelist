@@ -25,7 +25,7 @@ const NamedTileRow = ({
   onShowMore,
   ...props
 }: NamedTileRowProps) => {
-  const { videoStore } = useStore()
+  const { appState, videoStore } = useStore()
 
   const navigation = useReelistNavigation()
 
@@ -45,7 +45,11 @@ const NamedTileRow = ({
       <ScrollView horizontal>
         <Row space="8px" flex={1} paddingLeft="10px">
           {_.take(videos, size).map(video => (
-            <Pressable key={video.videoId} onPress={() => navigateToVideoScreen(video)}>
+            <Pressable
+              key={video.videoId}
+              onPress={() => navigateToVideoScreen(video)}
+              onLongPress={() => appState.setActionSheetVideo(video)}
+            >
               <VideoImage video={video} containerProps={{ height: '120px', width: 'auto' }} />
             </Pressable>
           ))}
