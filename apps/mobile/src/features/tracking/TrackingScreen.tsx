@@ -53,7 +53,6 @@ const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
           value={filterText}
           onChangeText={setfilterText}
           returnKeyType="search"
-          backgroundColor="white"
         />
 
         {sortedVideos.map(video => (

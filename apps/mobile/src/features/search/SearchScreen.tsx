@@ -41,7 +41,6 @@ const SearchScreen = observer(({ route, navigation }: ReelistScreenFrom<'search'
           onChangeText={setSearchText}
           onSubmitEditing={search}
           returnKeyType="search"
-          backgroundColor="white"
           autoFocus
         />
 
