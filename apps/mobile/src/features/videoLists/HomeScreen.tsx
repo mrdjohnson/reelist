@@ -1,10 +1,12 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Pressable, Text, View, Row, Box, IBoxProps, IPressableProps, useToast } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { ReelistScreen, useReelistNavigation } from '~/utils/navigation'
 import useIsPressed from '~/hooks/useIsPressed'
 import ProfileIcon from '~/shared/components/ProfileIcon'
 import { useStore } from '~/hooks/useStore'
+import NamedTileRow from '~/shared/components/NamedTileRow'
+import Video from '~/models/Video'
 
 type HomeScreenTileProps = IBoxProps & {
   start: number[]
@@ -63,6 +65,7 @@ const PressableProfileIcon = () => {
 
 const HomeScreen = observer(({ navigation }: ReelistScreen) => {
   const toast = useToast()
+  const { videoStore } = useStore()
 
   const alertMissingFavoritesScreen = () => {
     toast.show({
@@ -70,15 +73,21 @@ const HomeScreen = observer(({ navigation }: ReelistScreen) => {
     })
   }
 
+  const [bookmarks, setBookmarks] = useState<Video[]>([])
+
+  useEffect(() => {
+    videoStore.getTrackedVideos().then(setBookmarks)
+  }, [])
+
   return (
-    <View flex={1} paddingX="3">
-      <Row justifyContent="space-between" paddingTop="10px">
+    <View flex={1}>
+      <Row justifyContent="space-between" paddingTop="10px" paddingX="3">
         <View />
 
         <PressableProfileIcon />
       </Row>
 
-      <Row space={3} paddingTop="20px">
+      <Row space={3} paddingTop="20px" paddingX="3">
         <HomeScreenTile
           roundedRight="none"
           start={[1, 0]}
@@ -106,6 +115,14 @@ const HomeScreen = observer(({ navigation }: ReelistScreen) => {
           My Favorites
         </HomeScreenTile>
       </Row>
+
+      <NamedTileRow
+        label="Bookmarks"
+        videos={bookmarks}
+        showMoreText="All Bookmarks"
+        onShowMore={() => navigation.navigate('tracking', { screen: 'tracking' })}
+        marginTop="10px"
+      />
     </View>
   )
 })

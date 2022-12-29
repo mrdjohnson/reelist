@@ -7,8 +7,9 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { useReelistNavigation } from '~/utils/navigation'
 import { useStore } from '~/hooks/useStore'
 import LinkButton from '~/shared/components/LinkButton'
+import { IViewProps } from 'native-base/lib/typescript/components/basic/View/types'
 
-type NamedTileRowProps = {
+type NamedTileRowProps = IViewProps & {
   videos?: Video[]
   label: string
   size?: number
@@ -22,6 +23,7 @@ const NamedTileRow = ({
   size = 10,
   showMoreText,
   onShowMore,
+  ...props
 }: NamedTileRowProps) => {
   const { videoStore } = useStore()
 
@@ -35,7 +37,7 @@ const NamedTileRow = ({
   }
 
   return (
-    <Column marginX="10px" paddingBottom="10px">
+    <Column marginX="10px" paddingBottom="10px" {...props}>
       <Text paddingBottom="4px" fontSize="md">
         {label}
       </Text>
