@@ -1,5 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Center, Column, Divider, FlatList, Icon, Menu, Pressable, Row, Text } from 'native-base'
+import {
+  Center,
+  Column,
+  Divider,
+  FlatList,
+  Icon,
+  Menu,
+  Pressable,
+  Row,
+  Text,
+  View,
+} from 'native-base'
 import { useStore } from '~/hooks/useStore'
 import { ListRenderItem, RefreshControl } from 'react-native'
 import VideoItem, { videoItemSkeleton } from '~/features/video/VideoItem'
@@ -213,7 +224,9 @@ const VideoFlatList = observer(
           </Row>
 
           {activeUser && (
-            <TotalTimeDetailsPanel marginX="10px" user={activeUser} videos={trackedVideos} />
+            <View backgroundColor="light.100" paddingBottom="10px">
+              <TotalTimeDetailsPanel marginX="10px" user={activeUser} videos={trackedVideos} />
+            </View>
           )}
         </Column>
       )
