@@ -1,5 +1,6 @@
 import { RouteProp, useNavigation } from '@react-navigation/native'
 import { NativeStackScreenProps, NativeStackNavigationProp } from '@react-navigation/native-stack'
+import Video from '~/models/Video'
 
 export type ReelistTabParamList = {
   tracking: undefined
@@ -15,6 +16,11 @@ export type NavigatorParamList = {
   search?: { initialSearchValue?: string }
   videoScreen: undefined
   videoListManagementModal: undefined
+  videosModal: {
+    title: string
+    loadVideos: () => Promise<Video[]>
+    userId?: string
+  }
   tracking: undefined
   profile: undefined
   settings: undefined

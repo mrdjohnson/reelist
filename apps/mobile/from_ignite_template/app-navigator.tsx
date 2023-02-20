@@ -20,19 +20,20 @@ import TrackingScreen from '~/features/tracking/TrackingScreen'
 import { AppEventHandler } from '~/utils/AppEventHandler'
 import ProfileScreen from '~/features/profile/ProfileScreen'
 import SettingsScreen from '~/features/settings/SettingsScreen'
-import { NavigatorParamList } from '~/utils/navigation'
+import { NavigatorParamList, ReelistTabParamList } from '~/utils/navigation'
 import SplashScreen from '~/features/splash/SplashScreen'
 import HomeScreen from '~/features/videoLists/HomeScreen'
 import EditVideoListPage from '~/features/videoLists/EditVideoListPage'
 import VideoListManagementModal from '~/features/video/VideoListManagementModal'
 import AppActionSheets from '~/shared/components/AppActionSheets'
+import VideosModal from '~/features/videos/VideosModal'
 
 const Stack = createNativeStackNavigator<NavigatorParamList>()
 const Tab = createBottomTabNavigator<NavigatorParamList>()
 
 // this is one way to allow us to access common tabs from any screen
-const createSubStack = (name: string, component: React.ComponentType<any>) => {
-  const Stack = createNativeStackNavigator()
+const createSubStack = (name: keyof ReelistTabParamList, component: React.ComponentType<any>) => {
+  const Stack = createNativeStackNavigator<ReelistTabParamList & NavigatorParamList>()
 
   return (
     <>
@@ -61,6 +62,8 @@ const createSubStack = (name: string, component: React.ComponentType<any>) => {
           <Stack.Screen name="videoListScreenSettingsModal" component={EditVideoListPage} />
 
           <Stack.Screen name="videoListManagementModal" component={VideoListManagementModal} />
+          
+          <Stack.Screen name="videosModal" component={VideosModal} />
         </Stack.Group>
       </Stack.Navigator>
 
