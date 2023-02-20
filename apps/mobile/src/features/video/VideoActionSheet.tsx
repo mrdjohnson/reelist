@@ -7,6 +7,8 @@ import AppButton from '~/shared/components/AppButton'
 import VideoItem from './VideoItem'
 import ToggleButton from '~/shared/components/ToggleButton'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import SegmentButton from '~/shared/components/SegmentButton'
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 
 const VideoActionSheet = observer(() => {
   const { appState } = useStore()
@@ -37,6 +39,21 @@ const VideoActionSheet = observer(() => {
               activeContent="Added to Bookmarks"
               activeIcon={<MaterialCommunityIcons name="bookmark-check" />}
               onPress={() => video.toggleTracked()}
+            />
+
+            <SegmentButton
+              selectedSegmentIndex={video.allowInHistory ? 0 : 1}
+              onPress={() => video.toggleHistoryVisibility()}
+              segments={[
+                {
+                  icon: <MaterialIcons name="public" />,
+                  content: 'History visible to all',
+                },
+                {
+                  icon: <MaterialIcons name="public-off" />,
+                  content: 'History is private',
+                },
+              ]}
             />
 
             <AppButton onPress={openVideoListManagementModal}>Manage Lists</AppButton>

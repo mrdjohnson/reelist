@@ -54,6 +54,7 @@ export type VideoTableType = {
   last_watched_episode_number: number | null
   video_info: VideoInfoType
   user_id: string
+  allow_in_history: boolean
 }
 
 type VideoImageType = {
@@ -106,6 +107,7 @@ class Video {
   videoInfo: VideoInfoType = {}
   serverId: string | undefined
   unWatchableEpisodeCount = 0
+  allowInHistory = true
 
   storeAuth: Auth
   videoStore: VideoStore
@@ -179,6 +181,7 @@ class Video {
     this.serverId = videoTable.id
     this.videoInfo = videoTable.video_info || {}
     this.tracked = videoTable.tracked
+    this.allowInHistory = videoTable.allow_in_history
   }
 
   _lazyLoadVideoFromVideoTable = async () => {
@@ -256,6 +259,14 @@ class Video {
 
     await this.updateWatched('toggle tracked', {
       tracked: nextTracked,
+    })
+  }
+
+  toggleHistoryVisibility = async () => {
+    const nextAllowInHistory = !this.allowInHistory
+
+    await this.updateWatched('toggle history visibility', {
+      allow_in_history: nextAllowInHistory,
     })
   }
 
