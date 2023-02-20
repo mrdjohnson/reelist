@@ -40,7 +40,7 @@ const ProfileScreen = observer(({ navigation }: ReelistScreen) => {
       flex={1}
       refreshControl={<RefreshControl refreshing={loadingTrackedVideos} onRefresh={refresh} />}
     >
-      <Text>Tracked Videos:</Text>
+      <Text>Bookmarked Videos:</Text>
 
       {trackedVideos.map(video => (
         <TrackedVideoItem video={video} key={video.id} isInteractable={isCurrentUser} />
