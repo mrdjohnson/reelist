@@ -1,5 +1,5 @@
 import { AspectRatio, Row, View, Text, Column, ScrollView, Pressable } from 'native-base'
-import React from 'react'
+import React, { useMemo, useState } from 'react'
 import Video from '~/models/Video'
 import _ from 'lodash'
 import VideoImage from '~/features/video/VideoImage'
@@ -8,13 +8,16 @@ import { useReelistNavigation } from '~/utils/navigation'
 import { useStore } from '~/hooks/useStore'
 import LinkButton from '~/shared/components/LinkButton'
 import { IViewProps } from 'native-base/lib/typescript/components/basic/View/types'
+import useAsyncState from '~/hooks/useAsyncState'
 
 type NamedTileRowProps = IViewProps & {
   videos?: Video[]
   label: string
   size?: number
-  showMoreText: string
-  onShowMore: () => void
+  showMoreText?: string
+  onShowMore?: () => void
+  loadVideos?: () => Promise<Video[]>
+  userId?: string
 }
 
 const NamedTileRow = ({
@@ -23,17 +26,36 @@ const NamedTileRow = ({
   size = 10,
   showMoreText,
   onShowMore,
+  loadVideos,
+  userId,
   ...props
 }: NamedTileRowProps) => {
   const { appState, videoStore } = useStore()
 
   const navigation = useReelistNavigation()
+  const [localVideos] = useAsyncState([], loadVideos)
 
-  if (_.isEmpty(videos)) return null
+  const displayVideos = useMemo(() => {
+    return localVideos || videos
+  }, [localVideos, videos])
+
+  if (_.isEmpty(displayVideos)) return null
 
   const navigateToVideoScreen = (video: Video) => {
     videoStore.setCurrentVideoId(video.videoId)
     navigation.navigate('videoScreen')
+  }
+
+  const handleShowMore = () => {
+    if (onShowMore) {
+      onShowMore()
+    } else if (loadVideos) {
+      navigation.navigate('videosModal', {
+        title: label,
+        loadVideos,
+        userId,
+      })
+    }
   }
 
   return (
@@ -44,7 +66,7 @@ const NamedTileRow = ({
 
       <ScrollView horizontal>
         <Row space="8px" flex={1} paddingLeft="10px">
-          {_.take(videos, size).map(video => (
+          {_.take(displayVideos, size).map(video => (
             <Pressable
               key={video.videoId}
               onPress={() => navigateToVideoScreen(video)}
@@ -54,7 +76,7 @@ const NamedTileRow = ({
             </Pressable>
           ))}
 
-          <Pressable backgroundColor="blue.300:alpha.20" rounded="sm" onPress={onShowMore}>
+          <Pressable backgroundColor="blue.300:alpha.20" rounded="sm" onPress={handleShowMore}>
             <AspectRatio ratio={{ base: 2 / 3 }} width="100%" height="120px">
               <View textAlign="center" alignItems="center" justifyContent="center">
                 <MaterialCommunityIcons
@@ -68,9 +90,11 @@ const NamedTileRow = ({
         </Row>
       </ScrollView>
 
-      <LinkButton alignSelf="flex-end" onPress={onShowMore}>
-        {showMoreText}
-      </LinkButton>
+      {showMoreText && (
+        <LinkButton alignSelf="flex-end" onPress={handleShowMore}>
+          {showMoreText}
+        </LinkButton>
+      )}
     </Column>
   )
 }

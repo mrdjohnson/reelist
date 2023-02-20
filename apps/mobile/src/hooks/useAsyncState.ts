@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
  */
 const useAsyncState = <T>(
   defaultValue: T,
-  callback: () => Promise<T>,
+  callback?: () => Promise<T>,
 ): [T, () => void, boolean] => {
   const [isRefreshing, setIsRefreshing] = useState(true)
   const [value, setValue] = useState(defaultValue)
@@ -19,7 +19,7 @@ const useAsyncState = <T>(
 
   useEffect(() => {
     if (isRefreshing) {
-      callback()
+      callback?.()
         .then(setValue)
         .then(() => setIsRefreshing(false))
     }
