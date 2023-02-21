@@ -55,6 +55,7 @@ export type VideoTableType = {
   video_info: VideoInfoType
   user_id: string
   allow_in_history: boolean
+  updated_at: Date
 }
 
 type VideoImageType = {

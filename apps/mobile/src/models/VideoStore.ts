@@ -111,6 +111,43 @@ class VideoStore {
     return videos
   }
 
+  getHistoricVideos = async (userId: string | null = null): Promise<Video[]> => {
+    console.log('getHistoricVideos for user: ', this.storeAuth.user.id)
+
+    const serverUserId = userId || this.storeAuth.user.id
+
+    const match: Partial<VideoTableType> = {
+      user_id: serverUserId
+    }
+
+    // only show history items that the user allows to be seen by others
+    // for "self" show all history items
+    if(userId !== this.storeAuth.user.id) {
+      match.allow_in_history = true
+    }
+
+    let videos: Video[] = []
+    const { data: videoJsons, error } = await supabase
+      .from<VideoTableType>('videos')
+      .select('*')
+      .match(match)
+      .order('updated_at', { ascending: false })
+      .limit(25)
+
+    if (error) {
+      console.error('failed to lazy load history videos', error.message)
+      throw new Error('failed to lazy load history videos: ' + error.message)
+    } else if (videoJsons) {
+      const videoPromises = await Promise.allSettled(videoJsons.map(this._getTrackedVideo))
+
+      videos = _.chain(videoPromises).map('value').compact().value()
+
+      await Promise.allSettled(videos.map(video => video.fetchSeasons()))
+    }
+
+    return videos
+  }
+
   getVideoProgressesForUser = async (user: User | null, videoIds: string[] | undefined) => {
     if (!videoIds || _.isEmpty(videoIds) || !user) return []
 

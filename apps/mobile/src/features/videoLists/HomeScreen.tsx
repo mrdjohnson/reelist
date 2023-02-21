@@ -117,6 +117,13 @@ const HomeScreen = observer(({ navigation }: ReelistScreen) => {
         onShowMore={() => navigation.navigate('tracking', { screen: 'tracking' })}
         marginTop="10px"
       />
+
+      <NamedTileRow
+        label="History"
+        marginTop="10px"
+        loadVideos={videoStore.getHistoricVideos}
+        showMoreText='See History Page'
+      />
     </View>
   )
 })
