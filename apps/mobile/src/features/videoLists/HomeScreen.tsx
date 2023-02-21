@@ -73,12 +73,6 @@ const HomeScreen = observer(({ navigation }: ReelistScreen) => {
     })
   }
 
-  const [bookmarks, setBookmarks] = useState<Video[]>([])
-
-  useEffect(() => {
-    videoStore.getTrackedVideos().then(setBookmarks)
-  }, [])
-
   return (
     <View flex={1}>
       <Row justifyContent="space-between" paddingTop="10px" paddingX="3">
@@ -118,7 +112,7 @@ const HomeScreen = observer(({ navigation }: ReelistScreen) => {
 
       <NamedTileRow
         label="Bookmarks"
-        videos={bookmarks}
+        loadVideos={videoStore.getTrackedVideos}
         showMoreText="All Bookmarks"
         onShowMore={() => navigation.navigate('tracking', { screen: 'tracking' })}
         marginTop="10px"
