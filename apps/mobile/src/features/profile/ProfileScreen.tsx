@@ -10,6 +10,8 @@ import { Pressable, RefreshControl } from 'react-native'
 import ProfileIcon from '~/shared/components/ProfileIcon'
 import useAsyncState from '~/hooks/useAsyncState'
 import NamedTileRow from '~/shared/components/NamedTileRow'
+import ToggleButton from '~/shared/components/ToggleButton'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 
 const ProfileScreen = observer(({ navigation }: ReelistScreen) => {
   const { auth, appState, videoStore } = useStore()
@@ -41,6 +43,17 @@ const ProfileScreen = observer(({ navigation }: ReelistScreen) => {
       flex={1}
       refreshControl={<RefreshControl refreshing={loadingTrackedVideos} onRefresh={refresh} />}
     >
+      {!isCurrentUser && (
+        <ToggleButton
+          active={auth.user.isFollowingUser(user)}
+          content="Follow user?"
+          activeContent="Following User"
+          icon={<MaterialCommunityIcons name="star-outline" />}
+          activeIcon={<MaterialCommunityIcons name="star-check" />}
+          onPress={() => auth.user.toggleFollowingUser(user)}
+        />
+      )}
+
       <NamedTileRow
         label="History"
         loadVideos={() => videoStore.getHistoricVideos(user.id)}

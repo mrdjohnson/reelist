@@ -65,6 +65,16 @@ class User implements UserType {
     User.save(this.viewModel)
   }
 
+  toggleFollowingUser = (user: User) => {
+    if (this.isFollowingUser(user)) {
+      this.viewModel.followedUserIds = _.without(this.followedUserIds, user.id)
+    } else {
+      this.viewModel.followedUserIds = [...this.followedUserIds, user.id]
+    }
+
+    User.save(this.viewModel)
+  }
+
   unFollowVideoList = (videoList: VideoList) => {
     this.viewModel.followedListIds = _.without(this.viewModel.followedListIds, videoList.id)
 
@@ -73,6 +83,10 @@ class User implements UserType {
 
   isFollowingVideoList = (videoList: VideoList) => {
     return this.followedListIds.includes(videoList.id)
+  }
+
+  isFollowingUser = (user: User) => {
+    return this.followedUserIds.includes(user.id)
   }
 
   get viewModel() {
