@@ -88,7 +88,7 @@ const HomeScreen = observer(({ navigation }: ReelistScreen) => {
           end={[0.5, 0.5]}
           onPress={() => navigation.navigate('tracking', { screen: 'tracking' })}
         >
-          My Bookmarks
+          Bookmarks
         </HomeScreenTile>
 
         <HomeScreenTile
@@ -97,7 +97,7 @@ const HomeScreen = observer(({ navigation }: ReelistScreen) => {
           end={[0, 1]}
           onPress={() => navigation.push('videoListsHome')}
         >
-          My Lists
+          Watchlists
         </HomeScreenTile>
 
         <HomeScreenTile
@@ -106,7 +106,7 @@ const HomeScreen = observer(({ navigation }: ReelistScreen) => {
           end={[0.5, 0.5]}
           onPress={alertMissingFavoritesScreen}
         >
-          My Favorites
+          Following
         </HomeScreenTile>
       </Row>
 
