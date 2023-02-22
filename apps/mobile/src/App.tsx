@@ -82,7 +82,7 @@ const config = {
 }
 
 const App = observer(() => {
-  const { auth, videoListStore, appState } = useStore()
+  const { auth, userStore } = useStore()
   const offset = useRef(new Animated.Value(0)).current
   const isDarkMode = useColorScheme() === 'dark'
   const {
@@ -97,7 +97,7 @@ const App = observer(() => {
 
   useEffect(() => {
     const logInUser = async (authId: string) => {
-      const user = await User.fromAuthIdOrCreate(authId)
+      const user = await userStore.getOrCreateUser(authId)
 
       auth.setUser(user)
     }

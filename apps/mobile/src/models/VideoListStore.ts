@@ -7,6 +7,7 @@ import Auth from './Auth'
 import VideoList, { VideoListTableType } from './VideoList'
 import { IViewModel } from 'mobx-utils'
 import VideoStore from './VideoStore'
+import UserStore from './UserStore'
 
 class VideoListStore {
   adminVideoLists: VideoList[] = []
@@ -17,8 +18,9 @@ class VideoListStore {
 
   storeAuth: Auth
   videoStore: VideoStore
+  userStore: UserStore
 
-  constructor(auth: Auth, videoStore: VideoStore) {
+  constructor(auth: Auth, videoStore: VideoStore, userStore: UserStore) {
     makeAutoObservable(this, {
       getPublicVideoLists: flow,
       setCurrentVideoListFromShareId: flow,
@@ -26,10 +28,11 @@ class VideoListStore {
 
     this.storeAuth = auth
     this.videoStore = videoStore
+    this.userStore = userStore
   }
 
   makeUiVideoList = (videoList: VideoListTableType) => {
-    return new VideoList(videoList, this.storeAuth, this, this.videoStore)
+    return new VideoList(videoList, this.storeAuth, this, this.videoStore, this.userStore)
   }
 
   addToAdminVideoList = (videoList: VideoList) => {
@@ -182,7 +185,7 @@ class VideoListStore {
   })
 
   createBlankVideoList = () => {
-    const videoList = new VideoList(null, this.storeAuth, this, this.videoStore)
+    const videoList = new VideoList(null, this.storeAuth, this, this.videoStore, this.userStore)
 
     return videoList
   }

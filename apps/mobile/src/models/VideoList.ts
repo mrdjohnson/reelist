@@ -17,6 +17,7 @@ import User from '~/models/User'
 import { createViewModel, IViewModel } from 'mobx-utils'
 import { humanizedDuration } from '~/utils'
 import VideoStore from './VideoStore'
+import UserStore from './UserStore'
 
 export enum AutoSortType {
   NONE,
@@ -57,6 +58,7 @@ class VideoList implements VideoListType {
   videoListStore: VideoListStore
   storeAuth: Auth
   videoStore: VideoStore
+  userStore: UserStore
   _viewModel?: VideoList & IViewModel<VideoList> = undefined
 
   constructor(
@@ -64,6 +66,7 @@ class VideoList implements VideoListType {
     auth: Auth,
     videoListStore: VideoListStore,
     videoStore: VideoStore,
+    userStore: UserStore
   ) {
     if (json) {
       this._assignValuesFromJson(json)
@@ -81,6 +84,7 @@ class VideoList implements VideoListType {
     this.storeAuth = auth
     this.videoListStore = videoListStore
     this.videoStore = videoStore
+    this.userStore = userStore
 
     makeAutoObservable(this, {
       id: false,
@@ -197,20 +201,6 @@ class VideoList implements VideoListType {
     return VideoList.save(this.viewModel)
   }
 
-  getByUniqueId = async (uniqueId: string) => {
-    const { data: videoListResponse, error } = await supabase
-      .from('videoLists')
-      .select('*')
-      .match({ unique_id: uniqueId })
-      .single()
-
-    if (error) {
-      throw error.message
-    }
-
-    return new VideoList(videoListResponse, this.storeAuth, this.videoListStore, this.videoStore)
-  }
-
   static createUniqueShareId = () => {
     const generateUniqueId = new ShortUniqueId({ length: 10 })
     const uniqueId = generateUniqueId()
@@ -221,15 +211,7 @@ class VideoList implements VideoListType {
   fetchAdmins = async () => {
     if (!this.adminIds) return
 
-    const adminPromises = this.adminIds?.map(adminId =>
-      User.fromAuthId(adminId, { loggedIn: false }),
-    )
-
-    const admins: (User | undefined)[] = await Promise.allSettled(adminPromises).then(values =>
-      _.map(values, 'value'),
-    )
-
-    this.admins = _.compact(admins)
+    this.admins = await this.userStore.getUsers(this.adminIds)
   }
 
   clearVideos = () => {

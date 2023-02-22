@@ -97,38 +97,6 @@ class User implements UserType {
     return this._viewModel
   }
 
-  static fromAuthId = async (
-    profileId: string,
-    { loggedIn = true }: { loggedIn?: boolean } = {},
-  ) => {
-    const { data: userProfile, error: findProfileError } = await supabase
-      .from<ProfileTableType>('profiles')
-      .select('*')
-      .match({ id: profileId })
-      .maybeSingle()
-
-    const profile = humps.camelizeKeys<ProfileTableType | null>(userProfile)
-
-    if (maybePrintError(findProfileError) || !profile) {
-      return null
-    }
-
-    return new User({ profile, loggedIn })
-  }
-
-  static fromAuthIdOrCreate = async (authId: string) => {
-    const { data: profile, error: createProfileError } = await supabase
-      .from<ProfileTableType>('profiles')
-      .upsert({ id: authId })
-      .single()
-
-    if (maybePrintError(createProfileError)) {
-      return null
-    }
-
-    return new User({ profile: humps.camelizeKeys(profile), loggedIn: true })
-  }
-
   static save = async (userViewModel: User & IViewModel<User>) => {
     // Map{'exampleField' -> 'exampleValue'} -> {example_field: 'exampleValue'}
     const changedFields = humps.decamelizeKeys(Object.fromEntries(userViewModel.changedValues))
