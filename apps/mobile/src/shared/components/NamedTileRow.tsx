@@ -79,7 +79,7 @@ const NamedTileRow = ({
   }
 
   return (
-    <Column marginX="10px" paddingBottom="10px" {...props}>
+    <Column marginX="10px" paddingBottom="5px" {...props}>
       <Text paddingBottom="4px" fontSize="md">
         {label}
       </Text>

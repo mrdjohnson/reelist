@@ -1,5 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Pressable, Text, View, Row, Box, IBoxProps, IPressableProps, useToast } from 'native-base'
+import {
+  Pressable,
+  Text,
+  View,
+  Row,
+  Box,
+  IBoxProps,
+  IPressableProps,
+  useToast,
+  ScrollView,
+} from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { ReelistScreen, useReelistNavigation } from '~/utils/navigation'
 import useIsPressed from '~/hooks/useIsPressed'
@@ -110,27 +120,26 @@ const HomeScreen = observer(({ navigation }: ReelistScreen) => {
         </HomeScreenTile>
       </Row>
 
-      <NamedTileRow
-        label="Bookmarks"
-        loadVideos={videoStore.getTrackedVideos}
-        showMoreText="All Bookmarks"
-        onShowMore={() => navigation.navigate('tracking', { screen: 'tracking' })}
-        marginTop="10px"
-      />
+      <ScrollView marginTop="10px">
+        <NamedTileRow
+          label="Bookmarks"
+          loadVideos={videoStore.getTrackedVideos}
+          showMoreText="All Bookmarks"
+          onShowMore={() => navigation.navigate('tracking', { screen: 'tracking' })}
+        />
 
-      <NamedTileRow
-        label="History"
-        marginTop="10px"
-        loadVideos={videoStore.getHistoricVideos}
-        showMoreText='See History Page'
-      />
+        <NamedTileRow
+          label="History"
+          loadVideos={videoStore.getHistoricVideos}
+          showMoreText="See History Page"
+        />
 
-      <NamedTileRow
-        label="Followed Users"
-        marginTop="10px"
-        loadUsers={userStore.getFollowedUsers}
-        showMoreText='See Followed Users'
-      />
+        <NamedTileRow
+          label="Followed Users"
+          loadUsers={userStore.getFollowedUsers}
+          showMoreText="See Followed Users"
+        />
+      </ScrollView>
     </View>
   )
 })
