@@ -65,7 +65,7 @@ const PressableProfileIcon = () => {
 
 const HomeScreen = observer(({ navigation }: ReelistScreen) => {
   const toast = useToast()
-  const { videoStore } = useStore()
+  const { videoStore, userStore } = useStore()
 
   const alertMissingFavoritesScreen = () => {
     toast.show({
@@ -123,6 +123,13 @@ const HomeScreen = observer(({ navigation }: ReelistScreen) => {
         marginTop="10px"
         loadVideos={videoStore.getHistoricVideos}
         showMoreText='See History Page'
+      />
+
+      <NamedTileRow
+        label="Followed Users"
+        marginTop="10px"
+        loadUsers={userStore.getFollowedUsers}
+        showMoreText='See Followed Users'
       />
     </View>
   )

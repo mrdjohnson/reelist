@@ -1,4 +1,14 @@
-import { AspectRatio, Row, View, Text, Column, ScrollView, Pressable } from 'native-base'
+import {
+  AspectRatio,
+  Row,
+  View,
+  Text,
+  Column,
+  ScrollView,
+  Pressable,
+  Center,
+  Spacer,
+} from 'native-base'
 import React, { useMemo, useState } from 'react'
 import Video from '~/models/Video'
 import _ from 'lodash'
@@ -9,6 +19,8 @@ import { useStore } from '~/hooks/useStore'
 import LinkButton from '~/shared/components/LinkButton'
 import { IViewProps } from 'native-base/lib/typescript/components/basic/View/types'
 import useAsyncState from '~/hooks/useAsyncState'
+import User from '~/models/User'
+import ProfileIcon from './ProfileIcon'
 
 type NamedTileRowProps = IViewProps & {
   videos?: Video[]
@@ -17,6 +29,7 @@ type NamedTileRowProps = IViewProps & {
   showMoreText?: string
   onShowMore?: () => void
   loadVideos?: () => Promise<Video[]>
+  loadUsers?: () => Promise<User[]>
   userId?: string
 }
 
@@ -27,6 +40,7 @@ const NamedTileRow = ({
   showMoreText,
   onShowMore,
   loadVideos,
+  loadUsers,
   userId,
   ...props
 }: NamedTileRowProps) => {
@@ -34,16 +48,22 @@ const NamedTileRow = ({
 
   const navigation = useReelistNavigation()
   const [localVideos] = useAsyncState([], loadVideos)
+  const [localUsers] = useAsyncState([], loadUsers)
 
   const displayVideos = useMemo(() => {
     return localVideos || videos
   }, [localVideos, videos])
 
-  if (_.isEmpty(displayVideos)) return null
+  if (_.isEmpty(displayVideos) && _.isEmpty(localUsers)) return null
 
   const navigateToVideoScreen = (video: Video) => {
     videoStore.setCurrentVideoId(video.videoId)
     navigation.navigate('videoScreen')
+  }
+
+  const navigateToProfileScreen = (user: User) => {
+    appState.setProfileScreenUser(user)
+    navigation.navigate('profile')
   }
 
   const handleShowMore = () => {
@@ -73,6 +93,19 @@ const NamedTileRow = ({
               onLongPress={() => appState.setActionSheetVideo(video)}
             >
               <VideoImage video={video} containerProps={{ height: '120px', width: 'auto' }} />
+            </Pressable>
+          ))}
+
+          {_.take(localUsers, size).map(user => (
+            <Pressable key={user.id} onPress={() => navigateToProfileScreen(user)}>
+              <AspectRatio ratio={{ base: 2 / 3 }} height="120px" width="auto">
+                <Center>
+                  <ProfileIcon user={user} marginBottom="10px" />
+                  <Text numberOfLines={1} adjustsFontSizeToFit>
+                    {user.name}
+                  </Text>
+                </Center>
+              </AspectRatio>
             </Pressable>
           ))}
 
