@@ -41,6 +41,8 @@
     "moment": "*",
     "react-native-linear-gradient": "*",
     "@react-navigation/bottom-tabs": "*",
-    "@faker-js/faker": "*"
+    "@faker-js/faker": "*",
+    "@jest/globals": "*",
+    "lodash": "*"
   }
 }
