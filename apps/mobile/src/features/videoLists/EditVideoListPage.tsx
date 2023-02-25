@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import { Button, FormControl, Input, View, AlertDialog } from 'native-base'
 import { observer } from 'mobx-react-lite'
-import VideoList, { AutoSortType } from '~/models/VideoList'
+import VideoList, { AutoSortType } from '@reelist/models/VideoList'
 import { ReelistScreen } from '~/utils/navigation'
 import { createViewModel } from 'mobx-utils'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'

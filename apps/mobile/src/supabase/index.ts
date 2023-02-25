@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createClient } from '@supabase/supabase-js'
-import secrets from '~/secrets/secrets-index'
+import secrets from '@reelist/apis/secrets/secrets-index'
 
 const supabase = createClient(secrets.SUPABASE_URL, secrets.SUPABASE_KEY, {
   localStorage: AsyncStorage,

@@ -4,7 +4,7 @@ import { Avatar, Icon, IAvatarProps } from 'native-base'
 import _ from 'lodash'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 
-import User from '~/models/User'
+import User from '@reelist/models/User'
 
 const missingIconOptions = [
   'user-astronaut',

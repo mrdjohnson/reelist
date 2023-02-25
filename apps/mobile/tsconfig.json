@@ -7,10 +7,7 @@
     "moduleResolution": "node",
     "noEmit": true,
     "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "paths": {
-      "~/*": ["apps/mobile/src/*"]
-    },
+    "resolveJsonModule": true
   },
   "files": ["../../node_modules/@nrwl/react-native/typings/svg.d.ts"],
   "include": [],

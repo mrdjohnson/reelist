@@ -2,7 +2,7 @@ import { Row, View } from 'native-base'
 import React from 'react'
 import TrackedVideoItem from '~/features/video/TrackedVideoItem'
 import VideoItem from '~/features/video/VideoItem'
-import Video from '~/models/Video'
+import Video from '@reelist/models/Video'
 
 export type VideoChunk = [Video, Video?, Video?]
 

@@ -1,6 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-export const loadString = async (key: string) => {
+import IStorage, { StorageInversionKey } from '@reelist/utils/storage/storage.interface'
+import { injectable } from 'inversify'
+
+const loadString = async (key: string) => {
   try {
     return await AsyncStorage.getItem(key)
   } catch {
@@ -14,7 +17,7 @@ export const loadString = async (key: string) => {
  * @param key The key to fetch.
  * @param value The value to store.
  */
-export const saveString = async (key: string, value: string) => {
+const saveString = async (key: string, value: string) => {
   try {
     await AsyncStorage.setItem(key, value)
     return true
@@ -23,49 +26,48 @@ export const saveString = async (key: string, value: string) => {
   }
 }
 
-/**
- * Loads something from storage and runs it thru JSON.parse.
- *
- * @param key The key to fetch.
- */
-export const load = async <T = unknown>(key: string) => {
-  try {
-    const almostThere = await AsyncStorage.getItem(key)
+@injectable()
+class Storage implements IStorage {
+  save = (key: string, value: unknown) => {
+    return saveString(key, JSON.stringify(value))
+  }
 
-    if (!almostThere) return null
+  load = async <T = unknown>(key: string) => {
+    try {
+      const almostThere = await AsyncStorage.getItem(key)
 
-    return JSON.parse(almostThere) as T
-  } catch {
-    return null
+      if (!almostThere) return null
+
+      return JSON.parse(almostThere) as T
+    } catch {
+      return null
+    }
+  }
+
+  remove = async (key: string) => {
+    try {
+      await AsyncStorage.removeItem(key)
+
+      return true
+    } catch {
+      console.error('unable to remove item from cache')
+      return false
+    }
+  }
+
+  clear = async () => {
+    try {
+      await AsyncStorage.clear()
+
+      return true
+    } catch {
+      console.error('unable to clear cache')
+
+      return false
+    }
   }
 }
 
-export const save = (key: string, value: unknown) => {
-  return saveString(key, JSON.stringify(value))
-}
+export { IStorage, StorageInversionKey }
 
-export const remove = async (key: string) => {
-  try {
-    await AsyncStorage.removeItem(key)
-
-    return true
-  } catch {
-    console.error('unable to remove item from cache')
-    return false
-  }
-}
-
-/**
- * Burn it all to the ground.
- */
-export const clear = async () => {
-  try {
-    await AsyncStorage.clear()
-
-    return true
-  } catch {
-    console.error('unable to clear cache')
-
-    return false
-  }
-}
+export default Storage

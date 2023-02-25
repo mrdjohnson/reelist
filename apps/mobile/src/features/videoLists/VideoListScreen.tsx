@@ -3,7 +3,7 @@ import { Actionsheet, Center, Pressable, Row, Text, useDisclose, useToast, View 
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
 import Clipboard from '@react-native-clipboard/clipboard'
-import User from '~/models/User'
+import User from '@reelist/models/User'
 import { ReelistScreen } from '~/utils/navigation'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import VideoListDetailsSection from './VideoListDetailsSection'

@@ -12,10 +12,15 @@
     "module": "esnext",
     "lib": ["es2017", "dom"],
     "skipLibCheck": true,
+    "esModuleInterop": true,
     "skipDefaultLibCheck": true,
     "types": ["reflect-metadata"],
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@reelist/apis/*": ["libs/apis/src/lib/*"],
+      "@reelist/utils/*": ["libs/utils/src/lib/*"],
+      "@reelist/models/*": ["libs/models/src/lib/*"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

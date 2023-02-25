@@ -3,10 +3,9 @@ import { Center, Spinner, View } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
 import { NavigatorParamList, ReelistScreen as ReelistScreenProps } from '~/utils/navigation'
-import { load } from '~/utils/storage'
 
 const SplashScreen = observer(({ navigation }: ReelistScreenProps) => {
-  const { auth, supabase } = useStore()
+  const { auth, supabase, storage} = useStore()
   const { loggedIn } = auth.user
 
   const resetNavigationTo = (name: keyof NavigatorParamList) => {
@@ -39,7 +38,7 @@ const SplashScreen = observer(({ navigation }: ReelistScreenProps) => {
 
   // if the user has not been signed in before, nav to welcome screen
   useEffect(() => {
-    load<boolean>('has_signed_in').then(value => {
+    storage.load<boolean>('has_signed_in').then(value => {
       if (!value) {
         resetNavigationTo('welcome')
       }

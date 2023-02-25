@@ -7,6 +7,7 @@
     "paths": {
       "~/*": ["./src/*"]
     },
+    "composite": true
   },
   "include": [
     "jest.config.ts",

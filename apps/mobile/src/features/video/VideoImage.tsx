@@ -1,6 +1,6 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
-import Video from '~/models/Video'
+import Video from '@reelist/models/Video'
 import { AspectRatio, IAspectRatioProps, IImageProps, Image, View } from 'native-base'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'

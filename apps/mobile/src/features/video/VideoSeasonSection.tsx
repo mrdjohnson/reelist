@@ -14,7 +14,7 @@ import {
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import Video, { TvEpisode, TvSeason } from '~/models/Video'
+import Video, { TvEpisode, TvSeason } from '@reelist/models/Video'
 import _ from 'lodash'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import moment from 'moment'

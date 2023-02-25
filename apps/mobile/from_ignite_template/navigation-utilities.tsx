@@ -6,6 +6,7 @@ import {
   NavigationAction,
   createNavigationContainerRef,
 } from '@react-navigation/native'
+import { IStorage } from '~/utils/storage'
 
 /* eslint-disable */
 export const RootNavigation = {
@@ -82,7 +83,7 @@ export function useBackButtonHandler(canExit: (routeName: string) => boolean) {
 /**
  * Custom hook for persisting navigation state.
  */
-export function useNavigationPersistence(storage: any, persistenceKey: string) {
+export function useNavigationPersistence(storage: IStorage, persistenceKey: string) {
   const [initialNavigationState, setInitialNavigationState] = useState()
 
   // This feature is particularly useful in development mode.

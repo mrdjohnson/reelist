@@ -10,7 +10,7 @@ import { RefreshControl } from 'react-native'
 import useAsyncState from '~/hooks/useAsyncState'
 import useVideoSearch from '~/hooks/useVideoSearch'
 import NamedTileRow from '~/shared/components/NamedTileRow'
-import Video from '~/models/Video'
+import Video from '@reelist/models/Video'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { useStore } from '~/hooks/useStore'
 
