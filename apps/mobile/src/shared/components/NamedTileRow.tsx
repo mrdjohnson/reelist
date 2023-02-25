@@ -10,7 +10,7 @@ import {
   Spacer,
 } from 'native-base'
 import React, { useMemo, useState } from 'react'
-import Video from '~/models/Video'
+import Video from '@reelist/models/Video'
 import _ from 'lodash'
 import VideoImage from '~/features/video/VideoImage'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -19,7 +19,7 @@ import { useStore } from '~/hooks/useStore'
 import LinkButton from '~/shared/components/LinkButton'
 import { IViewProps } from 'native-base/lib/typescript/components/basic/View/types'
 import useAsyncState from '~/hooks/useAsyncState'
-import User from '~/models/User'
+import User from '@reelist/models/User'
 import ProfileIcon from './ProfileIcon'
 
 type NamedTileRowProps = IViewProps & {

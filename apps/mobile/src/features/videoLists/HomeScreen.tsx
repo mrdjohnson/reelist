@@ -16,7 +16,7 @@ import useIsPressed from '~/hooks/useIsPressed'
 import ProfileIcon from '~/shared/components/ProfileIcon'
 import { useStore } from '~/hooks/useStore'
 import NamedTileRow from '~/shared/components/NamedTileRow'
-import Video from '~/models/Video'
+import Video from '@reelist/models/Video'
 
 type HomeScreenTileProps = IBoxProps & {
   start: number[]

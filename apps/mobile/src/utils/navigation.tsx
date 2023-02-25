@@ -1,6 +1,6 @@
 import { RouteProp, useNavigation } from '@react-navigation/native'
 import { NativeStackScreenProps, NativeStackNavigationProp } from '@react-navigation/native-stack'
-import Video from '~/models/Video'
+import Video from '@reelist/models/Video'
 
 export type ReelistTabParamList = {
   tracking: undefined

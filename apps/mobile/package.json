@@ -46,6 +46,7 @@
     "lodash": "*",
     "metro-config": "*",
     "inversify": "*",
-    "reflect-metadata": "*"
+    "reflect-metadata": "*",
+    "@types/lodash": "*"
   }
 }

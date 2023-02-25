@@ -16,6 +16,10 @@ This project is backed by [Supabase](https://supabase.com/) and [TMDB](https://w
 
 This project uses [NX](https://nx.dev/) to handle building and bundling. Using the Visual Studio Code plugin is the best way to interact with this codebase
 
+## Creating a new Library
+Creating a new library "examples" can be done by running
+`nx generate library examples --appProject=apps/mobile --importPath=@reelist/examples --directory=libs` 
+
 ## Import aliases
 
 ###  Mobile:
@@ -23,8 +27,13 @@ This project uses [NX](https://nx.dev/) to handle building and bundling. Using t
 Imports like `import Example from '@features/Example'` are handled by [craco](https://www.npmjs.com/package/@craco/craco).
 
 adding new aliases like `~features` can be done via the `/apps/mobile/.babelrc` and `/apps/mobile/tsconfig.json` files.
+because mobile handles its own version of `~/*`, we need to copy the custom import paths used in the `tsconfig.base.json` into our `tsconfig.app.json`
 
-Currently this maps directly to any directory in the `src` directory: Example: `/apps/mobile/src/feature/FeatureExample`  would be mapped to `~/feature/FeatureExample`
+Currently; this maps directly to any directory in the `src` directory: Example: `/apps/mobile/src/feature/FeatureExample`  would be mapped to `~/feature/FeatureExample`
+
+### Libraries: 
+
+Each library should have its own import alias: `libs/apis` should be `@reelist/apis`, this allows all the projects (including the libraries) to follow the same import structure 
 
   ## Misc
 

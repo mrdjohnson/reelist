@@ -11,7 +11,7 @@ import { RefreshControl } from 'react-native'
 import useAsyncState from '~/hooks/useAsyncState'
 import useVideoSearch from '~/hooks/useVideoSearch'
 import NamedTileRow from '~/shared/components/NamedTileRow'
-import Video from '~/models/Video'
+import Video from '@reelist/models/Video'
 
 const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
   const [filterText, setfilterText] = useState('')

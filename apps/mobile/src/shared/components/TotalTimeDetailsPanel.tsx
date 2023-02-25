@@ -2,9 +2,9 @@ import React, { useMemo } from 'react'
 import { Text, Column } from 'native-base'
 import { IViewProps } from 'native-base/lib/typescript/components/basic/View/types'
 import DetailsPanel from './DetailsPanel'
-import User from '~/models/User'
-import Video from '~/models/Video'
-import { humanizedDuration } from '~/utils'
+import User from '@reelist/models/User'
+import Video from '@reelist/models/Video'
+import { humanizedDuration } from '@reelist/utils/humanizedDuration'
 import { observer } from 'mobx-react-lite'
 
 type TotalTimeDetailsPanelProps = IViewProps & {

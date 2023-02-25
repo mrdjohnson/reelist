@@ -6,11 +6,15 @@ import App from './App'
 import 'react-native-url-polyfill/auto'
 import { configure } from 'mobx'
 
-import inversionContainer from '~/models/inversionContainer'
+import inversionContainer from '@reelist/models/inversionContainer'
 import { SupabaseClient } from '@supabase/supabase-js'
 import supabase from '~/supabase'
+import VideoApi from '@reelist/apis/VideoApi'
+import Storage, {IStorage, StorageInversionKey} from '~/utils/storage'
 
 inversionContainer.bind<SupabaseClient>(SupabaseClient).toConstantValue(supabase)
+inversionContainer.bind<VideoApi>(VideoApi).toSelf().inSingletonScope()
+inversionContainer.bind<IStorage>(StorageInversionKey).to(Storage).inSingletonScope()
 
 configure({
   enforceActions: 'never',

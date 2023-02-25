@@ -1,6 +1,6 @@
-import { callTmdb } from '~/api/api'
+import { callTmdb } from '@reelist/apis/api'
 import _ from 'lodash'
-import Video from '~/models/Video'
+import Video from '@reelist/models/Video'
 import { useStore } from './useStore'
 
 const useVideoSearch = () => {

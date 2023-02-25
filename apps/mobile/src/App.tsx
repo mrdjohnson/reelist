@@ -25,17 +25,13 @@ import {
 import { NativeBaseProvider, Text, Box, ScrollView, Button, extendTheme } from 'native-base'
 import AnimatedHeader from './AnimatedHeader'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import Store from '~/models/Store'
 import { useStore } from '~/hooks/useStore'
-import User, { LoggedOutUser } from '~/models/User'
+import User, { LoggedOutUser } from '@reelist/models/User'
 import { observer } from 'mobx-react-lite'
 import { AppNavigator } from '../from_ignite_template/app-navigator'
 import WelcomeScreen from '~/features/welcome/WelcomeScreen'
 import { useNavigationPersistence } from '../from_ignite_template/navigation-utilities'
-import * as storage from '~/utils/storage'
 import InAppBrowser from 'react-native-inappbrowser-reborn'
-import supabase from './supabase'
-// import Store from './src/data/Store'
 
 const Section: React.FC<
   PropsWithChildren<{
@@ -72,9 +68,6 @@ const Section: React.FC<
 }
 export const NAVIGATION_PERSISTENCE_KEY = 'NAVIGATION_STATE'
 
-// does nothing for now but verifies imports
-const rootStore = new Store()
-
 const config = {
   dependencies: {
     'linear-gradient': LinearGradient,
@@ -82,7 +75,7 @@ const config = {
 }
 
 const App = observer(() => {
-  const { auth, userStore, supabase } = useStore()
+  const { auth, userStore, supabase, storage } = useStore()
   const offset = useRef(new Animated.Value(0)).current
   const isDarkMode = useColorScheme() === 'dark'
   const {
@@ -103,6 +96,7 @@ const App = observer(() => {
     }
 
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, nextSession) => {
+      console.log('auth event: ', event)
       if (event !== 'SIGNED_IN') return
 
       if (nextSession?.user) {
@@ -120,7 +114,7 @@ const App = observer(() => {
 
   useEffect(() => {
     const signIn = async (refreshToken: string) => {
-      const { user, session, error } = await auth.signin({
+      const { user, session, error } = await supabase.auth.signIn({
         refreshToken,
       })
 
@@ -131,6 +125,7 @@ const App = observer(() => {
     }
 
     const { remove } = Linking.addEventListener('url', ({ url }) => {
+      console.log('got linking event for: ', url)
       if (!url.includes('reelist://refresh/')) return
 
       const refreshToken = url.replace('reelist://refresh/', '')
@@ -145,14 +140,6 @@ const App = observer(() => {
 
     return remove
   }, [])
-
-  const handleLoginLogoutButtonClick = () => {
-    console.log('loggin in or out')
-    if (!auth.user.loggedIn) {
-      console.log('loggin in')
-      auth.login()
-    }
-  }
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,

@@ -1,6 +1,6 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
-import Video from '~/models/Video'
+import Video from '@reelist/models/Video'
 import { useStore } from '~/hooks/useStore'
 import { useReelistNavigation } from '~/utils/navigation'
 import { Column, IPressableProps, Pressable, Row, Skeleton, Text, View } from 'native-base'
