@@ -2,6 +2,7 @@ import { makeAutoObservable, observable } from 'mobx'
 import _ from 'lodash'
 import User from '~/models/User'
 import Video from './Video'
+import { injectable } from 'inversify'
 
 type UpdateType = {
   message: string
@@ -13,6 +14,8 @@ type ProfileScreenType = {
   user: User | null
   editing: boolean
 }
+
+@injectable()
 export default class AppState {
   // todo: set to false by default
   dialogStack: Record<string, { size: number; options: any }> = {}

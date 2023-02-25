@@ -1,20 +1,31 @@
-import supabase from '~/supabase'
+import { SupabaseClient } from '@supabase/supabase-js'
+import { inject, injectable } from 'inversify'
+import Auth from '~/models/Auth'
 
 import { VideoTableType } from '~/models/Video'
 
+@injectable()
 class VideoApi {
-  static loadVideo = async ({ userId, videoId }: { userId: string; videoId: string }) => {
-    const { data, error } = await supabase
+  constructor(
+    @inject(SupabaseClient) private supabase: SupabaseClient,
+    @inject(Auth) private storeAuth: Auth,
+  ) {}
+
+  loadVideo = async ({ videoId }: { videoId: string }) => {
+    const { data, error } = await this.supabase
       .from<VideoTableType>('videos')
       .select('*')
-      .match({ user_id: userId, video_id: videoId })
+      .match({ user_id: this.storeAuth.user.id, video_id: videoId })
       .maybeSingle()
 
     return { data, error }
   }
 
-  static updateVideo = async (nextData: Partial<VideoTableType>) => {
-    const { data, error } = await supabase.from<VideoTableType>('videos').upsert(nextData).single()
+  updateVideo = async (nextData: Partial<VideoTableType>) => {
+    const { data, error } = await this.supabase
+      .from<VideoTableType>('videos')
+      .upsert({ ...nextData, user_id: this.storeAuth.user.id })
+      .single()
 
     return { data, error }
   }

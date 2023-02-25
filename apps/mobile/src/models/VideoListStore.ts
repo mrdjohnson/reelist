@@ -1,14 +1,15 @@
-import supabase from '~/supabase'
 import Video from '~/models/Video'
 import _ from 'lodash'
-import { flow, flowResult, makeAutoObservable, runInAction } from 'mobx'
-// import { camelizeKeys } from '@utils/camelizeKeys'
-import Auth from './Auth'
+import { flow, makeAutoObservable } from 'mobx'
+import Auth from '~/models/Auth'
 import VideoList, { VideoListTableType } from './VideoList'
 import { IViewModel } from 'mobx-utils'
-import VideoStore from './VideoStore'
-import UserStore from './UserStore'
+import VideoStore from '~/models/VideoStore'
+import UserStore from '~/models/UserStore'
+import { inject, injectable } from 'inversify'
+import { SupabaseClient } from '@supabase/supabase-js'
 
+@injectable()
 class VideoListStore {
   adminVideoLists: VideoList[] = []
   publicVideoLists: VideoList[] = []
@@ -16,23 +17,20 @@ class VideoListStore {
   currentVideo: Video | null = null
   currentVideoList: VideoList | null = null
 
-  storeAuth: Auth
-  videoStore: VideoStore
-  userStore: UserStore
-
-  constructor(auth: Auth, videoStore: VideoStore, userStore: UserStore) {
+  constructor(
+    @inject(Auth) private storeAuth: Auth,
+    @inject(UserStore) private userStore: UserStore,
+    @inject(VideoStore) private videoStore: VideoStore,
+    @inject(SupabaseClient) private supabase: SupabaseClient,
+  ) {
     makeAutoObservable(this, {
       getPublicVideoLists: flow,
       setCurrentVideoListFromShareId: flow,
     })
-
-    this.storeAuth = auth
-    this.videoStore = videoStore
-    this.userStore = userStore
   }
 
   makeUiVideoList = (videoList: VideoListTableType) => {
-    return new VideoList(videoList, this.storeAuth, this, this.videoStore, this.userStore)
+    return new VideoList(videoList, this.storeAuth, this, this.videoStore, this.userStore, this.supabase)
   }
 
   addToAdminVideoList = (videoList: VideoList) => {
@@ -74,7 +72,7 @@ class VideoListStore {
   getAdminVideoLists = async () => {
     if (!_.isEmpty(this.adminVideoLists)) return this.adminVideoLists
 
-    const { data: videoLists, error } = await supabase
+    const { data: videoLists, error } = await this.supabase
       .from<VideoListTableType>('videoLists')
       .select('*')
       .contains('admin_ids', [this.storeAuth.user?.id])
@@ -101,7 +99,7 @@ class VideoListStore {
       return
     }
 
-    const { data: videoList } = yield supabase
+    const { data: videoList } = yield this.supabase
       .from<VideoListTableType>('videoLists')
       .select('*')
       .match({ unique_id: videoListShareId })
@@ -117,7 +115,7 @@ class VideoListStore {
   refreshCurrentVideoList = flow(function* (this: VideoListStore) {
     if (!this.currentVideoList) return
 
-    const { data: videoListJson } = yield supabase
+    const { data: videoListJson } = yield this.supabase
       .from<VideoListTableType>('videoLists')
       .select('*')
       .match({ id: this.currentVideoList.id })
@@ -152,7 +150,7 @@ class VideoListStore {
 
     const followedListIds = this.storeAuth.user.followedListIds
 
-    const { data: videoLists, error } = yield supabase
+    const { data: videoLists, error } = yield this.supabase
       .from<VideoListTableType>('videoLists')
       .select('*')
       .match({ is_public: true })
@@ -172,7 +170,7 @@ class VideoListStore {
 
     const followedListIds = this.storeAuth.user.followedListIds
 
-    const { data: videoLists, error } = yield supabase
+    const { data: videoLists, error } = yield this.supabase
       .from<VideoListTableType>('videoLists')
       .select('*')
       .in('id', followedListIds)
@@ -185,7 +183,7 @@ class VideoListStore {
   })
 
   createBlankVideoList = () => {
-    const videoList = new VideoList(null, this.storeAuth, this, this.videoStore, this.userStore)
+    const videoList = new VideoList(null, this.storeAuth, this, this.videoStore, this.userStore, this.supabase)
 
     return videoList
   }
@@ -194,7 +192,7 @@ class VideoListStore {
     const { name, isPublic, isJoinable } = videoListViewModel
     const uniqueShareId = VideoList.createUniqueShareId()
 
-    const { data: videoListJson, error } = await supabase
+    const { data: videoListJson, error } = await this.supabase
       .from<VideoListTableType>('videoLists')
       .insert({
         name: name,

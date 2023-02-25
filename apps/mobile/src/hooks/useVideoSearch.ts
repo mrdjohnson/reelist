@@ -18,7 +18,7 @@ const useVideoSearch = () => {
     return searchResults
       .filter(searchResult => ['movie', 'tv'].includes(searchResult.mediaType))
       .map(video => {
-        return new Video(video, auth, videoStore)
+        return videoStore.makeUiVideo(video)
       })
   }
 

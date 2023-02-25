@@ -4,10 +4,9 @@ import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
 import { NavigatorParamList, ReelistScreen as ReelistScreenProps } from '~/utils/navigation'
 import { load } from '~/utils/storage'
-import supabase from '~/supabase'
 
 const SplashScreen = observer(({ navigation }: ReelistScreenProps) => {
-  const { auth } = useStore()
+  const { auth, supabase } = useStore()
   const { loggedIn } = auth.user
 
   const resetNavigationTo = (name: keyof NavigatorParamList) => {

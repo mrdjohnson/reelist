@@ -2,7 +2,6 @@ import React from 'react'
 import { Center, Column, ScrollView, Text, useToast } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '~/hooks/useStore'
-import supabase from '~/supabase'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { ReelistScreen } from '~/utils/navigation'
 import AppButton from '~/shared/components/AppButton'
@@ -12,7 +11,7 @@ const SettingsScreen = observer(({ navigation }: ReelistScreen) => {
   const toast = useToast()
 
   const logout = async () => {
-    const { error } = await supabase.auth.signOut()
+    const { error } = await auth.signOut()
 
     if (error) {
       toast.show({

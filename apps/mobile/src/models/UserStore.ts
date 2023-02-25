@@ -1,27 +1,24 @@
 import _ from 'lodash'
-import { makeAutoObservable } from 'mobx'
 import Auth from './Auth'
-import supabase from '~/supabase'
 import User, { ProfileTableType } from '~/models/User'
 import humps from 'humps'
+import { inject, injectable } from 'inversify'
+import { SupabaseClient } from '@supabase/supabase-js'
 
+@injectable()
 class UserStore {
-  storeAuth: Auth
   userById: Record<string, User | null> = {}
   followedUsers: User[] = []
 
-  constructor(auth: Auth) {
-    makeAutoObservable(this, {
-      storeAuth: false,
-    })
-
-    this.storeAuth = auth
-  }
+  constructor(
+    @inject(Auth) private storeAuth: Auth,
+    @inject(SupabaseClient) private supabase: SupabaseClient,
+  ) {}
 
   makeUiUser = (profileData: ProfileTableType, loggedIn: boolean = false) => {
     const profile = humps.camelizeKeys<ProfileTableType>(profileData)
 
-    return new User({ profile, loggedIn })
+    return new User({ profile, loggedIn }, this.supabase)
   }
 
   getFollowedUsers = async () => {
@@ -37,7 +34,7 @@ class UserStore {
   getUser = async (userId: string) => {
     if (!userId) return null
 
-    const { data: userJson, error } = await supabase
+    const { data: userJson, error } = await this.supabase
       .from<ProfileTableType>('profiles')
       .select('*')
       .match({ id: userId })
@@ -57,7 +54,7 @@ class UserStore {
   getUsers = async (userIds: string[]) => {
     if (_.isEmpty(userIds)) return []
 
-    const { data: userJsons, error } = await supabase
+    const { data: userJsons, error } = await this.supabase
       .from<ProfileTableType>('profiles')
       .select('*')
       .in('id', userIds)
@@ -74,12 +71,14 @@ class UserStore {
   }
 
   getOrCreateUser = async (authId: string) => {
-    const { data: userJson, error } = await supabase
+    console.log('getting user')
+    const { data: userJson, error } = await this.supabase
       .from<ProfileTableType>('profiles')
       .upsert({ id: authId })
       .single()
 
     if (userJson) {
+      debugger
       return this.makeUiUser(userJson, true)
     }
 

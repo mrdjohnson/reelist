@@ -1,23 +1,16 @@
-import supabase from '~/supabase'
-import _, { flow } from 'lodash'
-import {
-  extendObservable,
-  isObservableArray,
-  makeAutoObservable,
-  makeObservable,
-  runInAction,
-} from 'mobx'
+import _ from 'lodash'
+import { makeAutoObservable } from 'mobx'
 import Auth from './Auth'
 import humps, { Camelized } from 'humps'
 import VideoListStore from './VideoListStore'
 import Video from './Video'
-import { callTmdb } from '~/api/api'
 import ShortUniqueId from 'short-unique-id'
 import User from '~/models/User'
 import { createViewModel, IViewModel } from 'mobx-utils'
 import { humanizedDuration } from '~/utils'
 import VideoStore from './VideoStore'
 import UserStore from './UserStore'
+import { SupabaseClient } from '@supabase/supabase-js'
 
 export enum AutoSortType {
   NONE,
@@ -61,12 +54,15 @@ class VideoList implements VideoListType {
   userStore: UserStore
   _viewModel?: VideoList & IViewModel<VideoList> = undefined
 
+  static supabase: SupabaseClient
+
   constructor(
     json: VideoListTableType | null,
     auth: Auth,
     videoListStore: VideoListStore,
     videoStore: VideoStore,
-    userStore: UserStore
+    userStore: UserStore,
+    private supabase: SupabaseClient,
   ) {
     if (json) {
       this._assignValuesFromJson(json)
@@ -147,7 +143,7 @@ class VideoList implements VideoListType {
     // Map{'exampleField' -> 'exampleValue'} -> {example_field: 'exampleValue'}
     const changedFields = humps.decamelizeKeys(Object.fromEntries(videoListViewModel.changedValues))
 
-    const { data: videoList, error } = await supabase
+    const { data: videoList, error } = await this.supabase
       .from('videoLists')
       .update(changedFields)
       .match({ id: videoListViewModel.id })
@@ -167,7 +163,7 @@ class VideoList implements VideoListType {
   }
 
   destroy = async () => {
-    const { error } = await supabase
+    const { error } = await this.supabase
       .from<VideoListTableType>('videoLists')
       .delete()
       .match({ id: this.id })

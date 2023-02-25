@@ -1,7 +1,8 @@
 import React, { createContext } from 'react'
+import inversionContainer from '~/models/inversionContainer'
 import Store from '~/models/Store'
 
-const store = new Store()
+const store = inversionContainer.get<Store>(Store)
 export const storeContext = createContext<Store>(store)
 
 const Provider = storeContext.Provider

@@ -1,13 +1,11 @@
-import { NavigationProp, useNavigation } from '@react-navigation/native'
 import { useToast } from 'native-base'
 import { useEffect } from 'react'
 import { Linking } from 'react-native'
 import { useStore } from '~/hooks/useStore'
-import supabase from '~/supabase'
 import { useReelistNavigation } from './navigation'
 
 export const AppEventHandler = () => {
-  const { appState, auth } = useStore()
+  const { appState, auth, supabase } = useStore()
   const navigation = useReelistNavigation()
 
   const toast = useToast()

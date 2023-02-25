@@ -1,13 +1,13 @@
 import _ from 'lodash'
 import { makeAutoObservable } from 'mobx'
-import Auth from './Auth'
-import Video, { TvSeason, VideoInfoType, VideoTableType } from './Video'
-import VideoList from './VideoList'
+import Auth from '~/models/Auth'
+import Video, { TvSeason, VideoInfoType, VideoTableType } from '~/models/Video'
+import VideoList from '~/models/VideoList'
 import { callTmdb } from '~/api/api'
-import supabase from '~/supabase'
-import humps from 'humps'
-import { findLastValidBreakpoint } from 'native-base/lib/typescript/theme/v33x-theme/tools'
 import User from '~/models/User'
+import { inject, injectable } from 'inversify'
+import { SupabaseClient } from '@supabase/supabase-js'
+import VideoApi from '~/api/VideoApi'
 
 type TrackedVideoJson = {
   video_id: string
@@ -15,18 +15,23 @@ type TrackedVideoJson = {
   current_season: number
   current_episode: number
 }
+
+@injectable()
 class VideoStore {
-  storeAuth: Auth
   currentVideoId: string | null = null
   tmdbJsonByVideoId: Record<string, Video | null> = {}
   videoSeasonMapByVideoId: Record<string, Record<number, TvSeason | null>> = {}
 
-  constructor(auth: Auth) {
-    makeAutoObservable(this, {
-      storeAuth: false,
-    })
+  constructor(
+    @inject(Auth) private storeAuth: Auth,
+    @inject(SupabaseClient) private supabase: SupabaseClient,
+    @inject(VideoApi) private videoApi: VideoApi,
+  ) {
+    makeAutoObservable(this)
+  }
 
-    this.storeAuth = auth
+  makeUiVideo = (json: Video, videoId?: string, videoTableData?: VideoTableType) => {
+    return new Video(json, videoTableData, videoId, this, this.videoApi)
   }
 
   setCurrentVideoId = (videoId: string | null) => {
@@ -76,7 +81,7 @@ class VideoStore {
       this.tmdbJsonByVideoId[videoId] = video || null
     }
 
-    const uiVideo = video && new Video(video, this.storeAuth, this, videoTableData, videoId)
+    const uiVideo = video && this.makeUiVideo(video, videoId, videoTableData)
 
     return uiVideo
   }
@@ -92,7 +97,7 @@ class VideoStore {
   getTrackedVideos = async (userId: string | null = null): Promise<Video[]> => {
     console.log('getTrackedVideos for user: ', this.storeAuth.user.id)
     let videos: Video[] = []
-    const { data: videoJsons, error } = await supabase
+    const { data: videoJsons, error } = await this.supabase
       .from<VideoTableType>('videos')
       .select('*')
       .match({ user_id: userId || this.storeAuth.user.id, tracked: true })
@@ -117,17 +122,17 @@ class VideoStore {
     const serverUserId = userId || this.storeAuth.user.id
 
     const match: Partial<VideoTableType> = {
-      user_id: serverUserId
+      user_id: serverUserId,
     }
 
     // only show history items that the user allows to be seen by others
     // for "self" show all history items
-    if(userId !== this.storeAuth.user.id) {
+    if (userId !== this.storeAuth.user.id) {
       match.allow_in_history = true
     }
 
     let videos: Video[] = []
-    const { data: videoJsons, error } = await supabase
+    const { data: videoJsons, error } = await this.supabase
       .from<VideoTableType>('videos')
       .select('*')
       .match(match)
@@ -153,7 +158,7 @@ class VideoStore {
 
     let videos: Video[] = []
 
-    const { data: videoJsons, error } = await supabase
+    const { data: videoJsons, error } = await this.supabase
       .from<VideoTableType>('videos')
       .select('*')
       .match({ user_id: user.id })
