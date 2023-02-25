@@ -27,7 +27,6 @@ import AnimatedHeader from './AnimatedHeader'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import Store from '~/models/Store'
 import { useStore } from '~/hooks/useStore'
-import supabase from '~/supabase'
 import User, { LoggedOutUser } from '~/models/User'
 import { observer } from 'mobx-react-lite'
 import { AppNavigator } from '../from_ignite_template/app-navigator'
@@ -35,6 +34,7 @@ import WelcomeScreen from '~/features/welcome/WelcomeScreen'
 import { useNavigationPersistence } from '../from_ignite_template/navigation-utilities'
 import * as storage from '~/utils/storage'
 import InAppBrowser from 'react-native-inappbrowser-reborn'
+import supabase from './supabase'
 // import Store from './src/data/Store'
 
 const Section: React.FC<
@@ -82,7 +82,7 @@ const config = {
 }
 
 const App = observer(() => {
-  const { auth, userStore } = useStore()
+  const { auth, userStore, supabase } = useStore()
   const offset = useRef(new Animated.Value(0)).current
   const isDarkMode = useColorScheme() === 'dark'
   const {
@@ -120,7 +120,7 @@ const App = observer(() => {
 
   useEffect(() => {
     const signIn = async (refreshToken: string) => {
-      const { user, session, error } = await supabase.auth.signIn({
+      const { user, session, error } = await auth.signin({
         refreshToken,
       })
 

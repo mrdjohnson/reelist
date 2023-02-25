@@ -1,15 +1,20 @@
-import AppState from './AppState'
-import Auth from './Auth'
-import VideoListStore from './VideoListStore'
-import VideoStore from './VideoStore'
-import UserStore from './UserStore'
+import { inject, injectable } from 'inversify'
 
+import AppState from '~/models/AppState'
+import Auth from '~/models/Auth'
+import VideoListStore from '~/models/VideoListStore'
+import VideoStore from '~/models/VideoStore'
+import UserStore from '~/models/UserStore'
+import { SupabaseClient } from '@supabase/supabase-js'
+
+@injectable()
 class Store {
-  auth = new Auth()
-  appState = new AppState()
-  videoStore = new VideoStore(this.auth)
-  userStore = new UserStore(this.auth)
-  videoListStore = new VideoListStore(this.auth, this.videoStore, this.userStore)
+  @inject(Auth) public auth: Auth
+  @inject(AppState) public appState: AppState
+  @inject(VideoStore) public videoStore: VideoStore
+  @inject(UserStore) public userStore: UserStore
+  @inject(VideoListStore) public videoListStore: VideoListStore
+  @inject(SupabaseClient) public supabase: SupabaseClient
 }
 
 export default Store

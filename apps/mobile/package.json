@@ -43,6 +43,9 @@
     "@react-navigation/bottom-tabs": "*",
     "@faker-js/faker": "*",
     "@jest/globals": "*",
-    "lodash": "*"
+    "lodash": "*",
+    "metro-config": "*",
+    "inversify": "*",
+    "reflect-metadata": "*"
   }
 }

@@ -110,19 +110,16 @@ class Video {
   unWatchableEpisodeCount = 0
   allowInHistory = true
 
-  storeAuth: Auth
-  videoStore: VideoStore
-
   seasonMap: Record<number, TvSeason | null> = {}
 
   _selectedSeason: TvSeason | null = null
 
   constructor(
     json: Video,
-    auth: Auth,
-    videoStore: VideoStore,
     videoTableData: VideoTableType | null = null,
     videoId: string | null = null,
+    private videoStore: VideoStore,
+    private videoApi: VideoApi,
   ) {
     makeAutoObservable(this, {
       adult: false,
@@ -145,11 +142,7 @@ class Video {
       voteAverage: false,
       voteCount: false,
       seasons: false,
-      storeAuth: false,
     })
-
-    this.storeAuth = auth
-    this.videoStore = videoStore
 
     if (videoId) {
       this.mediaType = videoId.startsWith('mv') ? 'movie' : 'tv'
@@ -186,8 +179,7 @@ class Video {
   }
 
   _lazyLoadVideoFromVideoTable = async () => {
-    const { data: videoTable, error } = await VideoApi.loadVideo({
-      userId: this.storeAuth.user.id,
+    const { data: videoTable, error } = await this.videoApi.loadVideo({
       videoId: this.videoId,
     })
 
@@ -447,11 +439,10 @@ class Video {
   }
 
   updateWatched = async (type: string, upsertData: Partial<VideoTableType>) => {
-    const { data: videoJson, error } = await VideoApi.updateVideo({
+    const { data: videoJson, error } = await this.videoApi.updateVideo({
       ...upsertData,
       id: this.serverId,
       video_id: this.videoId,
-      user_id: this.storeAuth.user.id,
     })
 
     if (error) {

@@ -1,7 +1,6 @@
-import supabase, { SupabaseUser } from '~/supabase'
-import mobx, { makeAutoObservable } from 'mobx'
-import { PostgrestError } from '@supabase/supabase-js'
-import humps, { Camelized, Decamelized } from 'humps'
+import { makeAutoObservable } from 'mobx'
+import { PostgrestError, SupabaseClient, User as SupabaseUser } from '@supabase/supabase-js'
+import humps, { Camelized } from 'humps'
 import { createViewModel, IViewModel } from 'mobx-utils'
 import VideoList from './VideoList'
 import _ from 'lodash'
@@ -43,7 +42,12 @@ class User implements UserType {
 
   _viewModel?: User & IViewModel<User> = undefined
 
-  constructor({ user, loggedIn = true, profile }: UserConstructorType) {
+  static supabase: SupabaseClient
+
+  constructor(
+    { user, loggedIn = true, profile }: UserConstructorType,
+    private supabase: SupabaseClient,
+  ) {
     makeAutoObservable(this)
 
     this.loggedIn = loggedIn
@@ -101,7 +105,7 @@ class User implements UserType {
     // Map{'exampleField' -> 'exampleValue'} -> {example_field: 'exampleValue'}
     const changedFields = humps.decamelizeKeys(Object.fromEntries(userViewModel.changedValues))
 
-    const { data: profile, error } = await supabase
+    const { data: profile, error } = await this.supabase
       .from('profiles')
       .update(changedFields)
       .match({ id: userViewModel.id })
@@ -116,20 +120,23 @@ class User implements UserType {
   }
 }
 
-export const LoggedOutUser = new User({
-  profile: {
-    id: '',
-    followedListIds: [],
-    followedUserIds: [],
-    updatedAt: '',
-    username: '',
-    avatarUrl: '',
-    notificationId: '',
-    name: '',
-  },
+export const LoggedOutUser = new User(
+  {
+    profile: {
+      id: '',
+      followedListIds: [],
+      followedUserIds: [],
+      updatedAt: '',
+      username: '',
+      avatarUrl: '',
+      notificationId: '',
+      name: '',
+    },
 
-  loggedIn: false,
-})
+    loggedIn: false,
+  },
+  null,
+)
 
 const maybePrintError = (error: PostgrestError | null) => {
   if (error) {
