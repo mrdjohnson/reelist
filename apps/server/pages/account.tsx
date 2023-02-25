@@ -1,10 +1,11 @@
 import { useEffect } from 'react'
-import { supabaseClient as supabase } from '../utils/supabaseClient'
 import { Box, CircularProgress } from '@mui/material'
 import Router, { useRouter } from 'next/router'
+import { useStore } from '@reelist/utils/hooks/useStore'
 
 export default function Account() {
   const { query } = useRouter()
+  const { supabase } = useStore()
 
   useEffect(() => {
     supabase.auth.onAuthStateChange((event, session) => {

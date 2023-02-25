@@ -1,12 +1,13 @@
-import { UserProvider } from '@supabase/auth-helpers-react'
-import { supabaseClient } from '../utils/supabaseClient'
+import '~/setupServerEnv'
+
+import { StoreProvider } from '@reelist/utils/store'
 
 // eslint-disable-next-line react/prop-types
 function MyApp({ Component, pageProps }) {
   return (
-    <UserProvider supabaseClient={supabaseClient}>
+    <StoreProvider>
       <Component {...pageProps} />
-    </UserProvider>
+    </StoreProvider>
   )
 }
 
