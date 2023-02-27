@@ -37,4 +37,18 @@ Each library should have its own import alias: `libs/apis` should be `@reelist/a
 
   ## Misc
 
-Google play store feature graphic generated using: http://tools.neko2me.net/efgg/
+- Google play store feature graphic generated using: http://tools.neko2me.net/efgg/
+
+- If you run into a missing `secrets-index.ts` please copy/paste `local.index.ts` and change the name
+
+## Building the project
+
+### Mobile:
+
+Previous: builds could be started through the nx console, or manually running `nx run mobile:build-android` (with the optional `--apk` flag)
+
+Current: Due to some forced hermes issues, this command can only be run manually from `/reelist`: `ENTRY_FILE="../../src/main.tsx" nx run mobile:build-android` 
+
+Build output locations are  
+- apk: `apps/mobile/android/app/build/outputs/apk/release`
+- aab: `apps/mobile/android/app/build/outputs/bundle/release`
