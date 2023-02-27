@@ -5,8 +5,7 @@
  * and a "main" flow which the user will use once logged in.
  */
 import React from 'react'
-import { useColorScheme } from 'react-native'
-import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native'
+import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { navigationRef, useBackButtonHandler } from './navigation-utilities'
@@ -62,7 +61,7 @@ const createSubStack = (name: keyof ReelistTabParamList, component: React.Compon
           <Stack.Screen name="videoListScreenSettingsModal" component={EditVideoListPage} />
 
           <Stack.Screen name="videoListManagementModal" component={VideoListManagementModal} />
-          
+
           <Stack.Screen name="videosModal" component={VideosModal} />
         </Stack.Group>
       </Stack.Navigator>
@@ -133,15 +132,10 @@ const AppStack = () => {
 type NavigationProps = Partial<React.ComponentProps<typeof NavigationContainer>>
 
 export const AppNavigator = (props: NavigationProps) => {
-  const colorScheme = useColorScheme()
   useBackButtonHandler(canExit)
 
   return (
-    <NavigationContainer
-      ref={navigationRef}
-      theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
-      {...props}
-    >
+    <NavigationContainer ref={navigationRef} {...props}>
       <AppStack />
 
       <AppEventHandler />
