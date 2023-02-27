@@ -1,7 +1,7 @@
 import React from 'react'
 import { Actionsheet, Column } from 'native-base'
 import { observer } from 'mobx-react-lite'
-import { useStore } from '~/hooks/useStore'
+import { useStore } from '@reelist/utils/hooks/useStore'
 import { useReelistNavigation } from '~/utils/navigation'
 import AppButton from '~/shared/components/AppButton'
 import VideoItem from './VideoItem'

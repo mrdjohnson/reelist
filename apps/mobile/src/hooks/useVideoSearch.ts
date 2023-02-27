@@ -1,7 +1,7 @@
 import { callTmdb } from '@reelist/apis/api'
 import _ from 'lodash'
 import Video from '@reelist/models/Video'
-import { useStore } from './useStore'
+import { useStore } from '@reelist/utils/hooks/useStore'
 
 const useVideoSearch = () => {
   const { auth, videoStore } = useStore()

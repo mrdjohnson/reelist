@@ -1,7 +1,7 @@
 import { useToast } from 'native-base'
 import { useEffect } from 'react'
 import { Linking } from 'react-native'
-import { useStore } from '~/hooks/useStore'
+import { useStore } from '@reelist/utils/hooks/useStore'
 import { useReelistNavigation } from './navigation'
 
 export const AppEventHandler = () => {

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { Center, Spinner, View } from 'native-base'
 import { observer } from 'mobx-react-lite'
-import { useStore } from '~/hooks/useStore'
+import { useStore } from '@reelist/utils/hooks/useStore'
 import { NavigatorParamList, ReelistScreen as ReelistScreenProps } from '~/utils/navigation'
 
 const SplashScreen = observer(({ navigation }: ReelistScreenProps) => {

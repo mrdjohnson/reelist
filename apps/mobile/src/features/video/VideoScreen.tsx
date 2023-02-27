@@ -16,7 +16,7 @@ import {
   Flex,
 } from 'native-base'
 import { observer } from 'mobx-react-lite'
-import { useStore } from '~/hooks/useStore'
+import { useStore } from '@reelist/utils/hooks/useStore'
 import { BackHandler } from 'react-native'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import Video, { TvSeason } from '@reelist/models/Video'

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { ScrollView, View } from 'native-base'
 import { observer } from 'mobx-react-lite'
-import { useStore } from '~/hooks/useStore'
+import { useStore } from '@reelist/utils/hooks/useStore'
 import _ from 'lodash'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import TrackedVideoItem from '~/features/video/TrackedVideoItem'

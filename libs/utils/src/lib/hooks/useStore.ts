@@ -1,4 +1,4 @@
-import { storeContext } from '~/utils/store'
+import { storeContext } from '@reelist/utils/store'
 import { useContext } from 'react'
 
 export const useStore = () => {

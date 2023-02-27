@@ -11,7 +11,7 @@ import {
   Text,
   View,
 } from 'native-base'
-import { useStore } from '~/hooks/useStore'
+import { useStore } from '@reelist/utils/hooks/useStore'
 import { ListRenderItem, RefreshControl } from 'react-native'
 import VideoItem, { videoItemSkeleton } from '~/features/video/VideoItem'
 import User from '@reelist/models/User'

@@ -12,7 +12,7 @@ import useVideoSearch from '~/hooks/useVideoSearch'
 import NamedTileRow from '~/shared/components/NamedTileRow'
 import Video from '@reelist/models/Video'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import { useStore } from '~/hooks/useStore'
+import { useStore } from '@reelist/utils/hooks/useStore'
 
 const VideosModal = observer(({ route, navigation }: ReelistScreenFrom<'videosModal'>) => {
   const {auth} = useStore()

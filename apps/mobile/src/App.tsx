@@ -25,7 +25,7 @@ import {
 import { NativeBaseProvider, Text, Box, ScrollView, Button, extendTheme } from 'native-base'
 import AnimatedHeader from './AnimatedHeader'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { useStore } from '~/hooks/useStore'
+import { useStore } from '@reelist/utils/hooks/useStore'
 import User, { LoggedOutUser } from '@reelist/models/User'
 import { observer } from 'mobx-react-lite'
 import { AppNavigator } from '../from_ignite_template/app-navigator'

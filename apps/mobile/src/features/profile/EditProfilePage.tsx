@@ -13,7 +13,7 @@ import {
   Text,
 } from 'native-base'
 import { observer } from 'mobx-react-lite'
-import { useStore } from '~/hooks/useStore'
+import { useStore } from '@reelist/utils/hooks/useStore'
 import _ from 'lodash'
 import { createViewModel } from 'mobx-utils'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'

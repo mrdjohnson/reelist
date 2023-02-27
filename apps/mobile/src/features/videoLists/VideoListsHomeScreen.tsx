@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import { Pressable, SectionList, Text, View } from 'native-base'
 import { observer } from 'mobx-react-lite'
-import { useStore } from '~/hooks/useStore'
+import { useStore } from '@reelist/utils/hooks/useStore'
 import VideoList from '@reelist/models/VideoList'
 import { RefreshControl, SectionListData } from 'react-native'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'

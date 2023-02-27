@@ -1,7 +1,7 @@
 import React from 'react'
 import { ScrollView, Text, View, Center, Pressable, Row, Column } from 'native-base'
 import { observer } from 'mobx-react-lite'
-import { useStore } from '~/hooks/useStore'
+import { useStore } from '@reelist/utils/hooks/useStore'
 import VideoList from '@reelist/models/VideoList'
 import { useReelistNavigation } from '~/utils/navigation'
 import User from '@reelist/models/User'

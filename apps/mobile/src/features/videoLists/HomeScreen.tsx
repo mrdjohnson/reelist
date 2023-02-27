@@ -14,7 +14,7 @@ import { observer } from 'mobx-react-lite'
 import { ReelistScreen, useReelistNavigation } from '~/utils/navigation'
 import useIsPressed from '~/hooks/useIsPressed'
 import ProfileIcon from '~/shared/components/ProfileIcon'
-import { useStore } from '~/hooks/useStore'
+import { useStore } from '@reelist/utils/hooks/useStore'
 import NamedTileRow from '~/shared/components/NamedTileRow'
 import Video from '@reelist/models/Video'
 

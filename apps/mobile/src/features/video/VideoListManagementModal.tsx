@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { ScrollView, Text, View, Checkbox, Row, Pressable, Icon } from 'native-base'
 import { observer } from 'mobx-react-lite'
-import { useStore } from '~/hooks/useStore'
+import { useStore } from '@reelist/utils/hooks/useStore'
 import { ReelistScreen } from '~/utils/navigation'
 import FormSection from '~/shared/components/FormSection'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'

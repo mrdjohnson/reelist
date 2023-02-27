@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Actionsheet, Center, Pressable, Row, Text, useDisclose, useToast, View } from 'native-base'
 import { observer } from 'mobx-react-lite'
-import { useStore } from '~/hooks/useStore'
+import { useStore } from '@reelist/utils/hooks/useStore'
 import Clipboard from '@react-native-clipboard/clipboard'
 import User from '@reelist/models/User'
 import { ReelistScreen } from '~/utils/navigation'

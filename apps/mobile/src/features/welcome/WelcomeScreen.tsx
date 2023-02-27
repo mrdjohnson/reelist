@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { Center, Text, View } from 'native-base'
 import { observer } from 'mobx-react-lite'
-import { useStore } from '~/hooks/useStore'
+import { useStore } from '@reelist/utils/hooks/useStore'
 import { InAppBrowser } from 'react-native-inappbrowser-reborn'
 import { ReelistScreen as ReelistScreenProps } from '~/utils/navigation'
 import AppButton from '~/shared/components/AppButton'

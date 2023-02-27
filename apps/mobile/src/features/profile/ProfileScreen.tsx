@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { View, Icon, Center, Column, Text, ScrollView, Spinner, Badge } from 'native-base'
 import { observer } from 'mobx-react-lite'
-import { useStore } from '~/hooks/useStore'
+import { useStore } from '@reelist/utils/hooks/useStore'
 import EditProfilePage from './EditProfilePage'
 import { ReelistScreen } from '~/utils/navigation'
 import TrackedVideoItem from '~/features/video/TrackedVideoItem'
