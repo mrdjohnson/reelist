@@ -11,7 +11,13 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "incremental": true,
-    "types": ["jest", "node"]
+    "types": ["jest", "node"],
+    "paths": {
+      "~/*": ["apps/server/src/*"],
+      "@reelist/models/*": ["libs/models/src/lib/*"],
+      "@reelist/utils/*": ["libs/utils/src/lib/*"],
+      "@reelist/apis/*": ["libs/apis/src/lib/*"],
+    },
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "next-env.d.ts"],
   "exclude": ["node_modules", "jest.config.ts"]
