@@ -162,7 +162,7 @@ class Video {
     })
 
     if (error) {
-      console.error('failed to lazy load video:', error.message)
+      // console.error('failed to lazy load video:', error.message)
     } else if (videoTable) {
       this._assignFromVideoTable(videoTable)
     }

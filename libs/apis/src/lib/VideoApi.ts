@@ -6,6 +6,8 @@ class VideoApi extends TableApi<VideoTableType> {
   loadVideo = async ({ videoId }: { videoId: string }) => {
     const userId = this.supabase.auth.user()?.id
 
+    if (!userId) return { error: new Error('no user') }
+
     const { data, error } = await this.match({ user_id: userId, video_id: videoId }).maybeSingle()
 
     return { data, error }
