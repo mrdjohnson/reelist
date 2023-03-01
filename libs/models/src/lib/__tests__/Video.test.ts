@@ -1,10 +1,11 @@
-import Video, { VideoTableType } from '@reelist/models/Video'
+import Video from '@reelist/models/Video'
 import { createTmdbVideo } from '@reelist/models/factories/TmdbVideoFactory'
 import { createVideoTable } from '@reelist/models/factories/VideoTableFactory'
 import { createUser } from '@reelist/models/factories/UserFactory'
 import Auth from '@reelist/models/Auth'
 import VideoStore from '@reelist/models/VideoStore'
 import VideoApiSource from '@reelist/apis/VideoApi'
+import { VideoTableType } from '@reelist/utils/interfaces/tables/VideoTable'
 
 jest.mock('~/api/VideoApi')
 
@@ -57,7 +58,7 @@ describe('Video', () => {
     })
 
     it('sets the serverId from the server on lazy load', async () => {
-      const videoTableData = createVideoTable({ id: 'some_resolved_server_id' })
+      const videoTableData = createVideoTable.create({ id: 'some_resolved_server_id' })
 
       VideoApi.loadVideo.mockResolvedValue({ data: videoTableData, error: null })
 
@@ -69,7 +70,7 @@ describe('Video', () => {
     })
 
     it('sets the serverId from the preloaded table data', async () => {
-      const videoTableData = createVideoTable({ id: 'some_preloaded_server_id' })
+      const videoTableData = createVideoTable.create({ id: 'some_preloaded_server_id' })
 
       const video = createVideo({ videoTableData })
 

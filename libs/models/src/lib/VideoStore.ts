@@ -1,20 +1,14 @@
 import _ from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import Auth from '@reelist/models/Auth'
-import Video, { TvSeason, VideoInfoType, VideoTableType } from '@reelist/models/Video'
+import Video, { TvSeason } from '@reelist/models/Video'
 import VideoList from '@reelist/models/VideoList'
 import { callTmdb } from '@reelist/apis/api'
 import User from '@reelist/models/User'
 import { inject, injectable } from 'inversify'
 import { SupabaseClient } from '@supabase/supabase-js'
 import VideoApi from '@reelist/apis/VideoApi'
-
-type TrackedVideoJson = {
-  video_id: string
-  video_info: VideoInfoType
-  current_season: number
-  current_episode: number
-}
+import { VideoTableType } from '@reelist/utils/interfaces/tables/VideoTable'
 
 @injectable()
 class VideoStore {
@@ -71,7 +65,7 @@ class VideoStore {
 
     if (!path) return null
 
-    let video: Video  | null = this.tmdbJsonByVideoId[videoId]
+    let video: Video | null = this.tmdbJsonByVideoId[videoId]
 
     if (_.isUndefined(video)) {
       video = await callTmdb(path, null, '&append_to_response=images').then(

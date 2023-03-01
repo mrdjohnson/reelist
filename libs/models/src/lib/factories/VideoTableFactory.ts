@@ -1,7 +1,9 @@
-import { VideoTableType } from '@reelist/models/Video'
+import { Factory } from 'fishery'
 import { faker } from '@faker-js/faker'
+import { VideoTableType } from '@reelist/utils/interfaces/tables/VideoTable'
+import moment from 'moment'
 
-export const createVideoTable = (options: Partial<VideoTableType> = {}): VideoTableType => {
+export const createVideoTable = Factory.define<VideoTableType>(() => {
   const isMovie = faker.datatype.boolean()
 
   return {
@@ -12,6 +14,7 @@ export const createVideoTable = (options: Partial<VideoTableType> = {}): VideoTa
     last_watched_episode_number: isMovie ? null : faker.datatype.number(25),
     video_info: {},
     user_id: '',
-    ...options,
+    allow_in_history: true,
+    updated_at: moment().subtract(5, 'minutes').toDate(),
   }
-}
+})

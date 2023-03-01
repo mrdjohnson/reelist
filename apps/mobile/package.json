@@ -47,6 +47,7 @@
     "metro-config": "*",
     "inversify": "*",
     "reflect-metadata": "*",
-    "@types/lodash": "*"
+    "@types/lodash": "*",
+    "fishery": "*"
   }
 }
