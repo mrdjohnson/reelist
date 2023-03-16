@@ -66,7 +66,7 @@ class User implements UserType {
   followVideoList = (videoList: VideoList) => {
     this.viewModel.followedListIds = [...this.followedListIds, videoList.id]
 
-    User.save(this.viewModel)
+    this.save()
   }
 
   toggleFollowingUser = (user: User) => {
@@ -76,13 +76,13 @@ class User implements UserType {
       this.viewModel.followedUserIds = [...this.followedUserIds, user.id]
     }
 
-    User.save(this.viewModel)
+    this.save()
   }
 
   unFollowVideoList = (videoList: VideoList) => {
     this.viewModel.followedListIds = _.without(this.viewModel.followedListIds, videoList.id)
 
-    User.save(this.viewModel)
+    this.save()
   }
 
   isFollowingVideoList = (videoList: VideoList) => {
@@ -101,7 +101,9 @@ class User implements UserType {
     return this._viewModel
   }
 
-  static save = async (userViewModel: User & IViewModel<User>) => {
+  save = async () => {
+    const userViewModel = this.viewModel
+
     // Map{'exampleField' -> 'exampleValue'} -> {example_field: 'exampleValue'}
     const changedFields = humps.decamelizeKeys(Object.fromEntries(userViewModel.changedValues))
 

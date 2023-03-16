@@ -1,23 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import {
-  Input,
-  Image,
-  FormControl,
-  View,
-  Avatar,
-  Icon,
-  Center,
-  Row,
-  useToast,
-  Switch,
-  Text,
-} from 'native-base'
+import { Input, FormControl, View, Avatar, Icon, Row, useToast, Switch } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@reelist/utils/hooks/useStore'
 import _ from 'lodash'
-import { createViewModel } from 'mobx-utils'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
-import User from '@reelist/models/User'
 import { BackHandler } from 'react-native'
 import AppButton from '~/shared/components/AppButton'
 import ActionButton from '~/shared/components/ActionButton'
@@ -48,14 +34,12 @@ const EditProfilePage = observer(() => {
     return _.sample(missingIconOptions) || 'user-secret'
   }, [])
 
-  const userViewModel = useMemo(() => {
-    return createViewModel(user)
-  }, [user])
+  const userViewModel = user.viewModel
 
   const save = async () => {
     setLoading(true)
 
-    const errorMessage = await User.save(userViewModel)
+    const errorMessage = await user.save()
 
     const description = errorMessage || 'Saved'
 
