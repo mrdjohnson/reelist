@@ -1,9 +1,8 @@
-import React, { useMemo, useState } from 'react'
-import { Button, FormControl, Input, View, AlertDialog } from 'native-base'
+import React, { useState } from 'react'
+import { Button, Input, View, AlertDialog } from 'native-base'
 import { observer } from 'mobx-react-lite'
-import VideoList, { AutoSortType } from '@reelist/models/VideoList'
+import { AutoSortType } from '@reelist/models/VideoList'
 import { ReelistScreen } from '~/utils/navigation'
-import { createViewModel } from 'mobx-utils'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { useStore } from '@reelist/utils/hooks/useStore'
@@ -34,7 +33,8 @@ const EditVideoListPage = observer(({ navigation }: ReelistScreen) => {
 
   const handleSave = () => {
     if (currentVideoList.id) {
-      VideoList.save(videoListViewModel)
+      currentVideoList
+        .save()
         .then(closeEditPage)
         .catch((e: Error) => {
           setEditingErrorMessage(e.message)
@@ -44,9 +44,7 @@ const EditVideoListPage = observer(({ navigation }: ReelistScreen) => {
     }
   }
 
-  const videoListViewModel = useMemo(() => {
-    return createViewModel(currentVideoList)
-  }, [currentVideoList])
+  const videoListViewModel = currentVideoList.viewModel
 
   return (
     <View flex={1} backgroundColor="light.100">

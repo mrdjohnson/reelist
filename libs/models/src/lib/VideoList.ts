@@ -109,16 +109,18 @@ class VideoList implements VideoListType {
   join = async () => {
     this.viewModel.adminIds = this.adminIds.concat(this.storeAuth.user.id)
 
-    VideoList.save(this.viewModel)
+    this.save()
   }
 
   leave = async () => {
     this.viewModel.adminIds = _.without(this.adminIds, this.storeAuth.user.id)
 
-    VideoList.save(this.viewModel)
+    this.save()
   }
 
-  static save = async (videoListViewModel: VideoList & IViewModel<VideoList>) => {
+  save = async () => {
+    const videoListViewModel = this.viewModel
+
     if (!videoListViewModel.isDirty) return
 
     const name = videoListViewModel.changedValues.get('name') as string
@@ -194,7 +196,7 @@ class VideoList implements VideoListType {
 
     this.viewModel.videos = nextVideos
 
-    return VideoList.save(this.viewModel)
+    return this.save()
   }
 
   static createUniqueShareId = () => {
