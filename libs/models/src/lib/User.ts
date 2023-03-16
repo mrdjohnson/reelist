@@ -1,22 +1,13 @@
 import { makeAutoObservable } from 'mobx'
-import { PostgrestError, SupabaseClient, User as SupabaseUser } from '@supabase/supabase-js'
+import { PostgrestError, User as SupabaseUser } from '@supabase/supabase-js'
 import humps, { Camelized } from 'humps'
 import { createViewModel, IViewModel } from 'mobx-utils'
 import VideoList from './VideoList'
 import _ from 'lodash'
+import { UserTableType } from '@reelist/utils/interfaces/tables/UserTable'
+import TableApi from '@reelist/apis/TableApi'
 
-export type ProfileTableType = {
-  id: string
-  updated_at: string
-  username: string
-  avatar_url: string
-  followed_list_ids: string[]
-  followed_user_ids: string[]
-  notificationId: string
-  name: string
-}
-
-type ProfileType = Camelized<ProfileTableType>
+type ProfileType = Camelized<UserTableType>
 
 // table values + any ui values
 type UserType = ProfileType & {
@@ -42,11 +33,9 @@ class User implements UserType {
 
   _viewModel?: User & IViewModel<User> = undefined
 
-  static supabase: SupabaseClient
-
   constructor(
     { user, loggedIn = true, profile }: UserConstructorType,
-    private supabase: SupabaseClient,
+    private userApi: TableApi<UserTableType>,
   ) {
     makeAutoObservable(this)
 
@@ -107,8 +96,7 @@ class User implements UserType {
     // Map{'exampleField' -> 'exampleValue'} -> {example_field: 'exampleValue'}
     const changedFields = humps.decamelizeKeys(Object.fromEntries(userViewModel.changedValues))
 
-    const { data: profile, error } = await this.supabase
-      .from('profiles')
+    const { data: profile, error } = await this.userApi
       .update(changedFields)
       .match({ id: userViewModel.id })
       .single()

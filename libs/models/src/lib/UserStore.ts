@@ -1,24 +1,30 @@
 import _ from 'lodash'
 import Auth from './Auth'
-import User, { ProfileTableType } from '@reelist/models/User'
+import User from '@reelist/models/User'
 import humps from 'humps'
 import { inject, injectable } from 'inversify'
 import { SupabaseClient } from '@supabase/supabase-js'
+import { UserTableType } from '@reelist/utils/interfaces/tables/UserTable'
+import TableApi from '@reelist/apis/TableApi'
 
 @injectable()
 class UserStore {
   userById: Record<string, User | null> = {}
   followedUsers: User[] = []
 
+  private userApi: TableApi<UserTableType>
+
   constructor(
     @inject(Auth) private storeAuth: Auth,
     @inject(SupabaseClient) private supabase: SupabaseClient,
-  ) {}
+  ) {
+    this.userApi = new TableApi<UserTableType>('profiles', supabase)
+  }
 
-  makeUiUser = (profileData: ProfileTableType, loggedIn: boolean = false) => {
-    const profile = humps.camelizeKeys<ProfileTableType>(profileData)
+  makeUiUser = (profileData: UserTableType, loggedIn: boolean = false) => {
+    const profile = humps.camelizeKeys<UserTableType>(profileData)
 
-    return new User({ profile, loggedIn }, this.supabase)
+    return new User({ profile, loggedIn }, this.userApi)
   }
 
   getFollowedUsers = async () => {
@@ -34,11 +40,7 @@ class UserStore {
   getUser = async (userId: string) => {
     if (!userId) return null
 
-    const { data: userJson, error } = await this.supabase
-      .from<ProfileTableType>('profiles')
-      .select('*')
-      .match({ id: userId })
-      .single()
+    const { data: userJson, error } = await this.userApi.match({ id: userId }).single()
 
     if (userJson) {
       return this.makeUiUser(userJson)
@@ -54,10 +56,7 @@ class UserStore {
   getUsers = async (userIds: string[]) => {
     if (_.isEmpty(userIds)) return []
 
-    const { data: userJsons, error } = await this.supabase
-      .from<ProfileTableType>('profiles')
-      .select('*')
-      .in('id', userIds)
+    const { data: userJsons, error } = await this.userApi.selectAll.in('id', userIds)
 
     if (userJsons) {
       return userJsons.map(user => this.makeUiUser(user))
@@ -72,10 +71,7 @@ class UserStore {
 
   getOrCreateUser = async (authId: string) => {
     console.log('getting user')
-    const { data: userJson, error } = await this.supabase
-      .from<ProfileTableType>('profiles')
-      .upsert({ id: authId })
-      .single()
+    const { data: userJson, error } = await this.userApi.upsert({ id: authId }).single()
 
     if (userJson) {
       debugger
