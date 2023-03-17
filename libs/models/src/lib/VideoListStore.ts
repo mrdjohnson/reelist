@@ -2,12 +2,14 @@ import Video from '@reelist/models/Video'
 import _ from 'lodash'
 import { flow, makeAutoObservable } from 'mobx'
 import Auth from '@reelist/models/Auth'
-import VideoList, { VideoListTableType } from './VideoList'
+import VideoList from '@reelist/models/VideoList'
+import { VideoListTableType } from '@reelist/utils/interfaces/tables/VideoListTable'
 import { IViewModel } from 'mobx-utils'
 import VideoStore from '@reelist/models/VideoStore'
 import UserStore from '@reelist/models/UserStore'
 import { inject, injectable } from 'inversify'
 import { SupabaseClient } from '@supabase/supabase-js'
+import TableApi from '@reelist/apis/TableApi'
 
 @injectable()
 class VideoListStore {
@@ -17,12 +19,16 @@ class VideoListStore {
   currentVideo: Video | null = null
   currentVideoList: VideoList | null = null
 
+  private videoListApi: TableApi<VideoListTableType>
+
   constructor(
     @inject(Auth) private storeAuth: Auth,
     @inject(UserStore) private userStore: UserStore,
     @inject(VideoStore) private videoStore: VideoStore,
-    @inject(SupabaseClient) private supabase: SupabaseClient,
+    @inject(SupabaseClient) protected supabase: SupabaseClient,
   ) {
+    this.videoListApi = new TableApi<VideoListTableType>('videoLists', supabase)
+
     makeAutoObservable(this, {
       getPublicVideoLists: flow,
       setCurrentVideoListFromShareId: flow,
@@ -30,7 +36,14 @@ class VideoListStore {
   }
 
   makeUiVideoList = (videoList: VideoListTableType) => {
-    return new VideoList(videoList, this.storeAuth, this, this.videoStore, this.userStore, this.supabase)
+    return new VideoList(
+      videoList,
+      this.storeAuth,
+      this,
+      this.videoStore,
+      this.userStore,
+      this.videoListApi,
+    )
   }
 
   addToAdminVideoList = (videoList: VideoList) => {
@@ -72,9 +85,7 @@ class VideoListStore {
   getAdminVideoLists = async () => {
     if (!_.isEmpty(this.adminVideoLists)) return this.adminVideoLists
 
-    const { data: videoLists, error } = await this.supabase
-      .from<VideoListTableType>('videoLists')
-      .select('*')
+    const { data: videoLists, error } = await this.videoListApi.selectAll
       .contains('admin_ids', [this.storeAuth.user?.id])
       .order('id', { ascending: false })
 
@@ -99,9 +110,7 @@ class VideoListStore {
       return
     }
 
-    const { data: videoList } = yield this.supabase
-      .from<VideoListTableType>('videoLists')
-      .select('*')
+    const { data: videoList } = yield this.videoListApi
       .match({ unique_id: videoListShareId })
       .single()
 
@@ -115,9 +124,7 @@ class VideoListStore {
   refreshCurrentVideoList = flow(function* (this: VideoListStore) {
     if (!this.currentVideoList) return
 
-    const { data: videoListJson } = yield this.supabase
-      .from<VideoListTableType>('videoLists')
-      .select('*')
+    const { data: videoListJson } = yield this.videoListApi
       .match({ id: this.currentVideoList.id })
       .single()
 
@@ -150,9 +157,7 @@ class VideoListStore {
 
     const followedListIds = this.storeAuth.user.followedListIds
 
-    const { data: videoLists, error } = yield this.supabase
-      .from<VideoListTableType>('videoLists')
-      .select('*')
+    const { data: videoLists, error } = yield this.videoListApi
       .match({ is_public: true })
       .not('admin_ids', 'cs', '{"' + this.storeAuth.user?.id + '"}')
       .not('id', 'in', '(' + followedListIds + ')')
@@ -170,10 +175,7 @@ class VideoListStore {
 
     const followedListIds = this.storeAuth.user.followedListIds
 
-    const { data: videoLists, error } = yield this.supabase
-      .from<VideoListTableType>('videoLists')
-      .select('*')
-      .in('id', followedListIds)
+    const { data: videoLists, error } = yield this.videoListApi.selectAll.in('id', followedListIds)
 
     if (error) {
       console.log('getfollowedVideoLists error', error)
@@ -183,7 +185,14 @@ class VideoListStore {
   })
 
   createBlankVideoList = () => {
-    const videoList = new VideoList(null, this.storeAuth, this, this.videoStore, this.userStore, this.supabase)
+    const videoList = new VideoList(
+      null,
+      this.storeAuth,
+      this,
+      this.videoStore,
+      this.userStore,
+      this.videoListApi,
+    )
 
     return videoList
   }
@@ -192,8 +201,7 @@ class VideoListStore {
     const { name, isPublic, isJoinable } = videoListViewModel
     const uniqueShareId = VideoList.createUniqueShareId()
 
-    const { data: videoListJson, error } = await this.supabase
-      .from<VideoListTableType>('videoLists')
+    const { data: videoListJson, error } = await this.videoListApi.fromTable
       .insert({
         name: name,
         is_public: isPublic,

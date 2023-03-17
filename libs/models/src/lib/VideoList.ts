@@ -10,27 +10,8 @@ import { createViewModel, IViewModel } from 'mobx-utils'
 import { humanizedDuration } from '@reelist/utils/humanizedDuration'
 import VideoStore from './VideoStore'
 import UserStore from './UserStore'
-import { SupabaseClient } from '@supabase/supabase-js'
-
-export enum AutoSortType {
-  NONE,
-  NAME,
-  FIRST_AIRED,
-  LAST_AIRED,
-  TOTAL_TIME,
-}
-
-export type VideoListTableType = {
-  id: string
-  admin_ids: string[]
-  is_joinable: boolean
-  name: string
-  video_ids: string[]
-  is_public: boolean
-  unique_id: string
-  auto_sort_type: AutoSortType
-  auto_sort_is_ascending: boolean
-}
+import { AutoSortType, VideoListTableType } from '@reelist/utils/interfaces/tables/VideoListTable'
+import TableApi from '@reelist/apis/TableApi'
 
 type VideoListType = Camelized<VideoListTableType>
 class VideoList implements VideoListType {
@@ -54,15 +35,13 @@ class VideoList implements VideoListType {
   userStore: UserStore
   _viewModel?: VideoList & IViewModel<VideoList> = undefined
 
-  static supabase: SupabaseClient
-
   constructor(
     json: VideoListTableType | null,
     auth: Auth,
     videoListStore: VideoListStore,
     videoStore: VideoStore,
     userStore: UserStore,
-    private supabase: SupabaseClient,
+    private videoListApi: TableApi<VideoListTableType>,
   ) {
     if (json) {
       this._assignValuesFromJson(json)
@@ -145,8 +124,7 @@ class VideoList implements VideoListType {
     // Map{'exampleField' -> 'exampleValue'} -> {example_field: 'exampleValue'}
     const changedFields = humps.decamelizeKeys(Object.fromEntries(videoListViewModel.changedValues))
 
-    const { data: videoList, error } = await this.supabase
-      .from('videoLists')
+    const { data: videoList, error } = await this.videoListApi
       .update(changedFields)
       .match({ id: videoListViewModel.id })
       .single()
@@ -165,10 +143,7 @@ class VideoList implements VideoListType {
   }
 
   destroy = async () => {
-    const { error } = await this.supabase
-      .from<VideoListTableType>('videoLists')
-      .delete()
-      .match({ id: this.id })
+    const { error } = await this.videoListApi.delete.match({ id: this.id })
 
     this.videoListStore.removeFromAllLists(this)
 
