@@ -9,6 +9,7 @@ import { inject, injectable } from 'inversify'
 import { SupabaseClient } from '@supabase/supabase-js'
 import VideoApi from '@reelist/apis/VideoApi'
 import { VideoTableType } from '@reelist/utils/interfaces/tables/VideoTable'
+import TableApi from '@reelist/apis/TableApi'
 
 @injectable()
 class VideoStore {
@@ -16,11 +17,14 @@ class VideoStore {
   tmdbJsonByVideoId: Record<string, Video | null> = {}
   videoSeasonMapByVideoId: Record<string, Record<number, TvSeason | null>> = {}
 
+  private videoApi: VideoApi
+
   constructor(
     @inject(Auth) private storeAuth: Auth,
-    @inject(SupabaseClient) private supabase: SupabaseClient,
-    @inject(VideoApi) private videoApi: VideoApi,
+    @inject(SupabaseClient) protected supabase: SupabaseClient,
   ) {
+    this.videoApi = new VideoApi('videos', supabase)
+
     makeAutoObservable(this)
   }
 
@@ -91,10 +95,10 @@ class VideoStore {
   getTrackedVideos = async (userId: string | null = null): Promise<Video[]> => {
     console.log('getTrackedVideos for user: ', this.storeAuth.user.id)
     let videos: Video[] = []
-    const { data: videoJsons, error } = await this.supabase
-      .from<VideoTableType>('videos')
-      .select('*')
-      .match({ user_id: userId || this.storeAuth.user.id, tracked: true })
+    const { data: videoJsons, error } = await this.videoApi.match({
+      user_id: userId || this.storeAuth.user.id,
+      tracked: true,
+    })
 
     if (error) {
       console.error('failed to lazy load tracked videos', error.message)
@@ -126,9 +130,7 @@ class VideoStore {
     }
 
     let videos: Video[] = []
-    const { data: videoJsons, error } = await this.supabase
-      .from<VideoTableType>('videos')
-      .select('*')
+    const { data: videoJsons, error } = await this.videoApi
       .match(match)
       .order('updated_at', { ascending: false })
       .limit(25)
@@ -152,9 +154,7 @@ class VideoStore {
 
     let videos: Video[] = []
 
-    const { data: videoJsons, error } = await this.supabase
-      .from<VideoTableType>('videos')
-      .select('*')
+    const { data: videoJsons, error } = await this.videoApi
       .match({ user_id: user.id })
       .in('video_id', videoIds)
 
