@@ -72,7 +72,7 @@ class VideoStore {
     let video: Video | null = this.tmdbJsonByVideoId[videoId]
 
     if (_.isUndefined(video)) {
-      video = await callTmdb(path, null, '&append_to_response=images').then(
+      video = await callTmdb(path, { append_to_response: 'images' }).then(
         item => _.get(item, 'data.data') || null,
       )
 

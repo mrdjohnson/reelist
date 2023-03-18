@@ -5,48 +5,36 @@ import humps from 'humps'
 const base_url = 'https://api.themoviedb.org/3'
 const apiKey = secrets.TMDB_API_KEY
 
-export const callTmdb = async (
-  path: string,
-  query: string | null = null,
-  extra: string | null = '',
-) => {
+export const callTmdb = async (path: string, queryParams: Record<string, string> = {}) => {
   // todo figure out how to get __DEV__ in the libraries
   // if (__DEV__) return await localCallTmdb(path, query, extra)
 
   // // // todo: remove this
   // if (!__DEV__) return await localCallTmdb(path, query, extra)
 
-  return await localCallTmdb(path, query, extra)
+  queryParams['api_key'] = apiKey
 
-  const response = await axios.get(secrets.SERVER_URL + '/api/tmdb', {
-    params: {
-      path,
-      query: (query || '') + extra,
-    },
-  })
+  const params = '?' + new URLSearchParams(queryParams).toString()
 
-  console.log(secrets.SERVER_URL + '/api/tmdb?path=' + path + '&query=' + (query || '') + extra)
+  return await localCallTmdb(path, params)
 
-  return humps.camelizeKeys(response)
+  // const response = await axios.get(secrets.SERVER_URL + '/api/tmdb', {
+  //   params: {
+  //     path,
+  //     query: (query || '') + extra,
+  //   },
+  // })
+
+  // console.log(secrets.SERVER_URL + '/api/tmdb?path=' + path + '&query=' + (query || '') + extra)
+
+  // return humps.camelizeKeys(response)
 }
 
-const localCallTmdb = async (
-  path: string,
-  query: string | null = null,
-  extra: string | null = null,
-) => {
+const localCallTmdb = async (path: string, params: string) => {
   // console.log('faux tmdb endpoint')
 
   try {
-    let tmdbUrl = base_url + path + '?api_key=' + apiKey
-
-    if (query) {
-      tmdbUrl += '&query=' + encodeURI(query)
-    }
-
-    if (extra) {
-      tmdbUrl += extra
-    }
+    const tmdbUrl = base_url + path + params
 
     const { data, status, statusText } = await axios.get(tmdbUrl)
 
