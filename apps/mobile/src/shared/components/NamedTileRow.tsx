@@ -18,7 +18,7 @@ import { useReelistNavigation } from '~/utils/navigation'
 import { useStore } from '@reelist/utils/hooks/useStore'
 import LinkButton from '~/shared/components/LinkButton'
 import { IViewProps } from 'native-base/lib/typescript/components/basic/View/types'
-import useAsyncState from '~/hooks/useAsyncState'
+import useAsyncState from '@reelist/utils/hooks/useAsyncState'
 import User from '@reelist/models/User'
 import ProfileIcon from './ProfileIcon'
 

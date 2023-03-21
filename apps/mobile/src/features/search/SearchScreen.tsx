@@ -5,7 +5,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import VideoItem from '~/features/video/VideoItem'
 import SearchBar from '~/shared/components/SearchBar'
 import { ReelistScreenFrom } from '~/utils/navigation'
-import useAsyncState from '~/hooks/useAsyncState'
+import useAsyncState from '@reelist/utils/hooks/useAsyncState'
 import { RefreshControl } from 'react-native'
 import useVideoSearch from '~/hooks/useVideoSearch'
 
