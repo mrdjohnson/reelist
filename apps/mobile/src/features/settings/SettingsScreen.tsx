@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { useStore } from '@reelist/utils/hooks/useStore'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { ReelistScreen } from '~/utils/navigation'
-import AppButton from '~/shared/components/AppButton'
+import AppButton from '@reelist/components/AppButton'
 
 const SettingsScreen = observer(({ navigation }: ReelistScreen) => {
   const { auth } = useStore()

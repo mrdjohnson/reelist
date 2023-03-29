@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { useStore } from '@reelist/utils/hooks/useStore'
 import { InAppBrowser } from 'react-native-inappbrowser-reborn'
 import { ReelistScreen as ReelistScreenProps } from '~/utils/navigation'
-import AppButton from '~/shared/components/AppButton'
+import AppButton from '@reelist/components/AppButton'
 
 const WelcomeScreen = observer(({ navigation }: ReelistScreenProps) => {
   const { auth } = useStore()

@@ -25,7 +25,7 @@ import moment from 'moment'
 import { ReelistScreen } from '~/utils/navigation'
 import VideoSeasonSection from './VideoSeasonSection'
 import ToggleButton from '~/shared/components/ToggleButton'
-import AppButton from '~/shared/components/AppButton'
+import AppButton from '@reelist/components/AppButton'
 import ActionButton from '@reelist/components/ActionButton'
 import TotalTimeDetailsPanel from '~/shared/components/TotalTimeDetailsPanel'
 
