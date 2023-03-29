@@ -20,7 +20,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import moment from 'moment'
 import { BackHandler } from 'react-native'
 import AppButton from '~/shared/components/AppButton'
-import ActionButton from '~/shared/components/ActionButton'
+import ActionButton from '@reelist/components/ActionButton'
 
 const IndeterminateIcon = <Icon as={<MaterialIcons name="indeterminate-check-box" />} />
 

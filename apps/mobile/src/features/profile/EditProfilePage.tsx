@@ -6,7 +6,7 @@ import _ from 'lodash'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import { BackHandler } from 'react-native'
 import AppButton from '~/shared/components/AppButton'
-import ActionButton from '~/shared/components/ActionButton'
+import ActionButton from '@reelist/components/ActionButton'
 
 const CAN_GO_BACK = false
 const CANNOT_GO_BACK = true

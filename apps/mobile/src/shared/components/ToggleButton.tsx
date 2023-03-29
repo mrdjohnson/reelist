@@ -1,7 +1,7 @@
 import React from 'react'
 import { IButtonProps } from 'native-base'
 import { IconButtonProps } from 'react-native-vector-icons/Icon'
-import ActionButton from './ActionButton'
+import ActionButton from '@reelist/components/ActionButton'
 
 type ToggleButtonProps = Omit<IButtonProps, 'onPress'> & {
   active: boolean

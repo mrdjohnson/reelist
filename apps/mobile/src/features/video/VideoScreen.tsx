@@ -26,7 +26,7 @@ import { ReelistScreen } from '~/utils/navigation'
 import VideoSeasonSection from './VideoSeasonSection'
 import ToggleButton from '~/shared/components/ToggleButton'
 import AppButton from '~/shared/components/AppButton'
-import ActionButton from '~/shared/components/ActionButton'
+import ActionButton from '@reelist/components/ActionButton'
 import TotalTimeDetailsPanel from '~/shared/components/TotalTimeDetailsPanel'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
