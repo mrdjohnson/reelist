@@ -2,7 +2,10 @@
   "name": "reelist",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "server:start": "yarn nx serve server --configuration=development",
+    "mobile:start": "cd apps/mobile && yarn start"
+  },
   "private": true,
   "dependencies": {
     "@emotion/react": "11.10.5",
