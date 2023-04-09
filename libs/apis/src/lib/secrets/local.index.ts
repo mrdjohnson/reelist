@@ -1,8 +1,0 @@
-export default {
-  TMDB_API_KEY: 'TMDB_API_KEY',
-  SERVER_URL: 'http://localhost:8000',
-  SUPABASE_URL: 'SUPABASE_URL',
-  SUPABASE_KEY: 'SUPABASE_KEY',
-  TEST_EMAIL: '',
-  TEST_PASSWORD: '',
-}

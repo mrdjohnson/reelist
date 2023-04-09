@@ -1,4 +1,4 @@
-import secrets from '@reelist/apis/secrets/secrets-index'
+import secrets from '@reelist/apis/secrets/secrets-index.json'
 import axios from 'axios'
 import humps from 'humps'
 

@@ -6,22 +6,22 @@
     "prep-dev": {
       "executor": "nx:run-commands",
       "options": {
-        "cwd": "./apps/server/",
-        "commands": ["cp envs/.env.development.local .env.local", "cat .env.local"]
+        "cwd": "./",
+        "commands": ["node apps/server/scripts/prep.mjs development"]
       }
     },
     "prep-stage": {
       "executor": "nx:run-commands",
       "options": {
-        "cwd": "./apps/server/",
-        "commands": ["cp envs/.env.staging.local .env.local", "cat .env.local"]
+        "cwd": "./",
+        "commands": ["node apps/server/scripts/prep.mjs staging"]
       }
     },
     "prep-prod": {
       "executor": "nx:run-commands",
       "options": {
-        "cwd": "./apps/server/",
-        "commands": ["cp envs/.env.production.local .env.local", "cat .env.local"]
+        "cwd": "./",
+        "commands": ["node apps/server/scripts/prep.mjs production"]
       }
     },
     "deploy-prod": {
