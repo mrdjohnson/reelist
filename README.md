@@ -13,19 +13,18 @@ This project is backed by [Supabase](https://supabase.com/) and [TMDB](https://w
   
 ## Getting started  
 clone the project, and run `yarn install` in the root directory
-**You do not need to run yarn in the `apps/mobile` folder!!**
 
-the project expects a secrets file to exist in the correct location; `yarn nx run server:prep-dev` will ensure that file exists and has some base (useless) values; actual values can be received from project owners (or go create your own) 
+`yarn prep` will ensure that the secrets file exists and has some base (useless) values; actual values can be received from project owners (or go create your own) 
 
 ### Mobile:
- `cd apps/mobile` and run `yarn start`; this should boot up the react native setup and allow you to run via android or ios
+ `yarn mobile:start` this should boot up the react native setup and allow you to run via android or ios
 
 ### Website:
-the project can be started with `serve development` in the nx console (or `yarn nx serve server --configuration=development` in the terminal)
+`yarn server:start` this will start up a next js instance on the localhost (dev:4200 staging:3001)
   
 ## Available Scripts  
   
-This project uses [NX](https://nx.dev/) to handle building and bundling. Using the Visual Studio Code plugin is the best way to interact with this codebase  
+This project uses [NX](https://nx.dev/) to handle building and bundling. Using the Visual Studio Code plugin is the best way to interact with nx
   
 ## Creating a new Library  
 Creating a new library "examples" can be done by running  

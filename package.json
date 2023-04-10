@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
+    "prep": "yarn nx run server:prep-dev",
     "server:start": "yarn nx serve server --configuration=development",
     "mobile:start": "cd apps/mobile && yarn start"
   },
