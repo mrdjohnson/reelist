@@ -33,10 +33,9 @@ Creating a new library "examples" can be done by running
   
 ###  Mobile:  
   
-Imports like `import Example from '@features/Example'` are handled by [craco](https://www.npmjs.com/package/@craco/craco).  
+Imports like `import Example from '@reelist/Example'` are handled by tsconfig files, either through tsconfig.base or through tsconfig.lib or tsconfig.app
   
-adding new aliases like `~features` can be done via the `/apps/mobile/.babelrc` and `/apps/mobile/tsconfig.json` files.  
-because mobile handles its own version of `~/*`, we need to copy the custom import paths used in the `tsconfig.base.json` into our `tsconfig.app.json`  
+because mobile and server handles their own version of `~/*`, we need to copy the custom import paths used in the `tsconfig.base.json` into our `tsconfig.app.json`  
   
 Currently; this maps directly to any directory in the `src` directory: Example: `/apps/mobile/src/feature/FeatureExample` would be mapped to `~/feature/FeatureExample`  
   
