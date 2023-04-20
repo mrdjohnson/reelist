@@ -36,6 +36,17 @@ export type TvSeason = {
   episodes?: TvEpisode[]
 }
 
+type TvNetwork = {
+  name: string
+  id: string
+  logoPath: string
+}
+
+type TvGenre = {
+  id: number
+  name: string
+}
+
 type VideoImageType = {
   aspectRatio: number
   height: number
@@ -74,6 +85,8 @@ class Video {
   seasons?: TvSeason[] | undefined
   lastEpisodeToAir?: TvEpisode
   nextEpisodeToAir?: TvEpisode
+  networks: TvNetwork[] = []
+  genres: TvGenre[] = []
 
   images?: {
     backdrops: VideoImageType[]
@@ -162,7 +175,7 @@ class Video {
     })
 
     if (error) {
-      console.error('failed to lazy load video:', error.message)
+      // console.error('failed to lazy load video:', error.message)
     } else if (videoTable) {
       this._assignFromVideoTable(videoTable)
     }
