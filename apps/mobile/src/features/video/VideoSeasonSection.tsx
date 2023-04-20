@@ -103,6 +103,7 @@ const VideoSeasonSection = observer(({ video, season }: VideoSeasonSectionProps)
           onChange={() => video.toggleEpisodeWatched(episode)}
           accessibilityLabel={'Episode ' + episode.episodeNumber}
           size="md"
+          colorScheme="reelist"
         />
       </View>
     )
@@ -131,6 +132,7 @@ const VideoSeasonSection = observer(({ video, season }: VideoSeasonSectionProps)
             icon={
               video.getIsSeasonPartiallyWatched(season.seasonNumber) ? IndeterminateIcon : undefined
             }
+            colorScheme="reelist"
           />
         </View>
 

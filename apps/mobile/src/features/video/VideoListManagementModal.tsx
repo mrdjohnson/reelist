@@ -42,6 +42,7 @@ const VideoListManagementModal = observer(({ navigation }: ReelistScreen) => {
                 isChecked={videoList.includes(video)}
                 onChange={() => videoList.addOrRemoveVideo(video)}
                 accessibilityLabel={'VideoList: ' + videoList.name}
+                colorScheme="reelist"
               />
             </View>
           ))}

@@ -234,6 +234,7 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
                 isChecked={video.isWatched}
                 onChange={() => video.toggleWatched()}
                 accessibilityLabel={video.name}
+                colorScheme="reelist"
               />
             </View>
 
@@ -262,6 +263,7 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
                       ? IndeterminateIcon
                       : undefined
                   }
+                  colorScheme="reelist"
                 />
               </View>
             ))}
