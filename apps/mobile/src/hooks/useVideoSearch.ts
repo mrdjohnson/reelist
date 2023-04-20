@@ -9,7 +9,7 @@ const useVideoSearch = () => {
   const videoSearch = async (searchText: string) => {
     if (!searchText) return []
 
-    const searchResults = await callTmdb('/search/multi', searchText).then(
+    const searchResults = await callTmdb('/search/multi', { query: searchText }).then(
       item => _.get(item, 'data.data.results') as Video[] | null,
     )
 
