@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Actionsheet, Column } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@reelist/utils/hooks/useStore'
@@ -24,6 +24,13 @@ const VideoActionSheet = observer(() => {
     appState.setCurrentVideo(video)
     navigation.navigate('videoListManagementModal')
   }
+
+  useEffect(() => {
+    if(!video) return
+  
+    video.fetchSeasons()
+  }, [video])
+  
 
   return (
     <Actionsheet isOpen={isOpen} onClose={closeSheet}>

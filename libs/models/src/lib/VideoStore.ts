@@ -92,7 +92,13 @@ class VideoStore {
     return this.getVideo(videoTableData.video_id, videoTableData)
   }
 
-  getTrackedVideos = async (userId: string | null = null): Promise<Video[]> => {
+  getTrackedVideos = async ({
+    userId = null,
+    includeSeasons = true,
+  }: {
+    userId?: string | null
+    includeSeasons?: boolean
+  } = {}): Promise<Video[]> => {
     console.log('getTrackedVideos for user: ', this.storeAuth.user.id)
     let videos: Video[] = []
     const { data: videoJsons, error } = await this.videoApi.match({
@@ -108,13 +114,21 @@ class VideoStore {
 
       videos = _.chain(videoPromises).map('value').compact().value()
 
-      await Promise.allSettled(videos.map(video => video.fetchSeasons()))
+      if (includeSeasons) {
+        await Promise.allSettled(videos.map(video => video.fetchSeasons()))
+      }
     }
 
     return videos
   }
 
-  getHistoricVideos = async (userId: string | null = null): Promise<Video[]> => {
+  getHistoricVideos = async ({
+    userId = null,
+    includeSeasons = true,
+  }: {
+    userId?: string | null
+    includeSeasons?: boolean
+  } = {}): Promise<Video[]> => {
     console.log('getHistoricVideos for user: ', this.storeAuth.user.id)
 
     const serverUserId = userId || this.storeAuth.user.id
@@ -143,7 +157,9 @@ class VideoStore {
 
       videos = _.chain(videoPromises).map('value').compact().value()
 
-      await Promise.allSettled(videos.map(video => video.fetchSeasons()))
+      if (includeSeasons) {
+        await Promise.allSettled(videos.map(video => video.fetchSeasons()))
+      }
     }
 
     return videos

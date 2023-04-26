@@ -19,7 +19,7 @@ const ProfileScreen = observer(({ navigation }: ReelistScreen) => {
   const isCurrentUser = user.id === auth.user.id
 
   const [trackedVideos, refresh, loadingTrackedVideos] = useAsyncState([], async () =>
-    videoStore.getTrackedVideos(user.id),
+    videoStore.getTrackedVideos({ userId: user.id }),
   )
 
   const startEditing = () => appState.setProfileScreenEditing(true)
@@ -56,7 +56,7 @@ const ProfileScreen = observer(({ navigation }: ReelistScreen) => {
 
       <NamedTileRow
         label="History"
-        loadVideos={() => videoStore.getHistoricVideos(user.id)}
+        loadVideos={() => videoStore.getHistoricVideos({ userId: user.id })}
         showMoreText="See History Page"
         userId={user.id}
       />

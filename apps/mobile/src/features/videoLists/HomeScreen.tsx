@@ -123,14 +123,14 @@ const HomeScreen = observer(({ navigation }: ReelistScreen) => {
       <ScrollView marginTop="10px">
         <NamedTileRow
           label="Bookmarks"
-          loadVideos={videoStore.getTrackedVideos}
+          loadVideos={() => videoStore.getTrackedVideos({ includeSeasons: false })}
           showMoreText="All Bookmarks"
           onShowMore={() => navigation.navigate('tracking', { screen: 'tracking' })}
         />
 
         <NamedTileRow
           label="History"
-          loadVideos={videoStore.getHistoricVideos}
+          loadVideos={() => videoStore.getHistoricVideos({ includeSeasons: false })}
           showMoreText="See History Page"
         />
 
