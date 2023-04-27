@@ -23,7 +23,7 @@ const VideoItem = observer(({ video, isTile = false, onPress, ...props }: VideoI
   const goToMediaPage = (event: GestureResponderEvent) => {
     onPress && onPress(event)
 
-    navigation.navigate('videoScreen', {videoId: video.videoId})
+    navigation.push('videoScreen', {videoId: video.videoId})
   }
 
   if (isTile) {
