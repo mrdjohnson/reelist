@@ -74,7 +74,6 @@ class UserStore {
     const { data: userJson, error } = await this.userApi.upsert({ id: authId }).single()
 
     if (userJson) {
-      debugger
       return this.makeUiUser(userJson, true)
     }
 
