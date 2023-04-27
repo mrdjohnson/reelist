@@ -19,7 +19,6 @@ export type NavigatorParamList = {
   videosModal: {
     title: string
     loadVideos: () => Promise<Video[]>
-    userId?: string
   }
   tracking: undefined
   profile: undefined

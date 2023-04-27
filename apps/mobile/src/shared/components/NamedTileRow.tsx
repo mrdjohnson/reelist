@@ -51,7 +51,7 @@ const NamedTileRow = ({
   const [localUsers] = useAsyncState([], loadUsers)
 
   const displayVideos = useMemo(() => {
-    return localVideos || videos
+    return videos || localVideos
   }, [localVideos, videos])
 
   if (_.isEmpty(displayVideos) && _.isEmpty(localUsers)) return null
@@ -69,11 +69,10 @@ const NamedTileRow = ({
   const handleShowMore = () => {
     if (onShowMore) {
       onShowMore()
-    } else if (loadVideos) {
+    } else {
       navigation.navigate('videosModal', {
         title: label,
-        loadVideos,
-        userId,
+        loadVideos: async () => displayVideos,
       })
     }
   }

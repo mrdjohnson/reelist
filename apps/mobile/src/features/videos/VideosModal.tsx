@@ -3,7 +3,7 @@ import { Center, Pressable, Row, ScrollView, View, Text } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import _ from 'lodash'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import TrackedVideoItem from '~/features/video/TrackedVideoItem'
+import VideoItem from '~/features/video/VideoItem'
 import SearchBar from '~/shared/components/SearchBar'
 import { ReelistScreenFrom } from '~/utils/navigation'
 import { RefreshControl } from 'react-native'
@@ -20,8 +20,6 @@ const VideosModal = observer(({ route, navigation }: ReelistScreenFrom<'videosMo
   const videoSearch = useVideoSearch()
   
   const title = route.params.title
-  const userId = route.params.userId || auth.user.id
-  const isCurrentUser = userId === auth.user.id
 
   const [videos, refresh, loadingVideos] = useAsyncState([], route.params.loadVideos)
   const [searchedVideos, setSearchedVideos] = useState<Video[]>([])
@@ -80,7 +78,7 @@ const VideosModal = observer(({ route, navigation }: ReelistScreenFrom<'videosMo
         />
 
         {sortedVideos.map(video => (
-          <TrackedVideoItem video={video} key={video.id} isInteractable={isCurrentUser} />
+          <VideoItem video={video} key={video.id} />
         ))}
 
         <NamedTileRow
