@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Actionsheet, Column } from 'native-base'
+import { Actionsheet, Column, Row } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@reelist/utils/hooks/useStore'
 import { useReelistNavigation } from '~/utils/navigation'
@@ -9,6 +9,7 @@ import ToggleButton from '~/shared/components/ToggleButton'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import SegmentButton from '~/shared/components/SegmentButton'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import VideoWatchedStatusRow from '~/shared/components/VideoWatchedStatusRow'
 
 const VideoActionSheet = observer(() => {
   const { appState } = useStore()
@@ -26,11 +27,10 @@ const VideoActionSheet = observer(() => {
   }
 
   useEffect(() => {
-    if(!video) return
-  
+    if (!video) return
+
     video.fetchSeasons()
   }, [video])
-  
 
   return (
     <Actionsheet isOpen={isOpen} onClose={closeSheet}>
@@ -39,14 +39,24 @@ const VideoActionSheet = observer(() => {
           <VideoItem video={video} margin="0" onPress={closeSheet} />
 
           <Column space="10px" marginY="20px" width="100%">
-            <ToggleButton
-              active={video.tracked}
-              content="Add to Bookmarks?"
-              icon={<MaterialCommunityIcons name="bookmark-plus" />}
-              activeContent="Added to Bookmarks"
-              activeIcon={<MaterialCommunityIcons name="bookmark-check" />}
-              onPress={() => video.toggleTracked()}
-            />
+            <Row alignItems="center" space="8px" justifyContent="space-between">
+              <AppButton flex={1} onPress={openVideoListManagementModal} size="sm">
+                Manage Lists
+              </AppButton>
+
+              <ToggleButton
+                size="sm"
+                flex={1}
+                active={video.tracked}
+                icon={<MaterialCommunityIcons name="bookmark-plus" />}
+                activeIcon={<MaterialCommunityIcons name="bookmark-check" />}
+                content="Add to Bookmarks"
+                activeContent="Added to Bookmarks"
+                onPress={() => video.toggleTracked()}
+              />
+            </Row>
+
+            <VideoWatchedStatusRow video={video} onModalOpen={closeSheet} />
 
             <SegmentButton
               selectedSegmentIndex={video.allowInHistory ? 0 : 1}
@@ -61,9 +71,8 @@ const VideoActionSheet = observer(() => {
                   content: 'History is private',
                 },
               ]}
+              size="sm"
             />
-
-            <AppButton onPress={openVideoListManagementModal}>Manage Lists</AppButton>
           </Column>
         </Actionsheet.Content>
       )}

@@ -16,9 +16,9 @@ import { useStore } from '@reelist/utils/hooks/useStore'
 
 const VideosModal = observer(({ route, navigation }: ReelistScreenFrom<'videosModal'>) => {
   const {auth} = useStore()
-  
+
   const videoSearch = useVideoSearch()
-  
+
   const title = route.params.title
 
   const [videos, refresh, loadingVideos] = useAsyncState([], route.params.loadVideos)
@@ -52,13 +52,13 @@ const VideosModal = observer(({ route, navigation }: ReelistScreenFrom<'videosMo
           </Pressable>
         </Center>
 
-        <Center flex={1} marginX="4px">
+        <Center flexShrink={1} marginX="4px">
           <Text fontSize="2xl" adjustsFontSizeToFit numberOfLines={1}>
             {title}
           </Text>
         </Center>
 
-        <Center />
+        <Center flex={1} />
       </Row>
 
       <ScrollView

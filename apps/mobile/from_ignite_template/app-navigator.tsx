@@ -26,6 +26,8 @@ import EditVideoListPage from '~/features/videoLists/EditVideoListPage'
 import VideoListManagementModal from '~/features/video/VideoListManagementModal'
 import AppActionSheets from '~/shared/components/AppActionSheets'
 import VideosModal from '~/features/videos/VideosModal'
+import VideoSeasonModal from '~/features/video/VideoSeasonModal'
+import VideoUpdateWatchedModal from '~/features/video/VideoUpdateWatchedModal'
 
 const Stack = createNativeStackNavigator<NavigatorParamList>()
 const Tab = createBottomTabNavigator<NavigatorParamList>()
@@ -61,6 +63,10 @@ const createSubStack = (name: keyof ReelistTabParamList, component: React.Compon
           <Stack.Screen name="videoListScreenSettingsModal" component={EditVideoListPage} />
 
           <Stack.Screen name="videoListManagementModal" component={VideoListManagementModal} />
+
+          <Stack.Screen name="videoSeasonModal" component={VideoSeasonModal} />
+
+          <Stack.Screen name="videoUpdateWatchedModal" component={VideoUpdateWatchedModal} />
 
           <Stack.Screen name="videosModal" component={VideosModal} />
         </Stack.Group>

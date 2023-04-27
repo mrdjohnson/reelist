@@ -15,6 +15,12 @@ const VideoListManagementModal = observer(({ navigation }: ReelistScreen) => {
     videoListStore.getAdminVideoLists()
   }, [])
 
+  if (!video) {
+    navigation.navigate('home')
+
+    return null
+  }
+
   return (
     <View flex={1} padding="10px" paddingTop="0">
       <Row direction="row-reverse" marginTop="10px">

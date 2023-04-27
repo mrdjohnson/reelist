@@ -15,7 +15,9 @@ export type NavigatorParamList = {
   videoListScreenSettingsModal: undefined
   search?: { initialSearchValue?: string }
   videoScreen: { videoId: string }
+  videoSeasonModal: { videoId: string; seasonNumber: number }
   videoListManagementModal: undefined
+  videoUpdateWatchedModal: { videoId: string }
   videosModal: {
     title: string
     loadVideos: () => Promise<Video[]>

@@ -118,8 +118,6 @@ class Video {
 
   seasonMap: Record<number, TvSeason | null> = {}
 
-  _selectedSeason: TvSeason | null = null
-
   constructor(
     json: Video,
     videoTableData: VideoTableType | null = null,
@@ -148,6 +146,8 @@ class Video {
       voteAverage: false,
       voteCount: false,
       seasons: false,
+      similar: false,
+      _relatedVideos: false,
     })
 
     if (videoId) {
@@ -156,6 +156,11 @@ class Video {
       this.videoId = videoId
     } else {
       this.videoId = (json.mediaType === 'movie' ? 'mv' : 'tv') + json.id
+    }
+
+    console.log('videoId: ', videoId)
+    if (this.videoId === 'tv116244') {
+      debugger
     }
 
     this._assignValuesFromJson(json)
@@ -466,8 +471,10 @@ class Video {
     await sendNotifications({ ...update })
   }
 
-  fetchSeason = flow(function* (this: Video, seasonNumber: number) {
+  fetchSeason = async (seasonNumber: number) => {
     if (this.seasonMap[seasonNumber]) return this.seasonMap[seasonNumber]
+
+    debugger
 
     // console.log('fetching season: ', seasonNumber, 'for', this.name)
 
@@ -476,7 +483,7 @@ class Video {
     let season: TvSeason | null = null
 
     try {
-      season = yield callTmdb(path).then(item => _.get(item, 'data.data'))
+      season = await callTmdb(path).then(item => _.get(item, 'data.data')) as TvSeason
     } catch (e) {
       console.error(e)
       throw e
@@ -485,7 +492,7 @@ class Video {
     }
 
     return this.seasonMap[seasonNumber]
-  })
+  }
 
   fetchSeasons = flow(function* (this: Video) {
     if (!this.seasons) return
@@ -509,7 +516,7 @@ class Video {
     this._linkEpisodes()
   })
 
-  fetchRelated = (): Video[] => {
+  fetchRelated = () => {
     if (this._relatedVideos || !this.similar?.results) return this._relatedVideos || []
 
     this._relatedVideos = this.similar.results.map(similarVideoJson =>
@@ -636,18 +643,6 @@ class Video {
     }
 
     return episodeToWatch
-  }
-
-  clearSelectedSeason = () => {
-    this.selectedSeason = null
-  }
-
-  set selectedSeason(selectedSeason: TvSeason | null) {
-    this._selectedSeason = selectedSeason
-  }
-
-  get selectedSeason() {
-    return this._selectedSeason
   }
 
   get isTv() {
