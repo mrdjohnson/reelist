@@ -4,6 +4,7 @@ import _ from 'lodash'
 
 export type ActionButtonProps = IButtonProps & {
   icon?: IButtonProps['startIcon']
+  endIcon?: IButtonProps['endIcon']
   color?: IButtonProps['color']
   variant?: IButtonProps['variant']
   darken?: boolean
@@ -11,8 +12,9 @@ export type ActionButtonProps = IButtonProps & {
 }
 
 const ActionButton = ({
-  color = 'blue.500',
+  color: colorProp = 'blue.500',
   icon,
+  endIcon,
   variant = 'outline',
   darken = true,
   darkenOnPressIn = true,
@@ -20,6 +22,10 @@ const ActionButton = ({
   ...props
 }: ActionButtonProps) => {
   const [pressedIn, setPressedIn] = useState(false)
+
+  const color = useMemo(() => {
+    return disabled ? 'dark.500' : colorProp
+  }, [colorProp, disabled])
 
   const colorScheme = useMemo(() => {
     if (!_.isString(color)) return color
@@ -45,6 +51,7 @@ const ActionButton = ({
       color={color}
       colorScheme={colorScheme}
       startIcon={icon && <Icon as={icon} color={color} />}
+      endIcon={endIcon && <Icon as={endIcon} color={color} />}
       rounded="full"
       onPressIn={() => setPressedIn(true)}
       onPressOut={() => setPressedIn(false)}
