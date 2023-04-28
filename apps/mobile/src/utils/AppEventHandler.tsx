@@ -11,6 +11,8 @@ export const AppEventHandler = () => {
   const toast = useToast()
 
   useEffect(() => {
+    // example command: adb shell am start -a android.intent.action.VIEW -d "reelist://share/video/tv116244"
+    
     const { remove } = Linking.addEventListener('url', ({ url }) => {
       if (!url.includes('reelist://share/')) return
 
@@ -24,6 +26,13 @@ export const AppEventHandler = () => {
 
           appState.setVideoListShareId(content)
           navigation.navigate('videoListScreen')
+        }
+
+        // reelist://share/video/{videoId}
+        case 'video': {
+          console.log('navigating to videoScreen with id:', content)
+
+          navigation.navigate('videoScreen', { videoId: content })
         }
       }
     })
