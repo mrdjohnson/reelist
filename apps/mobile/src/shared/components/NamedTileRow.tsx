@@ -57,8 +57,7 @@ const NamedTileRow = ({
   if (_.isEmpty(displayVideos) && _.isEmpty(localUsers)) return null
 
   const navigateToVideoScreen = (video: Video) => {
-    videoStore.setCurrentVideoId(video.videoId)
-    navigation.navigate('videoScreen')
+    navigation.navigate('videoScreen', {videoId: video.videoId})
   }
 
   const navigateToProfileScreen = (user: User) => {

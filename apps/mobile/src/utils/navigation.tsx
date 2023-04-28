@@ -14,7 +14,7 @@ export type NavigatorParamList = {
   videoListScreen: undefined
   videoListScreenSettingsModal: undefined
   search?: { initialSearchValue?: string }
-  videoScreen: undefined
+  videoScreen: { videoId: string }
   videoListManagementModal: undefined
   videosModal: {
     title: string

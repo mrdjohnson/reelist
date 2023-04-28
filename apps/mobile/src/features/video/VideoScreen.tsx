@@ -22,7 +22,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import Video, { TvSeason } from '@reelist/models/Video'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import moment from 'moment'
-import { ReelistScreen } from '~/utils/navigation'
+import { ReelistScreenFrom } from '~/utils/navigation'
 import VideoSeasonSection from './VideoSeasonSection'
 import ToggleButton from '~/shared/components/ToggleButton'
 import AppButton from '@reelist/components/AppButton'
@@ -35,13 +35,13 @@ const IndeterminateIcon = <Icon as={<MaterialIcons name="indeterminate-check-box
 const CAN_GO_BACK = false
 const CANNOT_GO_BACK = true
 
-const VideoScreen = observer(({ navigation }: ReelistScreen) => {
+const VideoScreen = observer(({ route, navigation }: ReelistScreenFrom<'videoScreen'>) => {
   const { videoStore, auth, appState } = useStore()
-  const videoId = videoStore.currentVideoId
   const [video, setVideo] = useState<Video | null>(null)
   const [minimizeVideoOverview, setMinimizeVideoOverview] = useState(true)
   const [showVideoId, setShowVideoId] = useState(false)
 
+  const { videoId } = route.params
   const season = video?.selectedSeason
 
   const setSeason = (nextSeason: TvSeason | null) => {
@@ -51,10 +51,8 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
   }
 
   useEffect(() => {
-    if (!videoId) return
-
     videoStore.getVideo(videoId).then(setVideo)
-  }, [videoId])
+  }, [])
 
   useEffect(() => {
     if (!video) return
@@ -63,7 +61,7 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
   }, [video])
 
   useEffect(() => {
-    if (!season || !videoId) return
+    if (!season) return
 
     video?.fetchSeason(season.seasonNumber).then(setSeason)
   }, [season?.id])
@@ -84,7 +82,7 @@ const VideoScreen = observer(({ navigation }: ReelistScreen) => {
     return () => BackHandler.removeEventListener('hardwareBackPress', onBackButtonPressed)
   }, [season])
 
-  if (!video || !videoId) {
+  if (!video) {
     return <Text>Loading, there may have been an error for: {videoId}</Text>
   }
 

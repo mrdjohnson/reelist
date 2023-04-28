@@ -12,7 +12,6 @@ import {
   Pressable,
 } from 'native-base'
 import { observer } from 'mobx-react-lite'
-import { useStore } from '@reelist/utils/hooks/useStore'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import Video, { TvEpisode, TvSeason } from '@reelist/models/Video'
 import _ from 'lodash'
@@ -37,9 +36,6 @@ type VideoSeasonSectionProps = {
   season: TvSeason
 }
 const VideoSeasonSection = observer(({ video, season }: VideoSeasonSectionProps) => {
-  const { videoStore } = useStore()
-
-  const videoId = videoStore.currentVideoId
   const [episode, setEpisode] = useState<TvEpisode | null>(null)
   const [ascendingOrder, setAscendingOrder] = useState<boolean>(true)
   const [hideFutureEpisodes, setHideFutureEpisodes] = useState(true)
@@ -73,10 +69,6 @@ const VideoSeasonSection = observer(({ video, season }: VideoSeasonSectionProps)
 
     return () => BackHandler.removeEventListener('hardwareBackPress', onBackButtonPressed)
   }, [episode])
-
-  if (!video || !videoId) {
-    return <Text>Loading, there may have been an error for: {videoId}</Text>
-  }
 
   const renderEpisode = (episode: TvEpisode) => {
     const aired = moment(episode.airDate).isBefore()

@@ -104,8 +104,7 @@ const TrackedVideoItem = observer(
     }
 
     const goToMediaPage = () => {
-      videoStore.setCurrentVideoId(video.videoId)
-      navigation.navigate('videoScreen')
+      navigation.navigate('videoScreen', { videoId: video.videoId })
     }
 
     // only fade for YOUR videos that cant be interacted with.

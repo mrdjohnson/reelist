@@ -13,7 +13,6 @@ import TableApi from '@reelist/apis/TableApi'
 
 @injectable()
 class VideoStore {
-  currentVideoId: string | null = null
   tmdbJsonByVideoId: Record<string, Video | null> = {}
   videoSeasonMapByVideoId: Record<string, Record<number, TvSeason | null>> = {}
 
@@ -30,10 +29,6 @@ class VideoStore {
 
   makeUiVideo = (json: Video, videoId?: string, videoTableData?: VideoTableType | null) => {
     return new Video(json, videoTableData, videoId, this, this.videoApi)
-  }
-
-  setCurrentVideoId = (videoId: string | null) => {
-    this.currentVideoId = videoId
   }
 
   getVideoPath = (videoId: string, seasonNumber?: number) => {
