@@ -6,6 +6,7 @@ import { ReelistScreenFrom } from '~/utils/navigation'
 import ActionButton from '@reelist/components/ActionButton'
 import moment from 'moment'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import LoadingSection from '~/shared/components/LoadingSection'
 
 const VideoUpdateWatchedModal = observer(
   ({ route, navigation }: ReelistScreenFrom<'videoUpdateWatchedModal'>) => {
@@ -27,7 +28,7 @@ const VideoUpdateWatchedModal = observer(
     }, [])
 
     if (!video) {
-      return null
+      return <LoadingSection />
     }
 
     const handleBackfill = () => {

@@ -9,6 +9,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import VideoListDetailsSection from './VideoListDetailsSection'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import VideoFlatList from './VideoFlatList'
+import LoadingSection from '~/shared/components/LoadingSection'
 
 const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
   const { videoListStore, auth, appState } = useStore()
@@ -46,7 +47,7 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
     return currentVideoList?.adminIds.includes(auth.user.id)
   }, [currentVideoList?.adminIds])
 
-  if (!currentVideoList) return null
+  if (!currentVideoList) return <LoadingSection />
 
   const handleProgressPressed = () => {
     setShowMembers(true)

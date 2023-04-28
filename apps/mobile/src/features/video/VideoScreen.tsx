@@ -19,6 +19,8 @@ import TabView from '@reelist/components/TabView'
 import _ from 'lodash'
 import VideoOverviewTab from './VideoOverviewTab'
 import VideoDashboardTab from './VideoDashboardTab'
+import { ActivityIndicator } from 'react-native'
+import LoadingSection from '~/shared/components/LoadingSection'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
@@ -58,7 +60,7 @@ const VideoScreen = observer(({ route, navigation }: ReelistScreenFrom<'videoScr
   }, [video])
 
   if (!video) {
-    return <Text>Loading, there may have been an error for: {videoId}</Text>
+    return <LoadingSection />
   }
 
   return (

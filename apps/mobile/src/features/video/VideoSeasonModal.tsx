@@ -25,6 +25,7 @@ import ActionButton from '@reelist/components/ActionButton'
 import { ReelistScreenFrom } from '~/utils/navigation'
 import { useStore } from '@reelist/utils/hooks/useStore'
 import ToggleButton from '~/shared/components/ToggleButton'
+import LoadingSection from '~/shared/components/LoadingSection'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
@@ -129,7 +130,7 @@ const VideoSeasonModal = observer(
     }
 
     if (!season) {
-      return null
+      return <LoadingSection />
     }
 
     return (
@@ -249,15 +250,15 @@ const VideoSeasonModal = observer(
                   <Text color="light.700">
                     {`S: ${season.seasonNumber} E: ${episode.episodeNumber} | ${moment(
                       episode.airDate,
-                    ).format("MMM Do 'YY")} | ${episode.runtime} min`}
+                    ).format("MMM Do 'YY")} | ${episode.runtime || 'Unknown'} min`}
                   </Text>
 
                   <Row alignItems="center">
                     <Icon as={<MaterialIcons name="star-rate" />} size="sm" color="red.600" />
                     <Text color="light.700">
-                      {`${episode.voteAverage.toPrecision(2)} | ${
-                        episode.voteCount
-                      }{episode.voteCount === 1 ? 'vote' : 'voters'}`}
+                      {`${episode.voteAverage.toPrecision(2)} | ${episode.voteCount} ${
+                        episode.voteCount === 1 ? 'vote' : 'voters'
+                      }`}
                     </Text>
                   </Row>
                 </Column>
