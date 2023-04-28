@@ -27,9 +27,9 @@ const TotalTimeDetailsPanel = observer(({ user, videos, ...props }: TotalTimeDet
 
   return (
     <DetailsPanel
-      {...props}
       text={'Approximate Watched Time for ' + (user.name || 'Nobody')}
       marginX="10px"
+      {...props}
     >
       <Column>
         <Text>Approximate duration: {humanizedDuration(totalDuration)}</Text>
