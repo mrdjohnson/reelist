@@ -59,6 +59,18 @@ type VideoImageType = {
   // iso6391
 }
 
+type CastMember = {
+  id: number
+  name: string
+  character: string
+  order: number
+  profilePath: string
+}
+
+type Credits = {
+  cast: CastMember[]
+}
+
 class Video {
   adult?: boolean | undefined
   backdropPath!: string
@@ -87,7 +99,10 @@ class Video {
   nextEpisodeToAir?: TvEpisode
   networks: TvNetwork[] = []
   genres: TvGenre[] = []
-
+  aggregateCredits?: Credits
+  credits!: Credits
+  similar: { results?: Video[] } = {}
+  _relatedVideos?: Video[]
   images?: {
     backdrops: VideoImageType[]
     logos: VideoImageType[]
@@ -239,6 +254,7 @@ class Video {
   }
 
   toggleTracked = async () => {
+    console.log('toggling tracked')
     const nextTracked = !this.tracked
 
     await this.updateWatched('toggle tracked', {
@@ -439,6 +455,7 @@ class Video {
     if (error) {
       console.error('video failed to ' + type, error.message)
     } else if (videoJson) {
+      console.log(this.videoName + ': ' + type)
       this._assignFromVideoTable(videoJson)
     }
 
@@ -491,6 +508,16 @@ class Video {
 
     this._linkEpisodes()
   })
+
+  fetchRelated = (): Video[] => {
+    if (this._relatedVideos || !this.similar?.results) return this._relatedVideos || []
+
+    this._relatedVideos = this.similar.results.map(similarVideoJson =>
+      this.videoStore.makeUiVideo(similarVideoJson, this.mediaType + similarVideoJson.id),
+    )
+
+    return this._relatedVideos
+  }
 
   watchNextEpisode = () => {
     if (this.nextEpisode) {
@@ -752,6 +779,10 @@ class Video {
 
   get totalDuration() {
     return humanizedDuration(this.totalDurationMinutes)
+  }
+
+  get cast() {
+    return (this.aggregateCredits || this.credits).cast
   }
 }
 
