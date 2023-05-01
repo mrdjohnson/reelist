@@ -9,6 +9,7 @@ export type ActionButtonProps = IButtonProps & {
   variant?: IButtonProps['variant']
   darken?: boolean
   darkenOnPressIn?: boolean
+  darknessLevel?: number
 }
 
 const ActionButton = ({
@@ -18,6 +19,7 @@ const ActionButton = ({
   variant = 'outline',
   darken = true,
   darkenOnPressIn = true,
+  darknessLevel = 10,
   disabled,
   ...props
 }: ActionButtonProps) => {
@@ -38,10 +40,12 @@ const ActionButton = ({
       if (!darken) return null
     }
 
-    const alphaValue = darkenOnPressIn && pressedIn ? '30' : '10'
+    const alphaValue = darknessLevel + (darkenOnPressIn && pressedIn ? 20 : 0)
+
+    if (alphaValue >= 100) return 'transparent'
 
     return color + ':alpha.' + alphaValue
-  }, [darken, pressedIn, color, darkenOnPressIn, disabled])
+  }, [darken, pressedIn, color, darkenOnPressIn, disabled, darknessLevel])
 
   return (
     <Button
