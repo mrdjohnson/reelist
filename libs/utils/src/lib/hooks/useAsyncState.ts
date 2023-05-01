@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
  * @returns value or default value, refresher function, is loading
  */
 const useAsyncState = <T>(
-  defaultValue: T,
+  defaultValue: T | (() => T),
   callback?: () => Promise<T>,
 ): [T, () => void, boolean] => {
   const [isRefreshing, setIsRefreshing] = useState(true)

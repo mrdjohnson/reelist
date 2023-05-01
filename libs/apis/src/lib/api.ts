@@ -14,7 +14,9 @@ export const callTmdb = async (path: string, queryParams: Record<string, string>
 
   queryParams['api_key'] = apiKey
 
-  const params = '?' + new URLSearchParams(queryParams).toString()
+  let params = '?' + new URLSearchParams(queryParams).toString()
+
+  params = params.replace('%2C', ',')
 
   return await localCallTmdb(path, params)
 
