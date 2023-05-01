@@ -1542,6 +1542,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.18.6, @babel/runtime@npm:^7.21.0":
+  version: 7.21.5
+  resolution: "@babel/runtime@npm:7.21.5"
+  dependencies:
+    regenerator-runtime: ^0.13.11
+  checksum: 358f2779d3187f5c67ad302e8f8d435412925d0b991d133c7d4a7b1ddd5a3fda1b6f34537cb64628dfd96a27ae46df105bed3895b8d754b88cacdded8d1129dd
+  languageName: node
+  linkType: hard
+
 "@babel/template@npm:^7.0.0, @babel/template@npm:^7.18.10, @babel/template@npm:^7.20.7, @babel/template@npm:^7.3.3":
   version: 7.20.7
   resolution: "@babel/template@npm:7.20.7"
@@ -2733,11 +2742,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/icons-material@npm:^5.8.4":
-  version: 5.11.9
-  resolution: "@mui/icons-material@npm:5.11.9"
+"@mui/icons-material@npm:^5.11.16":
+  version: 5.11.16
+  resolution: "@mui/icons-material@npm:5.11.16"
   dependencies:
-    "@babel/runtime": ^7.20.13
+    "@babel/runtime": ^7.21.0
   peerDependencies:
     "@mui/material": ^5.0.0
     "@types/react": ^17.0.0 || ^18.0.0
@@ -2745,7 +2754,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: bb7e4478272a8758c253c6fa89215247d735b3ead47a87f88dc6dde69a2f44e523a84304346eb7a3f07529e3aea08f649646b3d03a2f4ef3f534fcb7b6b692cb
+  checksum: db70426b6ede049307b951fc622c6ab3b156a24589242bebbc7effd4b0df2d3c7aca93796ed8dfdf20776248778a798724c7a112f8f687c3b4a1ae813f98fb17
   languageName: node
   linkType: hard
 
@@ -2902,6 +2911,20 @@ __metadata:
   peerDependencies:
     react: ^17.0.0 || ^18.0.0
   checksum: 23761e646443a8f9ad5e0715587491e65f5164fd99f6730f134068f9c859a6af9e3f9d218d193c9a9217da1c91182f76352c120de4f70ab19539afa7504698a2
+  languageName: node
+  linkType: hard
+
+"@native-base/next-adapter@npm:^2.3.0":
+  version: 2.3.0
+  resolution: "@native-base/next-adapter@npm:2.3.0"
+  dependencies:
+    native-base: ^3.4.19
+    react-native-vector-icons-for-web: ^0.1.7
+  peerDependencies:
+    next: "*"
+    react: "*"
+    react-native-web: "*"
+  checksum: 8e90f88177e67ec56781a8f944f96ea93965308846c0f16e5afbb544bff6dd6bf51933273a40aea90dc8517a6fc8e29bbfaf637a984d2c01181358bad2f76a9a
   languageName: node
   linkType: hard
 
@@ -3956,7 +3979,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-aria/checkbox@npm:^0.2.2":
+"@react-native-aria/checkbox@npm:^0.2.2, @react-native-aria/checkbox@npm:^0.2.3":
   version: 0.2.3
   resolution: "@react-native-aria/checkbox@npm:0.2.3"
   dependencies:
@@ -4050,6 +4073,24 @@ __metadata:
     react-dom: "*"
     react-native: "*"
   checksum: 3f215895305b7230bc3b9f441144a1444404343d8dc909d14c1861f8a2adf339dd7d5d2880922b933fd2c5858d75a3c060ac4c35616d370cd50743ba8e721b5c
+  languageName: node
+  linkType: hard
+
+"@react-native-aria/overlays@npm:^0.3.3":
+  version: 0.3.6
+  resolution: "@react-native-aria/overlays@npm:0.3.6"
+  dependencies:
+    "@react-aria/interactions": ^3.3.2
+    "@react-aria/overlays": ^3.7.0
+    "@react-native-aria/utils": ^0.2.8
+    "@react-stately/overlays": ^3.1.1
+    "@react-types/overlays": ^3.4.0
+    dom-helpers: ^5.0.0
+  peerDependencies:
+    react: "*"
+    react-dom: "*"
+    react-native: "*"
+  checksum: e481be4efb608b04cd130ce5be55752c00e158f5aea44a71420816b544fa4daf94ee2450721615e2b7951cecd6e5bf43013194e047dc3b4e31d99e62dffceac6
   languageName: node
   linkType: hard
 
@@ -7072,7 +7113,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"asap@npm:~2.0.6":
+"asap@npm:~2.0.3, asap@npm:~2.0.6":
   version: 2.0.6
   resolution: "asap@npm:2.0.6"
   checksum: b296c92c4b969e973260e47523207cd5769abd27c245a68c26dc7a0fe8053c55bb04360237cb51cab1df52be939da77150ace99ad331fb7fb13b3423ed73ff3d
@@ -10756,6 +10797,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fbjs-css-vars@npm:^1.0.0":
+  version: 1.0.2
+  resolution: "fbjs-css-vars@npm:1.0.2"
+  checksum: 72baf6d22c45b75109118b4daecb6c8016d4c83c8c0f23f683f22e9d7c21f32fff6201d288df46eb561e3c7d4bb4489b8ad140b7f56444c453ba407e8bd28511
+  languageName: node
+  linkType: hard
+
+"fbjs@npm:^3.0.4":
+  version: 3.0.4
+  resolution: "fbjs@npm:3.0.4"
+  dependencies:
+    cross-fetch: ^3.1.5
+    fbjs-css-vars: ^1.0.0
+    loose-envify: ^1.0.0
+    object-assign: ^4.1.0
+    promise: ^7.1.1
+    setimmediate: ^1.0.5
+    ua-parser-js: ^0.7.30
+  checksum: 8b23a3550fcda8a9109fca9475a3416590c18bb6825ea884192864ed686f67fcd618e308a140c9e5444fbd0168732e1ff3c092ba3d0c0ae1768969f32ba280c7
+  languageName: node
+  linkType: hard
+
 "fd-slicer@npm:~1.1.0":
   version: 1.1.0
   resolution: "fd-slicer@npm:1.1.0"
@@ -10950,6 +11013,15 @@ __metadata:
     "@google-cloud/storage":
       optional: true
   checksum: f67626c176ef99b1b41d4b34fbacaa8bae89b3ab71a1783f1a4b4fa7691686e6649c69014d999c8d5e0ed7167164aa8da65fbc82f0ae7df667b13a007d0237ca
+  languageName: node
+  linkType: hard
+
+"fishery@npm:^2.2.2":
+  version: 2.2.2
+  resolution: "fishery@npm:2.2.2"
+  dependencies:
+    lodash.mergewith: ^4.6.2
+  checksum: 270a90bb69c16b73e4dc3df20e0c9d7f54feed3658114c0fcdeda726634b624b89cfa39d3858170db85d9f5ef6fe130ffb16b0056e3dbe6a1473629e754f14cb
   languageName: node
   linkType: hard
 
@@ -14662,6 +14734,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash.uniqueid@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "lodash.uniqueid@npm:4.0.1"
+  checksum: f8a66b34c2a8df74aeab22a018c9247c96346dc449506278e6f651030166b74959a4f8e6fae60d392a4c00a40758677547b6e969e4cb6893d8fcd1cb0d2b4ba1
+  languageName: node
+  linkType: hard
+
 "lodash@npm:^4.17.14, lodash@npm:^4.17.15, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.17.5":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
@@ -14945,6 +15024,13 @@ __metadata:
   version: 5.2.1
   resolution: "memoize-one@npm:5.2.1"
   checksum: a3cba7b824ebcf24cdfcd234aa7f86f3ad6394b8d9be4c96ff756dafb8b51c7f71320785fbc2304f1af48a0467cbbd2a409efc9333025700ed523f254cb52e3d
+  languageName: node
+  linkType: hard
+
+"memoize-one@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "memoize-one@npm:6.0.0"
+  checksum: f185ea69f7cceae5d1cb596266dcffccf545e8e7b4106ec6aa93b71ab9d16460dd118ac8b12982c55f6d6322fcc1485de139df07eacffaae94888b9b3ad7675f
   languageName: node
   linkType: hard
 
@@ -16249,6 +16335,57 @@ __metadata:
   languageName: node
   linkType: hard
 
+"native-base@npm:^3.4.19":
+  version: 3.4.28
+  resolution: "native-base@npm:3.4.28"
+  dependencies:
+    "@react-aria/visually-hidden": ^3.2.1
+    "@react-native-aria/button": ^0.2.4
+    "@react-native-aria/checkbox": ^0.2.3
+    "@react-native-aria/combobox": ^0.2.4-alpha.0
+    "@react-native-aria/focus": ^0.2.6
+    "@react-native-aria/interactions": ^0.2.2
+    "@react-native-aria/listbox": ^0.2.4-alpha.3
+    "@react-native-aria/overlays": ^0.3.3
+    "@react-native-aria/radio": ^0.2.4
+    "@react-native-aria/slider": ^0.2.5-alpha.1
+    "@react-native-aria/tabs": ^0.2.7
+    "@react-native-aria/utils": ^0.2.8
+    "@react-stately/checkbox": 3.0.3
+    "@react-stately/collections": 3.3.0
+    "@react-stately/combobox": 3.0.0-alpha.1
+    "@react-stately/radio": 3.2.1
+    "@react-stately/slider": 3.0.1
+    "@react-stately/tabs": 3.0.0-alpha.1
+    "@react-stately/toggle": 3.2.1
+    inline-style-prefixer: ^6.0.1
+    lodash.clonedeep: ^4.5.0
+    lodash.get: ^4.4.2
+    lodash.has: ^4.5.2
+    lodash.isempty: ^4.4.0
+    lodash.isequal: ^4.5.0
+    lodash.isnil: ^4.0.0
+    lodash.merge: ^4.6.2
+    lodash.mergewith: ^4.6.2
+    lodash.omit: ^4.5.0
+    lodash.omitby: ^4.6.0
+    lodash.pick: ^4.4.0
+    lodash.uniqueid: ^4.0.1
+    stable-hash: ^0.0.2
+    tinycolor2: ^1.4.2
+    use-sync-external-store: ^1.2.0
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-native": "*"
+    react: "*"
+    react-dom: "*"
+    react-native: "*"
+    react-native-safe-area-context: "*"
+    react-native-svg: "*"
+  checksum: 68d3b2c56c23b2bc25296162dfbd586530df6bc3a3e0a577ab383cdfc014e4e436604edb5aa33312055226c375e170ca942e686d43b23372d075dd7aa613fa8d
+  languageName: node
+  linkType: hard
+
 "native-request@npm:^1.0.5":
   version: 1.1.0
   resolution: "native-request@npm:1.1.0"
@@ -16539,6 +16676,13 @@ __metadata:
   bin:
     nopt: bin/nopt.js
   checksum: 82149371f8be0c4b9ec2f863cc6509a7fd0fa729929c009f3a58e4eb0c9e4cae9920e8f1f8eb46e7d032fec8fb01bede7f0f41a67eb3553b7b8e14fa53de1dac
+  languageName: node
+  linkType: hard
+
+"normalize-css-color@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "normalize-css-color@npm:1.0.2"
+  checksum: 7433dc995a8d27c9384059ef0b52ceef47f4fab1bab55f1f085058b27e7472466ce321f46391fc85b6851db5212b9bd2bf55f5dc361da01a8a8cf4c360f69dab
   languageName: node
   linkType: hard
 
@@ -17881,6 +18025,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"promise@npm:^7.1.1":
+  version: 7.3.1
+  resolution: "promise@npm:7.3.1"
+  dependencies:
+    asap: ~2.0.3
+  checksum: 475bb069130179fbd27ed2ab45f26d8862376a137a57314cf53310bdd85cc986a826fd585829be97ebc0aaf10e9d8e68be1bfe5a4a0364144b1f9eedfa940cf1
+  languageName: node
+  linkType: hard
+
 "promise@npm:^8.3.0":
   version: 8.3.0
   resolution: "promise@npm:8.3.0"
@@ -18339,6 +18492,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-vector-icons-for-web@npm:^0.1.7":
+  version: 0.1.7
+  resolution: "react-native-vector-icons-for-web@npm:0.1.7"
+  peerDependencies:
+    react: ^16.13.1
+    react-dom: ^16.13.1
+  checksum: 520028e1681c42159a895f520060fd777f4c4b6c82db10017ff0e837abdab72690143967e851d8e930b1d43af88c090756be5df688583117b25e2bc82b492757
+  languageName: node
+  linkType: hard
+
 "react-native-vector-icons@npm:^9.2.0":
   version: 9.2.0
   resolution: "react-native-vector-icons@npm:9.2.0"
@@ -18349,6 +18512,25 @@ __metadata:
     fa5-upgrade: bin/fa5-upgrade.sh
     generate-icon: bin/generate-icon.js
   checksum: 222baf88c3f269234c08a41680e6400a4bf1f4c170f7c2ffac34b2c1c089cdb1084223db2a7d9cc54ee212eec20ff1478f3f482df19062e3057c328642da0be2
+  languageName: node
+  linkType: hard
+
+"react-native-web@npm:^0.19.4":
+  version: 0.19.4
+  resolution: "react-native-web@npm:0.19.4"
+  dependencies:
+    "@babel/runtime": ^7.18.6
+    fbjs: ^3.0.4
+    inline-style-prefixer: ^6.0.1
+    memoize-one: ^6.0.0
+    normalize-css-color: ^1.0.2
+    nullthrows: ^1.1.1
+    postcss-value-parser: ^4.2.0
+    styleq: ^0.1.2
+  peerDependencies:
+    react: ^18.0.0
+    react-dom: ^18.0.0
+  checksum: e8cf1f3d01a7d160bd02a28c90d239b1dcb7ee0661344c74b908cf205f9f1acf8dd87307cf1a1a30dfd4fe1604f49820f68e5cf721cd5e8693bd16e3d5a7e87b
   languageName: node
   linkType: hard
 
@@ -18558,9 +18740,10 @@ __metadata:
     "@emotion/react": 11.10.5
     "@emotion/styled": 11.10.5
     "@faker-js/faker": ^7.5.0
-    "@mui/icons-material": ^5.8.4
+    "@mui/icons-material": ^5.11.16
     "@mui/lab": ^5.0.0-alpha.97
     "@mui/material": ^5.10.1
+    "@native-base/next-adapter": ^2.3.0
     "@nrwl/cli": 15.7.2
     "@nrwl/cypress": 15.7.2
     "@nrwl/detox": 15.7.2
@@ -18622,6 +18805,7 @@ __metadata:
     eslint-plugin-react-hooks: 4.6.0
     faker: ^6.6.6
     firebase-admin: ^11.0.1
+    fishery: ^2.2.2
     humps: ^2.0.1
     inversify: ^6.0.1
     inversify-inject-decorators: ^3.1.0
@@ -18659,6 +18843,7 @@ __metadata:
     react-native-svg-transformer: 1.0.0
     react-native-url-polyfill: ^1.3.0
     react-native-vector-icons: ^9.2.0
+    react-native-web: ^0.19.4
     react-native-webview: ^11.23.0
     react-test-renderer: 18.2.0
     reflect-metadata: ^0.1.13
@@ -20244,6 +20429,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"styleq@npm:^0.1.2":
+  version: 0.1.3
+  resolution: "styleq@npm:0.1.3"
+  checksum: 14a8d23abd914166a9b4bd04ed753bd91363f0e029ee4a94ec2c7dc37d3213fe01fceee22dc655288da3ae89f5dc01cec42d5e2b58478b0dea33bf5bdf509be1
+  languageName: node
+  linkType: hard
+
 "stylis@npm:4.1.3":
   version: 4.1.3
   resolution: "stylis@npm:4.1.3"
@@ -21027,6 +21219,13 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: c981e82b77a5acdcc4e69af9c56cdecf5b934a87a08e7b52120596701e389a878b8e3f860e73ffb287bf649cc47a8c741262ce058148f71de4cdd88bb9c75153
+  languageName: node
+  linkType: hard
+
+"ua-parser-js@npm:^0.7.30":
+  version: 0.7.35
+  resolution: "ua-parser-js@npm:0.7.35"
+  checksum: 0a332e8d72d277e62f29ecb3a33843b274de93eb9378350b746ea0f89ef05ee09c94f2c1fdab8001373ad5e95a48beb0a94f39dc1670c908db9fc9b8f0876204
   languageName: node
   linkType: hard
 
