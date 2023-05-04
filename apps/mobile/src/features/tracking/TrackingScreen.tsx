@@ -9,7 +9,7 @@ import SearchBar from '~/shared/components/SearchBar'
 import { ReelistScreen } from '~/utils/navigation'
 import { RefreshControl } from 'react-native'
 import useAsyncState from '@reelist/utils/hooks/useAsyncState'
-import useVideoSearch from '~/hooks/useVideoSearch'
+import useVideoSearch from '@reelist/utils/hooks/useVideoSearch'
 import NamedTileRow from '~/shared/components/NamedTileRow'
 import Video from '@reelist/models/Video'
 

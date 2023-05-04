@@ -5,7 +5,7 @@ import { createUser } from '@reelist/models/factories/UserFactory'
 import Auth from '@reelist/models/Auth'
 import VideoStore from '@reelist/models/VideoStore'
 import VideoApiSource from '@reelist/apis/VideoApi'
-import { VideoTableType } from '@reelist/utils/interfaces/tables/VideoTable'
+import { VideoTableType } from '@reelist/interfaces/tables/VideoTable'
 
 jest.mock('~/api/VideoApi')
 

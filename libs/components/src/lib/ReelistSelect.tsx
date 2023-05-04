@@ -1,33 +1,21 @@
 import React, { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
-import {
-  ChevronDownIcon,
-  ChevronUpIcon,
-  Column,
-  Text,
-  Center,
-  Input,
-  useDisclose,
-  MinusIcon,
-  AddIcon,
-  Row,
-  ScrollView,
-  Popover,
-  Pressable,
-} from 'native-base'
-import PillButton from '@reelist/components/PillButton'
-import AppButton from '@reelist/components/AppButton'
+import classNames from 'classnames'
 import _ from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { makeAutoObservable } from 'mobx'
 import { useStore } from '@reelist/utils/hooks/useStore'
 import { IStorage } from '~/utils/storage'
+import { Button, Link, Popover, TextField } from '@mui/material'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import AddIcon from '@mui/icons-material/Add'
+import RemoveIcon from '@mui/icons-material/Remove'
 
 type StringOrNumber = string | number
 
 export type SelectOption<T extends StringOrNumber> = { id: T; name: string; selected?: boolean }
 
 export class SelectState<T extends StringOrNumber> {
-  selectedOptions: Array<T> = []
+  selectedOptions: Record<StringOrNumber, string> = {}
   storageKey: string
   options: Array<SelectOption<T>>
 
@@ -35,57 +23,91 @@ export class SelectState<T extends StringOrNumber> {
     public label: string,
     public loadOptions: () => Promise<Array<SelectOption<T>>>,
     private storage: IStorage,
-    private alternativeDefaultOptions?: () => T[],
-    private isMulti: boolean = true,
+    private alternativeDefaultOptions?: () => Array<string>,
+    public isMulti: boolean = true,
   ) {
     console.log('is multi: ', isMulti)
-    loadOptions().then(nextOptions => (this.options = nextOptions))
     this.storageKey = _.snakeCase(label)
 
-    this.lazyLoadFromStorage()
+    loadOptions().then(nextOptions => {
+      this.options = nextOptions
+      this.lazyLoadFromStorage()
 
-    makeAutoObservable(this)
+      makeAutoObservable(this)
+    })
   }
 
   lazyLoadFromStorage = async () => {
     const defaultKey = this.storageKey
 
-    const storedValues = await this.storage.load<T[]>(defaultKey)
+    const storedValues = await this.storage.load<typeof this.selectedOptions>(defaultKey)
 
     console.log('loaded ' + defaultKey + ':', storedValues)
 
-    if (storedValues != null) {
-      this.selectedOptions.push(...storedValues)
+    if (!_.isEmpty(storedValues)) {
+      this.selectedOptions = storedValues
+
+      return
     }
 
     if (this.alternativeDefaultOptions) {
-      this.selectedOptions.push(...this.alternativeDefaultOptions())
+      const defaultIds = this.alternativeDefaultOptions()
+      const allOptionsById = _.chain(this.options).keyBy('id').mapValues('name').value()
+
+      const options = {}
+
+      if (this.isMulti) {
+        defaultIds.forEach(id => {
+          if (allOptionsById[id]) {
+            options[id] = allOptionsById[id]
+          }
+        })
+      } else {
+        const [id] = defaultIds
+        options[id] = allOptionsById[id]
+      }
+
+      this.selectedOptions = options
+
+      this.save()
     }
 
     if (!this.isMulti && !_.isEmpty(this.selectedOptions)) {
-      this.selectedOptions = [this.selectedOptions[0]]
+      // todo:
+      // this.selectedOptions = {0: this.selectedOptions[0]}
     }
   }
 
   toggleOption = (option: SelectOption<T>) => {
-    const selected = this.selectedOptions
-    const removingOption = selected.includes(option.id)
+    const removingOption = !!this.selectedOptions[option.id]
 
     if (this.isMulti) {
-      this.selectedOptions = _.xor(this.selectedOptions, [option.id])
+      if (removingOption) return this.removeOption(option.id)
+
+      this.selectedOptions = { ...this.selectedOptions, [option.id]: option.name }
       // if this is not multi select, there should always be a selected option
     } else if (!removingOption) {
-      this.selectedOptions = [option.id]
+      this.selectedOptions = { [option.id]: option.name }
     }
 
-    this.storage.save(this.storageKey, selected)
+    this.save()
+  }
+
+  removeOption = (optionId: StringOrNumber) => {
+    this.selectedOptions = _.omit(this.selectedOptions, optionId)
+
+    this.save()
+  }
+
+  save = () => {
+    this.storage.save(this.storageKey, this.selectedOptions)
   }
 }
 
 export const useSelectState = <T extends StringOrNumber>(
   label: string,
   loadOptions: () => Promise<Array<SelectOption<T>>>,
-  config: { getAlternativeDefaults?: () => T[]; isMulti?: boolean } = {},
+  config: { getAlternativeDefaults?: () => Array<string>; isMulti?: boolean } = {},
 ) => {
   const { storage } = useStore()
 
@@ -107,152 +129,146 @@ type ReelistSelectProps<T extends StringOrNumber> = PropsWithChildren<{
 }>
 
 const ReelistSelect = observer(
-  <T extends StringOrNumber>({ selectState, children }: ReelistSelectProps<T>) => {
-    const { isOpen, onClose, onOpen } = useDisclose()
+  <T extends StringOrNumber>({
+    selectState,
+    children,
+    ...containerProps
+  }: ReelistSelectProps<T>) => {
+    const [isOpen, setIsOpen] = useState(false)
     const [filterText, setFilterText] = useState('')
-    const { label, options, selectedOptions, toggleOption } = selectState || {}
+    const { label, options = [], selectedOptions, toggleOption, isMulti } = selectState || {}
+    const buttonRef = useRef<HTMLButtonElement>(null)
 
     const filteredOptions = useMemo(() => {
       return _.chain(options)
         .filter(option => option.name.toLowerCase().includes(filterText.toLowerCase()))
-        .take(50)
         .value()
     }, [options, filterText])
 
     const onPopoverClose = () => {
-      onClose()
+      setIsOpen(false)
       setFilterText('')
     }
 
     const renderOption = (option: SelectOption<T>, isChecked) => {
-      const pillButtonProps = isChecked
-        ? { RightIcon: MinusIcon, darknessLevel: 20 }
-        : { RightIcon: AddIcon, darknessLevel: 100 }
+      let singleSelect = false
+
+      let icon
+      let remove = false
+      let add = false
+
+      if (!isMulti) {
+        singleSelect = true
+      } else if (isChecked) {
+        icon = <RemoveIcon className="pl-4" />
+        remove = true
+      } else {
+        icon = <AddIcon className="pl-4" />
+        add = true
+      }
 
       return (
-        <PillButton
+        <Button
           key={option.id}
-          label={option.name}
-          rightIcon={<pillButtonProps.RightIcon style={{ transform: [{ scale: 0.9 }] }} />}
-          onPress={() => toggleOption(option)}
-          marginRight="5px"
-          marginBottom="5px"
-          darknessLevel={pillButtonProps.darknessLevel}
-        />
+          className={classNames({
+            'hover:bg-reelist-red rounded-md text-white hover:text-black': singleSelect,
+            'bg-reelist-red rounded-l-full rounded-r-full text-black hover:text-white': remove,
+            'border-reelist-red hover:text-reelist-red rounded-l-full rounded-r-full border border-solid bg-black bg-opacity-30 text-white':
+              add,
+          })}
+          onClick={() => toggleOption(option)}
+        >
+          {option.name}
+
+          {icon}
+        </Button>
       )
     }
 
     return (
-      <Popover
-        isOpen={isOpen}
-        onOpen={onOpen}
-        onClose={onPopoverClose}
-        trigger={triggerProps => {
-          return (
-            <Pressable {...triggerProps} rounded="full" margin="7px">
-              <AppButton {...triggerProps} size="sm" minWidth="200px" isLoading={!label}>
-                <Column>
-                  <Text>{label}</Text>
+      <>
+        {selectState.isMulti ? (
+          <Button
+            className="font-inter bg-reelist-red group flex w-fit justify-start self-center rounded-l-full rounded-r-full pl-4 pr-2 text-left align-baseline text-lg text-black hover:text-white"
+            onClick={() => setIsOpen(true)}
+            aria-describedby={label}
+            ref={buttonRef}
+            disableRipple
+          >
+            {label}
 
-                  <Center>
-                    {isOpen ? (
-                      <ChevronUpIcon color="gray.300" />
-                    ) : (
-                      <ChevronDownIcon color="gray.300" />
-                    )}
-                  </Center>
-                </Column>
-              </AppButton>
-            </Pressable>
-          )
-        }}
-      >
-        <Popover.Content marginX="10px">
-          <Popover.Arrow />
-          {isOpen && (
-            <>
-              <Popover.CloseButton />
-              <Popover.Header>{label + ':'}</Popover.Header>
+            <ExpandMoreIcon className=" h-full pl-4 text-center align-baseline text-2xl" />
+          </Button>
+        ) : (
+          <div className="group flex flex-col justify-end">
+            <Button
+              className="font-inter w-fit text-right text-lg text-white hover:bg-transparent "
+              onClick={() => setIsOpen(true)}
+              aria-describedby={label}
+              ref={buttonRef}
+              disableRipple
+            >
+              <div className="flex items-center  justify-center border-0 border-b border-solid border-transparent group-hover:border-white ">
+                {_.values(selectedOptions)[0]}
 
-              <Popover.Body
-                maxHeight="0.7 * 100vh"
-                maxWidth="0.7 * 100vw"
-                width="500px"
-                height="500px"
-              >
-                <Row width="100%">
-                  <Column flex={1} alignItems="center" backgroundColor="gray:200">
-                    <Row paddingY="5px" width="100%">
-                      <Input
-                        placeholder="Search"
-                        flex={1}
-                        value={filterText}
-                        onChangeText={setFilterText}
-                      />
-                    </Row>
+                <ExpandMoreIcon className=" h-full justify-self-center pl-4 text-center align-baseline text-2xl " />
+              </div>
+            </Button>
+          </div>
+        )}
 
-                    <Row width="100%" justifyContent="center" marginY="5px">
-                      {children}
-                    </Row>
-                  </Column>
-                </Row>
+        <Popover
+          id={label}
+          open={isOpen}
+          anchorEl={buttonRef.current}
+          onClose={onPopoverClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          PaperProps={{
+            className: 'bg-transparent ',
+          }}
+        >
+          <div
+            className={classNames(
+              'no-scrollbar relative mt-3 flex h-[500px] w-[600px] flex-col overflow-y-scroll overscroll-none bg-black bg-opacity-30 p-3 text-green-300 backdrop-blur-md',
+              {
+                'mt-0 h-fit w-fit flex-row rounded-md': !selectState.isMulti,
+              },
+            )}
+          >
+            {selectState.isMulti && (
+              <div className="mx-3">
+                <input
+                  className="focus:shadow-outline border-reelist-red mb-4 w-full appearance-none border-0 border-b bg-transparent py-2 text-lg leading-tight text-gray-300 shadow outline-none"
+                  type="text"
+                  autoComplete="off"
+                  placeholder="Filter"
+                  onChange={e => setFilterText(e.target.value)}
+                />
+              </div>
+            )}
 
-                <ScrollView
-                  contentContainerStyle={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    flexDirection: 'row',
-                  }}
-                  removeClippedSubviews
-                  width="100%"
-                  height="100%"
-                >
-                  {filteredOptions.map(option => {
-                    const isChecked = selectedOptions.includes(option.id)
-                    return renderOption(option, isChecked)
-                  })}
+            <div className="w-full">{children}</div>
 
-                  <Row width="480px">
-                    {options.length > 100 && !filterText && (
-                      <Text color="gray.500">
-                        Not seeing what you're looking for? Try searching to show hidden options
-                      </Text>
-                    )}
-                  </Row>
-                </ScrollView>
-              </Popover.Body>
-            </>
-          )}
-        </Popover.Content>
-      </Popover>
+            <div
+              className={classNames('my-3 flex w-full flex-wrap gap-3', {
+                'flex-col rounded-md': !selectState.isMulti,
+              })}
+            >
+              {filteredOptions.map(option => {
+                const isChecked = selectedOptions[0] === option.id || !!selectedOptions[option.id]
+                return renderOption(option, isChecked)
+              })}
+            </div>
+
+            <div className="absolute top-0 -z-10 h-[calc(100%+1px)] w-full bg-transparent" />
+          </div>
+        </Popover>
+      </>
     )
   },
 )
 
 export default ReelistSelect
-
-const RenderSelectOption = observer(
-  <T extends StringOrNumber>({
-    option,
-    toggleOption,
-  }: {
-    option: SelectOption<T>
-    toggleOption: (nextOption: typeof option) => void
-  }) => {
-    const pillButtonProps = option.selected
-      ? { RightIcon: MinusIcon, darknessLevel: 20 }
-      : { RightIcon: AddIcon, darknessLevel: 100 }
-
-    return (
-      <PillButton
-        key={option.id}
-        label={option.name}
-        rightIcon={<pillButtonProps.RightIcon style={{ transform: [{ scale: 0.9 }] }} />}
-        onPress={() => toggleOption(option)}
-        marginRight="5px"
-        marginBottom="5px"
-        darknessLevel={pillButtonProps.darknessLevel}
-      />
-    )
-  },
-)

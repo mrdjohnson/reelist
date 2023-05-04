@@ -4,7 +4,7 @@ import humps, { Camelized } from 'humps'
 import { createViewModel, IViewModel } from 'mobx-utils'
 import VideoList from './VideoList'
 import _ from 'lodash'
-import { UserTableType } from '@reelist/utils/interfaces/tables/UserTable'
+import { UserTableType } from '@reelist/interfaces/tables/UserTable'
 import TableApi from '@reelist/apis/TableApi'
 
 type ProfileType = Camelized<UserTableType>

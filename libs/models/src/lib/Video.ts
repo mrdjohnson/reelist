@@ -6,7 +6,7 @@ import moment from 'moment'
 import { humanizedDuration } from '@reelist/utils/humanizedDuration'
 import VideoStore from './VideoStore'
 import VideoApi from '@reelist/apis/VideoApi'
-import { VideoInfoType, VideoTableType } from '@reelist/utils/interfaces/tables/VideoTable'
+import { VideoInfoType, VideoTableType } from 'libs/interfaces/src/lib/tables/VideoTable'
 
 export type TvEpisode = {
   airDate: string
@@ -40,6 +40,20 @@ type TvNetwork = {
   name: string
   id: string
   logoPath: string
+}
+
+export type Provider = {
+  logoPath: string
+  providerId: number
+  providerName: string
+  displayPriority: number
+}
+
+type ProviderCountry = {
+  link: string
+  flatrate: Provider[]
+  rent: Provider[]
+  buy: Provider[]
 }
 
 type TvGenre = {
@@ -98,6 +112,7 @@ class Video {
   lastEpisodeToAir?: TvEpisode
   nextEpisodeToAir?: TvEpisode
   networks: TvNetwork[] = []
+  providers!: Record<string, ProviderCountry> // = {}
   genres: TvGenre[] = []
   aggregateCredits?: Credits
   credits!: Credits
@@ -158,11 +173,6 @@ class Video {
       this.videoId = (json.mediaType === 'movie' ? 'mv' : 'tv') + json.id
     }
 
-    console.log('videoId: ', videoId)
-    if (this.videoId === 'tv116244') {
-      debugger
-    }
-
     this._assignValuesFromJson(json)
 
     if (videoTableData) {
@@ -177,6 +187,11 @@ class Video {
     json.seasons && _.remove(json.seasons, season => season.name === 'Specials')
 
     Object.assign(this, json)
+
+    if (this.providers) return
+
+    const providers = _.get(json, 'watch/providers.results') || {}
+    this.providers = _.mapKeys(providers, (_value, key) => _.toUpper(key))
   }
 
   _assignFromVideoTable = (videoTable: VideoTableType) => {
@@ -471,6 +486,18 @@ class Video {
     await sendNotifications({ ...update })
   }
 
+  fetchWatchProviders = async () => {
+    if (!_.isEmpty(this.providers)) return
+
+    const videoType = this.isTv ? 'tv' : 'movie'
+
+    const providers = await callTmdb(`/${videoType}/${this.id}/watch/providers`)
+      .then(item => _.get(item, 'data.data.results') as Record<string, ProviderCountry>)
+      .then(providers => _.mapKeys(providers, (_value, key) => _.toUpper(key)))
+
+    this.providers = providers
+  }
+
   fetchSeason = async (seasonNumber: number) => {
     if (this.seasonMap[seasonNumber]) return this.seasonMap[seasonNumber]
 
@@ -483,7 +510,7 @@ class Video {
     let season: TvSeason | null = null
 
     try {
-      season = await callTmdb(path).then(item => _.get(item, 'data.data')) as TvSeason
+      season = (await callTmdb(path).then(item => _.get(item, 'data.data'))) as TvSeason
     } catch (e) {
       console.error(e)
       throw e
@@ -772,12 +799,20 @@ class Video {
     return 0
   }
 
+  get durationOrSeasons() {
+    if (this.isTv) {
+      return `${this.seasons?.length} seasons`
+    }
+
+    return `${this.totalDurationMinutes} min`
+  }
+
   get totalDuration() {
     return humanizedDuration(this.totalDurationMinutes)
   }
 
   get cast() {
-    return (this.aggregateCredits || this.credits).cast
+    return (this.credits || this.aggregateCredits).cast || []
   }
 }
 

@@ -1,6 +1,6 @@
 import { Factory } from 'fishery'
 import { faker } from '@faker-js/faker'
-import { VideoTableType } from '@reelist/utils/interfaces/tables/VideoTable'
+import { VideoTableType } from '@reelist/interfaces/tables/VideoTable'
 import moment from 'moment'
 
 export const createVideoTable = Factory.define<VideoTableType>(() => {

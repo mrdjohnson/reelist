@@ -2,7 +2,8 @@ import { makeAutoObservable } from 'mobx'
 import User, { LoggedOutUser } from '@reelist/models/User'
 import { Subscription, SupabaseClient } from '@supabase/supabase-js'
 import { inject, injectable } from 'inversify'
-import IStorage, { StorageInversionKey } from '@reelist/utils/storage/storage.interface'
+import { StorageInversionKey } from '@reelist/utils/storage/storage.interface'
+import type IStorage from '@reelist/utils/storage/storage.interface'
 
 @injectable()
 export default class Auth {

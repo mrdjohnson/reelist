@@ -8,7 +8,7 @@ import User from '@reelist/models/User'
 import { inject, injectable } from 'inversify'
 import { SupabaseClient } from '@supabase/supabase-js'
 import VideoApi from '@reelist/apis/VideoApi'
-import { VideoTableType } from '@reelist/utils/interfaces/tables/VideoTable'
+import { VideoTableType } from 'libs/interfaces/src/lib/tables/VideoTable'
 import TableApi from '@reelist/apis/TableApi'
 
 @injectable()
@@ -67,9 +67,9 @@ class VideoStore {
     let video: Video | null = this.tmdbJsonByVideoId[videoId]
 
     if (_.isUndefined(video)) {
-      video = await callTmdb(path, { append_to_response: 'images,similar,aggregate_credits,credits' }).then(
-        item => _.get(item, 'data.data') || null,
-      )
+      video = await callTmdb(path, {
+        append_to_response: 'images,similar,aggregate_credits,credits,watch/providers',
+      }).then(item => _.get(item, 'data.data') || null)
 
       this.tmdbJsonByVideoId[videoId] = video || null
     }
