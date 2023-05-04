@@ -20,10 +20,12 @@ import {
   Center,
   Row,
   PresenceTransition,
+  Button,
 } from 'native-base'
 import { AspectRatio, IAspectRatioProps, IImageProps, Image } from 'native-base'
 import ReelistSelect, { useSelectState } from '@reelist/components/ReelistSelect'
 import ActionButton from '@reelist/components/ActionButton'
+import { IViewProps } from 'native-base/lib/typescript/components/basic/View/types'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
@@ -168,9 +170,29 @@ const Discover = observer(() => {
   }
 
   return (
-    <div suppressHydrationWarning style={{ display: 'contents' }}>
-      <Flex height="100vh" maxHeight="100vh" padding="10px" maxWidth="1536px" alignSelf="center">
-        <Flex flexDir="row" flexWrap="wrap" justifyContent="center" marginBottom="10px">
+    <div
+      suppressHydrationWarning
+      style={{
+        height: '100vh',
+        width: '100vw',
+        background: 'radial-gradient(50% 50% at 50% 50%, #1A200F 0%, #131313 100%)',
+        display: 'flex',
+        justifyContent: 'center',
+      }}
+    >
+      <Flex
+        height="100vh"
+        maxHeight="100vh"
+        paddingX="54px"
+        paddingTop="20px"
+        maxWidth="min(1619px, 100vw)"
+        alignSelf="center"
+      >
+        <ActionButton onPress={search} marginY="10px" width="100%">
+          Search
+        </ActionButton>
+
+        <Row flexWrap="wrap" marginBottom="10px" space="10px">
           <ReelistSelect selectState={videoTypesSelectState}>
             <RadioGroup
               name="types-radio"
@@ -218,11 +240,7 @@ const Discover = observer(() => {
           </ReelistSelect>
 
           <ReelistSelect selectState={tvProviderSelectState} />
-        </Flex>
-
-        <ActionButton onPress={search} marginY="10px" width="100%">
-          Search
-        </ActionButton>
+        </Row>
 
         <Box flex={1}>
           <FlatList
@@ -230,7 +248,9 @@ const Discover = observer(() => {
               display: 'flex',
               flexWrap: 'wrap',
               flexDirection: 'row',
-              justifyContent: 'center',
+              marginBottom: '15px',
+              rowGap: 50,
+              columnGap: 21,
             }}
             data={videos}
             scrollEventThrottle={16}
@@ -239,8 +259,7 @@ const Discover = observer(() => {
               <VideoImage
                 video={video}
                 key={video.id}
-                marginBottom="15px"
-                containerProps={{ width: '350px' }}
+                containerProps={{ width: '307px' }}
                 isSmallImage={true}
                 onPress={() => handleVideoSelection(video)}
               />
@@ -286,7 +305,7 @@ const VideoSection = ({ video }: { video: Video }) => {
   return (
     <>
       <Center>
-        <VideoImage video={video} padding="15px" containerProps={{ width: '350px' }} isSmallImage />
+        <VideoImage video={video} padding="15px" containerProps={{ width: '307px' }} isFullImage />
 
         <Text>{video.videoName}</Text>
       </Center>
@@ -316,25 +335,31 @@ const VideoSection = ({ video }: { video: Video }) => {
 
 type VideoImageProps = IImageProps & {
   video: Video
-  containerProps?: IAspectRatioProps
-  isSmallImage?: boolean
+  containerProps?: IViewProps
+  isFullImage?: boolean
   onPress?: () => void
 }
 
 const VideoImage = observer(
-  ({ video, containerProps, onPress, isSmallImage, ...imageProps }: VideoImageProps) => {
+  ({ video, containerProps, onPress, isFullImage, ...imageProps }: VideoImageProps) => {
     const [hovered, setHovered] = useState(false)
     const [pressed, setPressed] = useState(false)
 
-    const { source, ratio } = useMemo(() => {
-      if (isSmallImage) {
-        return { source: video.backdropPath, ratio: 16 / 9 }
-      }
-
-      return { source: video.posterPath, ratio: 2 / 3 }
-    }, [video.backdropPath, video.posterPath, isSmallImage])
+    const source = video.posterPath
 
     if (!source) return null
+
+    const imageSizeProps: IImageProps = isFullImage
+      ? {
+          resizeMode: 'contain',
+          width: '406',
+          height: '609',
+        }
+      : {
+          resizeMode: 'object-fit',
+          width: '307px',
+          height: '207px',
+        }
 
     const fullImage = !onPress
 
@@ -355,18 +380,13 @@ const VideoImage = observer(
             transform: [{ scale: fullImage || pressed ? 1 : hovered ? 0.99 : 0.97 }],
           }}
         >
-          <AspectRatio ratio={ratio} {...containerProps}>
-            <View>
-              <Image
-                source={{ uri: IMAGE_PATH + source }}
-                alt={source}
-                resizeMode="contain"
-                rounded="sm"
-                size="100%"
-                {...imageProps}
-              />
-            </View>
-          </AspectRatio>
+          <Image
+            source={{ uri: IMAGE_PATH + source }}
+            alt={source}
+            rounded="sm"
+            {...imageProps}
+            {...imageSizeProps}
+          />
 
           <PresenceTransition
             visible={hovered}
@@ -418,6 +438,8 @@ const getRegions = () => {
 }
 
 const getDefaultRegions = () => {
+  if (!navigator) return []
+
   return navigator.languages // options look like: en-US, en
     .filter(language => language.includes('-')) // only grab 'en-US' like options
     .map(language => language.match(/-(.*)/)[1]) // only grab 'US' from each option

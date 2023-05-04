@@ -126,18 +126,21 @@ const ReelistSelect = observer(
 
     const renderOption = (option: SelectOption<T>, isChecked) => {
       const pillButtonProps = isChecked
-        ? { RightIcon: MinusIcon, darknessLevel: 20 }
-        : { RightIcon: AddIcon, darknessLevel: 100 }
+        ? { RightIcon: MinusIcon, variant: 'solid' }
+        : { RightIcon: AddIcon, variant: 'outline' }
 
       return (
         <PillButton
           key={option.id}
           label={option.name}
-          rightIcon={<pillButtonProps.RightIcon style={{ transform: [{ scale: 0.9 }] }} />}
+          rightIcon={
+            <pillButtonProps.RightIcon
+              style={{ transform: [{ scale: 0.9 }], paddingLeft: '21px' }}
+              color="inherit"
+            />
+          }
           onPress={() => toggleOption(option)}
-          marginRight="5px"
-          marginBottom="5px"
-          darknessLevel={pillButtonProps.darknessLevel}
+          variant={pillButtonProps.variant}
         />
       )
     }
@@ -147,47 +150,62 @@ const ReelistSelect = observer(
         isOpen={isOpen}
         onOpen={onOpen}
         onClose={onPopoverClose}
+        placement="bottom left"
         trigger={triggerProps => {
           return (
-            <Pressable {...triggerProps} rounded="full" margin="7px">
-              <AppButton {...triggerProps} size="sm" minWidth="200px" isLoading={!label}>
-                <Column>
-                  <Text>{label}</Text>
-
-                  <Center>
-                    {isOpen ? (
-                      <ChevronUpIcon color="gray.300" />
-                    ) : (
-                      <ChevronDownIcon color="gray.300" />
-                    )}
-                  </Center>
-                </Column>
+            <Pressable {...triggerProps} rounded="full">
+              <AppButton
+                {...triggerProps}
+                isLoading={!label}
+                variant="solid"
+                endIcon={() =>
+                  isOpen ? (
+                    <ChevronUpIcon color="inherit" paddingLeft="21px" />
+                  ) : (
+                    <ChevronDownIcon color="inherit" paddingLeft="21px" />
+                  )
+                }
+              >
+                {label}
               </AppButton>
             </Pressable>
           )
         }}
       >
-        <Popover.Content marginX="10px">
-          <Popover.Arrow />
-          {isOpen && (
-            <>
-              <Popover.CloseButton />
-              <Popover.Header>{label + ':'}</Popover.Header>
+        <Popover.Content marginX="10px" background="#1D1D1D">
+          <Popover.Arrow background="#1D1D1D" />
 
-              <Popover.Body
-                maxHeight="0.7 * 100vh"
-                maxWidth="0.7 * 100vw"
-                width="500px"
-                height="500px"
+          {isOpen && (
+            <Popover.Body
+              maxHeight="0.7 * 100vh"
+              maxWidth="0.7 * 100vw"
+              width="600px"
+              height="350px"
+              backgroundColor="#1D1D1D"
+            >
+              <ScrollView
+                contentContainerStyle={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  flexDirection: 'row',
+                  gap: 10,
+                }}
+                removeClippedSubviews
+                width="100%"
+                height="100%"
               >
                 <Row width="100%">
                   <Column flex={1} alignItems="center" backgroundColor="gray:200">
                     <Row paddingY="5px" width="100%">
                       <Input
-                        placeholder="Search"
+                        placeholder="Filter"
                         flex={1}
                         value={filterText}
                         onChangeText={setFilterText}
+                        colorScheme="reelist"
+                        variant="underlined"
+                        placeholderTextColor="light.200"
+                        size="md"
                       />
                     </Row>
 
@@ -197,31 +215,20 @@ const ReelistSelect = observer(
                   </Column>
                 </Row>
 
-                <ScrollView
-                  contentContainerStyle={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    flexDirection: 'row',
-                  }}
-                  removeClippedSubviews
-                  width="100%"
-                  height="100%"
-                >
-                  {filteredOptions.map(option => {
-                    const isChecked = selectedOptions.includes(option.id)
-                    return renderOption(option, isChecked)
-                  })}
+                {filteredOptions.map(option => {
+                  const isChecked = selectedOptions.includes(option.id)
+                  return renderOption(option, isChecked)
+                })}
 
-                  <Row width="480px">
-                    {options.length > 100 && !filterText && (
-                      <Text color="gray.500">
-                        Not seeing what you're looking for? Try searching to show hidden options
-                      </Text>
-                    )}
-                  </Row>
-                </ScrollView>
-              </Popover.Body>
-            </>
+                <Row width="480px">
+                  {options.length > 100 && !filterText && (
+                    <Text color="gray.500">
+                      Not seeing what you're looking for? Try searching to show hidden options
+                    </Text>
+                  )}
+                </Row>
+              </ScrollView>
+            </Popover.Body>
           )}
         </Popover.Content>
       </Popover>

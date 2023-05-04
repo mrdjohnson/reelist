@@ -13,7 +13,8 @@ export type ActionButtonProps = IButtonProps & {
 }
 
 const ActionButton = ({
-  color: colorProp = 'blue.500',
+  color: colorProp = 'reelist.500',
+  colorScheme = 'reelist',
   icon,
   endIcon,
   variant = 'outline',
@@ -29,37 +30,37 @@ const ActionButton = ({
     return disabled ? 'dark.500' : colorProp
   }, [colorProp, disabled])
 
-  const colorScheme = useMemo(() => {
-    if (!_.isString(color)) return color
+  // const colorScheme = useMemo(() => {
+  //   if (!_.isString(color)) return color
 
-    return color.substring(0, color.indexOf('.')) || color
-  }, [color])
+  //   return color.substring(0, color.indexOf('.')) || color
+  // }, [color])
 
-  const backgroundColor = useMemo(() => {
-    if (!disabled) {
-      if (!darken) return null
-    }
+  // const backgroundColor = useMemo(() => {
+  //   if (!disabled) {
+  //     if (!darken) return null
+  //   }
 
-    const alphaValue = darknessLevel + (darkenOnPressIn && pressedIn ? 20 : 0)
+  //   const alphaValue = darknessLevel + (darkenOnPressIn && pressedIn ? 20 : 0)
 
-    if (alphaValue >= 100) return 'transparent'
+  //   if (alphaValue >= 100) return 'transparent'
 
-    return color + ':alpha.' + alphaValue
-  }, [darken, pressedIn, color, darkenOnPressIn, disabled, darknessLevel])
+  //   return color + ':alpha.' + alphaValue
+  // }, [darken, pressedIn, color, darkenOnPressIn, disabled, darknessLevel])
 
   return (
     <Button
       variant={variant || 'outline'}
       borderColor={color}
-      _text={{ color }}
-      color={color}
+      // _text={{ fontFamily: 'Inter' }}
+      // color={color}
       colorScheme={colorScheme}
       startIcon={icon && <Icon as={icon} color={color} />}
       endIcon={endIcon && <Icon as={endIcon} color={color} />}
       rounded="full"
       onPressIn={() => setPressedIn(true)}
       onPressOut={() => setPressedIn(false)}
-      backgroundColor={backgroundColor}
+      // backgroundColor={backgroundColor}
       disabled={disabled}
       {...props}
     />
