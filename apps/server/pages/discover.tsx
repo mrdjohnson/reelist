@@ -21,6 +21,7 @@ import {
   Row,
   PresenceTransition,
   Button,
+  Checkbox,
 } from 'native-base'
 import { AspectRatio, IAspectRatioProps, IImageProps, Image } from 'native-base'
 import ReelistSelect, { useSelectState } from '@reelist/components/ReelistSelect'
@@ -227,15 +228,16 @@ const Discover = observer(() => {
             >
               <FormControlLabel
                 value="includes_every"
-                control={<Radio />}
-                label="Genres Include Every"
+                control={<Checkbox />}
+                label="Genres Must Have All of selected"
+                color="white"
               />
 
-              <FormControlLabel
+              {/* <FormControlLabel
                 value="includes_any"
                 control={<Radio />}
-                label="Genres Include Any"
-              />
+                label="Genres Can Have any of selected"
+              /> */}
             </RadioGroup>
           </ReelistSelect>
 

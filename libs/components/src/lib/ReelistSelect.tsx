@@ -181,7 +181,7 @@ const ReelistSelect = observer(
               maxWidth="0.7 * 100vw"
               width="600px"
               height="350px"
-              backgroundColor="#1D1D1D"
+              background="rgba(0, 0, 0, 0.49)"
             >
               <ScrollView
                 contentContainerStyle={{
