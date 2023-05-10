@@ -22,6 +22,9 @@ import {
   PresenceTransition,
   Button,
   Checkbox,
+  Input,
+  SearchIcon,
+  Divider,
 } from 'native-base'
 import { AspectRatio, IAspectRatioProps, IImageProps, Image } from 'native-base'
 import ReelistSelect, { useSelectState } from '@reelist/components/ReelistSelect'
@@ -105,6 +108,7 @@ const Discover = observer(() => {
       with_providers: selectedTvProviders.join(','),
     })
       .then(videos => videos.filter(video => !!video.posterPath))
+      .then(_.compact)
       .then(nextVideos => {
         if (page === 1) {
           console.log('making new videos')
@@ -115,6 +119,7 @@ const Discover = observer(() => {
           setVideos(videos.concat(nextVideos))
         }
       })
+      .catch(e => {})
   }
 
   const videoTypesSelectState = useSelectState('Types', getVideoTypes)
@@ -182,65 +187,79 @@ const Discover = observer(() => {
       <Flex
         height="100vh"
         maxHeight="100vh"
-        paddingX="54px"
+        paddingX={['20px', '20px', '54px']}
         paddingTop="20px"
+        width="min(1619px, 100vw)"
         maxWidth="min(1619px, 100vw)"
         alignSelf="center"
       >
-        <ActionButton onPress={search} marginY="10px" width="100%">
-          Search
-        </ActionButton>
+        <Input
+          placeholder="Search"
+          leftElement={<SearchIcon />}
+          variant="unstyled"
+          fontSize="24px"
+        />
 
-        <Row flexWrap="wrap" marginBottom="10px" space="10px">
-          <ReelistSelect selectState={videoTypesSelectState}>
-            <RadioGroup
-              name="types-radio"
-              value={typesSeparationType}
-              onChange={e => setTypesSeparationType(e.target.value)}
-              row
-            >
-              <FormControlLabel
-                value="includes_every"
-                control={<Radio />}
-                label="Types Include Every"
-              />
+        <Divider backgroundColor="reelist.500" marginBottom="20px" />
 
-              <FormControlLabel
-                value="includes_any"
-                control={<Radio />}
-                label="Types Include Any"
-              />
-            </RadioGroup>
-          </ReelistSelect>
+        <Flex
+          flexWrap="wrap"
+          marginBottom="10px"
+          space="10px"
+          justifyContent="space-between"
+          flexDirection={['column-reverse', 'column-reverse', 'row']}
+        >
+          <Row space="10px">
+            <ReelistSelect selectState={videoTypesSelectState}>
+              <RadioGroup
+                name="types-radio"
+                value={typesSeparationType}
+                onChange={e => setTypesSeparationType(e.target.value)}
+                row
+              >
+                <FormControlLabel
+                  value="includes_every"
+                  control={<Radio />}
+                  label="Types Include Every"
+                />
 
-          <ReelistSelect selectState={sortTypesSelectState} />
+                <FormControlLabel
+                  value="includes_any"
+                  control={<Radio />}
+                  label="Types Include Any"
+                />
+              </RadioGroup>
+            </ReelistSelect>
 
-          <ReelistSelect selectState={regionSelectState} />
+            <ReelistSelect selectState={regionSelectState} />
 
-          <ReelistSelect selectState={tvGenreSelectState}>
-            <RadioGroup
-              name="types-radio"
-              value={tvGenreSeparationType}
-              onChange={e => setTvGenreSeparationType(e.target.value)}
-              row
-            >
-              <FormControlLabel
-                value="includes_every"
-                control={<Checkbox />}
-                label="Genres Must Have All of selected"
-                color="white"
-              />
+            <ReelistSelect selectState={tvGenreSelectState}>
+              <RadioGroup
+                name="types-radio"
+                value={tvGenreSeparationType}
+                onChange={e => setTvGenreSeparationType(e.target.value)}
+                row
+              >
+                <FormControlLabel
+                  value="includes_every"
+                  control={<Checkbox color="white" _text={{ color: 'white' }} />}
+                  label="Genres Must Have All of selected"
+                  color="white"
+                />
 
-              {/* <FormControlLabel
+                {/* <FormControlLabel
                 value="includes_any"
                 control={<Radio />}
                 label="Genres Can Have any of selected"
               /> */}
-            </RadioGroup>
-          </ReelistSelect>
+              </RadioGroup>
+            </ReelistSelect>
 
-          <ReelistSelect selectState={tvProviderSelectState} />
-        </Row>
+            <ReelistSelect selectState={tvProviderSelectState} />
+          </Row>
+
+          <ReelistSelect selectState={sortTypesSelectState} alignSelf="flex-end" />
+        </Flex>
 
         <Box flex={1}>
           <FlatList
@@ -250,7 +269,7 @@ const Discover = observer(() => {
               flexDirection: 'row',
               marginBottom: '15px',
               rowGap: 50,
-              columnGap: 21,
+              columnGap: 20,
             }}
             data={videos}
             scrollEventThrottle={16}
@@ -265,16 +284,38 @@ const Discover = observer(() => {
               />
             )}
             extraData={videos}
-            keyExtractor={video => video.id}
             onEndReached={getNextPage}
             onEndReachedThreshold={0.5}
           />
+
+          {/* <FlatList
+            contentContainerStyle={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              flexDirection: 'row',
+              marginBottom: '15px',
+              rowGap: 50,
+              columnGap: 21,
+            }}
+            data={_.times(100)}
+            scrollEventThrottle={16}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item: number }) => (
+              <Button backgroundColor="reelist.600" margin="5px">
+                {number}
+              </Button>
+            )}
+            extraData={videos}
+            onEndReached={getNextPage}
+            onEndReachedThreshold={0.5}
+          /> */}
         </Box>
 
         <Slide in={showSelectedVideo} placement="right" display="flex" width="100vw" height="100vh">
           <Pressable
             flex={1}
             backgroundColor="black:alpha.40"
+            style={{backdropFilter: 'blur(16px)'}}
             onPress={router.back}
             {...safeAreaProps}
           />

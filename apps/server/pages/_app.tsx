@@ -48,6 +48,11 @@ function MyApp({ Component, pageProps }) {
         },
       },
 
+      CheckBox: {
+        color: 'white',
+        _text: { color: 'white' },
+      },
+
       Button: {
         defaultProps: {
           _text: { fontFamily: 'Inter', fontWeight: 600, fontSize: '16px' },
@@ -59,15 +64,20 @@ function MyApp({ Component, pageProps }) {
             color: 'light.100',
           },
 
+          link: {
+            _text: { color: 'light.100' },
+            color: 'light.100',
+          },
+
           solid: {
             _text: { color: 'black' },
             color: 'black',
             borderWidth: 1,
             _hover: {
-              backgroundColor: 'reelist.400',
+              backgroundColor: 'reelist.500',
             },
             _pressed: {
-              backgroundColor: 'reelist.700',
+              backgroundColor: 'reelist.500',
             },
           },
         },

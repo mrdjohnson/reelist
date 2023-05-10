@@ -13,6 +13,7 @@ import {
   ScrollView,
   Popover,
   Pressable,
+  IPressableProps,
 } from 'native-base'
 import PillButton from '@reelist/components/PillButton'
 import AppButton from '@reelist/components/AppButton'
@@ -36,7 +37,7 @@ export class SelectState<T extends StringOrNumber> {
     public loadOptions: () => Promise<Array<SelectOption<T>>>,
     private storage: IStorage,
     private alternativeDefaultOptions?: () => T[],
-    private isMulti: boolean = true,
+    public isMulti: boolean = true,
   ) {
     console.log('is multi: ', isMulti)
     loadOptions().then(nextOptions => (this.options = nextOptions))
@@ -102,15 +103,19 @@ export const useSelectState = <T extends StringOrNumber>(
   return selectState
 }
 
-type ReelistSelectProps<T extends StringOrNumber> = PropsWithChildren<{
+type ReelistSelectProps<T extends StringOrNumber> = IPressableProps & {
   selectState: SelectState<T>
-}>
+}
 
 const ReelistSelect = observer(
-  <T extends StringOrNumber>({ selectState, children }: ReelistSelectProps<T>) => {
+  <T extends StringOrNumber>({
+    selectState,
+    children,
+    ...containerProps
+  }: ReelistSelectProps<T>) => {
     const { isOpen, onClose, onOpen } = useDisclose()
     const [filterText, setFilterText] = useState('')
-    const { label, options, selectedOptions, toggleOption } = selectState || {}
+    const { label, options, selectedOptions, toggleOption, isMulti } = selectState || {}
 
     const filteredOptions = useMemo(() => {
       return _.chain(options)
@@ -125,22 +130,37 @@ const ReelistSelect = observer(
     }
 
     const renderOption = (option: SelectOption<T>, isChecked) => {
-      const pillButtonProps = isChecked
-        ? { RightIcon: MinusIcon, variant: 'solid' }
-        : { RightIcon: AddIcon, variant: 'outline' }
+      const pillButtonIconStyle = { transform: [{ scale: 0.9 }], paddingLeft: '21px' }
+      const variant = isChecked ? 'solid' : 'outline'
+      let pillButtonProps
+
+      if (!isMulti) {
+        pillButtonProps = {
+          rounded: 'sm',
+          borderWidth: 0,
+          variant,
+          width: '100%',
+          textAlign:'left'
+        }
+      } else if (isChecked) {
+        pillButtonProps = {
+          rightIcon: <MinusIcon style={pillButtonIconStyle} color="inherit" />,
+          variant,
+        }
+      } else {
+        pillButtonProps = {
+          rightIcon: <AddIcon style={pillButtonIconStyle} color="inherit" />,
+          variant,
+        }
+      }
 
       return (
         <PillButton
           key={option.id}
           label={option.name}
-          rightIcon={
-            <pillButtonProps.RightIcon
-              style={{ transform: [{ scale: 0.9 }], paddingLeft: '21px' }}
-              color="inherit"
-            />
-          }
           onPress={() => toggleOption(option)}
           variant={pillButtonProps.variant}
+          {...pillButtonProps}
         />
       )
     }
@@ -152,81 +172,87 @@ const ReelistSelect = observer(
         onClose={onPopoverClose}
         placement="bottom left"
         trigger={triggerProps => {
+          const paddingLeft = selectState.isMulti ? '21px' : '0'
+
           return (
-            <Pressable {...triggerProps} rounded="full">
+            <Pressable {...triggerProps} {...containerProps} rounded="full">
               <AppButton
                 {...triggerProps}
                 isLoading={!label}
-                variant="solid"
+                variant={selectState.isMulti ? 'solid' : 'link'}
                 endIcon={() =>
                   isOpen ? (
-                    <ChevronUpIcon color="inherit" paddingLeft="21px" />
+                    <ChevronUpIcon color="inherit" paddingLeft={paddingLeft} />
                   ) : (
-                    <ChevronDownIcon color="inherit" paddingLeft="21px" />
+                    <ChevronDownIcon color="inherit" paddingLeft={paddingLeft} />
                   )
                 }
+                height="40px"
               >
-                {label}
+                {selectState.isMulti ? label : _.find(options, { id: selectedOptions[0] })?.name}
               </AppButton>
             </Pressable>
           )
         }}
       >
-        <Popover.Content marginX="10px" background="#1D1D1D">
+        <Popover.Content marginX="10px">
           <Popover.Arrow background="#1D1D1D" />
 
           {isOpen && (
             <Popover.Body
               maxHeight="0.7 * 100vh"
               maxWidth="0.7 * 100vw"
-              width="600px"
-              height="350px"
-              background="rgba(0, 0, 0, 0.49)"
+              width={isMulti ? '600px' : 'auto'}
+              height={isMulti ? '350px' : 'auto'}
+              backgroundColor="#1D1D1D"
             >
               <ScrollView
                 contentContainerStyle={{
                   display: 'flex',
                   flexWrap: 'wrap',
-                  flexDirection: 'row',
+                  flexDirection: isMulti && 'row',
                   gap: 10,
+                  paddingX: isMulti ? undefined : '0px',
                 }}
                 removeClippedSubviews
-                width="100%"
-                height="100%"
+                width={isMulti ? '100%' : 'auto'}
+                height={isMulti ? '100%' : 'auto'}
               >
-                <Row width="100%">
-                  <Column flex={1} alignItems="center" backgroundColor="gray:200">
-                    <Row paddingY="5px" width="100%">
-                      <Input
-                        placeholder="Filter"
-                        flex={1}
-                        value={filterText}
-                        onChangeText={setFilterText}
-                        colorScheme="reelist"
-                        variant="underlined"
-                        placeholderTextColor="light.200"
-                        size="md"
-                      />
-                    </Row>
+                {selectState.isMulti && (
+                  <Row width="100%">
+                    <Column flex={1} alignItems="center" backgroundColor="gray:200">
+                      <Row paddingY="5px" width="100%">
+                        <Input
+                          placeholder="Filter"
+                          flex={1}
+                          value={filterText}
+                          onChangeText={setFilterText}
+                          colorScheme="reelist"
+                          variant="underlined"
+                          placeholderTextColor="light.200"
+                          size="md"
+                        />
+                      </Row>
 
-                    <Row width="100%" justifyContent="center" marginY="5px">
-                      {children}
-                    </Row>
-                  </Column>
-                </Row>
+                      <Row width="100%" justifyContent="center" marginY="5px">
+                        {children}
+                      </Row>
+                    </Column>
+                  </Row>
+                )}
 
                 {filteredOptions.map(option => {
                   const isChecked = selectedOptions.includes(option.id)
                   return renderOption(option, isChecked)
                 })}
 
-                <Row width="480px">
-                  {options.length > 100 && !filterText && (
+                {options.length > 100 && !filterText && (
+                  <Row width="480px">
                     <Text color="gray.500">
                       Not seeing what you're looking for? Try searching to show hidden options
                     </Text>
-                  )}
-                </Row>
+                  </Row>
+                )}
               </ScrollView>
             </Popover.Body>
           )}

@@ -8,7 +8,7 @@ type PillButtonProps = {
 
 const PillButton = ({ label, ...buttonProps }: PillButtonProps) => {
   return (
-    <ActionButton rounded="full" {...buttonProps} width="fit-content">
+    <ActionButton rounded="full" width="fit-content" {...buttonProps} >
       {label}
     </ActionButton>
   )

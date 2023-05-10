@@ -30,24 +30,6 @@ const ActionButton = ({
     return disabled ? 'dark.500' : colorProp
   }, [colorProp, disabled])
 
-  // const colorScheme = useMemo(() => {
-  //   if (!_.isString(color)) return color
-
-  //   return color.substring(0, color.indexOf('.')) || color
-  // }, [color])
-
-  // const backgroundColor = useMemo(() => {
-  //   if (!disabled) {
-  //     if (!darken) return null
-  //   }
-
-  //   const alphaValue = darknessLevel + (darkenOnPressIn && pressedIn ? 20 : 0)
-
-  //   if (alphaValue >= 100) return 'transparent'
-
-  //   return color + ':alpha.' + alphaValue
-  // }, [darken, pressedIn, color, darkenOnPressIn, disabled, darknessLevel])
-
   return (
     <Button
       variant={variant || 'outline'}
@@ -55,8 +37,8 @@ const ActionButton = ({
       // _text={{ fontFamily: 'Inter' }}
       // color={color}
       colorScheme={colorScheme}
-      startIcon={icon && <Icon as={icon} color={color} />}
-      endIcon={endIcon && <Icon as={endIcon} color={color} />}
+      startIcon={icon && <Icon as={icon} />}
+      endIcon={endIcon && <Icon as={endIcon} />}
       rounded="full"
       onPressIn={() => setPressedIn(true)}
       onPressOut={() => setPressedIn(false)}
