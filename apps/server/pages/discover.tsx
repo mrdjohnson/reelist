@@ -1,11 +1,14 @@
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
+import { Backdrop, Dialog } from '@mui/material'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { RadioGroup, FormControlLabel, Radio } from '@mui/material'
 import _ from 'lodash'
 import { useStore } from '@reelist/utils/hooks/useStore'
 import useLocalStorageState from '@reelist/utils/hooks/useLocalStorageState'
+import useVideoDiscover from '@reelist/utils/hooks/useVideoDiscover'
+import useVideoSearch from '@reelist/utils/hooks/useVideoSearch'
 import { callTmdb } from '@reelist/apis/api'
 import Video from '@reelist/models/Video'
 import {
@@ -25,51 +28,33 @@ import {
   Input,
   SearchIcon,
   Divider,
+  Icon,
+  CloseIcon,
+  ITextProps,
+  Modal,
 } from 'native-base'
 import { AspectRatio, IAspectRatioProps, IImageProps, Image } from 'native-base'
 import ReelistSelect, { useSelectState } from '@reelist/components/ReelistSelect'
 import ActionButton from '@reelist/components/ActionButton'
 import { IViewProps } from 'native-base/lib/typescript/components/basic/View/types'
+import PillButton from '@reelist/components/PillButton'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
-const useVideoDiscover = () => {
-  const { videoStore } = useStore()
-
-  const videoDiscover = async (params: Record<string, string>) => {
-    const searchResults = await Promise.allSettled([
-      callTmdb('/discover/tv', params),
-      callTmdb('/discover/movie', params),
-    ])
-      .then(([tvShows, movies]) => {
-        return [
-          _.get(tvShows, 'value.data.data.results') as Video[] | null,
-          _.get(movies, 'value.data.data.results') as Video[] | null,
-        ]
-      })
-      .then(([tvShows, movies]) => {
-        tvShows?.forEach(tvShow => (tvShow.mediaType = 'tv'))
-        movies?.forEach(movie => (movie.mediaType = 'movie'))
-
-        return [tvShows, movies]
-      })
-      .then(_.flatten)
-
-    if (!searchResults) return []
-
-    return searchResults.map(video => {
-      return videoStore.makeUiVideo(video)
-    })
-  }
-
-  return videoDiscover
-}
+const REMOVE_ICON = (
+  <View alignSelf="center" style={{ height: '100%' }}>
+    <CloseIcon color="black" size="xs" />
+  </View>
+)
 
 const Discover = observer(() => {
   const router = useRouter()
 
   const { videoStore } = useStore()
   const videoDiscover = useVideoDiscover()
+  const videoSearch = useVideoSearch()
+
+  const [searchText, setSearchText] = useState('')
 
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null)
   const [showSelectedVideo, setShowSelectedVideo] = useState(false)
@@ -86,13 +71,23 @@ const Discover = observer(() => {
   const pageRef = useRef(1)
   const [videos, setVideos] = useState<Video[]>([])
 
-  const search = async () => {
-    const page = pageRef.current
+  const handleVideos = (nextVideos: Video[]) => {
+    const filteredVideos = _.chain(nextVideos)
+      .filter(video => !!(video.posterPath && video.backdropPath))
+      .compact()
+      .value()
 
-    if (page > 10) {
-      return
+    if (pageRef.current === 1) {
+      console.log('making new videos')
+      setVideos(filteredVideos)
+    } else {
+      console.log('adding to current videos')
+
+      setVideos(videos.concat(filteredVideos))
     }
+  }
 
+  const discover = () => {
     const selectedVideoTypes = videoTypesSelectState.selectedOptions
     const selectedSortType = videoTypesSelectState.selectedOptions[0]
     const selectedRegions = regionSelectState.selectedOptions
@@ -101,25 +96,34 @@ const Discover = observer(() => {
 
     videoDiscover({
       with_type: selectedVideoTypes.join(typesSeparationType === 'includes_any' ? ',' : '|'),
-      page: page.toString(),
+      page: pageRef.current.toString(),
       sort_by: selectedSortType,
       watch_region: selectedRegions.join(','),
       with_genres: selectedTvGenres.join(typesSeparationType === 'includes_any' ? ',' : '|'),
       with_providers: selectedTvProviders.join(','),
     })
-      .then(videos => videos.filter(video => !!video.posterPath))
-      .then(_.compact)
-      .then(nextVideos => {
-        if (page === 1) {
-          console.log('making new videos')
-          setVideos(nextVideos)
-        } else {
-          console.log('adding to current videos')
-
-          setVideos(videos.concat(nextVideos))
-        }
-      })
+      .then(handleVideos)
       .catch(e => {})
+  }
+
+  const search = () => {
+    videoSearch(searchText, { page: pageRef.current.toString() })
+      .then(handleVideos)
+      .catch(e => {})
+  }
+
+  const loadVideos = () => {
+    const page = pageRef.current
+
+    if (page > 10) {
+      return
+    }
+
+    if (searchText) {
+      search()
+    } else {
+      discover()
+    }
   }
 
   const videoTypesSelectState = useSelectState('Types', getVideoTypes)
@@ -147,7 +151,7 @@ const Discover = observer(() => {
   const getNextPage = () => {
     pageRef.current += 1
 
-    search()
+    loadVideos()
   }
 
   useEffect(() => {
@@ -162,8 +166,12 @@ const Discover = observer(() => {
   }, [router.query])
 
   useEffect(() => {
-    search()
-  }, [])
+    if (!searchText) {
+      pageRef.current = 1
+    }
+
+    loadVideos()
+  }, [searchText])
 
   const safeAreaProps = useSafeArea({
     safeAreaTop: true,
@@ -193,14 +201,31 @@ const Discover = observer(() => {
         maxWidth="min(1619px, 100vw)"
         alignSelf="center"
       >
-        <Input
-          placeholder="Search"
-          leftElement={<SearchIcon />}
-          variant="unstyled"
-          fontSize="24px"
-        />
+        <Row>
+          <SearchIcon size="md" alignSelf="center" paddingRight="12px" />
 
-        <Divider backgroundColor="reelist.500" marginBottom="20px" />
+          {searchText ? (
+            <PillButton
+              label={searchText}
+              height="35px"
+              endIcon={REMOVE_ICON}
+              variant="solid"
+              onPress={() => setSearchText('')}
+              borderWidth="0"
+            />
+          ) : (
+            <Input
+              placeholder="Search"
+              variant="unstyled"
+              fontSize="24px"
+              height="35px"
+              padding="0px"
+              onSubmitEditing={e => setSearchText(e.target.value)}
+            />
+          )}
+        </Row>
+
+        <Divider backgroundColor="reelist.500" marginBottom="20px" marginTop="14px" />
 
         <Flex
           flexWrap="wrap"
@@ -277,12 +302,12 @@ const Discover = observer(() => {
             renderItem={({ item: video }) => (
               <VideoImage
                 video={video}
-                key={video.id}
                 containerProps={{ width: '307px' }}
                 isSmallImage={true}
                 onPress={() => handleVideoSelection(video)}
               />
             )}
+            keyExtractor={video => video.videoId}
             extraData={videos}
             onEndReached={getNextPage}
             onEndReachedThreshold={0.5}
@@ -311,30 +336,29 @@ const Discover = observer(() => {
           /> */}
         </Box>
 
-        <Slide in={showSelectedVideo} placement="right" display="flex" width="100vw" height="100vh">
-          <Pressable
-            flex={1}
-            backgroundColor="black:alpha.40"
-            style={{backdropFilter: 'blur(16px)'}}
-            onPress={router.back}
-            {...safeAreaProps}
-          />
-
-          <Box
-            flex={1}
-            padding="2"
-            _text={{
-              color: 'orange.600',
-            }}
-            bg="gray.200"
-            maxWidth="400px"
-            height="100%"
-            position="absolute"
-            right="0"
-          >
-            {selectedVideo && <VideoSection video={selectedVideo} />}
-          </Box>
-        </Slide>
+        <Dialog
+          open={showSelectedVideo}
+          onClose={_.debounce(router.back, 500)}
+          hideBackdrop
+          style={{
+            backgroundColor: 'rgba(0, 0, 0, 0.49)',
+            backdropFilter: 'blur(15px)',
+            // cursor: 'pointer',
+          }}
+          PaperProps={{
+            style: {
+              background:
+                'radial-gradient(50% 50% at 50% 50%, rgba(21, 30, 1, 0.25) 0%, rgba(0, 0, 0, 0.45) 100%)',
+              backdropFilter: 'blur(15px)',
+              maxWidth: 'calc(100vw - 20px)',
+              position: 'relative',
+              padding: '38px',
+              paddingRight: '60px',
+            },
+          }}
+        >
+          {selectedVideo && <VideoSection video={selectedVideo} />}
+        </Dialog>
       </Flex>
     </div>
   )
@@ -343,33 +367,52 @@ const Discover = observer(() => {
 export default Discover
 
 const VideoSection = ({ video }: { video: Video }) => {
+
+  useEffect(()=> {
+video.fetchWatchProviders()
+  }, [])
+
   return (
     <>
-      <Center>
-        <VideoImage video={video} padding="15px" containerProps={{ width: '307px' }} isFullImage />
+      <Row>
+        <VideoImage video={video} marginRight="50px" isPoster />
 
-        <Text>{video.videoName}</Text>
-      </Center>
+        <View>
+          <Text fontSize="48px" numberOfLines={2} adjustsFontSizeToFit>
+            {video.videoName}
+          </Text>
 
-      <Text>{_.map(video.genres, 'name').join(', ')}</Text>
+          <Text>
+            {_.map(video.genres, 'name').join('/')} ‧ {video.durationOrSeasons}
+          </Text>
 
-      <Text paddingTop="5 px">Find on: </Text>
-      <Flex flexDir="row" flexWrap="wrap" paddingLeft="7px">
-        <Row space={2}>
-          {video.networks.map(network => (
-            <AspectRatio width="70px">
-              <Image
-                source={{ uri: IMAGE_PATH + network.logoPath }}
-                resizeMode="contain"
-                rounded="sm"
-                size="100%"
-              />
-            </AspectRatio>
-          ))}
-        </Row>
-      </Flex>
+          <Divider backgroundColor="reelist.500" marginBottom="35px" marginTop="28px" />
 
-      <Text paddingTop="10px">{video.overview}</Text>
+          <Text maxWidth="440px" flexWrap="wrap">
+            {video.overview}
+          </Text>
+
+          {video.networks.length > 0 && (
+            <>
+              <Text paddingTop="5 px">Find on: </Text>
+              <Flex flexDir="row" flexWrap="wrap" paddingLeft="7px">
+                <Row space={2}>
+                  {video.networks.map(network => (
+                    <AspectRatio width="70px">
+                      <Image
+                        source={{ uri: IMAGE_PATH + network.logoPath }}
+                        resizeMode="contain"
+                        rounded="sm"
+                        size="100%"
+                      />
+                    </AspectRatio>
+                  ))}
+                </Row>
+              </Flex>
+            </>
+          )}
+        </View>
+      </Row>
     </>
   )
 }
@@ -377,20 +420,27 @@ const VideoSection = ({ video }: { video: Video }) => {
 type VideoImageProps = IImageProps & {
   video: Video
   containerProps?: IViewProps
-  isFullImage?: boolean
+  isPoster?: boolean
   onPress?: () => void
 }
 
+const videoTextProps: ITextProps = {
+  paddingX: '10px',
+  numberOfLines: 2,
+  ellipsizeMode: 'clip',
+  color: 'white',
+}
+
 const VideoImage = observer(
-  ({ video, containerProps, onPress, isFullImage, ...imageProps }: VideoImageProps) => {
+  ({ video, containerProps, onPress, isPoster, ...imageProps }: VideoImageProps) => {
     const [hovered, setHovered] = useState(false)
     const [pressed, setPressed] = useState(false)
 
-    const source = video.posterPath
+    const source = isPoster ? video.posterPath : video.backdropPath
 
     if (!source) return null
 
-    const imageSizeProps: IImageProps = isFullImage
+    const imageSizeProps: IImageProps = isPoster
       ? {
           resizeMode: 'contain',
           width: '406',
@@ -428,32 +478,28 @@ const VideoImage = observer(
             {...imageProps}
             {...imageSizeProps}
           />
-
-          <PresenceTransition
-            visible={hovered}
-            initial={{
-              opacity: 0,
-            }}
-            animate={{
-              opacity: 1,
-              transition: {
-                duration: 250,
-                restDisplacementThreshold: 300,
-              },
-            }}
-          >
+          {!isPoster && (
             <View
-              backgroundColor="black:alpha.40"
               position="absolute"
               bottom="0"
               width="100%"
               roundedBottom="sm"
+              minHeight="85px"
+              paddingTop="10px"
+              style={{
+                background:
+                  'linear-gradient(180deg, rgba(0, 0, 0, 0.54) 0%, rgba(0, 0, 0, 0) 0.01%, rgba(0, 0, 0, 0.54) 33.85%)',
+              }}
             >
-              <Text color="white" textAlign="center">
+              <Text {...videoTextProps} fontSize="24px">
                 {video.videoName}
               </Text>
+
+              <Text {...videoTextProps} fontSize="15px">
+                {video.durationOrSeasons}
+              </Text>
             </View>
-          </PresenceTransition>
+          )}
         </View>
       </Pressable>
     )

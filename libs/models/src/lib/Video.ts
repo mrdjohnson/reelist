@@ -158,7 +158,7 @@ class Video {
       this.videoId = (json.mediaType === 'movie' ? 'mv' : 'tv') + json.id
     }
 
-    console.log('videoId: ', videoId)
+    console.log('videoId: ', this.videoId)
     if (this.videoId === 'tv116244') {
       debugger
     }
@@ -471,6 +471,14 @@ class Video {
     await sendNotifications({ ...update })
   }
 
+  fetchWatchProviders = async () => {
+    const videoType = this.isTv? 'tv' : 'movie'
+
+    callTmdb(`/${videoType}/${this.id}/watch/providers`).then(
+      item => _.get(item, 'data.data') || null,
+    ).then(console.log)
+  }
+
   fetchSeason = async (seasonNumber: number) => {
     if (this.seasonMap[seasonNumber]) return this.seasonMap[seasonNumber]
 
@@ -483,7 +491,7 @@ class Video {
     let season: TvSeason | null = null
 
     try {
-      season = await callTmdb(path).then(item => _.get(item, 'data.data')) as TvSeason
+      season = (await callTmdb(path).then(item => _.get(item, 'data.data'))) as TvSeason
     } catch (e) {
       console.error(e)
       throw e
@@ -770,6 +778,14 @@ class Video {
     }
 
     return 0
+  }
+
+  get durationOrSeasons() {
+    if (this.isTv) {
+      return `${this.seasons?.length} seasons`
+    }
+
+    return `${this.totalDurationMinutes} min`
   }
 
   get totalDuration() {

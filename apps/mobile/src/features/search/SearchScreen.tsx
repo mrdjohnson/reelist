@@ -7,7 +7,7 @@ import SearchBar from '~/shared/components/SearchBar'
 import { ReelistScreenFrom } from '~/utils/navigation'
 import useAsyncState from '@reelist/utils/hooks/useAsyncState'
 import { RefreshControl } from 'react-native'
-import useVideoSearch from '~/hooks/useVideoSearch'
+import useVideoSearch from '@reelist/utils/hooks/useVideoSearch'
 
 const SearchScreen = observer(({ route, navigation }: ReelistScreenFrom<'search'>) => {
   const [searchText, setSearchText] = useState(route.params?.initialSearchValue || '')

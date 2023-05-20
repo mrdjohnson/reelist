@@ -6,10 +6,10 @@ import { useStore } from '@reelist/utils/hooks/useStore'
 const useVideoSearch = () => {
   const { auth, videoStore } = useStore()
 
-  const videoSearch = async (searchText: string) => {
+  const videoSearch = async (searchText: string, params: Record<string, string> = {}) => {
     if (!searchText) return []
 
-    const searchResults = await callTmdb('/search/multi', { query: searchText }).then(
+    const searchResults = await callTmdb('/search/multi', { query: searchText, ...params }).then(
       item => _.get(item, 'data.data.results') as Video[] | null,
     )
 

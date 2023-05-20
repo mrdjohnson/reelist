@@ -53,6 +53,15 @@ function MyApp({ Component, pageProps }) {
         _text: { color: 'white' },
       },
 
+      Modal: {
+        defaultProps: {
+          _backdrop: {
+            backgroundColor: 'rgba(0, 0, 0, 0.69)',
+            backdropFilter: 'blur(15px)'
+          },
+        },
+      },
+
       Button: {
         defaultProps: {
           _text: { fontFamily: 'Inter', fontWeight: 600, fontSize: '16px' },
