@@ -129,7 +129,9 @@ const Discover = observer(() => {
   const videoTypesSelectState = useSelectState('Types', getVideoTypes)
   const tvGenreSelectState = useSelectState('Tv Genres', getTvGenres)
   const tvProviderSelectState = useSelectState('Tv Providers', getTvProviders)
-  const regionSelectState = useSelectState('Regions', getRegions)
+  const regionSelectState = useSelectState('Regions', getRegions, {
+    getAlternativeDefaults: getDefaultRegions,
+  })
   const sortTypesSelectState = useSelectState('Sort By', getSortTypes, {
     isMulti: false,
     getAlternativeDefaults: () => ['popularity.desc'],
@@ -506,46 +508,58 @@ const VideoImage = observer(
   },
 )
 
-const getRegions = async () => [
-  { id: '0', name: 'Documentary' },
-  { id: '1', name: 'News' },
-  { id: '2', name: 'Miniseries' },
-  { id: '3', name: 'Reality' },
-  { id: '4', name: 'Scripted' },
-  { id: '5', name: 'Talk Show' },
-  { id: '6', name: 'Video' },
-]
+const getRegions = () => {
+  return callTmdb('/watch/providers/regions')
+    .then(
+      item =>
+        _.get(item, 'data.data.results') as Array<{
+          iso31661: string
+          englishName: string
+          nativeName: string
+        }>,
+    )
+    .then(items =>
+      items.map(item => ({
+        id: item.iso31661,
+        name: item.englishName,
+      })),
+    )
+}
 
-const getDefaultRegions = async () => [
-  { id: '0', name: 'Documentary' },
-  { id: '1', name: 'News' },
-  { id: '2', name: 'Miniseries' },
-  { id: '3', name: 'Reality' },
-  { id: '4', name: 'Scripted' },
-  { id: '5', name: 'Talk Show' },
-  { id: '6', name: 'Video' },
-]
+const getDefaultRegions = () => {
+  if (!navigator) return []
 
-const getTvGenres = async () => [
-  { id: '0', name: 'Documentary' },
-  { id: '1', name: 'News' },
-  { id: '2', name: 'Miniseries' },
-  { id: '3', name: 'Reality' },
-  { id: '4', name: 'Scripted' },
-  { id: '5', name: 'Talk Show' },
-  { id: '6', name: 'Video' },
-]
+  return navigator.languages // options look like: en-US, en
+    .filter(language => language.includes('-')) // only grab 'en-US' like options
+    .map(language => language.match(/-(.*)/)[1]) // only grab 'US' from each option
+}
+
+const getTvGenres = () => {
+  return callTmdb('/genre/tv/list')
+    .then(
+      item =>
+        _.get(item, 'data.data.genres') as Array<{
+          id: string
+          name: string
+        }>,
+    )
+    .then(_.toArray)
+}
 
 // initial options: navigator.languages.filter(language => language.includes('-')).map(language => language.match(/-(.*)/)[1])
-const getTvProviders = async () => [
-  { id: '0', name: 'Documentary' },
-  { id: '1', name: 'News' },
-  { id: '2', name: 'Miniseries' },
-  { id: '3', name: 'Reality' },
-  { id: '4', name: 'Scripted' },
-  { id: '5', name: 'Talk Show' },
-  { id: '6', name: 'Video' },
-]
+const getTvProviders = () => {
+  return callTmdb('/watch/providers/tv')
+    .then(
+      item =>
+        _.get(item, 'data.data.results') as Array<{
+          displayPriority: string
+          logoPath: string
+          providerName: string
+          providerId: string
+        }>,
+    )
+    .then(items => items.map(item => ({ id: item.providerId, name: item.providerName })))
+}
 
 const getVideoTypes = async () => [
   { id: '0', name: 'Documentary' },
