@@ -42,6 +42,20 @@ type TvNetwork = {
   logoPath: string
 }
 
+type Provider = {
+  logoPath: string
+  providerId: number
+  providerName: string
+  displayPriority: number
+}
+
+type ProviderCountry = {
+  link: string
+  flatrate: Provider[]
+  rent: Provider[]
+  buy: Provider[]
+}
+
 type TvGenre = {
   id: number
   name: string
@@ -98,6 +112,7 @@ class Video {
   lastEpisodeToAir?: TvEpisode
   nextEpisodeToAir?: TvEpisode
   networks: TvNetwork[] = []
+  providers: Record<string, ProviderCountry> = {}
   genres: TvGenre[] = []
   aggregateCredits?: Credits
   credits!: Credits
@@ -156,11 +171,6 @@ class Video {
       this.videoId = videoId
     } else {
       this.videoId = (json.mediaType === 'movie' ? 'mv' : 'tv') + json.id
-    }
-
-    console.log('videoId: ', this.videoId)
-    if (this.videoId === 'tv116244') {
-      debugger
     }
 
     this._assignValuesFromJson(json)
@@ -472,11 +482,15 @@ class Video {
   }
 
   fetchWatchProviders = async () => {
-    const videoType = this.isTv? 'tv' : 'movie'
+    if (!_.isEmpty(this.providers)) return
 
-    callTmdb(`/${videoType}/${this.id}/watch/providers`).then(
-      item => _.get(item, 'data.data') || null,
-    ).then(console.log)
+    const videoType = this.isTv ? 'tv' : 'movie'
+
+    const providers = await callTmdb(`/${videoType}/${this.id}/watch/providers`)
+      .then(item => _.get(item, 'data.data.results') as Record<string, ProviderCountry>)
+      .then(providers => _.mapKeys(providers, (_value, key) => _.toUpper(key)))
+
+    this.providers = providers
   }
 
   fetchSeason = async (seasonNumber: number) => {
