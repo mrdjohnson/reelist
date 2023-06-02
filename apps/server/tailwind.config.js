@@ -4,6 +4,7 @@ module.exports = {
     './apps/server/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './apps/server/components/**/*.{js,ts,jsx,tsx,mdx}',
     './apps/server/app/**/*.{js,ts,jsx,tsx,mdx}',
+    './apps/server/src/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   corePlugins: {
     preflight: false,

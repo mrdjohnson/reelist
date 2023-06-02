@@ -45,6 +45,7 @@ import { IViewProps } from 'native-base/lib/typescript/components/basic/View/typ
 import PillButton from '@reelist/components/PillButton'
 
 import 'tailwindcss/tailwind.css'
+import NavBar from '~/components/NavBar'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
@@ -269,6 +270,7 @@ const Discover = observer(() => {
         maxWidth="1619px"
         alignSelf="center"
       >
+        <NavBar path="/discover" />
         <Row>
           <SearchIcon size="md" alignSelf="center" paddingRight="12px" />
 
@@ -347,7 +349,7 @@ const Discover = observer(() => {
           </div>
         </div>
 
-        <Box flex={1} paddingTop="34px">
+        <Box flex={1} paddingTop="34px" marginBottom="20px">
           <FlatList
             contentContainerStyle={{
               display: 'flex',
@@ -405,25 +407,27 @@ const Discover = observer(() => {
           style={{
             backgroundColor: 'rgba(0, 0, 0, 0.49)',
             backdropFilter: 'blur(15px)',
-            // cursor: 'pointer',
+            cursor: 'pointer',
           }}
           PaperProps={{
             style: {
               background:
                 'radial-gradient(50% 50% at 50% 50%, rgba(21, 30, 1, 0.25) 0%, rgba(0, 0, 0, 0.45) 100%)',
               backdropFilter: 'blur(15px)',
-              maxWidth: '100vw',
+              maxWidth: '1619px',
               position: 'relative',
               padding: '38px',
               paddingRight: '60px',
               overflowY: 'scroll',
               overflowX: 'clip',
+              cursor: 'default',
             },
           }}
           transitionDuration={{ exit: 50 }}
         >
           <div className="absolute top-2 right-3">
             <CloseOutlinedIcon
+              className="cursor-pointer"
               sx={{ color: 'rgb(254, 83, 101)', fontSize: '35px' }}
               onClick={closeVideo}
             />

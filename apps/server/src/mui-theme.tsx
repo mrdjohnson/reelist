@@ -5,6 +5,11 @@ const rootElement = () => document.getElementById('__next')
 // Create a theme instance.
 const theme = responsiveFontSizes(
   createTheme({
+    typography: {
+      button: {
+        textTransform: 'none',
+      },
+    },
     components: {
       MuiPopover: {
         defaultProps: {
