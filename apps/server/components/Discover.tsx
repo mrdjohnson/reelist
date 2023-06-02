@@ -1,7 +1,10 @@
+'use client'
+
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
-import { Backdrop, Dialog } from '@mui/material'
+import { Dialog } from '@mui/material'
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { RadioGroup, FormControlLabel, Radio } from '@mui/material'
 import _ from 'lodash'
@@ -41,6 +44,8 @@ import ActionButton from '@reelist/components/ActionButton'
 import { IViewProps } from 'native-base/lib/typescript/components/basic/View/types'
 import PillButton from '@reelist/components/PillButton'
 
+import 'tailwindcss/tailwind.css'
+
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
 const REMOVE_ICON = (
@@ -50,8 +55,8 @@ const REMOVE_ICON = (
 )
 
 const useWindowWidth = () => {
-  const [width, setWidth] = useState(window.innerWidth)
-  const handleResize = () => setWidth(window.innerWidth)
+  const [width, setWidth] = useState(window?.innerWidth)
+  const handleResize = () => setWidth(window?.innerWidth)
 
   useEffect(() => {
     handleResize()
@@ -208,7 +213,7 @@ const Discover = observer(() => {
 
   const containerPadding = useBreakpointValue({
     base: 20,
-    lg: 54,
+    xl: 54,
   })
 
   //   function calculateContainerWidthOld(itemCount: number): number {
@@ -225,7 +230,6 @@ const Discover = observer(() => {
     const spacing = 20 // spacing between items in pixels
 
     const numItemsPerRow = Math.floor((possibleWidth + spacing) / (itemWidth + spacing))
-    debugger
     const containerWidth = numItemsPerRow * itemWidth + (numItemsPerRow - 1) * spacing
     return 1 + containerWidth > possibleWidth ? possibleWidth : containerWidth
   }
@@ -239,6 +243,11 @@ const Discover = observer(() => {
     const totalContainerPadding = containerPadding * 2
     return calculateContainerWidth(Math.min(windowWidth, 1619) - totalContainerPadding)
   }, [windowWidth])
+
+  console.log('type: ', tvGenreSeparationType)
+
+  //  < 674px items lined up, with vertical spacing; or in a menu?
+  // < 1001 boxes in a row, with the sort by box on the row above, aligned to the right
 
   return (
     <div
@@ -286,14 +295,8 @@ const Discover = observer(() => {
 
         <Divider backgroundColor="reelist.500" marginBottom="20px" marginTop="14px" />
 
-        <Flex
-          flexWrap="wrap-reverse"
-          marginBottom="10px"
-          space="10px"
-          justifyContent="space-between"
-          flexDirection={['column-reverse', 'column-reverse', 'row']}
-        >
-          <Row space="10px" flexWrap="wrap">
+        <div className="grid grid-rows-2 max-[673px]:flex-col max-[1000px]:grid-rows-1">
+          <div className="flex row-start-1 max-[1000px]:row-start-2 max-[673px]:flex-col gap-2">
             <ReelistSelect selectState={videoTypesSelectState}>
               <RadioGroup
                 name="types-radio"
@@ -318,44 +321,43 @@ const Discover = observer(() => {
             <ReelistSelect selectState={regionSelectState} />
 
             <ReelistSelect selectState={tvGenreSelectState}>
-              <RadioGroup
-                name="types-radio"
-                value={tvGenreSeparationType}
-                onChange={e => setTvGenreSeparationType(e.target.value)}
-                row
-              >
-                <FormControlLabel
+              <div className="flex justify-center">
+                <Checkbox
                   value="includes_every"
-                  control={<Checkbox color="white" _text={{ color: 'white' }} />}
-                  label="Genres Must Have All of selected"
-                  color="white"
+                  onChange={checked =>
+                    setTvGenreSeparationType(checked ? 'includes_every' : 'includes_any')
+                  }
                 />
 
-                {/* <FormControlLabel
-                value="includes_any"
-                control={<Radio />}
-                label="Genres Can Have any of selected"
-              /> */}
-              </RadioGroup>
+                <div className="text-white ml-2">Genres Must Have All of selected</div>
+              </div>
             </ReelistSelect>
 
             <ReelistSelect selectState={tvProviderSelectState} />
-          </Row>
+          </div>
 
-          <ReelistSelect selectState={sortTypesSelectState} alignSelf="flex-end" />
-        </Flex>
+          <div className="max-[673px]:flex row-start-1 justify-center">
+            <ReelistSelect
+              selectState={sortTypesSelectState}
+              alignSelf="flex-end"
+              alignItems="end"
+              justifyContent="end"
+              flex={1}
+            />
+          </div>
+        </div>
 
-        <Box flex={1}>
+        <Box flex={1} paddingTop="34px">
           <FlatList
             contentContainerStyle={{
               display: 'flex',
               flexWrap: 'wrap',
               flexDirection: 'row',
               marginBottom: '15px',
-              rowGap: 50,
+              rowGap: [20, 20, 50],
               columnGap: 20,
               justifyContent: 'center',
-              width
+              width,
             }}
             data={videos}
             scrollEventThrottle={16}
@@ -420,6 +422,12 @@ const Discover = observer(() => {
           }}
           transitionDuration={{ exit: 50 }}
         >
+          <div className="absolute top-2 right-3">
+            <CloseOutlinedIcon
+              sx={{ color: 'rgb(254, 83, 101)', fontSize: '35px' }}
+              onClick={closeVideo}
+            />
+          </div>
           {selectedVideo && (
             <VideoSection
               video={selectedVideo}
@@ -449,55 +457,50 @@ const VideoSection = observer(
     }, [video.providers])
 
     return (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          maxWidth: '100%',
-          flexWrap: 'wrap',
-          justifyContent: 'center',
-        }}
-      >
-        <VideoImage
-          video={video}
-          marginRight="50px"
-          containerProps={{ alignSelf: 'center' }}
-          isPoster
-        />
+      <div className="flex flex-col flex-wrap justify-center text-white xl:flex-row xl:flex-nowrap">
+        <div className="flex justify-center xl:mr-12 rounded-lg">
+          <VideoImage
+            video={video}
+            containerProps={{ alignSelf: 'center' }}
+            rounded="lg"
+            isPoster
+          />
+        </div>
 
-        <Flex width={['300px', '440px', '600px']} height="609px" maxHeight="609px">
-          <Text fontSize="48px" numberOfLines={2} adjustsFontSizeToFit>
+        <div className="flex flex-col ">
+          <p className="text-5xl text-center mt-4 mb-1 xl:text-left xl:mt-0 xl:mb-2">
             {video.videoName}
-          </Text>
+          </p>
 
-          <Text>
+          <div>
             {_.map(video.genres, 'name').join('/')} ‧ {video.durationOrSeasons}
-          </Text>
+          </div>
 
           <Divider backgroundColor="reelist.500" marginBottom="35px" marginTop="28px" />
 
-          <Text flexWrap="wrap">{video.overview}</Text>
+          <div className="whitespace-normal break-words">{video.overview}</div>
 
           <Text>{selectedRegions.join(', ')}</Text>
 
-          <View alignSelf="bottom">
-            <Text fontSize="24px" paddingY="35px">
-              {providers.length === 0 ? 'Not available in provided regions' : 'Available on'}
-            </Text>
-            <ScrollView horizontal>
-              {providers.map(provider => (
-                <AspectRatio width="70px">
-                  <Image
-                    source={{ uri: IMAGE_PATH + provider.logoPath }}
-                    resizeMode="contain"
-                    rounded="sm"
-                    size="100%"
+          <div className="flex flex-1 items-end pt-4">
+            <div>
+              <div className="text-2xl pb-3">
+                {providers.length === 0 ? 'Not available in provided regions' : 'Available on'}
+              </div>
+
+              <div className="flex overflow-scroll gap-x-2">
+                {providers.map(provider => (
+                  <img
+                    src={IMAGE_PATH + provider.logoPath}
+                    className="rounded-md object-contain"
+                    width="70px"
+                    height="70px"
                   />
-                </AspectRatio>
-              ))}
-            </ScrollView>
-          </View>
-        </Flex>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     )
   },

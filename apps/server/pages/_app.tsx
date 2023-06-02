@@ -1,7 +1,10 @@
+import 'tailwindcss/tailwind.css'
 import '~/setupServerEnv'
 
 import { StoreProvider } from '@reelist/utils/store'
 import { NativeBaseProvider, extendTheme } from 'native-base'
+import { StyledEngineProvider, ThemeProvider } from '@mui/material'
+import muiTheme from '~/mui-theme'
 
 // eslint-disable-next-line react/prop-types
 function MyApp({ Component, pageProps }) {
@@ -57,7 +60,7 @@ function MyApp({ Component, pageProps }) {
         defaultProps: {
           _backdrop: {
             backgroundColor: 'rgba(0, 0, 0, 0.69)',
-            backdropFilter: 'blur(15px)'
+            backdropFilter: 'blur(15px)',
           },
         },
       },
@@ -95,11 +98,15 @@ function MyApp({ Component, pageProps }) {
   })
 
   return (
-    <StoreProvider>
-      <NativeBaseProvider theme={theme}>
-        <Component {...pageProps} />
-      </NativeBaseProvider>
-    </StoreProvider>
+    <StyledEngineProvider injectFirst>
+      <ThemeProvider theme={muiTheme}>
+        <StoreProvider>
+          <NativeBaseProvider theme={theme}>
+            <Component {...pageProps} />
+          </NativeBaseProvider>
+        </StoreProvider>
+      </ThemeProvider>
+    </StyledEngineProvider>
   )
 }
 

@@ -57,7 +57,8 @@
       "defaultConfiguration": "production",
       "options": {
         "root": "apps/server",
-        "outputPath": "apps/server/dist"
+        "outputPath": "apps/server/dist",
+        "postcssConfig": "apps/server/postcss.config.js"
       },
       "configurations": {
         "development": {
