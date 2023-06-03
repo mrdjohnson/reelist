@@ -86,11 +86,11 @@ const Discover = observer(() => {
 
   const [tvGenreSeparationType, setTvGenreSeparationType] = useLocalStorageState(
     'tvGenreSeparationType',
-    'includes_every',
+    'includes_any',
   )
   const [typesSeparationType, setTypesSeparationType] = useLocalStorageState(
     'typesSeparationType',
-    'includes_every',
+    'includes_any',
   )
 
   const pageRef = useRef(1)
@@ -300,38 +300,40 @@ const Discover = observer(() => {
         <div className="grid grid-rows-2 max-[673px]:flex-col max-[1000px]:grid-rows-1">
           <div className="flex row-start-1 max-[1000px]:row-start-2 max-[673px]:flex-col gap-2">
             <ReelistSelect selectState={videoTypesSelectState}>
-              <RadioGroup
-                name="types-radio"
-                value={typesSeparationType}
-                onChange={e => setTypesSeparationType(e.target.value)}
-                row
+              <div
+                className="flex justify-center cursor-pointer"
+                onClick={() =>
+                  setTypesSeparationType(
+                    typesSeparationType === 'includes_every' ? 'includes_any' : 'includes_every',
+                  )
+                }
               >
-                <FormControlLabel
+                <Checkbox
                   value="includes_every"
-                  control={<Radio />}
-                  label="Types Include Every"
+                  isChecked={typesSeparationType === 'includes_every'}
                 />
 
-                <FormControlLabel
-                  value="includes_any"
-                  control={<Radio />}
-                  label="Types Include Any"
-                />
-              </RadioGroup>
+                <div className="text-white ml-2">Types Must Include</div>
+              </div>
             </ReelistSelect>
 
             <ReelistSelect selectState={regionSelectState} />
 
             <ReelistSelect selectState={tvGenreSelectState}>
-              <div className="flex justify-center">
+              <div
+                className="flex justify-center cursor-pointer"
+                onClick={() =>
+                  setTypesSeparationType(
+                    tvGenreSeparationType === 'includes_every' ? 'includes_any' : 'includes_every',
+                  )
+                }
+              >
                 <Checkbox
                   value="includes_every"
-                  onChange={checked =>
-                    setTvGenreSeparationType(checked ? 'includes_every' : 'includes_any')
-                  }
+                  isChecked={tvGenreSeparationType === 'includes_every'}
                 />
 
-                <div className="text-white ml-2">Genres Must Have All of selected</div>
+                <div className="text-white ml-2">Genres Must Include</div>
               </div>
             </ReelistSelect>
 
@@ -484,8 +486,6 @@ const VideoSection = observer(
 
           <div className="whitespace-normal break-words">{video.overview}</div>
 
-          <Text>{selectedRegions.join(', ')}</Text>
-
           <div className="flex flex-1 items-end pt-4">
             <div>
               <div className="text-2xl pb-3">
@@ -540,7 +540,7 @@ const VideoImage = observer(
           height: '609',
         }
       : {
-          resizeMode: 'object-fit',
+          resizeMode: 'cover',
           width: '307px',
           height: '207px',
         }
@@ -573,13 +573,8 @@ const VideoImage = observer(
             {...imageSizeProps}
           />
           {!isPoster && (
-            <View
-              position="absolute"
-              bottom="0"
-              width="100%"
-              roundedBottom="sm"
-              minHeight="85px"
-              paddingTop="10px"
+            <div
+              className="absolute bottom-0 w-full rounded-b-md pt-3 min-h-[70px]"
               style={{
                 background:
                   'linear-gradient(180deg, rgba(0, 0, 0, 0.54) 0%, rgba(0, 0, 0, 0) 0.01%, rgba(0, 0, 0, 0.54) 33.85%)',
@@ -592,7 +587,7 @@ const VideoImage = observer(
               <Text {...videoTextProps} fontSize="15px">
                 {video.durationOrSeasons}
               </Text>
-            </View>
+            </div>
           )}
         </View>
       </Pressable>
