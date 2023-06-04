@@ -28,7 +28,7 @@ type StringOrNumber = string | number
 export type SelectOption<T extends StringOrNumber> = { id: T; name: string; selected?: boolean }
 
 export class SelectState<T extends StringOrNumber> {
-  selectedOptions: Array<T> = []
+  selectedOptions: Record<StringOrNumber, string> = {}
   storageKey: string
   options: Array<SelectOption<T>>
 
@@ -36,7 +36,7 @@ export class SelectState<T extends StringOrNumber> {
     public label: string,
     public loadOptions: () => Promise<Array<SelectOption<T>>>,
     private storage: IStorage,
-    private alternativeDefaultOptions?: () => T[],
+    private alternativeDefaultOptions?: () => Record<StringOrNumber, string>,
     public isMulti: boolean = true,
   ) {
     console.log('is multi: ', isMulti)
@@ -51,35 +51,42 @@ export class SelectState<T extends StringOrNumber> {
   lazyLoadFromStorage = async () => {
     const defaultKey = this.storageKey
 
-    const storedValues = await this.storage.load<T[]>(defaultKey)
+    const storedValues = await this.storage.load<typeof this.selectedOptions>(defaultKey)
 
     console.log('loaded ' + defaultKey + ':', storedValues)
 
     if (storedValues != null) {
-      this.selectedOptions.push(...storedValues)
+      this.selectedOptions = storedValues
     }
 
     if (this.alternativeDefaultOptions) {
-      this.selectedOptions.push(...this.alternativeDefaultOptions())
+      this.selectedOptions = this.alternativeDefaultOptions()
     }
 
     if (!this.isMulti && !_.isEmpty(this.selectedOptions)) {
-      this.selectedOptions = [this.selectedOptions[0]]
+      // todo:
+      // this.selectedOptions = {0: this.selectedOptions[0]}
     }
   }
 
   toggleOption = (option: SelectOption<T>) => {
     const selected = this.selectedOptions
-    const removingOption = selected.includes(option.id)
+    const removingOption = !!this.selectedOptions[option.id]
 
     if (this.isMulti) {
-      this.selectedOptions = _.xor(this.selectedOptions, [option.id])
+      this.selectedOptions[option.id] = removingOption ? undefined : option.name
       // if this is not multi select, there should always be a selected option
     } else if (!removingOption) {
-      this.selectedOptions = [option.id]
+      this.selectedOptions = { 0: option }
     }
 
-    this.storage.save(this.storageKey, selected)
+    this.storage.save(this.storageKey, this.selectedOptions)
+  }
+
+  removeOption = (optionId: StringOrNumber) => {
+    delete this.selectedOptions[optionId]
+
+    this.storage.save(this.storageKey, this.selectedOptions)
   }
 }
 
@@ -140,7 +147,7 @@ const ReelistSelect = observer(
           borderWidth: 0,
           variant,
           width: '100%',
-          textAlign:'left'
+          textAlign: 'left',
         }
       } else if (isChecked) {
         pillButtonProps = {
@@ -189,7 +196,7 @@ const ReelistSelect = observer(
                 }
                 height="40px"
               >
-                {selectState.isMulti ? label : _.find(options, { id: selectedOptions[0] })?.name}
+                {selectState.isMulti ? label : selectedOptions[0]?.name}
               </AppButton>
             </Pressable>
           )
@@ -242,7 +249,7 @@ const ReelistSelect = observer(
                 )}
 
                 {filteredOptions.map(option => {
-                  const isChecked = selectedOptions.includes(option.id)
+                  const isChecked = !!selectedOptions[option.id]
                   return renderOption(option, isChecked)
                 })}
 

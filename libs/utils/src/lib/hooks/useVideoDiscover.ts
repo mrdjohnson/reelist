@@ -8,8 +8,7 @@ const useVideoDiscover = () => {
 
   const videoDiscover = async (params: Record<string, string>) => {
     const searchResults = await Promise.allSettled([
-      // callTmdb('/discover/tv', params),
-      [],
+      callTmdb('/discover/tv', params),
       callTmdb('/discover/movie', params),
     ])
       .then(([tvShows, movies]) => {

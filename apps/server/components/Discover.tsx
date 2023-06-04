@@ -6,7 +6,7 @@ import { useRouter } from 'next/router'
 import { Dialog } from '@mui/material'
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { RadioGroup, FormControlLabel, Radio } from '@mui/material'
+import { RadioGroup, FormControlLabel, Radio, Button } from '@mui/material'
 import _ from 'lodash'
 import { useStore } from '@reelist/utils/hooks/useStore'
 import useLocalStorageState from '@reelist/utils/hooks/useLocalStorageState'
@@ -26,7 +26,6 @@ import {
   Center,
   Row,
   PresenceTransition,
-  Button,
   Checkbox,
   Input,
   SearchIcon,
@@ -39,7 +38,7 @@ import {
   useBreakpointValue,
 } from 'native-base'
 import { AspectRatio, IAspectRatioProps, IImageProps, Image } from 'native-base'
-import ReelistSelect, { useSelectState } from '@reelist/components/ReelistSelect'
+import ReelistSelect, { SelectState, useSelectState } from '@reelist/components/ReelistSelect'
 import ActionButton from '@reelist/components/ActionButton'
 import { IViewProps } from 'native-base/lib/typescript/components/basic/View/types'
 import PillButton from '@reelist/components/PillButton'
@@ -120,12 +119,16 @@ const Discover = observer(() => {
     const selectedTvProviders = tvProviderSelectState.selectedOptions
 
     videoDiscover({
-      with_type: selectedVideoTypes.join(typesSeparationType === 'includes_any' ? ',' : '|'),
+      with_type: _.values(selectedVideoTypes).join(
+        typesSeparationType === 'includes_any' ? ',' : '|',
+      ),
       page: pageRef.current.toString(),
       sort_by: selectedSortType,
-      watch_region: selectedRegions.join(','),
-      with_genres: selectedTvGenres.join(typesSeparationType === 'includes_any' ? ',' : '|'),
-      with_providers: selectedTvProviders.join(','),
+      watch_region: _.values(selectedRegions).join(','),
+      with_genres: _.values(selectedTvGenres).join(
+        typesSeparationType === 'includes_any' ? ',' : '|',
+      ),
+      with_providers: _.values(selectedTvProviders).join(','),
     })
       .then(handleVideos)
       .catch(e => {})
@@ -174,6 +177,8 @@ const Discover = observer(() => {
     tvGenreSeparationType,
     typesSeparationType,
   ])
+
+  const renderSelectedOptions = (options: string | number) => {}
 
   const getNextPage = () => {
     pageRef.current += 1
@@ -351,6 +356,20 @@ const Discover = observer(() => {
           </div>
         </div>
 
+        <div className="hidden flex-row md:flex gap-2">
+          {_.map(videoTypesSelectState.selectedOptions, (name, id) => (
+            <Button
+              className="border border-solid border-red-400 text-white px-3 rounded-full"
+              onClick={() => videoTypesSelectState.removeOption(id)}
+              key={id}
+            >
+              {name}
+
+              <CloseOutlinedIcon className="text-white text-[17px] pl-2" />
+            </Button>
+          ))}
+        </div>
+
         <Box flex={1} paddingTop="34px" marginBottom="20px">
           <FlatList
             contentContainerStyle={{
@@ -437,7 +456,7 @@ const Discover = observer(() => {
           {selectedVideo && (
             <VideoSection
               video={selectedVideo}
-              selectedRegions={regionSelectState.selectedOptions}
+              selectedRegions={_.keys(regionSelectState.selectedOptions)}
             />
           )}
         </Dialog>
