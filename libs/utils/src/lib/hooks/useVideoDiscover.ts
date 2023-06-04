@@ -27,6 +27,7 @@ const useVideoDiscover = () => {
 
     if (!searchResults) return []
 
+    // todo: this is not working for movies right now, its trying to get collections
     return videoStore.getVideos(searchResults)
   }
 
