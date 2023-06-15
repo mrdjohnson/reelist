@@ -13,7 +13,7 @@ import useLocalStorageState from '@reelist/utils/hooks/useLocalStorageState'
 import useVideoDiscover from '@reelist/utils/hooks/useVideoDiscover'
 import useVideoSearch from '@reelist/utils/hooks/useVideoSearch'
 import { callTmdb } from '@reelist/apis/api'
-import Video from '@reelist/models/Video'
+import Video, { Provider } from '@reelist/models/Video'
 import {
   Box,
   FlatList,
@@ -91,15 +91,35 @@ const Discover = observer(() => {
     'typesSeparationType',
     'includes_any',
   )
+  const [regionSeparationType, setRegionSeparationType] = useLocalStorageState(
+    'regionSeparationType',
+    'includes_any',
+  )
 
   const pageRef = useRef(1)
   const [videos, setVideos] = useState<Video[]>([])
 
+  const videoFilter = (video: Video) => {
+    if (_.isEmpty(video.posterPath || video.backdropPath)) return false
+
+    const mustIncludeAllRegions = regionSeparationType === 'includes_every'
+
+    // if there is a regions filter, actualy filter by it
+    for (const region in regionSelectState.selectedOptions) {
+      const regionExists = !_.isEmpty(video.providers[region])
+
+      if (mustIncludeAllRegions && !regionExists) {
+        return false
+      } else if (regionExists) {
+        return true
+      }
+    }
+
+    return false
+  }
+
   const handleVideos = (nextVideos: Video[]) => {
-    const filteredVideos = _.chain(nextVideos)
-      .filter(video => !!(video.posterPath && video.backdropPath))
-      .compact()
-      .value()
+    const filteredVideos = _.chain(nextVideos).filter(videoFilter).compact().value()
 
     if (pageRef.current === 1) {
       console.log('making new videos')
@@ -113,22 +133,22 @@ const Discover = observer(() => {
 
   const discover = () => {
     const selectedVideoTypes = videoTypesSelectState.selectedOptions
-    const selectedSortType = videoTypesSelectState.selectedOptions[0]
+    const selectedSortType = _.keys(sortTypesSelectState.selectedOptions)[0]
     const selectedRegions = regionSelectState.selectedOptions
     const selectedTvGenres = tvGenreSelectState.selectedOptions
     const selectedTvProviders = tvProviderSelectState.selectedOptions
 
     videoDiscover({
-      with_type: _.values(selectedVideoTypes).join(
+      with_type: _.keys(selectedVideoTypes).join(
         typesSeparationType === 'includes_any' ? ',' : '|',
       ),
       page: pageRef.current.toString(),
       sort_by: selectedSortType,
-      watch_region: _.values(selectedRegions).join(','),
-      with_genres: _.values(selectedTvGenres).join(
+      watch_region: _.keys(selectedRegions).join(','),
+      with_genres: _.keys(selectedTvGenres).join(
         typesSeparationType === 'includes_any' ? ',' : '|',
       ),
-      with_providers: _.values(selectedTvProviders).join(','),
+      with_providers: _.keys(selectedTvProviders).join(','),
     })
       .then(handleVideos)
       .catch(e => {})
@@ -167,18 +187,18 @@ const Discover = observer(() => {
 
   useEffect(() => {
     pageRef.current = 1
+
+    loadVideos()
   }, [
     videoTypesSelectState.selectedOptions,
     sortTypesSelectState.selectedOptions,
-    tvGenreSelectState.selectedOptions,
     tvGenreSelectState.selectedOptions,
     tvProviderSelectState.selectedOptions,
     regionSelectState.selectedOptions,
     tvGenreSeparationType,
     typesSeparationType,
+    regionSeparationType,
   ])
-
-  const renderSelectedOptions = (options: string | number) => {}
 
   const getNextPage = () => {
     pageRef.current += 1
@@ -222,16 +242,7 @@ const Discover = observer(() => {
     xl: 54,
   })
 
-  //   function calculateContainerWidthOld(itemCount: number): number {
-  //     const totalItemsWidth = itemCount * itemWidth
-  //     const totalSpacingWidth = (itemCount - 1) * spacing
-  //     const totalWidth = totalItemsWidth + totalSpacingWidth + containerPadding * 2
-  //     const maxWidth = window.innerWidth - 40 // maximum width minus 20 pixels for safety
-
-  //     return totalWidth <= maxWidth ? totalWidth : maxWidth
-  //   }
-
-  function calculateContainerWidth(possibleWidth: number) {
+  const calculateContainerWidth = (possibleWidth: number) => {
     const itemWidth = 307 // width of each item in pixels
     const spacing = 20 // spacing between items in pixels
 
@@ -250,8 +261,6 @@ const Discover = observer(() => {
     return calculateContainerWidth(Math.min(windowWidth, 1619) - totalContainerPadding)
   }, [windowWidth])
 
-  console.log('type: ', tvGenreSeparationType)
-
   //  < 674px items lined up, with vertical spacing; or in a menu?
   // < 1001 boxes in a row, with the sort by box on the row above, aligned to the right
 
@@ -264,6 +273,7 @@ const Discover = observer(() => {
         background: 'radial-gradient(50% 50% at 50% 50%, #1A200F 0%, #131313 100%)',
         display: 'flex',
         justifyContent: 'center',
+        // overflowY: 'scroll',
       }}
     >
       <Flex
@@ -302,7 +312,7 @@ const Discover = observer(() => {
 
         <Divider backgroundColor="reelist.500" marginBottom="20px" marginTop="14px" />
 
-        <div className="grid grid-rows-2 max-[673px]:flex-col max-[1000px]:grid-rows-1">
+        <div className="grid max-[673px]:flex-col max-[1000px]:grid-rows-1">
           <div className="flex row-start-1 max-[1000px]:row-start-2 max-[673px]:flex-col gap-2">
             <ReelistSelect selectState={videoTypesSelectState}>
               <div
@@ -322,13 +332,29 @@ const Discover = observer(() => {
               </div>
             </ReelistSelect>
 
-            <ReelistSelect selectState={regionSelectState} />
+            <ReelistSelect selectState={regionSelectState}>
+              <div
+                className="flex justify-center cursor-pointer"
+                onClick={() =>
+                  setRegionSeparationType(
+                    regionSeparationType === 'includes_every' ? 'includes_any' : 'includes_every',
+                  )
+                }
+              >
+                <Checkbox
+                  value="includes_every"
+                  isChecked={regionSeparationType === 'includes_every'}
+                />
+
+                <div className="text-white ml-2">Regions Must Include</div>
+              </div>
+            </ReelistSelect>
 
             <ReelistSelect selectState={tvGenreSelectState}>
               <div
                 className="flex justify-center cursor-pointer"
                 onClick={() =>
-                  setTypesSeparationType(
+                  setTvGenreSeparationType(
                     tvGenreSeparationType === 'includes_every' ? 'includes_any' : 'includes_every',
                   )
                 }
@@ -356,18 +382,25 @@ const Discover = observer(() => {
           </div>
         </div>
 
-        <div className="hidden flex-row md:flex gap-2">
-          {_.map(videoTypesSelectState.selectedOptions, (name, id) => (
-            <Button
-              className="border border-solid border-red-400 text-white px-3 rounded-full"
-              onClick={() => videoTypesSelectState.removeOption(id)}
-              key={id}
-            >
-              {name}
+        <div className="hidden flex-row min-[673px]:flex gap-2">
+          {[
+            videoTypesSelectState,
+            regionSelectState,
+            tvGenreSelectState,
+            tvProviderSelectState,
+          ].flatMap(selectState =>
+            _.map(selectState.selectedOptions, (name, id) => (
+              <Button
+                className="border border-solid border-red-400 text-white px-3 rounded-full mt-4"
+                onClick={() => selectState.removeOption(id)}
+                key={id}
+              >
+                {name}
 
-              <CloseOutlinedIcon className="text-white text-[17px] pl-2" />
-            </Button>
-          ))}
+                <CloseOutlinedIcon className="text-white text-[17px] pl-2" />
+              </Button>
+            )),
+          )}
         </div>
 
         <Box flex={1} paddingTop="34px" marginBottom="20px">
@@ -397,28 +430,6 @@ const Discover = observer(() => {
             onEndReached={getNextPage}
             onEndReachedThreshold={0.5}
           />
-
-          {/* <FlatList
-            contentContainerStyle={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              flexDirection: 'row',
-              marginBottom: '15px',
-              rowGap: 50,
-              columnGap: 21,
-            }}
-            data={_.times(100)}
-            scrollEventThrottle={16}
-            showsVerticalScrollIndicator={false}
-            renderItem={({ item: number }) => (
-              <Button backgroundColor="reelist.600" margin="5px">
-                {number}
-              </Button>
-            )}
-            extraData={videos}
-            onEndReached={getNextPage}
-            onEndReachedThreshold={0.5}
-          /> */}
         </Box>
 
         <Dialog
@@ -469,21 +480,32 @@ const Discover = observer(() => {
 
 const VideoSection = observer(
   ({ video, selectedRegions }: { video: Video; selectedRegions: string[] }) => {
-    useEffect(() => {
-      video.fetchWatchProviders()
-    }, [])
-
-    const providers = useMemo(() => {
-      return _.chain(selectedRegions)
-        .flatMap(region => video.providers[region]?.flatrate)
+    const getProvidersByType = (type): Provider[] =>
+      _.chain(selectedRegions)
+        .flatMap(region => video.providers[region]?.[type])
         .compact()
         .uniqBy('providerId')
         .value()
+
+    const flatrateProviders = useMemo(() => {
+      return getProvidersByType('flatrate').map(provider => ({ ...provider, type: 'Stream' }))
     }, [video.providers])
+
+    const buyProviders = useMemo(() => {
+      return getProvidersByType('buy').map(provider => ({ ...provider, type: 'Buy' }))
+    }, [video.providers])
+
+    const rentProviders = useMemo(() => {
+      return getProvidersByType('rent').map(provider => ({ ...provider, type: 'Rent' }))
+    }, [video.providers])
+
+    const providers = useMemo(() => {
+      return [...flatrateProviders, ...rentProviders, ...buyProviders]
+    }, [flatrateProviders, rentProviders, buyProviders])
 
     return (
       <div className="flex flex-col flex-wrap justify-center text-white xl:flex-row xl:flex-nowrap">
-        <div className="flex justify-center xl:mr-12 rounded-lg">
+        <div className="flex justify-center xl:mr-12 rounded-lg w-full">
           <VideoImage
             video={video}
             containerProps={{ alignSelf: 'center' }}
@@ -492,7 +514,7 @@ const VideoSection = observer(
           />
         </div>
 
-        <div className="flex flex-col ">
+        <div className="flex flex-col w-full">
           <p className="text-5xl text-center mt-4 mb-1 xl:text-left xl:mt-0 xl:mb-2">
             {video.videoName}
           </p>
@@ -505,20 +527,25 @@ const VideoSection = observer(
 
           <div className="whitespace-normal break-words">{video.overview}</div>
 
-          <div className="flex flex-1 items-end pt-4">
-            <div>
+          <div className="flex flex-1 items-end pt-4 w-full">
+            <div className="w-full">
               <div className="text-2xl pb-3">
                 {providers.length === 0 ? 'Not available in provided regions' : 'Available on'}
               </div>
 
-              <div className="flex overflow-scroll gap-x-2">
+              <div className="flex overflow-x-scroll gap-x-2">
                 {providers.map(provider => (
-                  <img
-                    src={IMAGE_PATH + provider.logoPath}
-                    className="rounded-md object-contain"
-                    width="70px"
-                    height="70px"
-                  />
+                  <div>
+                    <img
+                      src={IMAGE_PATH + provider.logoPath}
+                      className="rounded-md object-contain mb-3"
+                      alt={provider.providerName}
+                      width="70px"
+                      height="70px"
+                    />
+
+                    <span>{provider.type}</span>
+                  </div>
                 ))}
               </div>
             </div>

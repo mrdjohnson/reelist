@@ -42,7 +42,7 @@ type TvNetwork = {
   logoPath: string
 }
 
-type Provider = {
+export type Provider = {
   logoPath: string
   providerId: number
   providerName: string
@@ -112,7 +112,7 @@ class Video {
   lastEpisodeToAir?: TvEpisode
   nextEpisodeToAir?: TvEpisode
   networks: TvNetwork[] = []
-  providers: Record<string, ProviderCountry> = {}
+  providers!: Record<string, ProviderCountry> // = {}
   genres: TvGenre[] = []
   aggregateCredits?: Credits
   credits!: Credits
@@ -187,6 +187,11 @@ class Video {
     json.seasons && _.remove(json.seasons, season => season.name === 'Specials')
 
     Object.assign(this, json)
+
+    if (this.providers) return
+
+    const providers = _.get(json, 'watch/providers.results') || {}
+    this.providers = _.mapKeys(providers, (_value, key) => _.toUpper(key))
   }
 
   _assignFromVideoTable = (videoTable: VideoTableType) => {

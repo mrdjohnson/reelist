@@ -36,16 +36,18 @@ export class SelectState<T extends StringOrNumber> {
     public label: string,
     public loadOptions: () => Promise<Array<SelectOption<T>>>,
     private storage: IStorage,
-    private alternativeDefaultOptions?: () => Record<StringOrNumber, string>,
+    private alternativeDefaultOptions?: () => Array<string>,
     public isMulti: boolean = true,
   ) {
     console.log('is multi: ', isMulti)
-    loadOptions().then(nextOptions => (this.options = nextOptions))
     this.storageKey = _.snakeCase(label)
 
-    this.lazyLoadFromStorage()
+    loadOptions().then(nextOptions => {
+      this.options = nextOptions
+      this.lazyLoadFromStorage()
 
-    makeAutoObservable(this)
+      makeAutoObservable(this)
+    })
   }
 
   lazyLoadFromStorage = async () => {
@@ -55,12 +57,32 @@ export class SelectState<T extends StringOrNumber> {
 
     console.log('loaded ' + defaultKey + ':', storedValues)
 
-    if (storedValues != null) {
+    if (!_.isEmpty(storedValues)) {
       this.selectedOptions = storedValues
+
+      return
     }
 
     if (this.alternativeDefaultOptions) {
-      this.selectedOptions = this.alternativeDefaultOptions()
+      const defaultIds = this.alternativeDefaultOptions()
+      const allOptionsById = _.chain(this.options).keyBy('id').mapValues('name').value()
+
+      const options = {}
+
+      if (this.isMulti) {
+        defaultIds.forEach(id => {
+          if (allOptionsById[id]) {
+            options[id] = allOptionsById[id]
+          }
+        })
+      } else {
+        const [id] = defaultIds
+        options[id] = allOptionsById[id]
+      }
+
+      this.selectedOptions = options
+
+      this.save()
     }
 
     if (!this.isMulti && !_.isEmpty(this.selectedOptions)) {
@@ -70,22 +92,27 @@ export class SelectState<T extends StringOrNumber> {
   }
 
   toggleOption = (option: SelectOption<T>) => {
-    const selected = this.selectedOptions
     const removingOption = !!this.selectedOptions[option.id]
 
     if (this.isMulti) {
-      this.selectedOptions[option.id] = removingOption ? undefined : option.name
+      if (removingOption) return this.removeOption(option.id)
+
+      this.selectedOptions[option.id] = option.name
       // if this is not multi select, there should always be a selected option
     } else if (!removingOption) {
-      this.selectedOptions = { 0: option }
+      this.selectedOptions = { [option.id]: option.name }
     }
 
-    this.storage.save(this.storageKey, this.selectedOptions)
+    this.save()
   }
 
   removeOption = (optionId: StringOrNumber) => {
     delete this.selectedOptions[optionId]
 
+    this.save()
+  }
+
+  save = () => {
     this.storage.save(this.storageKey, this.selectedOptions)
   }
 }
@@ -93,7 +120,7 @@ export class SelectState<T extends StringOrNumber> {
 export const useSelectState = <T extends StringOrNumber>(
   label: string,
   loadOptions: () => Promise<Array<SelectOption<T>>>,
-  config: { getAlternativeDefaults?: () => T[]; isMulti?: boolean } = {},
+  config: { getAlternativeDefaults?: () => Array<string>; isMulti?: boolean } = {},
 ) => {
   const { storage } = useStore()
 
@@ -196,7 +223,7 @@ const ReelistSelect = observer(
                 }
                 height="40px"
               >
-                {selectState.isMulti ? label : selectedOptions[0]?.name}
+                {selectState.isMulti ? label : _.values(selectedOptions)[0]}
               </AppButton>
             </Pressable>
           )
@@ -249,7 +276,7 @@ const ReelistSelect = observer(
                 )}
 
                 {filteredOptions.map(option => {
-                  const isChecked = !!selectedOptions[option.id]
+                  const isChecked = selectedOptions[0] === option.id || !!selectedOptions[option.id]
                   return renderOption(option, isChecked)
                 })}
 
