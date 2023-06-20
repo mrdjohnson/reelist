@@ -45,6 +45,7 @@ import PillButton from '@reelist/components/PillButton'
 
 import 'tailwindcss/tailwind.css'
 import NavBar from '~/components/NavBar'
+import InfiniteScroll from './InfiniteScroll'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
@@ -262,7 +263,7 @@ const Discover = observer(() => {
   }, [windowWidth])
 
   const Header = () => (
-    <div className="bg-black w-full">
+    <div className="w-full">
       <Row>
         <SearchIcon size="md" alignSelf="center" paddingRight="12px" />
 
@@ -389,7 +390,8 @@ const Discover = observer(() => {
     <div
       suppressHydrationWarning
       style={{
-        height: '100vh',
+        minHeight: '100vh',
+        height: 'fit-content',
         width: '100vw',
         background: 'radial-gradient(50% 50% at 50% 50%, #1A200F 0%, #131313 100%)',
         display: 'flex',
@@ -398,8 +400,7 @@ const Discover = observer(() => {
       }}
     >
       <Flex
-        height="100vh"
-        maxHeight="100vh"
+        minHeight="100vh"
         marginX={`${containerPadding}px`}
         paddingTop="20px"
         width={width}
@@ -408,7 +409,7 @@ const Discover = observer(() => {
       >
         <NavBar path="/discover" />
 
-        <FlatList
+        {/* <FlatList
           contentContainerStyle={{
             display: 'flex',
             flexWrap: 'wrap',
@@ -435,8 +436,23 @@ const Discover = observer(() => {
           onEndReachedThreshold={0.5}
           ListHeaderComponent={Header}
         >
-          {/* <Header /> */}
-        </FlatList>
+        </FlatList> */}
+
+        <InfiniteScroll onRefresh={getNextPage}>
+          <Header />
+
+          <div
+            className={`flex flex-wrap flex-row my-4 gap-y-5 lg:gap-y-12 gap-x-5 justify-center w-[${width}]`}
+          >
+            {videos.map(video => (
+              <VideoImage
+                video={video}
+                containerProps={{ width: '307px' }}
+                onPress={() => handleVideoSelection(video)}
+              />
+            ))}
+          </div>
+        </InfiniteScroll>
 
         <Dialog
           open={showSelectedVideo}
