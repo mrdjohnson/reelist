@@ -409,35 +409,6 @@ const Discover = observer(() => {
       >
         <NavBar path="/discover" />
 
-        {/* <FlatList
-          contentContainerStyle={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            flexDirection: 'row',
-            marginBottom: '15px',
-            rowGap: [20, 20, 50],
-            columnGap: 20,
-            justifyContent: 'center',
-            width,
-          }}
-          data={videos}
-          scrollEventThrottle={16}
-          showsVerticalScrollIndicator={false}
-          renderItem={({ item: video }) => (
-            <VideoImage
-              video={video}
-              containerProps={{ width: '307px' }}
-              onPress={() => handleVideoSelection(video)}
-            />
-          )}
-          keyExtractor={video => video.videoId}
-          extraData={videos}
-          onEndReached={getNextPage}
-          onEndReachedThreshold={0.5}
-          ListHeaderComponent={Header}
-        >
-        </FlatList> */}
-
         <InfiniteScroll onRefresh={getNextPage}>
           <Header />
 
@@ -555,9 +526,9 @@ const VideoSection = observer(
                 {providers.length === 0 ? 'Not available in provided regions' : 'Available on'}
               </div>
 
-              <div className="flex overflow-x-scroll gap-x-2">
+              <div className="flex overflow-x-scroll gap-x-5 xl:gap-x-11">
                 {providers.map(provider => (
-                  <div>
+                  <div className='flex flex-col justify-center text-center'>
                     <img
                       src={IMAGE_PATH + provider.logoPath}
                       className="rounded-md object-contain mb-3"
@@ -642,7 +613,7 @@ const VideoImage = observer(
           />
           {!isPoster && (
             <div
-              className="absolute bottom-0 w-full rounded-b-md pt-3 min-h-[70px]"
+              className="absolute bottom-0 w-full rounded-b-md pt-3 pb-1 min-h-[70px] flex justify-end flex-col"
               style={{
                 background:
                   'linear-gradient(180deg, rgba(0, 0, 0, 0.54) 0%, rgba(0, 0, 0, 0) 0.01%, rgba(0, 0, 0, 0.54) 33.85%)',
