@@ -497,8 +497,8 @@ const VideoSection = observer(
     }, [flatrateProviders, rentProviders, buyProviders])
 
     return (
-      <div className="flex flex-col flex-wrap justify-center text-white xl:flex-row xl:flex-nowrap">
-        <div className="flex justify-center xl:mr-12 rounded-lg w-full">
+      <div className="flex flex-col flex-wrap justify-center text-white xl:flex-row xl:flex-nowrap max-w-7xl">
+        <div className="flex justify-center xl:mr-12 rounded-lg w-full flex-1">
           <VideoImage
             video={video}
             containerProps={{ alignSelf: 'center' }}
@@ -507,7 +507,7 @@ const VideoSection = observer(
           />
         </div>
 
-        <div className="flex flex-col w-full">
+        <div className="flex flex-col w-full overflow-clip">
           <p className="text-5xl text-center mt-4 mb-1 xl:text-left xl:mt-0 xl:mb-2">
             {video.videoName}
           </p>
@@ -526,9 +526,12 @@ const VideoSection = observer(
                 {providers.length === 0 ? 'Not available in provided regions' : 'Available on'}
               </div>
 
-              <div className="flex overflow-x-scroll gap-x-5 xl:gap-x-11">
+              <div
+                className="flex gap-x-5 xl:gap-x-11 overscroll-none overflow-x-auto pb-2"
+                style={{ scrollbarWidth: 'none' }}
+              >
                 {providers.map(provider => (
-                  <div className='flex flex-col justify-center text-center'>
+                  <div className="flex flex-col justify-center text-center">
                     <img
                       src={IMAGE_PATH + provider.logoPath}
                       className="rounded-md object-contain mb-3"
