@@ -6,48 +6,34 @@ import { useRouter } from 'next/router'
 import { Dialog } from '@mui/material'
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { RadioGroup, FormControlLabel, Radio, Button } from '@mui/material'
+import { Button } from '@mui/material'
 import _ from 'lodash'
 import { useStore } from '@reelist/utils/hooks/useStore'
 import useLocalStorageState from '@reelist/utils/hooks/useLocalStorageState'
 import useVideoDiscover from '@reelist/utils/hooks/useVideoDiscover'
 import useVideoSearch from '@reelist/utils/hooks/useVideoSearch'
 import { callTmdb } from '@reelist/apis/api'
-import Video, { Provider } from '@reelist/models/Video'
+import Video from '@reelist/models/Video'
 import {
-  Box,
-  FlatList,
   Flex,
-  Pressable,
-  Slide,
   View,
   useSafeArea,
-  Text,
-  Center,
   Row,
-  PresenceTransition,
   Checkbox,
   Input,
   SearchIcon,
   Divider,
-  Icon,
   CloseIcon,
-  ITextProps,
-  Modal,
-  ScrollView,
   useBreakpointValue,
 } from 'native-base'
-import { AspectRatio, IAspectRatioProps, IImageProps, Image } from 'native-base'
-import ReelistSelect, { SelectState, useSelectState } from '@reelist/components/ReelistSelect'
-import ActionButton from '@reelist/components/ActionButton'
-import { IViewProps } from 'native-base/lib/typescript/components/basic/View/types'
+import ReelistSelect, { useSelectState } from '@reelist/components/ReelistSelect'
 import PillButton from '@reelist/components/PillButton'
 
-import 'tailwindcss/tailwind.css'
+// import 'tailwindcss/tailwind.css'
 import NavBar from '~/components/NavBar'
 import InfiniteScroll from './InfiniteScroll'
-
-const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
+import VideoModal from './video/VideoModal'
+import VideoImage from './video/VideoImage'
 
 const REMOVE_ICON = (
   <View alignSelf="center" style={{ height: '100%' }}>
@@ -262,6 +248,18 @@ const Discover = observer(() => {
     return calculateContainerWidth(Math.min(windowWidth, 1619) - totalContainerPadding)
   }, [windowWidth])
 
+  const toggleRegionSeparationType = () => {
+    setRegionSeparationType(
+      regionSeparationType === 'includes_every' ? 'includes_any' : 'includes_every',
+    )
+  }
+
+  const toggleTvGenreSeparationType = () => {
+    setTvGenreSeparationType(
+      tvGenreSeparationType === 'includes_every' ? 'includes_any' : 'includes_every',
+    )
+  }
+
   const Header = () => (
     <div className="w-full">
       <Row>
@@ -313,11 +311,7 @@ const Discover = observer(() => {
           <ReelistSelect selectState={regionSelectState}>
             <div
               className="flex justify-center cursor-pointer"
-              onClick={() =>
-                setRegionSeparationType(
-                  regionSeparationType === 'includes_every' ? 'includes_any' : 'includes_every',
-                )
-              }
+              onClick={toggleRegionSeparationType}
             >
               <Checkbox
                 value="includes_every"
@@ -331,11 +325,7 @@ const Discover = observer(() => {
           <ReelistSelect selectState={tvGenreSelectState}>
             <div
               className="flex justify-center cursor-pointer"
-              onClick={() =>
-                setTvGenreSeparationType(
-                  tvGenreSeparationType === 'includes_every' ? 'includes_any' : 'includes_every',
-                )
-              }
+              onClick={toggleTvGenreSeparationType}
             >
               <Checkbox
                 value="includes_every"
@@ -383,9 +373,6 @@ const Discover = observer(() => {
     </div>
   )
 
-  //  < 674px items lined up, with vertical spacing; or in a menu?
-  // < 1001 boxes in a row, with the sort by box on the row above, aligned to the right
-
   return (
     <div
       suppressHydrationWarning
@@ -412,9 +399,7 @@ const Discover = observer(() => {
         <InfiniteScroll onRefresh={getNextPage}>
           <Header />
 
-          <div
-            className={`flex flex-wrap flex-row my-4 gap-y-5 lg:gap-y-12 gap-x-5 justify-center w-[${width}]`}
-          >
+          <div className="flex flex-wrap flex-row my-4 gap-y-5 lg:gap-y-12 gap-x-5 justify-center w-full">
             {videos.map(video => (
               <VideoImage
                 video={video}
@@ -458,7 +443,7 @@ const Discover = observer(() => {
             />
           </div>
           {selectedVideo && (
-            <VideoSection
+            <VideoModal
               video={selectedVideo}
               selectedRegions={_.keys(regionSelectState.selectedOptions)}
             />
@@ -470,172 +455,6 @@ const Discover = observer(() => {
 })
 
 // export default Discover
-
-const VideoSection = observer(
-  ({ video, selectedRegions }: { video: Video; selectedRegions: string[] }) => {
-    const getProvidersByType = (type): Provider[] =>
-      _.chain(selectedRegions)
-        .flatMap(region => video.providers[region]?.[type])
-        .compact()
-        .uniqBy('providerId')
-        .value()
-
-    const flatrateProviders = useMemo(() => {
-      return getProvidersByType('flatrate').map(provider => ({ ...provider, type: 'Stream' }))
-    }, [video.providers])
-
-    const buyProviders = useMemo(() => {
-      return getProvidersByType('buy').map(provider => ({ ...provider, type: 'Buy' }))
-    }, [video.providers])
-
-    const rentProviders = useMemo(() => {
-      return getProvidersByType('rent').map(provider => ({ ...provider, type: 'Rent' }))
-    }, [video.providers])
-
-    const providers = useMemo(() => {
-      return [...flatrateProviders, ...rentProviders, ...buyProviders]
-    }, [flatrateProviders, rentProviders, buyProviders])
-
-    return (
-      <div className="flex flex-col flex-wrap justify-center text-white xl:flex-row xl:flex-nowrap max-w-7xl">
-        <div className="flex justify-center xl:mr-12 rounded-lg w-full flex-1">
-          <VideoImage
-            video={video}
-            containerProps={{ alignSelf: 'center' }}
-            rounded="lg"
-            isPoster
-          />
-        </div>
-
-        <div className="flex flex-col w-full overflow-clip">
-          <p className="text-5xl text-center mt-4 mb-1 xl:text-left xl:mt-0 xl:mb-2">
-            {video.videoName}
-          </p>
-
-          <div>
-            {_.map(video.genres, 'name').join('/')} ‧ {video.durationOrSeasons}
-          </div>
-
-          <Divider backgroundColor="reelist.500" marginBottom="35px" marginTop="28px" />
-
-          <div className="whitespace-normal break-words">{video.overview}</div>
-
-          <div className="flex flex-1 items-end pt-4 w-full">
-            <div className="w-full">
-              <div className="text-2xl pb-3">
-                {providers.length === 0 ? 'Not available in provided regions' : 'Available on'}
-              </div>
-
-              <div
-                className="flex gap-x-5 xl:gap-x-11 overscroll-none overflow-x-auto pb-2"
-                style={{ scrollbarWidth: 'none' }}
-              >
-                {providers.map(provider => (
-                  <div className="flex flex-col justify-center text-center">
-                    <img
-                      src={IMAGE_PATH + provider.logoPath}
-                      className="rounded-md object-contain mb-3"
-                      alt={provider.providerName}
-                      width="70px"
-                      height="70px"
-                    />
-
-                    <span>{provider.type}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  },
-)
-
-type VideoImageProps = IImageProps & {
-  video: Video
-  containerProps?: IViewProps
-  isPoster?: boolean
-  onPress?: () => void
-}
-
-const videoTextProps: ITextProps = {
-  paddingX: '10px',
-  numberOfLines: 2,
-  ellipsizeMode: 'clip',
-  color: 'white',
-}
-
-const VideoImage = observer(
-  ({ video, containerProps, onPress, isPoster, ...imageProps }: VideoImageProps) => {
-    const [hovered, setHovered] = useState(false)
-    const [pressed, setPressed] = useState(false)
-
-    const source = isPoster ? video.posterPath : video.backdropPath
-
-    if (!source) return null
-
-    const imageSizeProps: IImageProps = isPoster
-      ? {
-          resizeMode: 'contain',
-          width: '406',
-          height: '609',
-        }
-      : {
-          resizeMode: 'cover',
-          width: '307px',
-          height: '207px',
-        }
-
-    const fullImage = !onPress
-
-    return (
-      <Pressable
-        onHoverIn={() => setHovered(true)}
-        onPressIn={() => setPressed(true)}
-        onHoverOut={() => setHovered(false)}
-        onPressOut={() => setPressed(false)}
-        isPressed={pressed}
-        onLongPress={() => console.log('long pressed: ', video.videoName)}
-        onPress={onPress}
-        disabled={fullImage}
-        {...containerProps}
-      >
-        <View
-          position="relative"
-          style={{
-            transform: [{ scale: fullImage || pressed ? 1 : hovered ? 0.99 : 0.97 }],
-          }}
-        >
-          <Image
-            source={{ uri: IMAGE_PATH + source }}
-            alt={source}
-            rounded="sm"
-            {...imageProps}
-            {...imageSizeProps}
-          />
-          {!isPoster && (
-            <div
-              className="absolute bottom-0 w-full rounded-b-md pt-3 pb-1 min-h-[70px] flex justify-end flex-col"
-              style={{
-                background:
-                  'linear-gradient(180deg, rgba(0, 0, 0, 0.54) 0%, rgba(0, 0, 0, 0) 0.01%, rgba(0, 0, 0, 0.54) 33.85%)',
-              }}
-            >
-              <Text {...videoTextProps} fontSize="24px">
-                {video.videoName}
-              </Text>
-
-              <Text {...videoTextProps} fontSize="15px">
-                {video.durationOrSeasons}
-              </Text>
-            </div>
-          )}
-        </View>
-      </Pressable>
-    )
-  },
-)
 
 const getRegions = () => {
   return callTmdb('/watch/providers/regions')

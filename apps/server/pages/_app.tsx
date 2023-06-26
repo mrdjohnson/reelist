@@ -1,4 +1,5 @@
-import 'tailwindcss/tailwind.css'
+import '../styles.css'
+
 import '~/setupServerEnv'
 
 import { StoreProvider } from '@reelist/utils/store'
