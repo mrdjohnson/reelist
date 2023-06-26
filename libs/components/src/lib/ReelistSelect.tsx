@@ -259,7 +259,6 @@ const ReelistSelect = observer(
                         <Input
                           placeholder="Filter"
                           flex={1}
-                          value={filterText}
                           onChangeText={setFilterText}
                           colorScheme="reelist"
                           variant="underlined"

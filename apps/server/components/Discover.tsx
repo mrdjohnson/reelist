@@ -17,7 +17,6 @@ import Video from '@reelist/models/Video'
 import {
   Flex,
   View,
-  useSafeArea,
   Row,
   Checkbox,
   Input,
@@ -29,7 +28,6 @@ import {
 import ReelistSelect, { useSelectState } from '@reelist/components/ReelistSelect'
 import PillButton from '@reelist/components/PillButton'
 
-// import 'tailwindcss/tailwind.css'
 import NavBar from '~/components/NavBar'
 import InfiniteScroll from './InfiniteScroll'
 import VideoModal from './video/VideoModal'
@@ -212,10 +210,6 @@ const Discover = observer(() => {
     loadVideos()
   }, [searchText])
 
-  const safeAreaProps = useSafeArea({
-    safeAreaTop: true,
-  })
-
   const handleVideoSelection = (video: Video) => {
     router.push(`/discover?videoId=${video.videoId}`)
   }
@@ -239,12 +233,8 @@ const Discover = observer(() => {
   }
 
   const width = useMemo(() => {
-    // const totalPadddingX = 40
-    // const videoImageWidth = 327
-
-    // let resultWidth = Math.floor((windowWidth - totalPadddingX) / videoImageWidth)
-
     const totalContainerPadding = containerPadding * 2
+
     return calculateContainerWidth(Math.min(windowWidth, 1619) - totalContainerPadding)
   }, [windowWidth])
 
@@ -259,119 +249,6 @@ const Discover = observer(() => {
       tvGenreSeparationType === 'includes_every' ? 'includes_any' : 'includes_every',
     )
   }
-
-  const Header = () => (
-    <div className="w-full">
-      <Row>
-        <SearchIcon size="md" alignSelf="center" paddingRight="12px" />
-
-        {searchText ? (
-          <PillButton
-            label={searchText}
-            height="35px"
-            endIcon={REMOVE_ICON}
-            variant="solid"
-            onPress={() => setSearchText('')}
-            borderWidth="0"
-          />
-        ) : (
-          <Input
-            placeholder="Search"
-            variant="unstyled"
-            fontSize="24px"
-            height="35px"
-            padding="0px"
-            onSubmitEditing={e => setSearchText(e.target.value)}
-          />
-        )}
-      </Row>
-
-      <Divider backgroundColor="reelist.500" marginBottom="20px" marginTop="14px" />
-
-      <div className="grid max-[673px]:flex-col max-[1000px]:grid-rows-1">
-        <div className="flex row-start-1 max-[1000px]:row-start-2 max-[673px]:flex-col gap-2">
-          <ReelistSelect selectState={videoTypesSelectState}>
-            <div
-              className="flex justify-center cursor-pointer"
-              onClick={() =>
-                setTypesSeparationType(
-                  typesSeparationType === 'includes_every' ? 'includes_any' : 'includes_every',
-                )
-              }
-            >
-              <Checkbox
-                value="includes_every"
-                isChecked={typesSeparationType === 'includes_every'}
-              />
-
-              <div className="text-white ml-2">Types Must Include</div>
-            </div>
-          </ReelistSelect>
-
-          <ReelistSelect selectState={regionSelectState}>
-            <div
-              className="flex justify-center cursor-pointer"
-              onClick={toggleRegionSeparationType}
-            >
-              <Checkbox
-                value="includes_every"
-                isChecked={regionSeparationType === 'includes_every'}
-              />
-
-              <div className="text-white ml-2">Regions Must Include</div>
-            </div>
-          </ReelistSelect>
-
-          <ReelistSelect selectState={tvGenreSelectState}>
-            <div
-              className="flex justify-center cursor-pointer"
-              onClick={toggleTvGenreSeparationType}
-            >
-              <Checkbox
-                value="includes_every"
-                isChecked={tvGenreSeparationType === 'includes_every'}
-              />
-
-              <div className="text-white ml-2">Genres Must Include</div>
-            </div>
-          </ReelistSelect>
-
-          <ReelistSelect selectState={tvProviderSelectState} />
-        </div>
-
-        <div className="max-[673px]:flex row-start-1 justify-center">
-          <ReelistSelect
-            selectState={sortTypesSelectState}
-            alignSelf="flex-end"
-            alignItems="end"
-            justifyContent="end"
-            flex={1}
-          />
-        </div>
-      </div>
-
-      <div className="hidden flex-row min-[673px]:flex gap-2">
-        {[
-          videoTypesSelectState,
-          regionSelectState,
-          tvGenreSelectState,
-          tvProviderSelectState,
-        ].flatMap(selectState =>
-          _.map(selectState.selectedOptions, (name, id) => (
-            <Button
-              className="border border-solid border-red-400 text-white px-3 rounded-full mt-4"
-              onClick={() => selectState.removeOption(id)}
-              key={id}
-            >
-              {name}
-
-              <CloseOutlinedIcon className="text-white text-[17px] pl-2" />
-            </Button>
-          )),
-        )}
-      </div>
-    </div>
-  )
 
   return (
     <div
@@ -397,7 +274,118 @@ const Discover = observer(() => {
         <NavBar path="/discover" />
 
         <InfiniteScroll onRefresh={getNextPage}>
-          <Header />
+          <div className="w-full">
+            <Row>
+              <SearchIcon size="md" alignSelf="center" paddingRight="12px" />
+
+              {searchText ? (
+                <PillButton
+                  label={searchText}
+                  height="35px"
+                  endIcon={REMOVE_ICON}
+                  variant="solid"
+                  onPress={() => setSearchText('')}
+                  borderWidth="0"
+                />
+              ) : (
+                <Input
+                  placeholder="Search"
+                  variant="unstyled"
+                  fontSize="24px"
+                  height="35px"
+                  padding="0px"
+                  onSubmitEditing={e => setSearchText(e.target.value)}
+                />
+              )}
+            </Row>
+
+            <Divider backgroundColor="reelist.500" marginBottom="20px" marginTop="14px" />
+
+            <div className="grid max-[673px]:flex-col max-[1000px]:grid-rows-1">
+              <div className="flex row-start-1 max-[1000px]:row-start-2 max-[673px]:flex-col gap-2">
+                <ReelistSelect selectState={videoTypesSelectState}>
+                  <div
+                    className="flex justify-center cursor-pointer"
+                    onClick={() =>
+                      setTypesSeparationType(
+                        typesSeparationType === 'includes_every'
+                          ? 'includes_any'
+                          : 'includes_every',
+                      )
+                    }
+                  >
+                    <Checkbox
+                      value="includes_every"
+                      isChecked={typesSeparationType === 'includes_every'}
+                    />
+
+                    <div className="text-white ml-2">Types Must Include</div>
+                  </div>
+                </ReelistSelect>
+
+                <ReelistSelect selectState={regionSelectState}>
+                  <div
+                    className="flex justify-center cursor-pointer"
+                    onClick={toggleRegionSeparationType}
+                  >
+                    <Checkbox
+                      value="includes_every"
+                      isChecked={regionSeparationType === 'includes_every'}
+                    />
+
+                    <div className="text-white ml-2">Regions Must Include</div>
+                  </div>
+                </ReelistSelect>
+
+                <ReelistSelect selectState={tvGenreSelectState}>
+                  <div
+                    className="flex justify-center cursor-pointer"
+                    onClick={toggleTvGenreSeparationType}
+                  >
+                    <Checkbox
+                      value="includes_every"
+                      isChecked={tvGenreSeparationType === 'includes_every'}
+                    />
+
+                    <div className="text-white ml-2">Genres Must Include</div>
+                  </div>
+                </ReelistSelect>
+
+                <ReelistSelect selectState={tvProviderSelectState} />
+              </div>
+
+              <div className="max-[673px]:flex row-start-1 justify-center">
+                <ReelistSelect
+                  selectState={sortTypesSelectState}
+                  alignSelf="flex-end"
+                  alignItems="end"
+                  justifyContent="end"
+                  flex={1}
+                />
+              </div>
+            </div>
+
+            <div className="hidden flex-row min-[673px]:flex gap-2">
+              {[
+                videoTypesSelectState,
+                regionSelectState,
+                tvGenreSelectState,
+                tvProviderSelectState,
+              ].flatMap(selectState =>
+                _.map(selectState.selectedOptions, (name, id) => (
+                  <Button
+                    className="border border-solid border-red-400 text-white px-3 rounded-full mt-4"
+                    onClick={() => selectState.removeOption(id)}
+                    key={id}
+                  >
+                    {name}
+
+                    <CloseOutlinedIcon className="text-white text-[17px] pl-2" />
+                  </Button>
+                )),
+              )}
+            </div>
+          </div>
 
           <div className="flex flex-wrap flex-row my-4 gap-y-5 lg:gap-y-12 gap-x-5 justify-center w-full">
             {videos.map(video => (
