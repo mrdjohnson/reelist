@@ -504,12 +504,13 @@ const getGenres = async () => {
   return tvGenres.concat(movieGenres)
 }
 
-// initial options: navigator.languages.filter(language => language.includes('-')).map(language => language.match(/-(.*)/)[1])
-const getProviders = () => {
-  return callTmdb('/watch/providers/tv')
+const getProvidersByType = async (type: string) => {
+  const typeLabel = _.capitalize(type)
+
+  return callTmdb(`/watch/providers/${type}`)
     .then(
       item =>
-        _.get(item, 'data.data.results') as Array<{
+        _.get(item, 'data.data.genres') as Array<{
           displayPriority: string
           logoPath: string
           providerName: string
@@ -517,9 +518,23 @@ const getProviders = () => {
         }>,
     )
     .then(items => _.sortBy(items, 'displayPriority'))
-    .then(items => items.map(item => ({ id: item.providerId, name: item.providerName })))
+    .then(items =>
+      items.map(item => ({
+        id: type + ':' + item.providerId,
+        name: `${item.providerName} (${typeLabel})`,
+      })),
+    )
 }
 
+// initial options: navigator.languages.filter(language => language.includes('-')).map(language => language.match(/-(.*)/)[1])
+const getProviders = async () => {
+  const tvProviders = await getProvidersByType('tv')
+  const movieProviders = await getProvidersByType('movie')
+
+  return tvProviders.concat(movieProviders)
+}
+
+//todo make sure this works for tv shows AND movies
 const getVideoTypes = async () => [
   { id: '0', name: 'Documentary' },
   { id: '1', name: 'News' },
