@@ -7,9 +7,21 @@ const useVideoDiscover = () => {
   const { videoStore } = useStore()
 
   const videoDiscover = async (params: Record<string, string>) => {
+    const { tvGenres, movieGenres, ...sharedParams } = params
+
+    const tvParams = {
+      ...sharedParams,
+      with_genres: tvGenres,
+    }
+
+    const movieParams = {
+      ...sharedParams,
+      with_genres: movieGenres,
+    }
+
     const searchResults = await Promise.allSettled([
-      callTmdb('/discover/tv', params),
-      callTmdb('/discover/movie', params),
+      callTmdb('/discover/tv', tvParams),
+      callTmdb('/discover/movie', movieParams),
     ])
       .then(([tvShows, movies]) => {
         return [
@@ -27,7 +39,6 @@ const useVideoDiscover = () => {
 
     if (!searchResults) return []
 
-    // todo: this is not working for movies right now, its trying to get collections
     return videoStore.getVideos(searchResults)
   }
 

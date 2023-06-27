@@ -117,11 +117,18 @@ const Discover = observer(() => {
   }
 
   const discover = () => {
+    const withoutIdentifier = (item: string) => item.split(':')[1]
+
     const selectedVideoTypes = videoTypesSelectState.selectedOptions
     const selectedSortType = _.keys(sortTypesSelectState.selectedOptions)[0]
     const selectedRegions = regionSelectState.selectedOptions
-    const selectedTvGenres = tvGenreSelectState.selectedOptions
+    const selectedTvGenres = _.keys(tvGenreSelectState.selectedOptions)
     const selectedTvProviders = tvProviderSelectState.selectedOptions
+
+    // todo, copy this code for providers
+    const [tvGenres, movieGenres] = _.partition(selectedTvGenres, item => item.startsWith('tv:'))
+
+    const genreSeparator = tvGenreSeparationType === 'includes_any' ? ',' : '|'
 
     videoDiscover({
       with_type: _.keys(selectedVideoTypes).join(
@@ -130,9 +137,8 @@ const Discover = observer(() => {
       page: pageRef.current.toString(),
       sort_by: selectedSortType,
       watch_region: _.keys(selectedRegions).join(','),
-      with_genres: _.keys(selectedTvGenres).join(
-        typesSeparationType === 'includes_any' ? ',' : '|',
-      ),
+      tvGenres: tvGenres.map(withoutIdentifier).join(genreSeparator),
+      movieGenres: movieGenres.map(withoutIdentifier).join(genreSeparator),
       with_providers: _.keys(selectedTvProviders).join(','),
     })
       .then(handleVideos)
@@ -203,9 +209,7 @@ const Discover = observer(() => {
   }, [router.query])
 
   useEffect(() => {
-    if (!searchText) {
-      pageRef.current = 1
-    }
+    pageRef.current = 1
 
     loadVideos()
   }, [searchText])
@@ -365,7 +369,7 @@ const Discover = observer(() => {
               </div>
             </div>
 
-            <div className="hidden flex-row min-[673px]:flex gap-2">
+            <div className="hidden flex-row min-[673px]:flex gap-x-2 flex-wrap">
               {[
                 videoTypesSelectState,
                 regionSelectState,
@@ -472,8 +476,10 @@ const getDefaultRegions = () => {
   return options
 }
 
-const getTvGenres = () => {
-  return callTmdb('/genre/tv/list')
+const getGenres = async (type: string) => {
+  const typeLabel = _.capitalize(type)
+
+  return callTmdb(`/genre/${type}/list`)
     .then(
       item =>
         _.get(item, 'data.data.genres') as Array<{
@@ -482,6 +488,20 @@ const getTvGenres = () => {
         }>,
     )
     .then(_.toArray)
+    .then(items =>
+      // map each item to {id: 'type:id', name: 'name (Type)'}
+      items.map(item => ({
+        id: type + ':' + item.id,
+        name: `${item.name} (${typeLabel})`,
+      })),
+    )
+}
+
+const getTvGenres = async () => {
+  const tvGenres = await getGenres('tv')
+  const movieGenres = await getGenres('movie')
+
+  return tvGenres.concat(movieGenres)
 }
 
 // initial options: navigator.languages.filter(language => language.includes('-')).map(language => language.match(/-(.*)/)[1])
