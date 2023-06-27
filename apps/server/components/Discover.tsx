@@ -123,7 +123,7 @@ const Discover = observer(() => {
     const selectedSortType = _.keys(sortTypesSelectState.selectedOptions)[0]
     const selectedRegions = regionSelectState.selectedOptions
     const selectedGenres = _.keys(genreSelectState.selectedOptions)
-    const selectedTvProviders = tvProviderSelectState.selectedOptions
+    const selectedWatchProviders = watchProviderSelectState.selectedOptions
 
     // todo, copy this code for providers
     const [tvGenres, movieGenres] = _.partition(selectedGenres, item => item.startsWith('tv:'))
@@ -139,7 +139,7 @@ const Discover = observer(() => {
       watch_region: _.keys(selectedRegions).join(','),
       tvGenres: tvGenres.map(withoutIdentifier).join(genreSeparator),
       movieGenres: movieGenres.map(withoutIdentifier).join(genreSeparator),
-      with_providers: _.keys(selectedTvProviders).join(','),
+      with_providers: _.keys(selectedWatchProviders).join(','),
     })
       .then(handleVideos)
       .catch(e => {})
@@ -167,7 +167,7 @@ const Discover = observer(() => {
 
   const videoTypesSelectState = useSelectState('Types', getVideoTypes)
   const genreSelectState = useSelectState('Genres', getGenres)
-  const tvProviderSelectState = useSelectState('Tv Providers', getTvProviders)
+  const watchProviderSelectState = useSelectState('Watch Providers', getProviders)
   const regionSelectState = useSelectState('Regions', getRegions, {
     getAlternativeDefaults: getDefaultRegions,
   })
@@ -184,7 +184,7 @@ const Discover = observer(() => {
     videoTypesSelectState.selectedOptions,
     sortTypesSelectState.selectedOptions,
     genreSelectState.selectedOptions,
-    tvProviderSelectState.selectedOptions,
+    watchProviderSelectState.selectedOptions,
     regionSelectState.selectedOptions,
     genreSeparationType,
     typesSeparationType,
@@ -355,7 +355,7 @@ const Discover = observer(() => {
                   </div>
                 </ReelistSelect>
 
-                <ReelistSelect selectState={tvProviderSelectState} />
+                <ReelistSelect selectState={watchProviderSelectState} />
               </div>
 
               <div className="max-[673px]:flex row-start-1 justify-center">
@@ -374,7 +374,7 @@ const Discover = observer(() => {
                 videoTypesSelectState,
                 regionSelectState,
                 genreSelectState,
-                tvProviderSelectState,
+                watchProviderSelectState,
               ].flatMap(selectState =>
                 _.map(selectState.selectedOptions, (name, id) => (
                   <Button
@@ -505,7 +505,7 @@ const getGenres = async () => {
 }
 
 // initial options: navigator.languages.filter(language => language.includes('-')).map(language => language.match(/-(.*)/)[1])
-const getTvProviders = () => {
+const getProviders = () => {
   return callTmdb('/watch/providers/tv')
     .then(
       item =>
