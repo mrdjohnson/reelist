@@ -68,8 +68,8 @@ const Discover = observer(() => {
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null)
   const [showSelectedVideo, setShowSelectedVideo] = useState(false)
 
-  const [tvGenreSeparationType, setTvGenreSeparationType] = useLocalStorageState(
-    'tvGenreSeparationType',
+  const [genreSeparationType, setGenreSeparationType] = useLocalStorageState(
+    'genreSeparationType',
     'includes_any',
   )
   const [typesSeparationType, setTypesSeparationType] = useLocalStorageState(
@@ -122,13 +122,13 @@ const Discover = observer(() => {
     const selectedVideoTypes = videoTypesSelectState.selectedOptions
     const selectedSortType = _.keys(sortTypesSelectState.selectedOptions)[0]
     const selectedRegions = regionSelectState.selectedOptions
-    const selectedTvGenres = _.keys(tvGenreSelectState.selectedOptions)
+    const selectedGenres = _.keys(genreSelectState.selectedOptions)
     const selectedTvProviders = tvProviderSelectState.selectedOptions
 
     // todo, copy this code for providers
-    const [tvGenres, movieGenres] = _.partition(selectedTvGenres, item => item.startsWith('tv:'))
+    const [tvGenres, movieGenres] = _.partition(selectedGenres, item => item.startsWith('tv:'))
 
-    const genreSeparator = tvGenreSeparationType === 'includes_any' ? ',' : '|'
+    const genreSeparator = genreSeparationType === 'includes_any' ? ',' : '|'
 
     videoDiscover({
       with_type: _.keys(selectedVideoTypes).join(
@@ -166,7 +166,7 @@ const Discover = observer(() => {
   }
 
   const videoTypesSelectState = useSelectState('Types', getVideoTypes)
-  const tvGenreSelectState = useSelectState('Tv Genres', getTvGenres)
+  const genreSelectState = useSelectState('Genres', getGenres)
   const tvProviderSelectState = useSelectState('Tv Providers', getTvProviders)
   const regionSelectState = useSelectState('Regions', getRegions, {
     getAlternativeDefaults: getDefaultRegions,
@@ -183,10 +183,10 @@ const Discover = observer(() => {
   }, [
     videoTypesSelectState.selectedOptions,
     sortTypesSelectState.selectedOptions,
-    tvGenreSelectState.selectedOptions,
+    genreSelectState.selectedOptions,
     tvProviderSelectState.selectedOptions,
     regionSelectState.selectedOptions,
-    tvGenreSeparationType,
+    genreSeparationType,
     typesSeparationType,
     regionSeparationType,
   ])
@@ -248,9 +248,9 @@ const Discover = observer(() => {
     )
   }
 
-  const toggleTvGenreSeparationType = () => {
-    setTvGenreSeparationType(
-      tvGenreSeparationType === 'includes_every' ? 'includes_any' : 'includes_every',
+  const toggleGenreSeparationType = () => {
+    setGenreSeparationType(
+      genreSeparationType === 'includes_every' ? 'includes_any' : 'includes_every',
     )
   }
 
@@ -341,14 +341,14 @@ const Discover = observer(() => {
                   </div>
                 </ReelistSelect>
 
-                <ReelistSelect selectState={tvGenreSelectState}>
+                <ReelistSelect selectState={genreSelectState}>
                   <div
                     className="flex justify-center cursor-pointer"
-                    onClick={toggleTvGenreSeparationType}
+                    onClick={toggleGenreSeparationType}
                   >
                     <Checkbox
                       value="includes_every"
-                      isChecked={tvGenreSeparationType === 'includes_every'}
+                      isChecked={genreSeparationType === 'includes_every'}
                     />
 
                     <div className="text-white ml-2">Genres Must Include</div>
@@ -373,7 +373,7 @@ const Discover = observer(() => {
               {[
                 videoTypesSelectState,
                 regionSelectState,
-                tvGenreSelectState,
+                genreSelectState,
                 tvProviderSelectState,
               ].flatMap(selectState =>
                 _.map(selectState.selectedOptions, (name, id) => (
@@ -476,7 +476,7 @@ const getDefaultRegions = () => {
   return options
 }
 
-const getGenres = async (type: string) => {
+const getGenresByType = async (type: string) => {
   const typeLabel = _.capitalize(type)
 
   return callTmdb(`/genre/${type}/list`)
@@ -497,9 +497,9 @@ const getGenres = async (type: string) => {
     )
 }
 
-const getTvGenres = async () => {
-  const tvGenres = await getGenres('tv')
-  const movieGenres = await getGenres('movie')
+const getGenres = async () => {
+  const tvGenres = await getGenresByType('tv')
+  const movieGenres = await getGenresByType('movie')
 
   return tvGenres.concat(movieGenres)
 }
