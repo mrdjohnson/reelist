@@ -239,7 +239,7 @@ const Discover = observer(() => {
   const width = useMemo(() => {
     const totalContainerPadding = containerPadding * 2
 
-    return calculateContainerWidth(Math.min(windowWidth, 1619) - totalContainerPadding)
+    return calculateContainerWidth(Math.min(windowWidth, 1800) - totalContainerPadding)
   }, [windowWidth])
 
   const toggleRegionSeparationType = () => {
@@ -272,7 +272,7 @@ const Discover = observer(() => {
         marginX={`${containerPadding}px`}
         paddingTop="20px"
         width={width}
-        maxWidth="1619px"
+        maxWidth={width}
         alignSelf="center"
       >
         <NavBar path="/discover" />
@@ -391,7 +391,7 @@ const Discover = observer(() => {
             </div>
           </div>
 
-          <div className="flex flex-wrap flex-row my-4 gap-y-5 lg:gap-y-12 gap-x-5 justify-center w-full">
+          <div className="flex flex-wrap flex-row my-4 gap-y-5 lg:gap-y-12 gap-x-5 w-full">
             {videos.map(video => (
               <VideoImage
                 video={video}
@@ -510,7 +510,7 @@ const getProvidersByType = async (type: string) => {
   return callTmdb(`/watch/providers/${type}`)
     .then(
       item =>
-        _.get(item, 'data.data.genres') as Array<{
+        _.get(item, 'data.data.results') as Array<{
           displayPriority: string
           logoPath: string
           providerName: string
@@ -520,18 +520,41 @@ const getProvidersByType = async (type: string) => {
     .then(items => _.sortBy(items, 'displayPriority'))
     .then(items =>
       items.map(item => ({
-        id: type + ':' + item.providerId,
-        name: `${item.providerName} (${typeLabel})`,
+        id: item.providerId,
+        name: item.providerName,
+        alternativeName: `${item.providerName} (${typeLabel})`,
       })),
     )
+    .then(items => _.keyBy(items, 'id'))
 }
 
 // initial options: navigator.languages.filter(language => language.includes('-')).map(language => language.match(/-(.*)/)[1])
 const getProviders = async () => {
-  const tvProviders = await getProvidersByType('tv')
-  const movieProviders = await getProvidersByType('movie')
+  const tvProvidersById = await getProvidersByType('tv')
+  const movieProvidersById = await getProvidersByType('movie')
 
-  return tvProviders.concat(movieProviders)
+  const providerIds = _.uniq(_.keys(tvProvidersById).concat(_.keys(movieProvidersById)))
+
+  const allProviders = []
+
+  providerIds.forEach(providerId => {
+    const tvProvider = tvProvidersById[providerId]
+    const movieProvider = movieProvidersById[providerId]
+
+    if (tvProvider && movieProvider && tvProvider.name !== movieProvider.name) {
+      throw Error('something wrong ')
+    }
+
+    if (tvProvider && !movieProvider) {
+      allProviders.push({ id: providerId, name: tvProvider.alternativeName })
+    } else if (!tvProvider && movieProvider) {
+      allProviders.push({ id: providerId, name: movieProvider.alternativeName })
+    } else if (tvProvider && movieProvider) {
+      allProviders.push({ id: providerId, name: tvProvider.name })
+    }
+  })
+
+  return allProviders
 }
 
 //todo make sure this works for tv shows AND movies
