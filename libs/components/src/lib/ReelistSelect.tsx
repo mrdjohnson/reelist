@@ -251,6 +251,7 @@ const ReelistSelect = observer(
                 removeClippedSubviews
                 width={isMulti ? '100%' : 'auto'}
                 height={isMulti ? '100%' : 'auto'}
+                className="overscroll-none"
               >
                 {selectState.isMulti && (
                   <Row width="100%">

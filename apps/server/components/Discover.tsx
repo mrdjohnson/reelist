@@ -123,10 +123,15 @@ const Discover = observer(() => {
     const selectedSortType = _.keys(sortTypesSelectState.selectedOptions)[0]
     const selectedRegions = regionSelectState.selectedOptions
     const selectedGenres = _.keys(genreSelectState.selectedOptions)
-    const selectedWatchProviders = watchProviderSelectState.selectedOptions
+    const selectedWatchProviders = _.keys(watchProviderSelectState.selectedOptions)
 
-    // todo, copy this code for providers
     const [tvGenres, movieGenres] = _.partition(selectedGenres, item => item.startsWith('tv:'))
+
+    const {
+      shared: sharedProviders = [],
+      tv: tvProviders = [],
+      movie: movieProviders = [],
+    } = _.groupBy(selectedWatchProviders, item => item.split(':')[0])
 
     const genreSeparator = genreSeparationType === 'includes_any' ? ',' : '|'
 
@@ -139,7 +144,8 @@ const Discover = observer(() => {
       watch_region: _.keys(selectedRegions).join(','),
       tvGenres: tvGenres.map(withoutIdentifier).join(genreSeparator),
       movieGenres: movieGenres.map(withoutIdentifier).join(genreSeparator),
-      with_providers: _.keys(selectedWatchProviders).join(','),
+      tvProviders: sharedProviders.concat(tvProviders).map(withoutIdentifier).join(','),
+      movieProviders: sharedProviders.concat(movieProviders).map(withoutIdentifier).join(','),
     })
       .then(handleVideos)
       .catch(e => {})
@@ -520,12 +526,17 @@ const getProvidersByType = async (type: string) => {
     .then(items => _.sortBy(items, 'displayPriority'))
     .then(items =>
       items.map(item => ({
-        id: item.providerId,
-        name: item.providerName,
-        alternativeName: `${item.providerName} (${typeLabel})`,
+        original: {
+          id: 'shared:' + item.providerId,
+          name: item.providerName,
+        },
+        alternative: {
+          id: type + ':' + item.providerId,
+          name: `${item.providerName} (${typeLabel})`,
+        },
       })),
     )
-    .then(items => _.keyBy(items, 'id'))
+    .then(items => _.keyBy(items, 'original.id'))
 }
 
 // initial options: navigator.languages.filter(language => language.includes('-')).map(language => language.match(/-(.*)/)[1])
@@ -541,16 +552,14 @@ const getProviders = async () => {
     const tvProvider = tvProvidersById[providerId]
     const movieProvider = movieProvidersById[providerId]
 
-    if (tvProvider && movieProvider && tvProvider.name !== movieProvider.name) {
-      throw Error('something wrong ')
-    }
+    const provider = tvProvider || movieProvider
+    const { original, alternative } = provider
 
-    if (tvProvider && !movieProvider) {
-      allProviders.push({ id: providerId, name: tvProvider.alternativeName })
-    } else if (!tvProvider && movieProvider) {
-      allProviders.push({ id: providerId, name: movieProvider.alternativeName })
-    } else if (tvProvider && movieProvider) {
-      allProviders.push({ id: providerId, name: tvProvider.name })
+    // the id is already the same, make sure the name is too
+    if (tvProvider?.original?.name === movieProvider?.original?.name) {
+      allProviders.push(original)
+    } else {
+      allProviders.push(alternative)
     }
   })
 

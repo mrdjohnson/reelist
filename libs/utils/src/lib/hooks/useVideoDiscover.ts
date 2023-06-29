@@ -7,16 +7,18 @@ const useVideoDiscover = () => {
   const { videoStore } = useStore()
 
   const videoDiscover = async (params: Record<string, string>) => {
-    const { tvGenres, movieGenres, ...sharedParams } = params
+    const { tvGenres, movieGenres, tvProviders, movieProviders, ...sharedParams } = params
 
     const tvParams = {
       ...sharedParams,
       with_genres: tvGenres,
+      with_providers: tvProviders,
     }
 
     const movieParams = {
       ...sharedParams,
       with_genres: movieGenres,
+      with_providers: movieProviders,
     }
 
     const searchResults = await Promise.allSettled([
