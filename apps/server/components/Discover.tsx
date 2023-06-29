@@ -384,7 +384,7 @@ const Discover = observer(() => {
               ].flatMap(selectState =>
                 _.map(selectState.selectedOptions, (name, id) => (
                   <Button
-                    className="border border-solid border-red-400 text-white px-3 rounded-full mt-4"
+                    className="border border-solid border-red-400 text-white px-3 rounded-full mt-4 font-serif"
                     onClick={() => selectState.removeOption(id)}
                     key={id}
                   >
@@ -397,7 +397,7 @@ const Discover = observer(() => {
             </div>
           </div>
 
-          <div className="flex flex-wrap flex-row my-4 gap-y-5 lg:gap-y-12 gap-x-5 w-full">
+          <div className="flex flex-wrap flex-row my-4 gap-y-3 gap-x-5 w-full">
             {videos.map(video => (
               <VideoImage
                 video={video}

@@ -32,17 +32,23 @@ const VideoImage = observer(
 
     if (!source) return null
 
-    const imageSizeProps: IImageProps = isPoster
-      ? {
-          resizeMode: 'contain',
-          width: '406',
-          height: '609',
-        }
-      : {
-          resizeMode: 'cover',
-          width: '307px',
-          height: '207px',
-        }
+    let imageSizeProps: IImageProps
+    let height: string
+
+    if (isPoster) {
+      imageSizeProps = {
+        resizeMode: 'contain',
+        width: '406',
+      }
+
+      height = '609px'
+    } else {
+      imageSizeProps = {
+        width: '307px',
+      }
+
+      height = hovered || pressed ? '237px' : '207px'
+    }
 
     const fullImage = !onPress
 
@@ -56,39 +62,42 @@ const VideoImage = observer(
         onLongPress={() => console.log('long pressed: ', video.videoName)}
         onPress={onPress}
         disabled={fullImage}
+        rounded="sm"
+        overflow="hidden"
+        position="relative"
+        display="flex"
+        justifyContent="center"
+        height={height}
+        marginTop={hovered || pressed ? '0px' : '15px'}
+        marginBottom={hovered || pressed ? '0px' : '15px'}
+        style={{ transition: 'height 0.3s ease, margin-bottom 0.3s ease, margin-top 0.3s ease' }}
         {...containerProps}
       >
-        <View
-          position="relative"
-          style={{
-            transform: [{ scale: fullImage || pressed ? 1 : hovered ? 0.99 : 0.97 }],
-          }}
-        >
-          <Image
-            source={{ uri: IMAGE_PATH + source }}
-            alt={source}
-            rounded="sm"
-            {...imageProps}
-            {...imageSizeProps}
-          />
-          {!isPoster && (
-            <div
-              className="absolute bottom-0 w-full rounded-b-md pt-3 pb-1 min-h-[70px] flex justify-end flex-col"
-              style={{
-                background:
-                  'linear-gradient(180deg, rgba(0, 0, 0, 0.54) 0%, rgba(0, 0, 0, 0) 0.01%, rgba(0, 0, 0, 0.54) 33.85%)',
-              }}
-            >
-              <Text {...videoTextProps} fontSize="24px">
-                {video.videoName}
-              </Text>
+        <Image
+          source={{ uri: IMAGE_PATH + source }}
+          alt={source}
+          height="100%"
+          {...imageProps}
+          {...imageSizeProps}
+        />
 
-              <Text {...videoTextProps} fontSize="15px">
-                {video.durationOrSeasons}
-              </Text>
+        {!isPoster && (
+          <div
+            className="absolute bottom-0 w-full pt-3 pb-1 min-h-[70px] flex justify-end flex-col"
+            style={{
+              background:
+                'linear-gradient(180deg, rgba(0, 0, 0, 0.54) 0%, rgba(0, 0, 0, 0) 0.01%, rgba(0, 0, 0, 0.54) 33.85%)',
+            }}
+          >
+            <div className="px-2 line-clamp-2 text-white text-2xl font-serif">
+              {video.videoName}
             </div>
-          )}
-        </View>
+
+            <div className="px-2 line-clamp-2 text-white text-lg font-serif">
+              {video.durationOrSeasons}
+            </div>
+          </div>
+        )}
       </Pressable>
     )
   },
