@@ -89,11 +89,11 @@ const VideoImage = observer(
                 'linear-gradient(180deg, rgba(0, 0, 0, 0.54) 0%, rgba(0, 0, 0, 0) 0.01%, rgba(0, 0, 0, 0.54) 33.85%)',
             }}
           >
-            <div className="px-2 line-clamp-2 text-white text-2xl font-serif">
+            <div className="px-2 line-clamp-2 text-white text-2xl font-inter">
               {video.videoName}
             </div>
 
-            <div className="px-2 line-clamp-2 text-white text-lg font-serif">
+            <div className="px-2 line-clamp-2 text-white text-lg font-inter">
               {video.durationOrSeasons}
             </div>
           </div>

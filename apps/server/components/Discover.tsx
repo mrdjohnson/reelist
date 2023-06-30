@@ -311,7 +311,7 @@ const Discover = observer(() => {
 
             <Divider backgroundColor="reelist.500" marginBottom="20px" marginTop="14px" />
 
-            <div className="grid max-[673px]:flex-col max-[1000px]:grid-rows-1">
+            <div className="grid max-[673px]:flex-col gap-2 max-[1000px]:grid-rows-1 mb-1">
               <div className="flex row-start-1 max-[1000px]:row-start-2 max-[673px]:flex-col gap-2">
                 <ReelistSelect selectState={videoTypesSelectState}>
                   <div
@@ -329,7 +329,7 @@ const Discover = observer(() => {
                       isChecked={typesSeparationType === 'includes_every'}
                     />
 
-                    <div className="text-white ml-2">Types Must Include</div>
+                    <div className="text-white ml-2">Types Must Include All Selected</div>
                   </div>
                 </ReelistSelect>
 
@@ -343,7 +343,7 @@ const Discover = observer(() => {
                       isChecked={regionSeparationType === 'includes_every'}
                     />
 
-                    <div className="text-white ml-2">Regions Must Include</div>
+                    <div className="text-white ml-2">Regions Must Include All Selected</div>
                   </div>
                 </ReelistSelect>
 
@@ -357,7 +357,7 @@ const Discover = observer(() => {
                       isChecked={genreSeparationType === 'includes_every'}
                     />
 
-                    <div className="text-white ml-2">Genres Must Include</div>
+                    <div className="text-white ml-2">Genres Must Include All Selected</div>
                   </div>
                 </ReelistSelect>
 
@@ -384,7 +384,7 @@ const Discover = observer(() => {
               ].flatMap(selectState =>
                 _.map(selectState.selectedOptions, (name, id) => (
                   <Button
-                    className="border border-solid border-red-400 text-white px-3 rounded-full mt-4 font-serif"
+                    className="border border-solid border-red-400 text-white px-3 rounded-full mt-4 font-inter"
                     onClick={() => selectState.removeOption(id)}
                     key={id}
                   >
@@ -507,7 +507,7 @@ const getGenres = async () => {
   const tvGenres = await getGenresByType('tv')
   const movieGenres = await getGenresByType('movie')
 
-  return tvGenres.concat(movieGenres)
+  return _.sortBy(tvGenres.concat(movieGenres), 'name')
 }
 
 const getProvidersByType = async (type: string) => {

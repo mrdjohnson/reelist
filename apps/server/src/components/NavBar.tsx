@@ -1,11 +1,11 @@
 import { Button } from '@mui/material'
 
 const activeButton = 'border-red-400 border-1'
-const defaultStyle = 'text-lg text-slate-300 px-5 '
+const defaultStyle = 'text-lg text-slate-300 px-5 rounded-l-full rounded-r-full '
 
 const getButtonProps = (path: string, href: string) => {
   const activeStyle =
-    path === href ? 'border border-solid border-red-400 rounded-l-full rounded-r-full' : ''
+    path === href ? 'border border-solid border-red-400 ' : ''
 
   return { className: defaultStyle + activeStyle, href }
 }
