@@ -297,6 +297,15 @@ const Discover = observer(() => {
                   onPress={() => setSearchText('')}
                   borderWidth="0"
                 />
+
+                // <Button
+                //   className="group border bg-red-400 text-white px-3 rounded-full mt-4 font-inter"
+                //   onClick={() => setSearchText('')}
+                // >
+                //   {searchText}
+
+                //   <CloseOutlinedIcon className="text-white text-[17px] pl-2 group-hover:text-red-400" />
+                // </Button>
               ) : (
                 <Input
                   placeholder="Search"
@@ -384,20 +393,20 @@ const Discover = observer(() => {
               ].flatMap(selectState =>
                 _.map(selectState.selectedOptions, (name, id) => (
                   <Button
-                    className="border border-solid border-red-400 text-white px-3 rounded-full mt-4 font-inter"
+                    className="group border border-solid border-red-400 text-white px-3 rounded-full mt-4 font-inter hover:border-red-600"
                     onClick={() => selectState.removeOption(id)}
                     key={id}
                   >
                     {name}
 
-                    <CloseOutlinedIcon className="text-white text-[17px] pl-2" />
+                    <CloseOutlinedIcon className="text-white text-[17px] pl-2 group-hover:text-red-600 transition-colors ease-in-out duration-300" />
                   </Button>
                 )),
               )}
             </div>
           </div>
 
-          <div className="flex flex-wrap flex-row my-4 gap-y-3 gap-x-5 w-full">
+          <div className="flex flex-wrap flex-row my-4 gap-x-5 w-full">
             {videos.map(video => (
               <VideoImage
                 video={video}
