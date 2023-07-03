@@ -221,11 +221,11 @@ const Discover = observer(() => {
   }, [searchText])
 
   const handleVideoSelection = (video: Video) => {
-    router.push(`/discover?videoId=${video.videoId}`)
+    router.push(`/discover?videoId=${video.videoId}`, undefined, { shallow: true })
   }
 
   const closeVideo = () => {
-    router.replace('/discover')
+    router.replace('/discover', undefined, { shallow: true })
   }
 
   const containerPadding = useBreakpointValue({
