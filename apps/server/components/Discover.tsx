@@ -297,7 +297,7 @@ const Discover = observer(() => {
                   onPress={() => setSearchText('')}
                   borderWidth="0"
                 />
-
+              ) : (
                 // <Button
                 //   className="group border bg-red-400 text-white px-3 rounded-full mt-4 font-inter"
                 //   onClick={() => setSearchText('')}
@@ -306,7 +306,6 @@ const Discover = observer(() => {
 
                 //   <CloseOutlinedIcon className="text-white text-[17px] pl-2 group-hover:text-red-400" />
                 // </Button>
-              ) : (
                 <Input
                   placeholder="Search"
                   variant="unstyled"
@@ -434,7 +433,6 @@ const Discover = observer(() => {
               maxWidth: '1619px',
               position: 'relative',
               padding: '38px',
-              paddingRight: '60px',
               overflowY: 'scroll',
               overflowX: 'clip',
               cursor: 'default',
@@ -442,19 +440,25 @@ const Discover = observer(() => {
           }}
           transitionDuration={{ exit: 50 }}
         >
-          <div className="absolute top-2 right-3">
-            <CloseOutlinedIcon
-              className="cursor-pointer"
-              sx={{ color: 'rgb(254, 83, 101)', fontSize: '35px' }}
-              onClick={closeVideo}
-            />
+          <div className="relative overflow-scroll overscroll-none no-scrollbar">
+            <div className="absolute top-2 right-3">
+              <CloseOutlinedIcon
+                className="cursor-pointer"
+                sx={{ color: 'rgb(254, 83, 101)', fontSize: '35px' }}
+                onClick={closeVideo}
+              />
+            </div>
+
+            {selectedVideo && (
+              <VideoModal
+                video={selectedVideo}
+                selectedRegions={_.keys(regionSelectState.selectedOptions)}
+              />
+            )}
+
+            {/* todo: this overflow container stops the background content from scrolling but leaves a strange 1px scrolling effect */}
+            <div className="absolute top-0 w-full h-[calc(100%+1px)] bg-transparent -z-10" />
           </div>
-          {selectedVideo && (
-            <VideoModal
-              video={selectedVideo}
-              selectedRegions={_.keys(regionSelectState.selectedOptions)}
-            />
-          )}
         </Dialog>
       </Flex>
     </div>
