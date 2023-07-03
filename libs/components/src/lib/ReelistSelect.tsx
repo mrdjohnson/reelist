@@ -97,7 +97,7 @@ export class SelectState<T extends StringOrNumber> {
     if (this.isMulti) {
       if (removingOption) return this.removeOption(option.id)
 
-      this.selectedOptions[option.id] = option.name
+      this.selectedOptions = { ...this.selectedOptions, [option.id]: option.name }
       // if this is not multi select, there should always be a selected option
     } else if (!removingOption) {
       this.selectedOptions = { [option.id]: option.name }
@@ -107,7 +107,7 @@ export class SelectState<T extends StringOrNumber> {
   }
 
   removeOption = (optionId: StringOrNumber) => {
-    delete this.selectedOptions[optionId]
+    this.selectedOptions = _.omit(this.selectedOptions, optionId)
 
     this.save()
   }
