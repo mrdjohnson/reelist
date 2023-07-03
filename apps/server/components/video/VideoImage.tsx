@@ -45,6 +45,8 @@ const VideoImage = observer(
     } else {
       imageSizeProps = {
         width: '307px',
+        height: '270px',
+        top: '-15px',
       }
 
       height = hovered || pressed ? '237px' : '207px'
@@ -93,7 +95,10 @@ const VideoImage = observer(
               {video.videoName}
             </div>
 
-            <div className="px-2 line-clamp-2 text-white text-lg font-inter">
+            <div
+              className="px-2 line-clamp-2 text-white text-lg font-inter"
+              style={{ transition: 'height 0.3s ease' }}
+            >
               {video.durationOrSeasons}
             </div>
           </div>
