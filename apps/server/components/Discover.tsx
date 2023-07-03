@@ -125,7 +125,11 @@ const Discover = observer(() => {
     const selectedGenres = _.keys(genreSelectState.selectedOptions)
     const selectedWatchProviders = _.keys(watchProviderSelectState.selectedOptions)
 
-    const [tvGenres, movieGenres] = _.partition(selectedGenres, item => item.startsWith('tv:'))
+    const {
+      shared: sharedGenres = [],
+      tv: tvGenres = [],
+      movie: movieGenres = [],
+    } = _.groupBy(selectedGenres, item => item.split(':')[0])
 
     const {
       shared: sharedProviders = [],
@@ -142,8 +146,8 @@ const Discover = observer(() => {
       page: pageRef.current.toString(),
       sort_by: selectedSortType,
       watch_region: _.keys(selectedRegions).join(','),
-      tvGenres: tvGenres.map(withoutIdentifier).join(genreSeparator),
-      movieGenres: movieGenres.map(withoutIdentifier).join(genreSeparator),
+      tvGenres: sharedGenres.concat(tvGenres).map(withoutIdentifier).join(genreSeparator),
+      movieGenres: sharedGenres.concat(movieGenres).map(withoutIdentifier).join(genreSeparator),
       tvProviders: sharedProviders.concat(tvProviders).map(withoutIdentifier).join(','),
       movieProviders: sharedProviders.concat(movieProviders).map(withoutIdentifier).join(','),
     })
@@ -508,19 +512,44 @@ const getGenresByType = async (type: string) => {
     )
     .then(_.toArray)
     .then(items =>
-      // map each item to {id: 'type:id', name: 'name (Type)'}
       items.map(item => ({
-        id: type + ':' + item.id,
-        name: `${item.name} (${typeLabel})`,
+        original: {
+          id: 'shared:' + item.id,
+          name: item.name,
+        },
+        alternative: {
+          id: type + ':' + item.id,
+          name: `${item.name} (${typeLabel})`,
+        },
       })),
     )
+    .then(items => _.keyBy(items, 'original.id'))
 }
 
 const getGenres = async () => {
-  const tvGenres = await getGenresByType('tv')
-  const movieGenres = await getGenresByType('movie')
+  const tvGenresById = await getGenresByType('tv')
+  const movieGenresById = await getGenresByType('movie')
 
-  return _.sortBy(tvGenres.concat(movieGenres), 'name')
+  const genreIds = _.uniq(_.keys(tvGenresById).concat(_.keys(movieGenresById)))
+
+  const allGenres = []
+
+  genreIds.forEach(genreId => {
+    const tvGenre = tvGenresById[genreId]
+    const movieGenre = movieGenresById[genreId]
+
+    const genre = tvGenre || movieGenre
+    const { original, alternative } = genre
+
+    // the id is already the same, make sure the name is too
+    if (tvGenre?.original?.name === movieGenre?.original?.name) {
+      allGenres.push(original)
+    } else {
+      allGenres.push(alternative)
+    }
+  })
+
+  return _.sortBy(allGenres, 'name')
 }
 
 const getProvidersByType = async (type: string) => {
