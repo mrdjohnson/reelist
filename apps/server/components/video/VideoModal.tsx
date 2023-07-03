@@ -65,7 +65,7 @@ const VideoModal = observer(
               </div>
 
               <div
-                className="flex gap-x-5 xl:gap-x-11 overscroll-none no-scrollbar overflow-x-auto pb-2"
+                className="flex gap-x-5 xl:gap-x-8 overscroll-none no-scrollbar overflow-x-auto pb-2"
                 style={{ scrollbarWidth: 'none' }}
               >
                 {providers.map(provider => (
