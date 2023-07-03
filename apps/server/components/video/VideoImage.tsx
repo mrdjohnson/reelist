@@ -55,55 +55,54 @@ const VideoImage = observer(
     const fullImage = !onPress
 
     return (
-      <Pressable
-        onHoverIn={() => setHovered(true)}
-        onPressIn={() => setPressed(true)}
-        onHoverOut={() => setHovered(false)}
-        onPressOut={() => setPressed(false)}
-        isPressed={pressed}
-        onLongPress={() => console.log('long pressed: ', video.videoName)}
-        onPress={onPress}
-        disabled={fullImage}
-        rounded="sm"
-        overflow="hidden"
-        position="relative"
-        display="flex"
-        justifyContent="center"
-        height={height}
-        marginTop={hovered || pressed ? '0px' : '15px'}
-        marginBottom={hovered || pressed ? '0px' : '15px'}
-        style={{ transition: 'height 0.3s ease, margin-bottom 0.3s ease, margin-top 0.3s ease' }}
-        {...containerProps}
-      >
-        <Image
-          source={{ uri: IMAGE_PATH + source }}
-          alt={source}
-          height="100%"
-          {...imageProps}
-          {...imageSizeProps}
-        />
+      <div className="group">
+        <Pressable
+          onHoverIn={() => setHovered(true)}
+          onPressIn={() => setPressed(true)}
+          onHoverOut={() => setHovered(false)}
+          onPressOut={() => setPressed(false)}
+          isPressed={pressed}
+          onLongPress={() => console.log('long pressed: ', video.videoName)}
+          onPress={onPress}
+          disabled={fullImage}
+          rounded="sm"
+          overflow="hidden"
+          position="relative"
+          display="flex"
+          justifyContent="center"
+          height={height}
+          marginTop={hovered || pressed ? '0px' : '15px'}
+          marginBottom={hovered || pressed ? '0px' : '15px'}
+          style={{ transition: 'height 0.3s ease, margin-bottom 0.3s ease, margin-top 0.3s ease' }}
+          {...containerProps}
+        >
+          <Image
+            source={{ uri: IMAGE_PATH + source }}
+            alt={source}
+            height="100%"
+            {...imageProps}
+            {...imageSizeProps}
+          />
 
-        {!isPoster && (
-          <div
-            className="absolute bottom-0 w-full pt-3 pb-1 min-h-[70px] flex justify-end flex-col"
-            style={{
-              background:
-                'linear-gradient(180deg, rgba(0, 0, 0, 0.54) 0%, rgba(0, 0, 0, 0) 0.01%, rgba(0, 0, 0, 0.54) 33.85%)',
-            }}
-          >
-            <div className="px-2 line-clamp-2 text-white text-2xl font-inter">
-              {video.videoName}
-            </div>
-
+          {!isPoster && (
             <div
-              className="px-2 line-clamp-2 text-white text-lg font-inter"
-              style={{ transition: 'height 0.3s ease' }}
+              className="absolute bottom-0 w-full pt-3 pb-1 min-h-[70px] flex justify-end flex-col group-hover:min-h-[40px] transition-min-height ease-in-out duration-300"
+              style={{
+                background:
+                  'linear-gradient(180deg, rgba(0, 0, 0, 0.54) 0%, rgba(0, 0, 0, 0) 0.01%, rgba(0, 0, 0, 0.54) 33.85%)',
+              }}
             >
-              {video.durationOrSeasons}
+              <div className="px-2 line-clamp-2 text-white text-2xl font-inter group-hover:mt-3  transition-margin-top ease-in-out duration-300">
+                {video.videoName}
+              </div>
+
+              <div className="px-2 line-clamp-2 text-white text-lg font-inter max-h-8 group-hover:max-h-0 overflow-hidden transition-max-height ease-in-out duration-300">
+                {video.durationOrSeasons}
+              </div>
             </div>
-          </div>
-        )}
-      </Pressable>
+          )}
+        </Pressable>
+      </div>
     )
   },
 )
