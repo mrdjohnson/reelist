@@ -105,7 +105,9 @@ const Discover = observer(() => {
   }
 
   const handleVideos = (nextVideos: Video[]) => {
-    const filteredVideos = _.chain(nextVideos).filter(videoFilter).compact().value()
+    const filteredVideos = searchText
+      ? nextVideos
+      : _.chain(nextVideos).filter(videoFilter).compact().value()
 
     if (page === 1) {
       console.log('making new videos')
