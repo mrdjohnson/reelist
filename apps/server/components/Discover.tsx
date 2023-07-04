@@ -81,7 +81,7 @@ const Discover = observer(() => {
     'includes_any',
   )
 
-  const pageRef = useRef(1)
+  const [page, setPage] = useState(1)
   const [videos, setVideos] = useState<Video[]>([])
 
   const videoFilter = (video: Video) => {
@@ -106,7 +106,7 @@ const Discover = observer(() => {
   const handleVideos = (nextVideos: Video[]) => {
     const filteredVideos = _.chain(nextVideos).filter(videoFilter).compact().value()
 
-    if (pageRef.current === 1) {
+    if (page === 1) {
       console.log('making new videos')
       setVideos(filteredVideos)
     } else {
@@ -143,7 +143,7 @@ const Discover = observer(() => {
       with_type: _.keys(selectedVideoTypes).join(
         typesSeparationType === 'includes_any' ? ',' : '|',
       ),
-      page: pageRef.current.toString(),
+      page: page.toString(),
       sort_by: selectedSortType,
       watch_region: _.keys(selectedRegions).join(','),
       tvGenres: sharedGenres.concat(tvGenres).map(withoutIdentifier).join(genreSeparator),
@@ -156,14 +156,12 @@ const Discover = observer(() => {
   }
 
   const search = () => {
-    videoSearch(searchText, { page: pageRef.current.toString() })
+    videoSearch(searchText, { page: page.toString() })
       .then(handleVideos)
       .catch(e => {})
   }
 
   const loadVideos = () => {
-    const page = pageRef.current
-
     if (page > 10) {
       return
     }
@@ -187,9 +185,7 @@ const Discover = observer(() => {
   })
 
   useEffect(() => {
-    pageRef.current = 1
-
-    loadVideos()
+    setPage(1)
   }, [
     videoTypesSelectState.selectedOptions,
     sortTypesSelectState.selectedOptions,
@@ -199,12 +195,15 @@ const Discover = observer(() => {
     genreSeparationType,
     typesSeparationType,
     regionSeparationType,
+    searchText
   ])
 
-  const getNextPage = () => {
-    pageRef.current += 1
-
+  useEffect(() => {
     loadVideos()
+  }, [page])
+
+  const getNextPage = () => {
+    setPage(page + 1)
   }
 
   useEffect(() => {
@@ -217,12 +216,6 @@ const Discover = observer(() => {
       setShowSelectedVideo(true)
     }
   }, [router.query])
-
-  useEffect(() => {
-    pageRef.current = 1
-
-    loadVideos()
-  }, [searchText])
 
   const handleVideoSelection = (video: Video) => {
     router.push(`/discover?videoId=${video.videoId}`, undefined, { shallow: true })
