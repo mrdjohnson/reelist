@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 
 import { Dialog } from '@mui/material'
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@mui/material'
 import _ from 'lodash'
 import { useStore } from '@reelist/utils/hooks/useStore'
@@ -66,7 +66,7 @@ const Discover = observer(() => {
   const [searchText, setSearchText] = useState('')
 
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null)
-  const [showSelectedVideo, setShowSelectedVideo] = useState(false)
+  const [showSelectedVideo, setShowSelectedVideo] = useState(true)
 
   const [genreSeparationType, setGenreSeparationType] = useLocalStorageState(
     'genreSeparationType',
@@ -83,6 +83,7 @@ const Discover = observer(() => {
 
   const [page, setPage] = useState(1)
   const [videos, setVideos] = useState<Video[]>([])
+  const loadingRef = useRef(false)
 
   const videoFilter = (video: Video) => {
     if (_.isEmpty(video.posterPath || video.backdropPath)) return false
@@ -153,25 +154,33 @@ const Discover = observer(() => {
     })
       .then(handleVideos)
       .catch(e => {})
+      .finally(() => {
+        loadingRef.current = false
+      })
   }
 
   const search = () => {
-    videoSearch(searchText, { page: page.toString() })
+    videoSearch(searchText, { deepSearch: true, page: page.toString() })
       .then(handleVideos)
       .catch(e => {})
+      .finally(() => {
+        loadingRef.current = false
+      })
   }
 
-  const loadVideos = () => {
-    if (page > 10) {
+  const loadVideos = useCallback(() => {
+    if (page > 10 || loadingRef.current) {
       return
     }
+
+    loadingRef.current = true
 
     if (searchText) {
       search()
     } else {
       discover()
     }
-  }
+  }, [page])
 
   const videoTypesSelectState = useSelectState('Types', getVideoTypes)
   const genreSelectState = useSelectState('Genres', getGenres)
@@ -195,16 +204,18 @@ const Discover = observer(() => {
     genreSeparationType,
     typesSeparationType,
     regionSeparationType,
-    searchText
+    searchText,
   ])
 
   useEffect(() => {
     loadVideos()
-  }, [page])
+  }, [page, searchText])
 
-  const getNextPage = () => {
+  const getNextPage = useCallback(() => {
+    if (loadingRef.current) return
+
     setPage(page + 1)
-  }
+  }, [page])
 
   useEffect(() => {
     const { videoId } = router.query
