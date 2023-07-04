@@ -170,7 +170,7 @@ const Discover = observer(() => {
       })
   }
 
-  const loadVideos = useCallback(() => {
+  const loadVideos = () => {
     if (page > 10 || loadingRef.current) {
       return
     }
@@ -182,7 +182,7 @@ const Discover = observer(() => {
     } else {
       discover()
     }
-  }, [page])
+  }
 
   const videoTypesSelectState = useSelectState('Types', getVideoTypes)
   const genreSelectState = useSelectState('Genres', getGenres)
@@ -197,6 +197,7 @@ const Discover = observer(() => {
 
   useEffect(() => {
     setPage(1)
+    loadVideos()
   }, [
     videoTypesSelectState.selectedOptions,
     sortTypesSelectState.selectedOptions,
