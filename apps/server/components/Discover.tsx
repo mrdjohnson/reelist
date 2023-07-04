@@ -452,7 +452,7 @@ const Discover = observer(() => {
           }}
           transitionDuration={{ exit: 50 }}
         >
-          <div className="absolute top-2 right-3">
+          <div className="absolute top-4 lg:top-2 right-3">
             <CloseOutlinedIcon
               className="cursor-pointer"
               sx={{ color: 'rgb(254, 83, 101)', fontSize: '35px' }}

@@ -33,8 +33,8 @@ const VideoModal = observer(
     }, [video.providers])
 
     return (
-      <div className="flex flex-col flex-wrap justify-center text-white xl:flex-row xl:flex-nowrap max-w-7xl">
-        <div className="flex justify-center xl:mr-12 rounded-lg w-full flex-1">
+      <div className="flex flex-col flex-wrap justify-center text-white lg:flex-row lg:flex-nowrap max-w-7xl">
+        <div className="flex justify-center lg:mr-12 rounded-lg w-full flex-1">
           <VideoImage
             video={video}
             containerProps={{ alignSelf: 'center' }}
@@ -44,7 +44,7 @@ const VideoModal = observer(
         </div>
 
         <div className="flex flex-col w-full overflow-clip">
-          <p className="text-5xl text-center mt-4 mb-1 xl:text-left xl:mt-0 xl:mb-2">
+          <p className="text-5xl text-center mt-4 mb-1 lg:text-left lg:mt-0 lg:mb-2">
             {video.videoName}
           </p>
 
@@ -90,7 +90,7 @@ const VideoModal = observer(
                 </div>
 
                 <div
-                  className="flex gap-x-5 xl:gap-x-8 overscroll-x-none no-scrollbar overflow-x-auto pb-2"
+                  className="flex gap-x-5 lg:gap-x-8 overscroll-x-none no-scrollbar overflow-x-auto pb-2"
                   style={{ scrollbarWidth: 'none' }}
                 >
                   {providers.map(provider => (
