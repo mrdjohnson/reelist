@@ -18,21 +18,19 @@ const VideoModal = observer(
         .uniqBy('providerId')
         .value()
 
-    const flatrateProviders = useMemo(() => {
-      return getProvidersByType('flatrate').map(provider => ({ ...provider, type: 'Stream' }))
-    }, [video.providers])
-
-    const buyProviders = useMemo(() => {
-      return getProvidersByType('buy').map(provider => ({ ...provider, type: 'Buy' }))
-    }, [video.providers])
-
-    const rentProviders = useMemo(() => {
-      return getProvidersByType('rent').map(provider => ({ ...provider, type: 'Rent' }))
-    }, [video.providers])
-
     const providers = useMemo(() => {
-      return [...flatrateProviders, ...rentProviders, ...buyProviders]
-    }, [flatrateProviders, rentProviders, buyProviders])
+      const buyProviders = getProvidersByType('buy').map(provider => ({ ...provider, type: 'Buy' }))
+      const flatrateProviders = getProvidersByType('flatrate').map(provider => ({
+        ...provider,
+        type: 'Stream',
+      }))
+      const rentProviders = getProvidersByType('rent').map(provider => ({
+        ...provider,
+        type: 'Rent',
+      }))
+
+      return _.sortBy([...flatrateProviders, ...rentProviders, ...buyProviders], 'providerName', 'displayPriority')
+    }, [video.providers])
 
     return (
       <div className="flex flex-col flex-wrap justify-center text-white xl:flex-row xl:flex-nowrap max-w-7xl">
@@ -74,8 +72,8 @@ const VideoModal = observer(
                       src={IMAGE_PATH + provider.logoPath}
                       className="rounded-md object-contain mb-3"
                       alt={provider.providerName}
-                      width="70px"
-                      height="70px"
+                      width="50px"
+                      height="50px"
                     />
 
                     <span>{provider.type}</span>
