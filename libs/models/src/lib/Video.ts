@@ -812,7 +812,7 @@ class Video {
   }
 
   get cast() {
-    return (this.aggregateCredits || this.credits).cast
+    return _.sortBy((this.aggregateCredits || this.credits).cast, 'order')
   }
 }
 
