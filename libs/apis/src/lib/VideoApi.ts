@@ -1,6 +1,7 @@
 import TableApi from '@reelist/apis/TableApi'
 
-import { VideoTableType } from '@reelist/utils/interfaces/tables/VideoTable'
+// todo move the interfaces to the models section to remove circular dependency graph
+import { VideoTableType } from 'libs/interfaces/src/lib/tables/VideoTable'
 
 class VideoApi extends TableApi<VideoTableType> {
   loadVideo = async ({ videoId }: { videoId: string }) => {

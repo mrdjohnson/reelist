@@ -6,7 +6,7 @@ import moment from 'moment'
 import { humanizedDuration } from '@reelist/utils/humanizedDuration'
 import VideoStore from './VideoStore'
 import VideoApi from '@reelist/apis/VideoApi'
-import { VideoInfoType, VideoTableType } from '@reelist/utils/interfaces/tables/VideoTable'
+import { VideoInfoType, VideoTableType } from 'libs/interfaces/src/lib/tables/VideoTable'
 
 export type TvEpisode = {
   airDate: string

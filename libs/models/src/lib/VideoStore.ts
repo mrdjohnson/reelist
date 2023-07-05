@@ -8,7 +8,7 @@ import User from '@reelist/models/User'
 import { inject, injectable } from 'inversify'
 import { SupabaseClient } from '@supabase/supabase-js'
 import VideoApi from '@reelist/apis/VideoApi'
-import { VideoTableType } from '@reelist/utils/interfaces/tables/VideoTable'
+import { VideoTableType } from 'libs/interfaces/src/lib/tables/VideoTable'
 import TableApi from '@reelist/apis/TableApi'
 
 @injectable()

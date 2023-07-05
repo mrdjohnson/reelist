@@ -19,6 +19,7 @@
     "paths": {
       "@reelist/apis/*": ["libs/apis/src/lib/*"],
       "@reelist/components/*": ["libs/components/src/lib/*"],
+      "@reelist/interfaces/*": ["libs/interfaces/src/lib/*"],
       "@reelist/models/*": ["libs/models/src/lib/*"],
       "@reelist/utils/*": ["libs/utils/src/lib/*"]
     }

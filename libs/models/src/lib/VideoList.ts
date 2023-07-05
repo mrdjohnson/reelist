@@ -10,7 +10,7 @@ import { createViewModel, IViewModel } from 'mobx-utils'
 import { humanizedDuration } from '@reelist/utils/humanizedDuration'
 import VideoStore from './VideoStore'
 import UserStore from './UserStore'
-import { AutoSortType, VideoListTableType } from '@reelist/utils/interfaces/tables/VideoListTable'
+import { AutoSortType, VideoListTableType } from 'libs/interfaces/src/lib/tables/VideoListTable'
 import TableApi from '@reelist/apis/TableApi'
 
 type VideoListType = Camelized<VideoListTableType>

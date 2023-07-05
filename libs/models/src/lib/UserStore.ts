@@ -4,7 +4,7 @@ import User from '@reelist/models/User'
 import humps from 'humps'
 import { inject, injectable } from 'inversify'
 import { SupabaseClient } from '@supabase/supabase-js'
-import { UserTableType } from '@reelist/utils/interfaces/tables/UserTable'
+import { UserTableType } from '@reelist/interfaces/tables/UserTable'
 import TableApi from '@reelist/apis/TableApi'
 
 @injectable()
