@@ -422,6 +422,7 @@ const Discover = observer(() => {
                 video={video}
                 containerProps={{ width: '307px' }}
                 onPress={() => handleVideoSelection(video)}
+                key={video.videoId}
               />
             ))}
           </div>
