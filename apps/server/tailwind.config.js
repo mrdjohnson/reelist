@@ -18,6 +18,7 @@ module.exports = {
       },
       colors: {
         'text-red-400': 'rgb(254, 83, 101)',
+        'reelist-red': '#FE5365',
       },
     },
   },
