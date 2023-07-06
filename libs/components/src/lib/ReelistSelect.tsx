@@ -253,7 +253,7 @@ const ReelistSelect = observer(
             <div className="w-full">{children}</div>
 
             <div
-              className={classNames('my-3 flex w-full flex-1 flex-wrap gap-3', {
+              className={classNames('my-3 flex w-full flex-wrap gap-3', {
                 'flex-col rounded-md': !selectState.isMulti,
               })}
             >

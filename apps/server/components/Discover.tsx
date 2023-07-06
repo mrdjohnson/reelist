@@ -2,8 +2,9 @@
 
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
+import classNames from 'classnames'
 
-import { Dialog, Popover } from '@mui/material'
+import { Dialog } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -15,29 +16,12 @@ import useVideoDiscover from '@reelist/utils/hooks/useVideoDiscover'
 import useVideoSearch from '@reelist/utils/hooks/useVideoSearch'
 import { callTmdb } from '@reelist/apis/api'
 import Video from '@reelist/models/Video'
-import {
-  Flex,
-  View,
-  Row,
-  Checkbox,
-  Input,
-  Divider,
-  CloseIcon,
-  useBreakpointValue,
-} from 'native-base'
 import ReelistSelect, { useSelectState } from '@reelist/components/ReelistSelect'
-import PillButton from '@reelist/components/PillButton'
 
 import NavBar from '~/components/NavBar'
 import InfiniteScroll from './InfiniteScroll'
 import VideoModal from './video/VideoModal'
 import VideoImage from './video/VideoImage'
-
-const REMOVE_ICON = (
-  <View alignSelf="center" style={{ height: '100%' }}>
-    <CloseIcon color="black" size="xs" />
-  </View>
-)
 
 const useWindowWidth = () => {
   const [width, setWidth] = useState(window?.innerWidth)
@@ -239,10 +223,7 @@ const Discover = observer(() => {
     router.replace('/discover', undefined, { shallow: true })
   }
 
-  const containerPadding = useBreakpointValue({
-    base: 20,
-    xl: 54,
-  })
+  const containerPadding = 20
 
   const calculateContainerWidth = (possibleWidth: number) => {
     const itemWidth = 307 // width of each item in pixels
@@ -291,13 +272,9 @@ const Discover = observer(() => {
         // overflowY: 'scroll',
       }}
     >
-      <Flex
-        minHeight="100vh"
-        marginX={`${containerPadding}px`}
-        paddingTop="20px"
-        width={width}
-        maxWidth={width}
-        alignSelf="center"
+      <div
+        className="mx-[20px] flex min-h-screen flex-col self-center pt-[20px]"
+        style={{ width }}
       >
         <NavBar path="/discover" />
 
@@ -332,7 +309,7 @@ const Discover = observer(() => {
               )}
             </div>
 
-            <Divider backgroundColor="reelist.500" marginBottom="20px" marginTop="14px" />
+            <div className="bg-reelist-red mb-6 mt-3 h-[1px]" />
 
             <div className="discover-lg:grid-cols-2 grid-rows-auto mb-1 grid grid-cols-1 gap-2 max-[673px]:flex-col">
               <div className="discover-lg:row-start-1 discover-lg:col-span-2 discover-lg:col-start-1 row-start-2 flex flex-grow gap-2 max-[673px]:flex-col">
@@ -347,9 +324,11 @@ const Discover = observer(() => {
                       )
                     }
                   >
-                    <Checkbox
+                    <input
+                      type="checkbox"
                       value="includes_every"
-                      isChecked={typesSeparationType === 'includes_every'}
+                      checked={typesSeparationType === 'includes_every'}
+                      className="accent-reelist-red bg-reelist-red border-reelist-red cursor-pointer border border-solid text-lg"
                     />
 
                     <div className="ml-2 text-white">Types Must Include All Selected</div>
@@ -361,9 +340,11 @@ const Discover = observer(() => {
                     className="flex cursor-pointer justify-center"
                     onClick={toggleRegionSeparationType}
                   >
-                    <Checkbox
+                    <input
+                      type="checkbox"
                       value="includes_every"
-                      isChecked={regionSeparationType === 'includes_every'}
+                      checked={regionSeparationType === 'includes_every'}
+                      className="accent-reelist-red bg-reelist-red border-reelist-red cursor-pointer border border-solid text-lg"
                     />
 
                     <div className="ml-2 text-white">Regions Must Include All Selected</div>
@@ -375,9 +356,11 @@ const Discover = observer(() => {
                     className="flex cursor-pointer justify-center"
                     onClick={toggleGenreSeparationType}
                   >
-                    <Checkbox
+                    <input
+                      type="checkbox"
                       value="includes_every"
-                      isChecked={genreSeparationType === 'includes_every'}
+                      checked={genreSeparationType === 'includes_every'}
+                      className="accent-reelist-red bg-reelist-red border-reelist-red cursor-pointer border border-solid text-lg"
                     />
 
                     <div className="ml-2 text-white">Genres Must Include All Selected</div>
@@ -478,7 +461,7 @@ const Discover = observer(() => {
             <div className="absolute top-0 -z-10 h-[calc(100%+1px)] w-full bg-transparent" />
           </div>
         </Dialog>
-      </Flex>
+      </div>
     </div>
   )
 })
