@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
 import { Dialog, Popover } from '@mui/material'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import SearchIcon from '@mui/icons-material/Search'
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@mui/material'
@@ -21,7 +21,6 @@ import {
   Row,
   Checkbox,
   Input,
-  SearchIcon,
   Divider,
   CloseIcon,
   useBreakpointValue,
@@ -272,8 +271,12 @@ const Discover = observer(() => {
     )
   }
 
-  const exampleButtonRef = useRef()
-  const [exampleOpen, setExampleOpen] = useState(false)
+  const handleKeyDown = event => {
+    if (event.keyCode === 13) {
+      event.preventDefault()
+      setSearchText(event.target.value)
+    }
+  }
 
   return (
     <div
@@ -300,37 +303,34 @@ const Discover = observer(() => {
 
         <InfiniteScroll onRefresh={getNextPage}>
           <div className="w-full">
-            <Row>
-              <SearchIcon size="md" alignSelf="center" paddingRight="12px" />
+            <div className="flex h-[40px] w-full flex-row items-baseline">
+              <SearchIcon className="mr-4 h-full justify-center self-center text-3xl text-gray-300" />
 
               {searchText ? (
-                <PillButton
-                  label={searchText}
-                  height="35px"
-                  endIcon={REMOVE_ICON}
-                  variant="solid"
-                  onPress={() => setSearchText('')}
-                  borderWidth="0"
-                />
-              ) : (
-                // <Button
-                //   className="group border bg-red-400 text-white px-3 rounded-full mt-4 font-inter"
-                //   onClick={() => setSearchText('')}
-                // >
-                //   {searchText}
+                <Button
+                  className="font-inter bg-reelist-red group h-fit items-center rounded-full border px-3 text-xl text-black hover:text-white"
+                  onClick={() => setSearchText('')}
+                >
+                  {/* {searchText}
 
-                //   <CloseOutlinedIcon className="text-white text-[17px] pl-2 group-hover:text-red-400" />
-                // </Button>
-                <Input
+                  <CloseOutlinedIcon className="h-full pl-2 text-lg text-center align-baseline" /> */}
+
+                  <div className="flex items-center justify-center">
+                    {searchText}
+
+                    <CloseOutlinedIcon className="h-full justify-self-center pl-4 text-center align-baseline text-lg " />
+                  </div>
+                </Button>
+              ) : (
+                <input
+                  className="focus:shadow-outline w-full appearance-none border-0 bg-transparent py-2 text-xl leading-tight text-gray-300 shadow outline-none"
+                  type="text"
+                  autoComplete="off"
                   placeholder="Search"
-                  variant="unstyled"
-                  fontSize="24px"
-                  height="35px"
-                  padding="0px"
-                  onSubmitEditing={e => setSearchText(e.target.value)}
+                  onKeyDown={handleKeyDown}
                 />
               )}
-            </Row>
+            </div>
 
             <Divider backgroundColor="reelist.500" marginBottom="20px" marginTop="14px" />
 
@@ -398,7 +398,7 @@ const Discover = observer(() => {
               </div>
             </div>
 
-            <div className="flex-row flex-wrap gap-x-2 flex">
+            <div className="flex flex-row flex-wrap gap-x-2">
               {[
                 videoTypesSelectState,
                 regionSelectState,
