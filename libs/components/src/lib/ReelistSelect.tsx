@@ -1,27 +1,14 @@
 import React, { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
-import {
-  ChevronDownIcon,
-  ChevronUpIcon,
-  Column,
-  Text,
-  Center,
-  Input,
-  useDisclose,
-  MinusIcon,
-  AddIcon,
-  Row,
-  ScrollView,
-  Popover,
-  Pressable,
-  IPressableProps,
-} from 'native-base'
-import PillButton from '@reelist/components/PillButton'
-import AppButton from '@reelist/components/AppButton'
+import classNames from 'classnames'
 import _ from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { makeAutoObservable } from 'mobx'
 import { useStore } from '@reelist/utils/hooks/useStore'
 import { IStorage } from '~/utils/storage'
+import { Button, Link, Popover, TextField } from '@mui/material'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import AddIcon from '@mui/icons-material/Add'
+import RemoveIcon from '@mui/icons-material/Remove'
 
 type StringOrNumber = string | number
 
@@ -137,9 +124,9 @@ export const useSelectState = <T extends StringOrNumber>(
   return selectState
 }
 
-type ReelistSelectProps<T extends StringOrNumber> = IPressableProps & {
+type ReelistSelectProps<T extends StringOrNumber> = PropsWithChildren<{
   selectState: SelectState<T>
-}
+}>
 
 const ReelistSelect = observer(
   <T extends StringOrNumber>({
@@ -147,181 +134,141 @@ const ReelistSelect = observer(
     children,
     ...containerProps
   }: ReelistSelectProps<T>) => {
-    const { isOpen, onClose, onOpen } = useDisclose()
+    const [isOpen, setIsOpen] = useState(false)
     const [filterText, setFilterText] = useState('')
-    const { label, options, selectedOptions, toggleOption, isMulti } = selectState || {}
+    const { label, options = [], selectedOptions, toggleOption, isMulti } = selectState || {}
+    const buttonRef = useRef<HTMLButtonElement>(null)
 
     const filteredOptions = useMemo(() => {
       return _.chain(options)
         .filter(option => option.name.toLowerCase().includes(filterText.toLowerCase()))
-        .take(50)
         .value()
     }, [options, filterText])
 
     const onPopoverClose = () => {
-      onClose()
+      setIsOpen(false)
       setFilterText('')
     }
 
     const renderOption = (option: SelectOption<T>, isChecked) => {
-      const pillButtonIconStyle = { transform: [{ scale: 0.9 }], paddingLeft: '21px' }
-      const variant = isChecked ? 'solid' : 'outline'
-      let pillButtonProps
+      let singleSelect = false
+
+      let icon
+      let remove = false
+      let add = false
 
       if (!isMulti) {
-        pillButtonProps = {
-          rounded: 'sm',
-          borderWidth: 0,
-          variant,
-          width: '100%',
-          textAlign: 'left',
-        }
+        singleSelect = true
       } else if (isChecked) {
-        pillButtonProps = {
-          rightIcon: <MinusIcon style={pillButtonIconStyle} color="inherit" />,
-          variant,
-        }
+        icon = <RemoveIcon className="pl-4" />
+        remove = true
       } else {
-        pillButtonProps = {
-          rightIcon: <AddIcon style={pillButtonIconStyle} color="inherit" />,
-          variant,
-        }
+        icon = <AddIcon className="pl-4" />
+        add = true
       }
 
       return (
-        <PillButton
+        <Button
           key={option.id}
-          label={option.name}
-          onPress={() => toggleOption(option)}
-          variant={pillButtonProps.variant}
-          {...pillButtonProps}
-        />
+          className={classNames({
+            'hover:bg-reelist-red rounded-md text-white hover:text-black': singleSelect,
+            'bg-reelist-red rounded-l-full rounded-r-full text-black hover:text-white': remove,
+            'border-reelist-red hover:text-reelist-red rounded-l-full rounded-r-full border border-solid bg-black bg-opacity-30 text-white':
+              add,
+          })}
+          onClick={() => toggleOption(option)}
+        >
+          {option.name}
+
+          {icon}
+        </Button>
       )
     }
 
     return (
-      <Popover
-        isOpen={isOpen}
-        onOpen={onOpen}
-        onClose={onPopoverClose}
-        placement="bottom left"
-        trigger={triggerProps => {
-          const paddingLeft = selectState.isMulti ? '21px' : '0'
+      <>
+        {selectState.isMulti ? (
+          <Button
+            className="font-inter bg-reelist-red group flex w-fit justify-start self-center rounded-l-full rounded-r-full pl-4 pr-2 text-left align-baseline text-lg text-black hover:text-white"
+            onClick={() => setIsOpen(true)}
+            aria-describedby={label}
+            ref={buttonRef}
+            disableRipple
+          >
+            {label}
 
-          return (
-            <Pressable {...triggerProps} {...containerProps} rounded="full">
-              <AppButton
-                {...triggerProps}
-                isLoading={!label}
-                variant={selectState.isMulti ? 'solid' : 'link'}
-                endIcon={() =>
-                  isOpen ? (
-                    <ChevronUpIcon color="inherit" paddingLeft={paddingLeft} />
-                  ) : (
-                    <ChevronDownIcon color="inherit" paddingLeft={paddingLeft} />
-                  )
-                }
-                height="40px"
-              >
-                {selectState.isMulti ? label : _.values(selectedOptions)[0]}
-              </AppButton>
-            </Pressable>
-          )
-        }}
-      >
-        <Popover.Content marginX="10px">
-          <Popover.Arrow background="#1D1D1D" />
-
-          {isOpen && (
-            <Popover.Body
-              maxHeight="0.7 * 100vh"
-              maxWidth="0.7 * 100vw"
-              width={isMulti ? '600px' : 'auto'}
-              height={isMulti ? '350px' : 'auto'}
-              backgroundColor="#1D1D1D"
+            <ExpandMoreIcon className=" h-full pl-4 text-center align-baseline text-2xl" />
+          </Button>
+        ) : (
+          <div className="group flex flex-col justify-end">
+            <Button
+              className="font-inter w-fit text-right text-lg text-white hover:bg-transparent "
+              onClick={() => setIsOpen(true)}
+              aria-describedby={label}
+              ref={buttonRef}
+              disableRipple
             >
-              <ScrollView
-                contentContainerStyle={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  flexDirection: isMulti && 'row',
-                  gap: 10,
-                  paddingX: isMulti ? undefined : '0px',
-                }}
-                removeClippedSubviews
-                width={isMulti ? '100%' : 'auto'}
-                height={isMulti ? '100%' : 'auto'}
-                style={{
-                  overscrollBehavior: 'none',
-                }}
-              >
-                {selectState.isMulti && (
-                  <Row width="100%">
-                    <Column flex={1} alignItems="center" backgroundColor="gray:200">
-                      <Row paddingY="5px" width="100%">
-                        <Input
-                          placeholder="Filter"
-                          flex={1}
-                          onChangeText={setFilterText}
-                          colorScheme="reelist"
-                          variant="underlined"
-                          placeholderTextColor="light.200"
-                          size="md"
-                        />
-                      </Row>
+              <div className="flex items-center  justify-center border-0 border-b border-solid border-transparent group-hover:border-white ">
+                {_.values(selectedOptions)[0]}
 
-                      <Row width="100%" justifyContent="center" marginY="5px">
-                        {children}
-                      </Row>
-                    </Column>
-                  </Row>
-                )}
+                <ExpandMoreIcon className=" h-full justify-self-center pl-4 text-center align-baseline text-2xl " />
+              </div>
+            </Button>
+          </div>
+        )}
 
-                {filteredOptions.map(option => {
-                  const isChecked = selectedOptions[0] === option.id || !!selectedOptions[option.id]
-                  return renderOption(option, isChecked)
-                })}
+        <Popover
+          id={label}
+          open={isOpen}
+          anchorEl={buttonRef.current}
+          onClose={onPopoverClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          PaperProps={{
+            className: 'bg-transparent ',
+          }}
+        >
+          <div
+            className={classNames(
+              'no-scrollbar relative mt-3 flex h-[500px] w-[600px] flex-col overflow-y-scroll overscroll-none bg-black bg-opacity-30 p-3 text-green-300 backdrop-blur-md',
+              {
+                'mt-0 h-fit w-fit flex-row rounded-md': !selectState.isMulti,
+              },
+            )}
+          >
+            {selectState.isMulti && (
+              <div className="mx-3">
+                <input
+                  className="focus:shadow-outline border-reelist-red mb-4 w-full appearance-none border-0 border-b bg-transparent py-2 text-lg leading-tight text-gray-300 shadow outline-none"
+                  type="text"
+                  autoComplete="off"
+                  placeholder="Filter"
+                  onChange={e => setFilterText(e.target.value)}
+                />
+              </div>
+            )}
 
-                {options.length > 100 && !filterText && (
-                  <Row width="480px">
-                    <Text color="gray.500">
-                      Not seeing what you're looking for? Try searching to show hidden options
-                    </Text>
-                  </Row>
-                )}
-              </ScrollView>
-            </Popover.Body>
-          )}
-        </Popover.Content>
-      </Popover>
+            <div className="w-full">{children}</div>
+
+            <div
+              className={classNames('my-3 flex w-full flex-1 flex-wrap gap-3', {
+                'flex-col rounded-md': !selectState.isMulti,
+              })}
+            >
+              {filteredOptions.map(option => {
+                const isChecked = selectedOptions[0] === option.id || !!selectedOptions[option.id]
+                return renderOption(option, isChecked)
+              })}
+            </div>
+
+            <div className="absolute top-0 -z-10 h-[calc(100%+1px)] w-full bg-transparent" />
+          </div>
+        </Popover>
+      </>
     )
   },
 )
 
 export default ReelistSelect
-
-const RenderSelectOption = observer(
-  <T extends StringOrNumber>({
-    option,
-    toggleOption,
-  }: {
-    option: SelectOption<T>
-    toggleOption: (nextOption: typeof option) => void
-  }) => {
-    const pillButtonProps = option.selected
-      ? { RightIcon: MinusIcon, darknessLevel: 20 }
-      : { RightIcon: AddIcon, darknessLevel: 100 }
-
-    return (
-      <PillButton
-        key={option.id}
-        label={option.name}
-        rightIcon={<pillButtonProps.RightIcon style={{ transform: [{ scale: 0.9 }] }} />}
-        onPress={() => toggleOption(option)}
-        marginRight="5px"
-        marginBottom="5px"
-        darknessLevel={pillButtonProps.darknessLevel}
-      />
-    )
-  },
-)

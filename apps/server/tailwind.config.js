@@ -1,11 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    './apps/server/pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './apps/server/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './apps/server/app/**/*.{js,ts,jsx,tsx,mdx}',
-    './apps/server/src/**/*.{js,ts,jsx,tsx,mdx}',
-  ],
+  content: ['./libs/**/*.{js,ts,jsx,tsx,mdx}', './apps/server/**/*.{js,ts,jsx,tsx,mdx}'],
   corePlugins: {
     preflight: false,
   },
@@ -20,6 +15,13 @@ module.exports = {
         'text-red-400': 'rgb(254, 83, 101)',
         'reelist-red': '#FE5365',
       },
+    },
+    screens: {
+      'discover-md': '673px',
+      // => @media (min-width: 673px) { ... }
+
+      'discover-lg': '1000px',
+      // => @media (min-width: 1000px) { ... }
     },
   },
   plugins: [],

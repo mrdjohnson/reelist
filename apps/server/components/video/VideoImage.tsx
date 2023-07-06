@@ -39,7 +39,7 @@ const VideoImage = observer(
           className={
             isPoster
               ? 'object-contain h-[609px] w-[406px]'
-              : 'h-[270px] w-[307px] -mt-4 group-hover:mt-0 transition-[margin-top] ease-in-out duration-300'
+              : 'h-[270px] w-[307px] -mt-4 group-hover:mt-0 transition-[margin-top] ease-in-out duration-300 object-cover'
           }
         />
 

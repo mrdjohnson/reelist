@@ -3,7 +3,8 @@
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
-import { Dialog } from '@mui/material'
+import { Dialog, Popover } from '@mui/material'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@mui/material'
@@ -271,6 +272,9 @@ const Discover = observer(() => {
     )
   }
 
+  const exampleButtonRef = useRef()
+  const [exampleOpen, setExampleOpen] = useState(false)
+
   return (
     <div
       suppressHydrationWarning
@@ -330,11 +334,11 @@ const Discover = observer(() => {
 
             <Divider backgroundColor="reelist.500" marginBottom="20px" marginTop="14px" />
 
-            <div className="grid max-[673px]:flex-col gap-2 max-[1000px]:grid-rows-1 mb-1">
-              <div className="flex row-start-1 max-[1000px]:row-start-2 max-[673px]:flex-col gap-2">
+            <div className="discover-lg:grid-cols-2 grid-rows-auto mb-1 grid grid-cols-1 gap-2 max-[673px]:flex-col">
+              <div className="discover-lg:row-start-1 discover-lg:col-span-2 discover-lg:col-start-1 row-start-2 flex flex-grow gap-2 max-[673px]:flex-col">
                 <ReelistSelect selectState={videoTypesSelectState}>
                   <div
-                    className="flex justify-center cursor-pointer"
+                    className="flex cursor-pointer justify-center"
                     onClick={() =>
                       setTypesSeparationType(
                         typesSeparationType === 'includes_every'
@@ -348,13 +352,13 @@ const Discover = observer(() => {
                       isChecked={typesSeparationType === 'includes_every'}
                     />
 
-                    <div className="text-white ml-2">Types Must Include All Selected</div>
+                    <div className="ml-2 text-white">Types Must Include All Selected</div>
                   </div>
                 </ReelistSelect>
 
                 <ReelistSelect selectState={regionSelectState}>
                   <div
-                    className="flex justify-center cursor-pointer"
+                    className="flex cursor-pointer justify-center"
                     onClick={toggleRegionSeparationType}
                   >
                     <Checkbox
@@ -362,13 +366,13 @@ const Discover = observer(() => {
                       isChecked={regionSeparationType === 'includes_every'}
                     />
 
-                    <div className="text-white ml-2">Regions Must Include All Selected</div>
+                    <div className="ml-2 text-white">Regions Must Include All Selected</div>
                   </div>
                 </ReelistSelect>
 
                 <ReelistSelect selectState={genreSelectState}>
                   <div
-                    className="flex justify-center cursor-pointer"
+                    className="flex cursor-pointer justify-center"
                     onClick={toggleGenreSeparationType}
                   >
                     <Checkbox
@@ -376,14 +380,14 @@ const Discover = observer(() => {
                       isChecked={genreSeparationType === 'includes_every'}
                     />
 
-                    <div className="text-white ml-2">Genres Must Include All Selected</div>
+                    <div className="ml-2 text-white">Genres Must Include All Selected</div>
                   </div>
                 </ReelistSelect>
 
                 <ReelistSelect selectState={watchProviderSelectState} />
               </div>
 
-              <div className="max-[673px]:flex row-start-1 justify-center">
+              <div className="discover-md:justify-self-end discover-lg:col-start-2 row-start-1 justify-self-center">
                 <ReelistSelect
                   selectState={sortTypesSelectState}
                   alignSelf="flex-end"
@@ -394,7 +398,7 @@ const Discover = observer(() => {
               </div>
             </div>
 
-            <div className="hidden flex-row min-[673px]:flex gap-x-2 flex-wrap">
+            <div className="flex-row flex-wrap gap-x-2 flex">
               {[
                 videoTypesSelectState,
                 regionSelectState,
@@ -403,20 +407,21 @@ const Discover = observer(() => {
               ].flatMap(selectState =>
                 _.map(selectState.selectedOptions, (name, id) => (
                   <Button
-                    className="group border border-solid border-red-400 text-white px-3 rounded-full mt-4 font-inter hover:border-red-600"
+                    className="font-inter mt-4 rounded-full border border-solid border-red-400 px-3 text-white hover:border-red-600 hover:text-red-600"
                     onClick={() => selectState.removeOption(id)}
                     key={id}
+                    disableRipple
                   >
                     {name}
 
-                    <CloseOutlinedIcon className="text-white text-[17px] pl-2 group-hover:text-red-600 transition-colors ease-in-out duration-300" />
+                    <CloseOutlinedIcon className=" pl-2 text-[17px]" />
                   </Button>
                 )),
               )}
             </div>
           </div>
 
-          <div className="flex flex-wrap flex-row my-4 gap-x-5 w-full">
+          <div className="my-4 flex w-full flex-row flex-wrap gap-x-5">
             {videos.map(video => (
               <VideoImage
                 video={video}
@@ -453,7 +458,7 @@ const Discover = observer(() => {
           }}
           transitionDuration={{ exit: 50 }}
         >
-          <div className="absolute top-4 lg:top-2 right-3">
+          <div className="absolute right-3 top-4 lg:top-2">
             <CloseOutlinedIcon
               className="cursor-pointer"
               sx={{ color: 'rgb(254, 83, 101)', fontSize: '35px' }}
@@ -461,7 +466,7 @@ const Discover = observer(() => {
             />
           </div>
 
-          <div className="relative overflow-scroll overscroll-none no-scrollbar">
+          <div className="no-scrollbar relative overflow-scroll overscroll-none">
             {selectedVideo && (
               <VideoModal
                 video={selectedVideo}
@@ -470,7 +475,7 @@ const Discover = observer(() => {
             )}
 
             {/* todo: this overflow container stops the background content from scrolling but leaves a strange 1px scrolling effect */}
-            <div className="absolute top-0 w-full h-[calc(100%+1px)] bg-transparent -z-10" />
+            <div className="absolute top-0 -z-10 h-[calc(100%+1px)] w-full bg-transparent" />
           </div>
         </Dialog>
       </Flex>
