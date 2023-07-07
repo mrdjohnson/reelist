@@ -362,13 +362,7 @@ const Discover = observer(() => {
               </div>
 
               <div className="discover-md:justify-self-end discover-lg:col-start-2 row-start-1 justify-self-center">
-                <ReelistSelect
-                  selectState={sortTypesSelectState}
-                  alignSelf="flex-end"
-                  alignItems="end"
-                  justifyContent="end"
-                  flex={1}
-                />
+                <ReelistSelect selectState={sortTypesSelectState} />
               </div>
             </div>
 
