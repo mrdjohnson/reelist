@@ -2,7 +2,6 @@
 
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import classNames from 'classnames'
 
 import { Dialog } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
@@ -262,20 +261,12 @@ const Discover = observer(() => {
   return (
     <div
       suppressHydrationWarning
+      className="m-h-screen flex h-fit w-screen justify-center"
       style={{
-        minHeight: '100vh',
-        height: 'fit-content',
-        width: '100vw',
         background: 'radial-gradient(50% 50% at 50% 50%, #1A200F 0%, #131313 100%)',
-        display: 'flex',
-        justifyContent: 'center',
-        // overflowY: 'scroll',
       }}
     >
-      <div
-        className="mx-[20px] flex min-h-screen flex-col self-center pt-[20px]"
-        style={{ width }}
-      >
+      <div className="mx-[20px] flex min-h-screen flex-col self-center pt-[20px]" style={{ width }}>
         <NavBar path="/discover" />
 
         <InfiniteScroll onRefresh={getNextPage}>
