@@ -17,7 +17,7 @@ const VideoModal = observer(
         .uniqBy('providerId')
         .value()
 
-    const providers = useMemo(() => {
+    const providers: Array<Provider & {type: string}> = useMemo(() => {
       const buyProviders = getProvidersByType('buy').map(provider => ({ ...provider, type: 'Buy' }))
       const flatrateProviders = getProvidersByType('flatrate').map(provider => ({
         ...provider,
@@ -93,7 +93,7 @@ const VideoModal = observer(
                   style={{ scrollbarWidth: 'none' }}
                 >
                   {providers.map(provider => (
-                    <div className="flex flex-col justify-center text-center" key={provider.id}>
+                    <div className="flex flex-col justify-center text-center" key={provider.providerId}>
                       <img
                         src={IMAGE_PATH + provider.logoPath}
                         className="rounded-md object-contain mb-3"
