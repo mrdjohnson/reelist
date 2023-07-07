@@ -2,7 +2,7 @@ import '../styles.css'
 
 import '~/setupServerEnv'
 
-import { StoreProvider } from '@reelist/utils/store'
+// import { StoreProvider } from '@reelist/utils/store'
 import { StyledEngineProvider, ThemeProvider } from '@mui/material'
 import muiTheme from '~/mui-theme'
 
@@ -11,9 +11,9 @@ function MyApp({ Component, pageProps }) {
   return (
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={muiTheme}>
-        <StoreProvider>
+        {/* <StoreProvider> */}
           <Component {...pageProps} />
-        </StoreProvider>
+        {/* </StoreProvider> */}
       </ThemeProvider>
     </StyledEngineProvider>
   )
