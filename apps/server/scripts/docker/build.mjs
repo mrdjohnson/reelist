@@ -1,16 +1,35 @@
-import util from 'node:util'
-import { exec as childExec } from 'node:child_process'
+import { spawn} from 'node:child_process'
 
-const exec = util.promisify(childExec)
+const printSpawnOutput = (commandString) => {
+  const [command, ...options] = commandString.split(' ')
+  const commandSpawn = spawn(command, options)
+
+  console.log('------- Starting : ', commandString)
+
+  return new Promise(resolve => {
+    commandSpawn.stdout.on('data', data => {
+      console.log(data.toString())
+    })
+
+    commandSpawn.stderr.on('data', error =>{
+      console.error(error.toString())
+    })
+
+    commandSpawn.on('error', error => {
+      console.error(error.toString())
+    })
+
+    commandSpawn.on('close', code => {
+      console.log(`------- finished with code:${code} \n\n`)
+      resolve()
+    })
+  })
+}
 
 const build = async () => {
-  console.log('building')
-  await exec('docker build -t reelist-server .')
+  await printSpawnOutput('docker build -t reelist-server .')
 
-  console.log('saving')
-  await exec('docker save reelist-server > reelist-server.tar')
-
-  console.log('finished building and saving')
+  await printSpawnOutput('docker save reelist-server > reelist-server.tar')
 }
 
 export default build
