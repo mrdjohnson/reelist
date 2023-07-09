@@ -1,5 +1,4 @@
 import { spawn } from 'node:child_process'
-import build from './build.mjs'
 
 const printSpawnOutput = commandString => {
   const [command, ...options] = commandString.split(' ')
@@ -27,14 +26,12 @@ const printSpawnOutput = commandString => {
   })
 }
 
-const run = async () => {
-  await build()
-  
+const run = async () => {  
   await printSpawnOutput('docker load --input reelist-server.tar')
 
   await printSpawnOutput('docker rm -f reelist-server')
 
-  await printSpawnOutput('docker run -d -p 3000:3000 --name reelist-server reelist-server')
+  await printSpawnOutput('docker run --restart=always -d -p 3000:3000 --name reelist-server reelist-server')
 
   await printSpawnOutput('docker ps')
 }
