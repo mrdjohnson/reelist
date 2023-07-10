@@ -2,6 +2,7 @@
 
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
+import classNames from 'classnames'
 
 import { Dialog } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
@@ -15,7 +16,7 @@ import useVideoDiscover from '@reelist/utils/hooks/useVideoDiscover'
 import useVideoSearch from '@reelist/utils/hooks/useVideoSearch'
 import { callTmdb } from '@reelist/apis/api'
 import Video from '@reelist/models/Video'
-import ReelistSelect, { useSelectState } from '@reelist/components/ReelistSelect'
+import ReelistSelect, { useSelectState } from '~/components/ReelistSelect'
 
 import NavBar from '~/components/NavBar'
 import InfiniteScroll from './InfiniteScroll'
@@ -304,7 +305,7 @@ const Discover = observer(() => {
 
             <div className="discover-lg:grid-cols-2 grid-rows-auto mb-1 grid grid-cols-1 gap-2 max-[673px]:flex-col">
               <div className="discover-lg:row-start-1 discover-lg:col-span-2 discover-lg:col-start-1 row-start-2 flex flex-grow gap-2 max-[673px]:flex-col">
-                <ReelistSelect selectState={videoTypesSelectState}>
+                <ReelistSelect selectState={videoTypesSelectState} disabled={searchText}>
                   <div
                     className="flex cursor-pointer justify-center"
                     onClick={() =>
@@ -326,7 +327,7 @@ const Discover = observer(() => {
                   </div>
                 </ReelistSelect>
 
-                <ReelistSelect selectState={regionSelectState}>
+                <ReelistSelect selectState={regionSelectState} disabled={searchText}>
                   <div
                     className="flex cursor-pointer justify-center"
                     onClick={toggleRegionSeparationType}
@@ -342,7 +343,7 @@ const Discover = observer(() => {
                   </div>
                 </ReelistSelect>
 
-                <ReelistSelect selectState={genreSelectState}>
+                <ReelistSelect selectState={genreSelectState} disabled={searchText}>
                   <div
                     className="flex cursor-pointer justify-center"
                     onClick={toggleGenreSeparationType}
@@ -358,11 +359,11 @@ const Discover = observer(() => {
                   </div>
                 </ReelistSelect>
 
-                <ReelistSelect selectState={watchProviderSelectState} />
+                <ReelistSelect selectState={watchProviderSelectState} disabled={searchText} />
               </div>
 
               <div className="discover-md:justify-self-end discover-lg:col-start-2 row-start-1 justify-self-center">
-                <ReelistSelect selectState={sortTypesSelectState} />
+                <ReelistSelect selectState={sortTypesSelectState} disabled={searchText} />
               </div>
             </div>
 
@@ -375,7 +376,13 @@ const Discover = observer(() => {
               ].flatMap(selectState =>
                 _.map(selectState.selectedOptions, (name, id) => (
                   <Button
-                    className="font-inter mt-4 rounded-full border border-solid border-red-400 px-3 text-white hover:border-red-600 hover:text-red-600"
+                    className={classNames(
+                      'font-inter mt-4 rounded-full border border-solid px-3  hover:border-red-600 hover:text-red-600',
+                      {
+                        'border-red-400 text-white': !searchText,
+                        'pointer-events-none border-gray-500 text-gray-500 opacity-40': searchText,
+                      },
+                    )}
                     onClick={() => selectState.removeOption(id)}
                     key={id}
                     disableRipple

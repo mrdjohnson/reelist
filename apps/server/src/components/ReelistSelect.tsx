@@ -126,14 +126,11 @@ export const useSelectState = <T extends StringOrNumber>(
 
 type ReelistSelectProps<T extends StringOrNumber> = PropsWithChildren<{
   selectState: SelectState<T>
+  disabled: boolean
 }>
 
 const ReelistSelect = observer(
-  <T extends StringOrNumber>({
-    selectState,
-    children,
-    ...containerProps
-  }: ReelistSelectProps<T>) => {
+  <T extends StringOrNumber>({ selectState, children, disabled }: ReelistSelectProps<T>) => {
     const [isOpen, setIsOpen] = useState(false)
     const [filterText, setFilterText] = useState('')
     const { label, options = [], selectedOptions, toggleOption, isMulti } = selectState || {}
@@ -189,20 +186,29 @@ const ReelistSelect = observer(
       <>
         {selectState.isMulti ? (
           <Button
-            className="font-inter bg-reelist-red group flex w-fit justify-start self-center rounded-l-full rounded-r-full pl-4 pr-2 text-left align-baseline text-lg text-black hover:text-white"
+            className={classNames(
+              'bg-reelist-red font-inter group flex w-fit justify-start self-center rounded-l-full rounded-r-full pl-4 pr-2 text-left align-baseline text-lg text-black hover:text-white',
+              {
+                'pointer-events-none bg-gray-500 opacity-40': disabled,
+              },
+            )}
             onClick={() => setIsOpen(true)}
             aria-describedby={label}
             ref={buttonRef}
-            disableRipple
           >
             {label}
 
             <ExpandMoreIcon className=" h-full pl-4 text-center align-baseline text-2xl" />
           </Button>
         ) : (
-          <div className="group flex flex-col justify-end">
+          <div className="flex flex-col justify-end">
             <Button
-              className="font-inter w-fit text-right text-lg text-white hover:bg-transparent "
+              className={classNames(
+                'font-inter group w-fit text-right text-lg text-white hover:bg-transparent ',
+                {
+                  'pointer-events-none border-gray-500 text-gray-500 opacity-40': disabled,
+                },
+              )}
               onClick={() => setIsOpen(true)}
               aria-describedby={label}
               ref={buttonRef}
@@ -232,8 +238,9 @@ const ReelistSelect = observer(
         >
           <div
             className={classNames(
-              'no-scrollbar relative mt-3 flex h-[500px] w-[600px] flex-col overflow-y-scroll overscroll-none bg-black bg-opacity-30 p-3 text-green-300 backdrop-blur-md',
+              'no-scrollbar relative mt-3 flex overflow-y-scroll overscroll-none bg-black bg-opacity-30 p-3 text-green-300 backdrop-blur-md',
               {
+                'h-[500px] w-[600px] flex-col ': selectState.isMulti,
                 'mt-0 h-fit w-fit flex-row rounded-md': !selectState.isMulti,
               },
             )}
@@ -250,7 +257,7 @@ const ReelistSelect = observer(
               </div>
             )}
 
-            <div className="w-full">{children}</div>
+            {children && <div className="w-full">{children}</div>}
 
             <div
               className={classNames('my-3 flex w-full flex-wrap gap-3', {
