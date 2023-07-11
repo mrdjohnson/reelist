@@ -17,7 +17,7 @@ const VideoModal = observer(
         .uniqBy('providerId')
         .value()
 
-    const providers: Array<Provider & {type: string}> = useMemo(() => {
+    const providers: Array<Provider & { type: string }> = useMemo(() => {
       const buyProviders = getProvidersByType('buy').map(provider => ({ ...provider, type: 'Buy' }))
       const flatrateProviders = getProvidersByType('flatrate').map(provider => ({
         ...provider,
@@ -28,12 +28,16 @@ const VideoModal = observer(
         type: 'Rent',
       }))
 
-      return _.sortBy([...flatrateProviders, ...rentProviders, ...buyProviders], 'providerName', 'displayPriority')
+      return _.sortBy(
+        [...flatrateProviders, ...rentProviders, ...buyProviders],
+        'providerName',
+        'displayPriority',
+      )
     }, [video.providers])
 
     return (
-      <div className="flex flex-col flex-wrap justify-center text-white discover-lg:flex-row discover-lg:flex-nowrap max-w-7xl">
-        <div className="flex justify-center discover-lg:mr-12 rounded-lg w-full flex-1">
+      <div className="discover-lg:flex-row discover-lg:flex-nowrap flex max-w-7xl flex-col flex-wrap justify-center text-white">
+        <div className="discover-lg:mr-12 flex w-full flex-1 justify-center rounded-lg">
           <VideoImage
             video={video}
             containerProps={{ alignSelf: 'center' }}
@@ -42,8 +46,8 @@ const VideoModal = observer(
           />
         </div>
 
-        <div className="flex flex-col w-full overflow-clip">
-          <p className="text-5xl text-center mt-4 mb-1 discover-lg:text-left discover-lg:mt-0 ldiscover-g:mb-2">
+        <div className="flex w-full flex-col overflow-clip">
+          <p className="discover-lg:text-left discover-lg:mt-0 ldiscover-g:mb-2 mt-4 mb-1 text-center text-5xl">
             {video.videoName}
           </p>
 
@@ -55,26 +59,31 @@ const VideoModal = observer(
 
           <div className="whitespace-normal break-words">{video.overview}</div>
 
-          <div className="flex flex-1 items-end pt-4 w-full ">
-            <div className="flex-col w-full">
-              <div className="w-full relative overscroll-x-none no-scrollbar overflow-x-auto">
-                <div className="text-2xl pb-3 sticky w-full left-0 z-20">Cast</div>
+          <div className="flex w-full flex-1 items-end pt-4 ">
+            <div className="w-full flex-col">
+              <div className="no-scrollbar relative w-full overflow-x-auto overscroll-x-none">
+                <div className="sticky left-0 z-20 w-full pb-3 text-2xl">Cast</div>
 
-                <div className="flex gap-x-5  pb-4 relative">
+                <div className="relative flex  w-[100px] gap-x-5 pb-4">
                   {video.cast.map(
                     castMember =>
                       castMember.profilePath && (
-                        <div className="flex flex-col justify-center text-center" key={castMember.id}>
+                        <div
+                          className="flex flex-col justify-center text-center"
+                          key={castMember.id}
+                        >
                           <img
                             src={IMAGE_PATH + castMember.profilePath}
-                            className="rounded-md object-cover mb-3"
+                            className="mb-3 rounded-md object-cover"
                             alt={castMember.name}
                             width="100px"
                             height="100px"
                           />
 
-                          <span className="text-base line-clamp-1">{castMember.character}</span>
-                          <span className="text-sm opacity-75 line-clamp-2  h-[2.50rem]">
+                          <span className="line-clamp-2 h-[3rem] text-base">
+                            {castMember.character}
+                          </span>
+                          <span className="line-clamp-2 h-[2.50rem] text-sm  opacity-75">
                             {castMember.name}
                           </span>
                         </div>
@@ -84,19 +93,22 @@ const VideoModal = observer(
               </div>
 
               <div className="w-full">
-                <div className="text-2xl pb-3">
+                <div className="pb-3 text-2xl">
                   {providers.length === 0 ? 'Not available in provided regions' : 'Available on'}
                 </div>
 
                 <div
-                  className="flex gap-x-5 discover-lg:gap-x-8 overscroll-x-none no-scrollbar overflow-x-auto pb-2"
+                  className="discover-lg:gap-x-8 no-scrollbar flex gap-x-5 overflow-x-auto overscroll-x-none pb-2"
                   style={{ scrollbarWidth: 'none' }}
                 >
                   {providers.map(provider => (
-                    <div className="flex flex-col justify-center text-center" key={provider.providerId}>
+                    <div
+                      className="flex flex-col justify-center text-center"
+                      key={provider.providerId}
+                    >
                       <img
                         src={IMAGE_PATH + provider.logoPath}
-                        className="rounded-md object-contain mb-3"
+                        className="mb-3 rounded-md object-contain"
                         alt={provider.providerName}
                         width="50px"
                         height="50px"
