@@ -21,6 +21,11 @@ module.exports = {
         'text-red-400': 'rgb(254, 83, 101)',
         'reelist-red': '#FE5365',
       },
+      spacing: {
+        '500': '500px',
+        '600': '600px',
+        'full-1': 'calc(100%+1px)',
+      }
     },
     screens: {
       'discover-md': '673px',

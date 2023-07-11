@@ -1,5 +1,4 @@
 import { observer } from 'mobx-react-lite'
-import classNames from 'classnames'
 
 import React from 'react'
 import _ from 'lodash'
@@ -22,14 +21,11 @@ const VideoImage = observer(
 
     return (
       <div
-        className={classNames(
-          'group rounded-md overflow-hidden relative justify-center flex my-4 hover:my-0',
-          'transition-all ease-in-out duration-300',
-          isPoster ? 'my-0' : 'my-4 h-[207px] hover:h-[237px]',
-          {
-            'cursor-pointer': onPress,
-          },
-        )}
+        className={
+          'group relative my-4 flex justify-center overflow-hidden rounded-md transition-all duration-300 ease-in-out ' +
+          (isPoster ? 'my-0 ' : 'my-4 h-[207px] hover:my-0 hover:h-[237px] ') +
+          (onPress && 'cursor-pointer')
+        }
         onClick={onPress}
       >
         <img
@@ -38,24 +34,24 @@ const VideoImage = observer(
           height="100%"
           className={
             isPoster
-              ? 'object-contain h-[609px] w-[406px]'
-              : 'h-[270px] w-[307px] -mt-4 group-hover:mt-0 transition-[margin-top] ease-in-out duration-300 object-cover'
+              ? 'h-[609px] w-[406px] object-contain'
+              : '-mt-4 h-[270px] w-[307px] object-cover transition-[margin-top] duration-300 ease-in-out group-hover:mt-0'
           }
         />
 
         {!isPoster && (
           <div
-            className="absolute bottom-0 w-full pt-3 pb-1 min-h-[70px] flex justify-end flex-col group-hover:min-h-[40px] transition-min-height ease-in-out duration-300"
+            className="transition-min-height absolute bottom-0 flex min-h-[70px] w-full flex-col justify-end pt-3 pb-1 duration-300 ease-in-out group-hover:min-h-[40px]"
             style={{
               background:
                 'linear-gradient(180deg, rgba(0, 0, 0, 0.54) 0%, rgba(0, 0, 0, 0) 0.01%, rgba(0, 0, 0, 0.54) 33.85%)',
             }}
           >
-            <div className="px-2 line-clamp-2 text-white text-2xl font-inter group-hover:mt-3  transition-margin-top ease-in-out duration-300">
+            <div className="line-clamp-2 font-inter transition-margin-top px-2 text-2xl text-white  duration-300 ease-in-out group-hover:mt-3">
               {video.videoName}
             </div>
 
-            <div className="px-2 line-clamp-2 text-white text-lg font-inter max-h-8 group-hover:max-h-0 overflow-hidden transition-max-height ease-in-out duration-300">
+            <div className="line-clamp-2 font-inter transition-max-height max-h-8 overflow-hidden px-2 text-lg text-white duration-300 ease-in-out group-hover:max-h-0">
               {video.durationOrSeasons}
             </div>
           </div>
