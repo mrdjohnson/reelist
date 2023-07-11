@@ -2,7 +2,6 @@
 
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import classNames from 'classnames'
 
 import { Dialog } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
@@ -376,13 +375,12 @@ const Discover = observer(() => {
               ].flatMap(selectState =>
                 _.map(selectState.selectedOptions, (name, id) => (
                   <Button
-                    className={classNames(
-                      'font-inter mt-4 rounded-full border border-solid px-3  hover:border-red-600 hover:text-red-600',
-                      {
-                        'border-red-400 text-white': !searchText,
-                        'pointer-events-none border-gray-500 text-gray-500 opacity-40': searchText,
-                      },
-                    )}
+                    className={
+                      'font-inter mt-4 rounded-full border border-solid px-3  hover:border-red-600 hover:text-red-600' +
+                      (searchText
+                        ? ' pointer-events-none border-gray-500 text-gray-500 opacity-40'
+                        : ' border-red-400 text-white')
+                    }
                     onClick={() => selectState.removeOption(id)}
                     key={id}
                     disableRipple

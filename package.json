@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "prep": "nx run server:prep-dev",
-    "server:start": "nx serve server --configuration=development",
+    "server:start": "nx serve server",
     "mobile:start": "nx run mobile:start"
   },
   "private": true,

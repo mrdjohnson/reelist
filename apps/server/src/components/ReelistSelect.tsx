@@ -1,5 +1,4 @@
 import React, { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
-import classNames from 'classnames'
 import _ from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { makeAutoObservable } from 'mobx'
@@ -167,12 +166,13 @@ const ReelistSelect = observer(
       return (
         <Button
           key={option.id}
-          className={classNames({
-            'hover:bg-reelist-red rounded-md text-white hover:text-black': singleSelect,
-            'bg-reelist-red rounded-l-full rounded-r-full text-black hover:text-white': remove,
-            'border-reelist-red hover:text-reelist-red rounded-l-full rounded-r-full border border-solid bg-black bg-opacity-30 text-white':
-              add,
-          })}
+          className={
+            (singleSelect && 'hover:bg-reelist-red rounded-md text-white hover:text-black') ||
+            (remove &&
+              'bg-reelist-red rounded-l-full rounded-r-full text-black hover:text-white') ||
+            (add &&
+              'border-reelist-red hover:text-reelist-red rounded-l-full rounded-r-full border border-solid bg-black bg-opacity-30 text-white')
+          }
           onClick={() => toggleOption(option)}
         >
           {option.name}
@@ -186,12 +186,10 @@ const ReelistSelect = observer(
       <>
         {selectState.isMulti ? (
           <Button
-            className={classNames(
-              'bg-reelist-red font-inter group flex w-fit justify-start self-center rounded-l-full rounded-r-full pl-4 pr-2 text-left align-baseline text-lg text-black hover:text-white',
-              {
-                'pointer-events-none bg-gray-500 opacity-40': disabled,
-              },
-            )}
+            className={
+              'font-inter group flex w-fit justify-start self-center rounded-l-full rounded-r-full pl-4 pr-2 text-left align-baseline text-lg text-black hover:text-white' +
+              (disabled ? ' pointer-events-none bg-gray-500 opacity-40' : ' bg-reelist-red ')
+            }
             onClick={() => setIsOpen(true)}
             aria-describedby={label}
             ref={buttonRef}
@@ -203,12 +201,10 @@ const ReelistSelect = observer(
         ) : (
           <div className="flex flex-col justify-end">
             <Button
-              className={classNames(
-                'font-inter group w-fit text-right text-lg text-white hover:bg-transparent ',
-                {
-                  'pointer-events-none border-gray-500 text-gray-500 opacity-40': disabled,
-                },
-              )}
+              className={
+                'font-inter group w-fit text-right text-lg  hover:bg-transparent ' +
+                (disabled ? ' pointer-events-none text-gray-500 opacity-40': ' text-white')
+              }
               onClick={() => setIsOpen(true)}
               aria-describedby={label}
               ref={buttonRef}
@@ -237,13 +233,12 @@ const ReelistSelect = observer(
           }}
         >
           <div
-            className={classNames(
-              'no-scrollbar relative mt-3 flex overflow-y-scroll overscroll-none bg-black bg-opacity-30 p-3 text-green-300 backdrop-blur-md',
-              {
-                'h-[500px] w-[600px] flex-col ': selectState.isMulti,
-                'mt-0 h-fit w-fit flex-row rounded-md': !selectState.isMulti,
-              },
-            )}
+            className={
+              'no-scrollbar relative mt-3 flex overflow-y-scroll overscroll-none bg-black bg-opacity-30 p-3 text-green-300 backdrop-blur-md ' +
+              (selectState.isMulti
+                ? 'h-500 w-600 flex-col '
+                : 'mt-0 h-fit w-fit flex-row rounded-md')
+            }
           >
             {selectState.isMulti && (
               <div className="mx-3">
@@ -260,9 +255,10 @@ const ReelistSelect = observer(
             {children && <div className="w-full">{children}</div>}
 
             <div
-              className={classNames('my-3 flex w-full flex-wrap gap-3', {
-                'flex-col rounded-md': !selectState.isMulti,
-              })}
+              className={
+                'my-3 flex w-full flex-wrap gap-3 ' +
+                (!selectState.isMulti && ' flex-col rounded-md')
+              }
             >
               {filteredOptions.map(option => {
                 const isChecked = selectedOptions[0] === option.id || !!selectedOptions[option.id]
@@ -270,7 +266,7 @@ const ReelistSelect = observer(
               })}
             </div>
 
-            <div className="absolute top-0 -z-10 h-[calc(100%+1px)] w-full bg-transparent" />
+            <div className="h-full-1 absolute top-0 -z-10 w-full bg-transparent" />
           </div>
         </Popover>
       </>
