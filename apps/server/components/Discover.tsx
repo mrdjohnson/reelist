@@ -261,14 +261,13 @@ const Discover = observer(() => {
   return (
     <div
       suppressHydrationWarning
-      className="m-h-screen flex h-fit w-screen justify-center"
+      className="m-h-screen flex h-fit w-screen flex-col justify-center"
       style={{
         background: 'radial-gradient(50% 50% at 50% 50%, #1A200F 0%, #131313 100%)',
       }}
     >
+      <NavBar path="/discover" />
       <div className="mx-[20px] flex min-h-screen flex-col self-center pt-[20px]" style={{ width }}>
-        <NavBar path="/discover" />
-
         <InfiniteScroll onRefresh={getNextPage}>
           <div className="w-full">
             <div className="flex h-[40px] w-full flex-row items-baseline">
