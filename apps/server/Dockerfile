@@ -1,18 +1,22 @@
-FROM node:16-alpine
-
+FROM node:20-alpine as builder
 WORKDIR /app
 
 ENV NODE_ENV production
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
 COPY ./dist/.next ./.next
 COPY ./dist/package.json ./package.json
 
+# if anything breaks, remove this next line
+COPY ./dist/yarn.lock ./yarn.lock
+
 RUN yarn
 
-USER nextjs
+FROM node:20-alpine as runner
+WORKDIR /app
+
+ENV NODE_ENV production
+
+COPY --from=builder ./app .
 
 EXPOSE 3000
 

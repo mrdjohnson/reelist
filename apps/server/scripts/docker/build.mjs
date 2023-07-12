@@ -1,6 +1,17 @@
-import { spawn} from 'node:child_process'
+import util from 'node:util'
+import { spawn, exec as childExec } from 'node:child_process'
 
-const printSpawnOutput = (commandString) => {
+const preExec = util.promisify(childExec)
+
+const exec = async commandString => {
+  console.log('------- Starting : ', commandString)
+
+  await preExec(commandString)
+
+  console.log(`------- finished \n\n`)
+}
+
+const printSpawnOutput = commandString => {
   const [command, ...options] = commandString.split(' ')
   const commandSpawn = spawn(command, options)
 
@@ -27,9 +38,13 @@ const printSpawnOutput = (commandString) => {
 }
 
 const build = async () => {
+  await printSpawnOutput('pwd')
+
   await printSpawnOutput('docker build -t reelist-server .')
 
-  await printSpawnOutput('docker save reelist-server > reelist-server.tar')
+  await printSpawnOutput('rm reelist-server.tar')
+
+  await exec('docker save reelist-server > reelist-server.tar')
 }
 
 export default build
