@@ -194,6 +194,14 @@ const Discover = observer(() => {
   ])
 
   useEffect(() => {
+    if (showSelectedVideo) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+  }, [showSelectedVideo])
+
+  useEffect(() => {
     loadVideos()
   }, [page, searchText])
 
@@ -445,9 +453,6 @@ const Discover = observer(() => {
                 selectedRegions={_.keys(regionSelectState.selectedOptions)}
               />
             )}
-
-            {/* todo: this overflow container stops the background content from scrolling but leaves a strange 1px scrolling effect */}
-            <div className="absolute top-0 -z-10 h-[calc(100%+1px)] w-full bg-transparent" />
           </div>
         </Dialog>
       </div>

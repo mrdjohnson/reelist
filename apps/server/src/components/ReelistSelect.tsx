@@ -146,6 +146,14 @@ const ReelistSelect = observer(
       setFilterText('')
     }
 
+    useEffect(() => {
+      if (isOpen) {
+        document.body.style.overflow = 'hidden'
+      } else {
+        document.body.style.overflow = 'unset'
+      }
+    }, [isOpen])
+
     const renderOption = (option: SelectOption<T>, isChecked) => {
       let singleSelect = false
 
@@ -265,8 +273,6 @@ const ReelistSelect = observer(
                 return renderOption(option, isChecked)
               })}
             </div>
-
-            <div className="h-full-1 absolute top-0 -z-10 w-full bg-transparent" />
           </div>
         </Popover>
       </>
