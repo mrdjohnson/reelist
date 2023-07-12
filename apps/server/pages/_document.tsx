@@ -4,7 +4,6 @@ export default function Document() {
   return (
     <Html>
       <Head>
-        <title>Discover</title>
         <link rel="shortcut icon" href="/static/favicon.ico" />
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>

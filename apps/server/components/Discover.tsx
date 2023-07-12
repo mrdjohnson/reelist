@@ -2,6 +2,7 @@
 
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
+import Head from 'next/head'
 
 import { Dialog } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
@@ -281,6 +282,10 @@ const Discover = observer(() => {
         background: 'radial-gradient(50% 50% at 50% 50%, #1A200F 0%, #131313 100%)',
       }}
     >
+      <Head>
+        <title>Discover</title>
+      </Head>
+
       <NavBar path="/discover" />
       <div className="flex min-h-screen flex-col self-center px-[20px] pt-[20px]" style={{ width }}>
         <InfiniteScroll onRefresh={getNextPage}>
@@ -439,7 +444,7 @@ const Discover = observer(() => {
             },
           }}
           classes={{ paper: 'my-4 discover-md:my-0' }}
-          className="bg-transparent-dark backdrop-blur-md cursor-pointer"
+          className="bg-transparent-dark cursor-pointer backdrop-blur-md"
           transitionDuration={{ exit: 50 }}
         >
           <div className="absolute right-3 top-4 lg:top-2">

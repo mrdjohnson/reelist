@@ -1,4 +1,5 @@
 import { Box, Container, Typography } from '@mui/material'
+import Head from 'next/head'
 
 const Index = () => {
   return (
@@ -12,6 +13,10 @@ const Index = () => {
         bottom: 0,
       }}
     >
+      <Head>
+        <title>Reelist</title>
+      </Head>
+
       <Container maxWidth="lg">
         <Box
           sx={{
