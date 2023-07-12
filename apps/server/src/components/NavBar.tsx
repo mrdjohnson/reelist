@@ -19,7 +19,7 @@ const NavBar = ({ path }: { path: string }) => {
 
         <div>
           <Button {...getButtonProps(path, '/')}>Home</Button>
-          <Button {...getButtonProps(path, '/about')}>About</Button>
+          {/* <Button {...getButtonProps(path, '/about')}>About</Button> */}
           <Button {...getButtonProps(path, '/discover')}>Discover</Button>
         </div>
       </div>
