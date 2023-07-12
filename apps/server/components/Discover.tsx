@@ -248,7 +248,7 @@ const Discover = observer(() => {
 
     const nextWidth = calculateContainerWidth(Math.min(windowWidth, 1800) - totalContainerPadding)
 
-    if (nextWidth <= 673) {
+    if (windowWidth <= 673) {
       return windowWidth - totalContainerPadding
     }
 
