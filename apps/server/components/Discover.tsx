@@ -21,6 +21,7 @@ import NavBar from '~/components/NavBar'
 import InfiniteScroll from './InfiniteScroll'
 import VideoModal from './video/VideoModal'
 import VideoImage from './video/VideoImage'
+import next from 'next'
 
 const useWindowWidth = () => {
   const [width, setWidth] = useState(window?.innerWidth)
@@ -244,7 +245,13 @@ const Discover = observer(() => {
   const width = useMemo(() => {
     const totalContainerPadding = containerPadding * 2
 
-    return calculateContainerWidth(Math.min(windowWidth, 1800) - totalContainerPadding)
+    const nextWidth = calculateContainerWidth(Math.min(windowWidth, 1800) - totalContainerPadding)
+
+    if (nextWidth <= 673) {
+      return windowWidth - totalContainerPadding
+    }
+
+    return nextWidth
   }, [windowWidth])
 
   const toggleRegionSeparationType = () => {
@@ -275,7 +282,7 @@ const Discover = observer(() => {
       }}
     >
       <NavBar path="/discover" />
-      <div className="mx-[20px] flex min-h-screen flex-col self-center pt-[20px]" style={{ width }}>
+      <div className="px-[20px] flex min-h-screen flex-col self-center pt-[20px]" style={{ width }}>
         <InfiniteScroll onRefresh={getNextPage}>
           <div className="w-full">
             <div className="flex h-[40px] w-full flex-row items-baseline">
@@ -401,7 +408,7 @@ const Discover = observer(() => {
             </div>
           </div>
 
-          <div className="my-4 flex w-full flex-row flex-wrap gap-x-5">
+          <div className="my-4 flex w-full flex-row flex-wrap gap-x-5 justify-center">
             {videos.map(video => (
               <VideoImage
                 video={video}
