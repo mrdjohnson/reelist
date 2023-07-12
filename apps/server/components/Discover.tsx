@@ -282,7 +282,7 @@ const Discover = observer(() => {
       }}
     >
       <NavBar path="/discover" />
-      <div className="px-[20px] flex min-h-screen flex-col self-center pt-[20px]" style={{ width }}>
+      <div className="flex min-h-screen flex-col self-center px-[20px] pt-[20px]" style={{ width }}>
         <InfiniteScroll onRefresh={getNextPage}>
           <div className="w-full">
             <div className="flex h-[40px] w-full flex-row items-baseline">
@@ -408,7 +408,7 @@ const Discover = observer(() => {
             </div>
           </div>
 
-          <div className="my-4 flex w-full flex-row flex-wrap gap-x-5 justify-center">
+          <div className="my-4 flex w-full flex-row flex-wrap justify-center gap-x-5">
             {videos.map(video => (
               <VideoImage
                 video={video}
@@ -424,11 +424,6 @@ const Discover = observer(() => {
           open={showSelectedVideo}
           onClose={closeVideo}
           hideBackdrop
-          style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.49)',
-            backdropFilter: 'blur(15px)',
-            cursor: 'pointer',
-          }}
           PaperProps={{
             style: {
               background:
@@ -443,6 +438,8 @@ const Discover = observer(() => {
               cursor: 'default',
             },
           }}
+          classes={{ paper: 'my-4 discover-md:my-0' }}
+          className="bg-transparent-dark backdrop-blur-md cursor-pointer"
           transitionDuration={{ exit: 50 }}
         >
           <div className="absolute right-3 top-4 lg:top-2">
