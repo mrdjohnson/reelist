@@ -24,7 +24,6 @@ module.exports = {
       spacing: {
         '500': '500px',
         '600': '600px',
-        'full-1': 'calc(100%+1px)',
       }
     },
     screens: {
