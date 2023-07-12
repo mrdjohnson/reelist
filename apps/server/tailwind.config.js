@@ -27,7 +27,7 @@ module.exports = {
       }
     },
     screens: {
-      'discover-md': '673px',
+      'discover-md': '674px',
       // => @media (min-width: 673px) { ... }
 
       'discover-lg': '1000px',

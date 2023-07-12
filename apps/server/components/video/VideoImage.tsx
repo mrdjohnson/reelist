@@ -23,7 +23,9 @@ const VideoImage = observer(
       <div
         className={
           'group relative my-4 flex justify-center overflow-hidden rounded-md transition-all duration-300 ease-in-out ' +
-          (isPoster ? 'my-0 ' : 'my-4 h-[207px] hover:my-0 hover:h-[237px] ') +
+          (isPoster
+            ? 'my-0 '
+            : 'discover-md:w-auto discover-md:hover:my-0 discover-md:hover:h-[237px] my-4  h-[207px]  w-fit ') +
           (onPress && 'cursor-pointer')
         }
         onClick={onPress}
@@ -35,7 +37,7 @@ const VideoImage = observer(
           className={
             isPoster
               ? 'h-[609px] w-[406px] object-contain'
-              : '-mt-4 h-[270px] w-[307px] object-cover transition-[margin-top] duration-300 ease-in-out group-hover:mt-0'
+              : 'discover-md:w-[307px] discover-md:object-cover -mt-4 h-[270px] w-full object-contain transition-[margin-top] duration-300 ease-in-out group-hover:mt-0'
           }
         />
 
