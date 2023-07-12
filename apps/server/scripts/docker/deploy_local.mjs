@@ -29,12 +29,14 @@ const printSpawnOutput = commandString => {
 
 const run = async () => {
   await build()
-  
+
   await printSpawnOutput('docker load --input reelist-server.tar')
 
   await printSpawnOutput('docker rm -f reelist-server')
 
   await printSpawnOutput('docker run -d -p 3000:3000 --name reelist-server reelist-server')
+
+  await printSpawnOutput('docker image ls')
 
   await printSpawnOutput('docker ps')
 }
