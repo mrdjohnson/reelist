@@ -22,7 +22,7 @@ const VideoImage = observer(
     return (
       <div
         className={
-          'group relative my-4 flex justify-center overflow-hidden rounded-md transition-all duration-300 ease-in-out ' +
+          'discover-md:group relative my-4 flex justify-center overflow-hidden rounded-md transition-all duration-300 ease-in-out ' +
           (isPoster
             ? 'my-0 '
             : 'discover-md:w-auto discover-md:hover:my-0 discover-md:hover:h-[237px] my-4  h-[207px]  w-fit ') +
