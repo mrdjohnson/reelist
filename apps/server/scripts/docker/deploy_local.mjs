@@ -30,15 +30,25 @@ const printSpawnOutput = commandString => {
 const run = async () => {
   await build()
 
+  // create a backup of the current image
+  await printSpawnOutput('docker tag reelist-server:latest reelist-server:previous')
+
+  // load in the new image from the saved file
   await printSpawnOutput('docker load --input reelist-server.tar')
 
+  // stop the current container 
   await printSpawnOutput('docker rm -f reelist-server')
 
+  // start the next container
   await printSpawnOutput('docker run -d -p 3000:3000 --name reelist-server reelist-server')
 
-  await printSpawnOutput('docker image ls')
+  // --- Outputs ----
 
-  await printSpawnOutput('docker ps')
+  // there should be two images, latest and previous, and latest should be under 1 min old
+  await printSpawnOutput('docker image ls -f reference=reelist-server')
+
+  // there should be a container running, and it should be under 1 min old
+  await printSpawnOutput('docker ps -a -f ancestor=reelist-server')
 }
 
 run()

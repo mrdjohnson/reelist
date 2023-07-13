@@ -38,13 +38,14 @@ const printSpawnOutput = commandString => {
 }
 
 const build = async () => {
+  // ensure we're in the correct location
   await printSpawnOutput('pwd')
+  
+  // create a backup of the current image
+  await printSpawnOutput('docker tag reelist-server:latest reelist-server:previous')
 
+  // create a new latest image
   await printSpawnOutput('docker build -t reelist-server .')
-
-  await printSpawnOutput('rm reelist-server.tar')
-
-  await exec('docker save reelist-server > reelist-server.tar')
 }
 
 export default build

@@ -29,6 +29,10 @@ const printSpawnOutput = (commandString) => {
 
 const run = async () => {
   await build()
+  
+  // remove the old server file and create a new one
+  await printSpawnOutput('rm reelist-server.tar')
+  await exec('docker save reelist-server > reelist-server.tar')
 
   await printSpawnOutput('scp -P 48199  reelist-server.tar  djohnson@reelist.app:~/app/')
 }

@@ -57,4 +57,9 @@ Build output locations are
 - apk: `apps/mobile/android/app/build/outputs/apk/release`  
 - aab: `apps/mobile/android/app/build/outputs/bundle/release`  
   
-  
+
+### Server:
+
+To test locally,  `yarn nx run server:deploy-prod-local` should stop your local docker, create a new build, and begin running the new docker instance
+
+If your new docker server fails use `docker logs $(docker ps -aqf "ancestor=reelist-server")` to see the logs of the crashed server

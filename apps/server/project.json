@@ -32,7 +32,6 @@
         "commands": [
           "nx run server:prep-prod",
           "rm -rf ./dist",
-          "docker image rm -f reelist-server",
           "cd ../../ && nx run server:build:production",
           "cp ../../yarn.lock ./dist",
           "node scripts/docker/deploy.mjs"
