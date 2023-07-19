@@ -25,8 +25,8 @@ module.exports = {
         'transparent-dark': 'rgba(0, 0, 0, 0.49)',
       },
       spacing: {
-        500: '500px',
-        600: '600px',
+        '500': '500px',
+        '600': '600px',
       },
     },
     screens: {

@@ -211,7 +211,7 @@ const ReelistSelect = observer(
             <Button
               className={
                 'font-inter group w-fit text-right text-lg  hover:bg-transparent ' +
-                (disabled ? ' pointer-events-none text-gray-500 opacity-40': ' text-white')
+                (disabled ? ' pointer-events-none text-gray-500 opacity-40' : ' text-white')
               }
               onClick={() => setIsOpen(true)}
               aria-describedby={label}
@@ -242,36 +242,38 @@ const ReelistSelect = observer(
         >
           <div
             className={
-              'no-scrollbar relative mt-3 flex overflow-y-scroll overscroll-none bg-black bg-opacity-30 p-3 text-green-300 backdrop-blur-md ' +
+              'no-scrollbar relative mt-3 flex overflow-y-scroll overscroll-none bg-black bg-opacity-30 text-green-300 backdrop-blur-md ' +
               (selectState.isMulti
-                ? 'h-500 w-600 flex-col '
+                ? 'max-h-500 h-full w-full max-w-[600px] flex-col '
                 : 'mt-0 h-fit w-fit flex-row rounded-md')
             }
           >
-            {selectState.isMulti && (
-              <div className="mx-3">
-                <input
-                  className="focus:shadow-outline border-reelist-red mb-4 w-full appearance-none border-0 border-b bg-transparent py-2 text-lg leading-tight text-gray-300 shadow outline-none"
-                  type="text"
-                  autoComplete="off"
-                  placeholder="Filter"
-                  onChange={e => setFilterText(e.target.value)}
-                />
+            <div className="p-3">
+              {selectState.isMulti && (
+                <div className="x-3">
+                  <input
+                    className="focus:shadow-outline border-reelist-red mb-4 w-full appearance-none border-0 border-b bg-transparent py-2 text-lg leading-tight text-gray-300 shadow outline-none"
+                    type="text"
+                    autoComplete="off"
+                    placeholder="Filter"
+                    onChange={e => setFilterText(e.target.value)}
+                  />
+                </div>
+              )}
+
+              {children && <div className="w-full">{children}</div>}
+
+              <div
+                className={
+                  'my-3 flex w-full flex-wrap gap-3 ' +
+                  (!selectState.isMulti && ' flex-col rounded-md')
+                }
+              >
+                {filteredOptions.map(option => {
+                  const isChecked = selectedOptions[0] === option.id || !!selectedOptions[option.id]
+                  return renderOption(option, isChecked)
+                })}
               </div>
-            )}
-
-            {children && <div className="w-full">{children}</div>}
-
-            <div
-              className={
-                'my-3 flex w-full flex-wrap gap-3 ' +
-                (!selectState.isMulti && ' flex-col rounded-md')
-              }
-            >
-              {filteredOptions.map(option => {
-                const isChecked = selectedOptions[0] === option.id || !!selectedOptions[option.id]
-                return renderOption(option, isChecked)
-              })}
             </div>
           </div>
         </Popover>
