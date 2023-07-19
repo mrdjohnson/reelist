@@ -23,7 +23,7 @@ const VideoImage = observer(({ video, onPress, isPoster }: VideoImageProps) => {
         'group relative my-4 flex justify-center overflow-hidden rounded-md transition-all duration-300 ease-in-out ' +
         (isPoster
           ? 'my-0 '
-          : 'discover-md:w-auto discover-md:hover:my-0 discover-md:hover:h-[237px] my-4  h-[207px]  w-fit ') +
+          : 'discover-md:w-auto discover-md:hover:my-0 discover-md:aspect-auto discover-md:hover:h-[237px] discover-md:h-[207px] m-0  my-4  aspect-video  w-fit ') +
         (onPress && 'cursor-pointer')
       }
       onClick={onPress}
@@ -35,7 +35,7 @@ const VideoImage = observer(({ video, onPress, isPoster }: VideoImageProps) => {
         className={
           isPoster
             ? 'discover-md:h-[609px] discover-md:w-[406px] h-auto w-full object-contain'
-            : 'discover-md:w-[307px] discover-md:object-cover discover-md:group-hover:mt-0 -mt-4 h-[270px] w-full object-contain transition-[margin-top] duration-300 ease-in-out'
+            : 'discover-md:w-[307px] discover-md:object-cover  discover-md:-mt-4  discover-md:h-[270px] discover-md:group-hover:mt-0 h-full w-full object-contain transition-[margin-top] duration-300  ease-in-out'
         }
       />
 
@@ -47,7 +47,7 @@ const VideoImage = observer(({ video, onPress, isPoster }: VideoImageProps) => {
               'linear-gradient(180deg, rgba(0, 0, 0, 0.54) 0%, rgba(0, 0, 0, 0) 0.01%, rgba(0, 0, 0, 0.54) 33.85%)',
           }}
         >
-          <div className="line-clamp-2 font-inter transition-margin-top px-2 text-2xl text-white  duration-300 ease-in-out discover-md:group-hover:mt-3">
+          <div className="line-clamp-2 font-inter transition-margin-top discover-md:group-hover:mt-3 px-2 text-2xl  text-white duration-300 ease-in-out">
             {video.videoName}
           </div>
 
