@@ -47,7 +47,7 @@ const VideoModal = observer(
         </div>
 
         <div className="flex w-full flex-col overflow-clip">
-          <p className="discover-lg:text-left discover-lg:mt-0 ldiscover-g:mb-2 mt-4 mb-1 text-center text-5xl">
+          <p className="discover-lg:text-left discover-lg:mt-0 discover-md:text-5xl my-4 text-center text-3xl">
             {video.videoName}
           </p>
 
