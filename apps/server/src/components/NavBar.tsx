@@ -11,7 +11,7 @@ const getButtonProps = (path: string, href: string) => {
 
 const NavBar = ({ path }: { path: string }) => {
   return (
-    <div className="discover-md:mb-8 mx-5 mb-4 mt-3">
+    <div className="discover-md:pb-8 bg-reelist-gray sticky top-0 left-0 right-0 z-10 px-5 pb-4 pt-3">
       <div className="flex w-full justify-between">
         <a className="text-4xl text-slate-300 no-underline " href="/">
           Reelist

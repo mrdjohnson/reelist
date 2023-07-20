@@ -23,10 +23,11 @@ module.exports = {
         'text-red-400': 'rgb(254, 83, 101)',
         'reelist-red': '#FE5365',
         'transparent-dark': 'rgba(0, 0, 0, 0.49)',
+        'reelist-gray': 'rgb(19, 19, 19)',
       },
       spacing: {
-        '500': '500px',
-        '600': '600px',
+        500: '500px',
+        600: '600px',
       },
     },
     screens: {

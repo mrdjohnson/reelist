@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 
-import { Dialog } from '@mui/material'
+import { Box, Dialog, Skeleton, SwipeableDrawer, Typography } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -233,20 +233,19 @@ const Discover = observer(() => {
   }
 
   const containerPadding = 20
+  const totalContainerPadding = containerPadding * 2
 
-  const calculateContainerWidth = (possibleWidth: number) => {
-    const itemWidth = 307 // width of each item in pixels
-    const spacing = 20 // spacing between items in pixels
+  const itemWidth = 307 // width of each item in pixels
+  const spacing = 20 // spacing between items in pixels
 
-    const numItemsPerRow = Math.floor((possibleWidth + spacing) / (itemWidth + spacing))
-    const containerWidth = numItemsPerRow * itemWidth + (numItemsPerRow - 1) * spacing
-    return 1 + containerWidth > possibleWidth ? possibleWidth : containerWidth
-  }
+  const numItemsPerRow = useMemo(() => {
+    const possibleItemsPerRow = Math.floor((windowWidth + spacing) / (itemWidth + spacing))
+
+    return Math.min(possibleItemsPerRow, 5)
+  }, [windowWidth])
 
   const width = useMemo(() => {
-    const totalContainerPadding = containerPadding * 2
-
-    const nextWidth = calculateContainerWidth(Math.min(windowWidth, 1800) - totalContainerPadding)
+    const nextWidth = numItemsPerRow * itemWidth + (numItemsPerRow - 1) * spacing
 
     if (windowWidth <= 673) {
       return windowWidth - totalContainerPadding
@@ -277,7 +276,7 @@ const Discover = observer(() => {
   return (
     <div
       suppressHydrationWarning
-      className="m-h-screen flex h-fit w-screen flex-col justify-center"
+      className="flex min-h-screen w-screen flex-col"
       style={{
         background: 'radial-gradient(50% 50% at 50% 50%, #1A200F 0%, #131313 100%)',
       }}
@@ -287,7 +286,8 @@ const Discover = observer(() => {
       </Head>
 
       <NavBar path="/discover" />
-      <div className="flex min-h-screen flex-col self-center px-[20px] pt-[20px]" style={{ width }}>
+
+      <div className="mt-[20px] flex h-full flex-col self-center px-[20px]" style={{ width }}>
         <InfiniteScroll onRefresh={getNextPage}>
           <div className="w-full">
             <div className="flex h-[40px] w-full flex-row items-baseline">
@@ -413,7 +413,10 @@ const Discover = observer(() => {
             </div>
           </div>
 
-          <div className="my-4 flex w-full flex-row flex-wrap justify-center gap-x-5">
+          <div
+            className={'my-4 grid  w-full flex-1 justify-center gap-x-5 '}
+            style={{ gridTemplateColumns: `repeat(${numItemsPerRow}, minmax(0, 1fr))` }}
+          >
             {videos.map(video => (
               <VideoImage
                 video={video}
