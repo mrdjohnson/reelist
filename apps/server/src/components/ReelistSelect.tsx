@@ -195,16 +195,31 @@ const ReelistSelect = observer(
         {selectState.isMulti ? (
           <Button
             className={
-              'font-inter group flex w-fit justify-start self-center rounded-l-full rounded-r-full pl-4 pr-2 text-left align-baseline text-lg text-black hover:text-white' +
+              'font-inter group flex w-fit justify-start self-center rounded-l-md rounded-r-md pl-4 pr-2 text-left align-baseline text-lg text-black hover:text-white' +
               (disabled ? ' pointer-events-none bg-gray-500 opacity-40' : ' bg-reelist-red ')
             }
             onClick={() => setIsOpen(true)}
             aria-describedby={label}
             ref={buttonRef}
+            disableRipple
           >
             {label}
 
-            <ExpandMoreIcon className=" h-full pl-4 text-center align-baseline text-2xl" />
+            {/* close icon */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              className={
+                'ml-2 h-5 w-5 transition-transform duration-200 ' + (isOpen && '-rotate-90 ')
+              }
+            >
+              <path
+                fillRule="evenodd"
+                d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                clipRule="evenodd"
+              />
+            </svg>
           </Button>
         ) : (
           <div className="flex flex-col justify-end">
@@ -218,10 +233,24 @@ const ReelistSelect = observer(
               ref={buttonRef}
               disableRipple
             >
-              <div className="flex items-center  justify-center border-0 border-b border-solid border-transparent group-hover:border-white ">
+              <div className="flex items-center  justify-center border-0 border-b border-solid border-transparent group-hover:border-white transition-color duration-200">
                 {_.values(selectedOptions)[0]}
 
-                <ExpandMoreIcon className=" h-full justify-self-center pl-4 text-center align-baseline text-2xl " />
+                {/* close icon */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  className={
+                    'ml-2 h-4 w-5 transition-transform duration-200 ' + (isOpen && '-rotate-90 ')
+                  }
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                    clipRule="evenodd"
+                  />
+                </svg>
               </div>
             </Button>
           </div>
