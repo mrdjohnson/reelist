@@ -6,7 +6,6 @@ import Head from 'next/head'
 
 import { Box, Dialog, Skeleton, SwipeableDrawer, Typography } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
-import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@mui/material'
 import _ from 'lodash'
@@ -298,14 +297,20 @@ const Discover = observer(() => {
                   className="font-inter bg-reelist-red group h-fit items-center rounded-full border px-3 text-xl text-black hover:text-white"
                   onClick={() => setSearchText('')}
                 >
-                  {/* {searchText}
-
-                  <CloseOutlinedIcon className="h-full pl-2 text-lg text-center align-baseline" /> */}
-
                   <div className="flex items-center justify-center">
                     {searchText}
 
-                    <CloseOutlinedIcon className="h-full justify-self-center pl-4 text-center align-baseline text-lg " />
+                    {/* close icon */}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="h-5 justify-self-center pl-4 text-center align-baseline "
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                   </div>
                 </Button>
               ) : (
@@ -406,7 +411,17 @@ const Discover = observer(() => {
                   >
                     {name}
 
-                    <CloseOutlinedIcon className=" pl-2 text-[17px]" />
+                    {/* close icon */}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="h-4 pl-2"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                   </Button>
                 )),
               )}
@@ -450,12 +465,21 @@ const Discover = observer(() => {
           className="bg-transparent-dark cursor-pointer backdrop-blur-md"
           transitionDuration={{ exit: 50 }}
         >
-          <div className="absolute right-3 top-4 lg:top-2">
-            <CloseOutlinedIcon
-              className="cursor-pointer"
-              sx={{ color: 'rgb(254, 83, 101)', fontSize: '35px' }}
-              onClick={closeVideo}
-            />
+          <div
+            className="text-reelist-red absolute right-3 top-4 cursor-pointer lg:top-2"
+            onClick={closeVideo}
+          >
+            {/* close icon */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="h-8"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </div>
 
           <div className="no-scrollbar relative overflow-scroll overscroll-none">
