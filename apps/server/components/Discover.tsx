@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 
-import { Box, Dialog, Skeleton, SwipeableDrawer, Typography } from '@mui/material'
+import { Box, Dialog, Drawer, Fab, Skeleton, SwipeableDrawer, Typography } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@mui/material'
@@ -21,7 +21,7 @@ import NavBar from '~/components/NavBar'
 import InfiniteScroll from './InfiniteScroll'
 import VideoModal from './video/VideoModal'
 import VideoImage from './video/VideoImage'
-import next from 'next'
+import ReelistAccordion, { ReelistAccordionSection } from '~/components/ReelistAccordion'
 
 const useWindowWidth = () => {
   const [width, setWidth] = useState(window?.innerWidth)
@@ -51,6 +51,8 @@ const Discover = observer(() => {
 
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null)
   const [showSelectedVideo, setShowSelectedVideo] = useState(true)
+  const [showMobileFilterOptions, setShowMobileFilterOptions] = useState(false)
+  const [mobileFilterText, setMobileFilterText] = useState('')
 
   const [genreSeparationType, setGenreSeparationType] = useLocalStorageState(
     'genreSeparationType',
@@ -203,7 +205,7 @@ const Discover = observer(() => {
   }, [showSelectedVideo])
 
   useEffect(() => {
-    loadVideos()
+    // loadVideos()
   }, [page, searchText])
 
   const getNextPage = useCallback(() => {
@@ -269,8 +271,30 @@ const Discover = observer(() => {
     if (event.keyCode === 13) {
       event.preventDefault()
       setSearchText(event.target.value)
+      toggleDrawer(false)
     }
   }
+  const [open, setOpen] = useState(false)
+  const toggleDrawer = (nextOpen: boolean) => {
+    setOpen(nextOpen)
+  }
+  const [selectedAccordion, setSelectedAccordion] = useState('')
+
+  const selectAccordion = (label: string) => {
+    if (label === selectedAccordion) {
+      setSelectedAccordion('')
+    } else {
+      setSelectedAccordion(label)
+    }
+  }
+
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+  }, [open])
 
   return (
     <div
@@ -286,9 +310,33 @@ const Discover = observer(() => {
 
       <NavBar path="/discover" />
 
-      <div className="mt-[20px] flex h-full flex-col self-center px-[20px]" style={{ width }}>
+      <Fab
+        className="bg-reelist-red discover-md:hidden fixed bottom-10 right-10 flex opacity-70 "
+        onClick={() => toggleDrawer(true)}
+      >
+        {/* filter icon */}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          className="h-6 w-6 text-white "
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z"
+          />
+        </svg>
+      </Fab>
+
+      <div
+        className="discover-md:mt-[20px] flex h-full flex-col self-center px-[20px]"
+        style={{ width }}
+      >
         <InfiniteScroll onRefresh={getNextPage}>
-          <div className="w-full">
+          <div className="discover-md:block mb-4 hidden w-full ">
             <div className="flex h-[40px] w-full flex-row items-baseline">
               <SearchIcon className="mr-4 h-full justify-center self-center text-3xl text-gray-300" />
 
@@ -429,7 +477,7 @@ const Discover = observer(() => {
           </div>
 
           <div
-            className={'my-4 grid  w-full flex-1 justify-center gap-x-5 '}
+            className="discover-md:justify-items-stretch mb-4 grid w-full  flex-1 justify-center justify-items-center gap-x-5"
             style={{ gridTemplateColumns: `repeat(${numItemsPerRow}, minmax(0, 1fr))` }}
           >
             {videos.map(video => (
@@ -443,6 +491,7 @@ const Discover = observer(() => {
           </div>
         </InfiniteScroll>
 
+        {/* selected video dialog */}
         <Dialog
           open={showSelectedVideo}
           onClose={closeVideo}
@@ -491,6 +540,260 @@ const Discover = observer(() => {
             )}
           </div>
         </Dialog>
+
+        {/* mobile filter options dialog */}
+        <Dialog
+          open={showMobileFilterOptions}
+          onClose={() => setShowMobileFilterOptions(false)}
+          hideBackdrop
+          PaperProps={{
+            style: {
+              background:
+                'radial-gradient(50% 50% at 50% 50%, rgba(21, 30, 1, 0.25) 0%, rgba(0, 0, 0, 0.45) 100%)',
+              backdropFilter: 'blur(15px)',
+              maxWidth: '1619px',
+              position: 'relative',
+              overflowY: 'hidden',
+              overflowX: 'clip',
+              cursor: 'default',
+            },
+          }}
+          classes={{ paper: 'm-2 relative p-4 pr-8 w-full h-full' }}
+          className="bg-transparent-dark cursor-pointer backdrop-blur-md"
+          transitionDuration={{ exit: 50 }}
+        >
+          <div
+            className="text-reelist-red fixed right-2 top-2 cursor-pointer lg:top-2"
+            onClick={() => setShowMobileFilterOptions(false)}
+          >
+            {/* close icon */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="h-6"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </div>
+
+          <div className="top-0 right-0 left-0 z-10 bg-black">
+            <input
+              className="focus:shadow-outline border-reelist-red mb-4 w-full appearance-none border-0 border-b bg-transparent py-2 text-lg leading-tight text-gray-300 shadow outline-none"
+              type="text"
+              autoComplete="off"
+              placeholder="Filter"
+              onChange={e => setMobileFilterText(e.target.value)}
+            />
+          </div>
+
+          <ReelistAccordion>
+            <ReelistAccordionSection
+              selectState={sortTypesSelectState}
+              disabled={searchText}
+              filterText={mobileFilterText}
+              index={0}
+              totalCount={5}
+            />
+
+            <ReelistAccordionSection
+              selectState={videoTypesSelectState}
+              disabled={searchText}
+              filterText={mobileFilterText}
+              index={1}
+              totalCount={5}
+            >
+              <div
+                className="flex cursor-pointer justify-center"
+                onClick={() =>
+                  setTypesSeparationType(
+                    typesSeparationType === 'includes_every' ? 'includes_any' : 'includes_every',
+                  )
+                }
+              >
+                <input
+                  type="checkbox"
+                  value="includes_every"
+                  checked={typesSeparationType === 'includes_every'}
+                  className="accent-reelist-red bg-reelist-red border-reelist-red cursor-pointer border border-solid text-lg"
+                />
+
+                <div className="ml-2 text-white">Types Must Include All Selected</div>
+              </div>
+            </ReelistAccordionSection>
+
+            <ReelistAccordionSection
+              selectState={regionSelectState}
+              disabled={searchText}
+              filterText={mobileFilterText}
+              index={2}
+              totalCount={5}
+            >
+              <div
+                className="flex cursor-pointer justify-center"
+                onClick={toggleRegionSeparationType}
+              >
+                <input
+                  type="checkbox"
+                  value="includes_every"
+                  checked={regionSeparationType === 'includes_every'}
+                  className="accent-reelist-red bg-reelist-red border-reelist-red cursor-pointer border border-solid text-lg"
+                />
+
+                <div className="ml-2 text-white">Regions Must Include All Selected</div>
+              </div>
+            </ReelistAccordionSection>
+
+            <ReelistAccordionSection
+              selectState={genreSelectState}
+              disabled={searchText}
+              filterText={mobileFilterText}
+              index={3}
+              totalCount={5}
+            >
+              <div
+                className="flex cursor-pointer justify-center"
+                onClick={toggleGenreSeparationType}
+              >
+                <input
+                  type="checkbox"
+                  value="includes_every"
+                  checked={genreSeparationType === 'includes_every'}
+                  className="accent-reelist-red bg-reelist-red border-reelist-red cursor-pointer border border-solid text-lg"
+                />
+
+                <div className="ml-2 text-white">Genres Must Include All Selected</div>
+              </div>
+            </ReelistAccordionSection>
+
+            <ReelistAccordionSection
+              selectState={watchProviderSelectState}
+              disabled={searchText}
+              filterText={mobileFilterText}
+              index={4}
+              totalCount={5}
+            />
+          </ReelistAccordion>
+        </Dialog>
+
+        <Drawer
+          anchor="bottom"
+          open={open}
+          onClose={() => toggleDrawer(false)}
+          PaperProps={{
+            className:
+              'h-[calc(100vh-70px)] bg-transparent-dark backdrop-blur-md rounded-t-lg p-3 m-3 mb-0 text-white',
+          }}
+        >
+          <div className="flex h-[40px] w-full flex-row items-baseline">
+            <SearchIcon className="mr-4 h-full justify-center self-center text-3xl text-gray-300" />
+
+            {searchText ? (
+              <Button
+                className="font-inter bg-reelist-red group h-fit items-center rounded-full border px-3 text-xl text-black hover:text-white"
+                onClick={() => setSearchText('')}
+              >
+                <div className="flex items-center justify-center">
+                  {searchText}
+
+                  {/* close icon */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="h-5 justify-self-center pl-4 text-center align-baseline "
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </div>
+              </Button>
+            ) : (
+              <input
+                className="focus:shadow-outline w-full appearance-none border-0 bg-transparent py-2 text-xl leading-tight text-gray-300 shadow outline-none"
+                type="text"
+                autoComplete="off"
+                placeholder="Search"
+                onKeyDown={handleKeyDown}
+              />
+            )}
+          </div>
+
+          <div className="bg-reelist-red mb-6 mt-3 h-[1px]" />
+
+          <Button
+            className={
+              'font-inter group flex w-fit justify-start self-center rounded-l-md rounded-r-md pl-4 pr-2 text-left align-baseline text-lg text-black hover:text-white' +
+              (searchText ? ' pointer-events-none bg-gray-500 opacity-40' : ' bg-reelist-red ')
+            }
+            onClick={() => setShowMobileFilterOptions(true)}
+            disableRipple
+          >
+            {/* filter icon */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="mr-2 h-5 w-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z"
+              />
+            </svg>
+            Filter Options
+          </Button>
+
+          <div
+            className={'m-0 m-3 w-full ' + (searchText ? 'text-gray-500 opacity-40' : 'text-white')}
+          >
+            Filters:
+          </div>
+
+          <div className="relative flex flex-row flex-wrap gap-x-3 gap-y-3">
+            {[
+              videoTypesSelectState,
+              regionSelectState,
+              genreSelectState,
+              watchProviderSelectState,
+            ].flatMap(selectState =>
+              _.map(selectState.selectedOptions, (name, id) => (
+                <Button
+                  className={
+                    'font-inter rounded-full border border-solid p-3  hover:border-red-600 hover:text-red-600' +
+                    (searchText
+                      ? ' pointer-events-none border-gray-500 text-gray-500 opacity-40'
+                      : ' border-red-400 text-white')
+                  }
+                  onClick={() => selectState.removeOption(id)}
+                  key={id}
+                  disableRipple
+                >
+                  {name}
+
+                  {/* close icon */}
+
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="h-5 justify-self-center pl-4 text-center align-baseline "
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </Button>
+              )),
+            )}
+          </div>
+        </Drawer>
       </div>
     </div>
   )

@@ -9,7 +9,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 
-type StringOrNumber = string | number
+export type StringOrNumber = string | number
 
 export type SelectOption<T extends StringOrNumber> = { id: T; name: string; selected?: boolean }
 
@@ -164,11 +164,30 @@ const ReelistSelect = observer(
       if (!isMulti) {
         singleSelect = true
       } else if (isChecked) {
-        icon = <RemoveIcon className="pl-4" />
         remove = true
+
+        icon = (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            className="h-5 w-5"
+          >
+            <path d="M6.75 9.25a.75.75 0 000 1.5h6.5a.75.75 0 000-1.5h-6.5z" />
+          </svg>
+        )
       } else {
-        icon = <AddIcon className="pl-4" />
         add = true
+        icon = (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            className="h-5 w-5"
+          >
+            <path d="M10.75 6.75a.75.75 0 00-1.5 0v2.5h-2.5a.75.75 0 000 1.5h2.5v2.5a.75.75 0 001.5 0v-2.5h2.5a.75.75 0 000-1.5h-2.5v-2.5z" />
+          </svg>
+        )
       }
 
       return (
@@ -233,7 +252,7 @@ const ReelistSelect = observer(
               ref={buttonRef}
               disableRipple
             >
-              <div className="flex items-center  justify-center border-0 border-b border-solid border-transparent group-hover:border-white transition-color duration-200">
+              <div className="transition-color flex  items-center justify-center border-0 border-b border-solid border-transparent duration-200 group-hover:border-white">
                 {_.values(selectedOptions)[0]}
 
                 {/* close icon */}
@@ -266,12 +285,12 @@ const ReelistSelect = observer(
             horizontal: 'left',
           }}
           PaperProps={{
-            className: 'bg-transparent ',
+            className: 'bg-transparent-dark backdrop-blur-md ',
           }}
         >
           <div
             className={
-              'no-scrollbar relative mt-3 flex overflow-y-scroll overscroll-none bg-black bg-opacity-30 text-green-300 backdrop-blur-md ' +
+              'no-scrollbar relative mt-3 flex overflow-y-scroll overscroll-none ' +
               (selectState.isMulti
                 ? 'max-h-500 h-full w-full max-w-[600px] flex-col '
                 : 'mt-0 h-fit w-fit flex-row rounded-md')
