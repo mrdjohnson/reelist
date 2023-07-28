@@ -8,10 +8,16 @@ import { Button, Link, Popover, TextField } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
+import classNames from 'classnames'
 
 export type StringOrNumber = string | number
 
-export type SelectOption<T extends StringOrNumber> = { id: T; name: string; selected?: boolean, icon?: ReactNode }
+export type SelectOption<T extends StringOrNumber> = {
+  id: T
+  name: string
+  selected?: boolean
+  icon?: ReactNode
+}
 
 export class SelectState<T extends StringOrNumber> {
   selectedOptions: Record<StringOrNumber, string> = {}
@@ -193,13 +199,13 @@ const ReelistSelect = observer(
       return (
         <Button
           key={option.id}
-          className={
-            (singleSelect && 'hover:bg-reelist-red rounded-md text-white hover:text-black') ||
-            (remove &&
-              'bg-reelist-red rounded-l-full rounded-r-full text-black hover:text-white') ||
-            (add &&
-              'border-reelist-red hover:text-reelist-red rounded-l-full rounded-r-full border border-solid bg-black bg-opacity-30 text-white')
-          }
+          className={classNames({
+            'hover:bg-reelist-red rounded-md text-white hover:text-black': singleSelect,
+            'border-reelist-red bg-reelist-red rounded-l-full rounded-r-full border border-solid text-black hover:text-white':
+              remove,
+            'border-reelist-red hover:text-reelist-red rounded-l-full rounded-r-full border border-solid bg-black bg-opacity-30 text-white':
+              add,
+          })}
           onClick={() => toggleOption(option)}
         >
           {option.name}
