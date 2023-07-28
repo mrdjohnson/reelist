@@ -20,8 +20,10 @@ const NavBar = ({ path }: { path: string }) => {
       <div className="flex h-fit w-full justify-between">
         <a className="h-fit w-fit self-center text-slate-300 no-underline" href="/">
           <span className="discover-md:block hidden text-4xl">Reelist</span>
-          <span className="discover-md:hidden flex h-fit">
-            <Image src="/static/logo.png" width={50} height={50} alt="Picture of the author" />
+          <span className="discover-md:hidden flex h-fit text-2xl">
+            {/* todo, get image working on build */}
+            {/* <Image src="/static/logo.png" width={50} height={50} alt="Picture of the author" /> */}
+            Reelist
           </span>
         </a>
 
