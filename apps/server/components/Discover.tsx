@@ -23,6 +23,36 @@ import VideoModal from './video/VideoModal'
 import VideoImage from './video/VideoImage'
 import ReelistAccordion, { ReelistAccordionSection } from '~/components/ReelistAccordion'
 
+const DescendingIcon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 20 20"
+    fill="currentColor"
+    className="h-5 w-5"
+  >
+    <path
+      fillRule="evenodd"
+      d="M2 3.75A.75.75 0 012.75 3h11.5a.75.75 0 010 1.5H2.75A.75.75 0 012 3.75zM2 7.5a.75.75 0 01.75-.75h7.508a.75.75 0 010 1.5H2.75A.75.75 0 012 7.5zM14 7a.75.75 0 01.75.75v6.59l1.95-2.1a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 111.1-1.02l1.95 2.1V7.75A.75.75 0 0114 7zM2 11.25a.75.75 0 01.75-.75h4.562a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75z"
+      clipRule="evenodd"
+    />
+  </svg>
+)
+
+const AscendingIcon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 20 20"
+    fill="currentColor"
+    className="h-5 w-5"
+  >
+    <path
+      fillRule="evenodd"
+      d="M2 3.75A.75.75 0 012.75 3h11.5a.75.75 0 010 1.5H2.75A.75.75 0 012 3.75zM2 7.5a.75.75 0 01.75-.75h6.365a.75.75 0 010 1.5H2.75A.75.75 0 012 7.5zM14 7a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02l-1.95-2.1v6.59a.75.75 0 01-1.5 0V9.66l-1.95 2.1a.75.75 0 11-1.1-1.02l3.25-3.5A.75.75 0 0114 7zM2 11.25a.75.75 0 01.75-.75H7A.75.75 0 017 12H2.75a.75.75 0 01-.75-.75z"
+      clipRule="evenodd"
+    />
+  </svg>
+)
+
 const useWindowWidth = () => {
   const [width, setWidth] = useState(window?.innerWidth)
   const handleResize = () => setWidth(window?.innerWidth)
@@ -311,7 +341,7 @@ const Discover = observer(() => {
       <NavBar path="/discover" />
 
       <Fab
-        className="bg-reelist-red discover-md:hidden fixed bottom-10 right-10 flex opacity-70 "
+        className="bg-reelist-red discover-md:hidden fixed bottom-5 right-5 flex opacity-70 "
         onClick={() => toggleDrawer(true)}
       >
         {/* filter icon */}
@@ -515,7 +545,7 @@ const Discover = observer(() => {
           transitionDuration={{ exit: 50 }}
         >
           <div
-            className="text-reelist-red absolute right-3 top-4 cursor-pointer lg:top-2"
+            className="text-reelist-red absolute right-2 top-2 cursor-pointer lg:top-2"
             onClick={closeVideo}
           >
             {/* close icon */}
@@ -558,12 +588,12 @@ const Discover = observer(() => {
               cursor: 'default',
             },
           }}
-          classes={{ paper: 'm-2 relative p-4 pr-8 w-full h-full' }}
+          classes={{ paper: 'm-1 relative p-2 pr-6 w-full h-full' }}
           className="bg-transparent-dark cursor-pointer backdrop-blur-md"
           transitionDuration={{ exit: 50 }}
         >
           <div
-            className="text-reelist-red fixed right-2 top-2 cursor-pointer lg:top-2"
+            className="text-reelist-red fixed right-2 top-2 z-10 cursor-pointer"
             onClick={() => setShowMobileFilterOptions(false)}
           >
             {/* close icon */}
@@ -579,7 +609,7 @@ const Discover = observer(() => {
             </svg>
           </div>
 
-          <div className="top-0 right-0 left-0 z-10 bg-black">
+          <div className="top-0 right-0 left-0 bg-black">
             <input
               className="focus:shadow-outline border-reelist-red mb-4 w-full appearance-none border-0 border-b bg-transparent py-2 text-lg leading-tight text-gray-300 shadow outline-none"
               type="text"
@@ -678,120 +708,144 @@ const Discover = observer(() => {
           </ReelistAccordion>
         </Dialog>
 
+        {/* mobile options drawer */}
         <Drawer
           anchor="bottom"
           open={open}
           onClose={() => toggleDrawer(false)}
           PaperProps={{
             className:
-              'h-[calc(100vh-70px)] bg-transparent-dark backdrop-blur-md rounded-t-lg p-3 m-3 mb-0 text-white',
+              'relative h-full bg-transparent-dark backdrop-blur-md rounded-t-lg p-3 m-1 mb-0 text-white',
           }}
         >
-          <div className="flex h-[40px] w-full flex-row items-baseline">
-            <SearchIcon className="mr-4 h-full justify-center self-center text-3xl text-gray-300" />
-
-            {searchText ? (
-              <Button
-                className="font-inter bg-reelist-red group h-fit items-center rounded-full border px-3 text-xl text-black hover:text-white"
-                onClick={() => setSearchText('')}
-              >
-                <div className="flex items-center justify-center">
-                  {searchText}
-
-                  {/* close icon */}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="h-5 justify-self-center pl-4 text-center align-baseline "
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </div>
-              </Button>
-            ) : (
-              <input
-                className="focus:shadow-outline w-full appearance-none border-0 bg-transparent py-2 text-xl leading-tight text-gray-300 shadow outline-none"
-                type="text"
-                autoComplete="off"
-                placeholder="Search"
-                onKeyDown={handleKeyDown}
-              />
-            )}
-          </div>
-
-          <div className="bg-reelist-red mb-6 mt-3 h-[1px]" />
-
-          <Button
-            className={
-              'font-inter group flex w-fit justify-start self-center rounded-l-md rounded-r-md pl-4 pr-2 text-left align-baseline text-lg text-black hover:text-white' +
-              (searchText ? ' pointer-events-none bg-gray-500 opacity-40' : ' bg-reelist-red ')
-            }
-            onClick={() => setShowMobileFilterOptions(true)}
-            disableRipple
+          <div
+            className="text-reelist-red fixed right-2 top-2 cursor-pointer"
+            onClick={() => toggleDrawer(false)}
           >
-            {/* filter icon */}
+            {/* close icon */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="mr-2 h-5 w-6"
+              className="h-6"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
-            Filter Options
-          </Button>
-
-          <div
-            className={'m-0 m-3 w-full ' + (searchText ? 'text-gray-500 opacity-40' : 'text-white')}
-          >
-            Filters:
           </div>
 
-          <div className="relative flex flex-row flex-wrap gap-x-3 gap-y-3">
-            {[
-              videoTypesSelectState,
-              regionSelectState,
-              genreSelectState,
-              watchProviderSelectState,
-            ].flatMap(selectState =>
-              _.map(selectState.selectedOptions, (name, id) => (
+          <div className="box no-scrollbar overflow-scroll overflow-x-clip pr-4">
+            <div className="flex h-[40px] w-full flex-row items-baseline">
+              <SearchIcon className="mr-4 h-full justify-center self-center text-3xl text-gray-300" />
+
+              {searchText ? (
                 <Button
-                  className={
-                    'font-inter rounded-full border border-solid p-3  hover:border-red-600 hover:text-red-600' +
-                    (searchText
-                      ? ' pointer-events-none border-gray-500 text-gray-500 opacity-40'
-                      : ' border-red-400 text-white')
-                  }
-                  onClick={() => selectState.removeOption(id)}
-                  key={id}
-                  disableRipple
+                  className="font-inter bg-reelist-red group h-fit items-center rounded-full border px-3 text-xl text-black hover:text-white"
+                  onClick={() => setSearchText('')}
                 >
-                  {name}
+                  <div className="flex items-center justify-center">
+                    {searchText}
 
-                  {/* close icon */}
-
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="h-5 justify-self-center pl-4 text-center align-baseline "
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                    {/* close icon */}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="h-5 justify-self-center pl-4 text-center align-baseline "
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </div>
                 </Button>
-              )),
-            )}
+              ) : (
+                <input
+                  className="focus:shadow-outline w-full appearance-none border-0 bg-transparent py-2 text-xl leading-tight text-gray-300 shadow outline-none"
+                  type="text"
+                  autoComplete="off"
+                  placeholder="Search"
+                  onKeyDown={handleKeyDown}
+                />
+              )}
+            </div>
+
+            <div className="bg-reelist-red mb-6 mt-3 h-[1px]" />
+
+            <div className="flex w-full justify-center">
+              <Button
+                className={
+                  'font-inter group flex w-fit justify-start self-center rounded-l-md rounded-r-md pl-4 pr-2 text-left align-baseline text-lg text-black hover:text-white' +
+                  (searchText ? ' pointer-events-none bg-gray-500 opacity-40' : ' bg-reelist-red ')
+                }
+                onClick={() => setShowMobileFilterOptions(true)}
+                disableRipple
+              >
+                {/* filter icon */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="mr-2 h-5 w-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z"
+                  />
+                </svg>
+                Filter Options
+              </Button>
+            </div>
+
+            <div
+              className={
+                'm-0 m-3 w-full ' + (searchText ? 'text-gray-500 opacity-40' : 'text-white')
+              }
+            >
+              Filters:
+            </div>
+
+            <div className="relative flex flex-row flex-wrap gap-x-3 gap-y-3">
+              {[
+                videoTypesSelectState,
+                regionSelectState,
+                genreSelectState,
+                watchProviderSelectState,
+              ].flatMap(selectState =>
+                _.map(selectState.selectedOptions, (name, id) => (
+                  <Button
+                    className={
+                      'font-inter rounded-full border border-solid p-3  hover:border-red-600 hover:text-red-600' +
+                      (searchText
+                        ? ' pointer-events-none border-gray-500 text-gray-500 opacity-40'
+                        : ' border-red-400 text-white')
+                    }
+                    onClick={() => selectState.removeOption(id)}
+                    key={id}
+                    disableRipple
+                  >
+                    {name}
+
+                    {/* close icon */}
+
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
+                      stroke="currentColor"
+                      className="h-5 justify-self-center pl-4 text-center align-baseline "
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </Button>
+                )),
+              )}
+            </div>
           </div>
         </Drawer>
       </div>
@@ -950,12 +1004,12 @@ const getVideoTypes = async () => [
 ]
 
 const getSortTypes = async () => [
-  { id: 'popularity.desc', name: 'Popularity (Desc)' },
-  { id: 'popularity.asc', name: 'Popularity (Asc)' },
-  { id: 'first_air_date.desc', name: 'First Air Date (Desc)' },
-  { id: 'first_air_date.asc', name: 'First Air Date (Asc)' },
-  { id: 'vote_average.desc', name: 'Vote Average (Desc)' },
-  { id: 'vote_average.asc', name: 'Vote Average (Asc)' },
+  { id: 'popularity.desc', name: 'Popularity (Desc)', icon: DescendingIcon },
+  { id: 'popularity.asc', name: 'Popularity (Asc)', icon: AscendingIcon },
+  { id: 'first_air_date.desc', name: 'First Air Date (Desc)', icon: DescendingIcon },
+  { id: 'first_air_date.asc', name: 'First Air Date (Asc)', icon: AscendingIcon },
+  { id: 'vote_average.desc', name: 'Vote Average (Desc)', icon: DescendingIcon },
+  { id: 'vote_average.asc', name: 'Vote Average (Asc)', icon: AscendingIcon },
 ]
 
 export default Discover

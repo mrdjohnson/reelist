@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
+import React, { PropsWithChildren, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import _ from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { makeAutoObservable } from 'mobx'
@@ -11,7 +11,7 @@ import RemoveIcon from '@mui/icons-material/Remove'
 
 export type StringOrNumber = string | number
 
-export type SelectOption<T extends StringOrNumber> = { id: T; name: string; selected?: boolean }
+export type SelectOption<T extends StringOrNumber> = { id: T; name: string; selected?: boolean, icon?: ReactNode }
 
 export class SelectState<T extends StringOrNumber> {
   selectedOptions: Record<StringOrNumber, string> = {}

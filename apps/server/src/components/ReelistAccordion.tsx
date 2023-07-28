@@ -147,7 +147,7 @@ const ReelistAccordion = observer(({ children }) => {
 
   return (
     <ReelistAccordionContext.Provider value={{ scrollToElement }}>
-      <div ref={scrollingDivRef} className="relative h-fit overflow-scroll">
+      <div ref={scrollingDivRef} className="relative h-fit overflow-scroll no-scrollbar">
         {children}
       </div>
     </ReelistAccordionContext.Provider>

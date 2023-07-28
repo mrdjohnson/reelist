@@ -66,7 +66,7 @@ const NavBar = ({ path }: { path: string }) => {
             horizontal: 'right',
           }}
           PaperProps={{
-            className: 'bg-transparent-dark backdrop-blur-md gap-x-3',
+            className: 'bg-reelist-gray backdrop-blur-md gap-x-3',
           }}
         >
           <Button {...getButtonProps(path, '/')}>Home</Button>
