@@ -17,7 +17,6 @@ import { callTmdb } from '@reelist/apis/api'
 import Video from '@reelist/models/Video'
 import ReelistSelect, { useSelectState } from '~/components/ReelistSelect'
 
-import NavBar from '~/components/NavBar'
 import InfiniteScroll from './InfiniteScroll'
 import VideoModal from './video/VideoModal'
 import VideoImage from './video/VideoImage'
@@ -337,8 +336,6 @@ const Discover = observer(() => {
       <Head>
         <title>Discover</title>
       </Head>
-
-      <NavBar path="/discover" />
 
       <Fab
         className="bg-reelist-red discover-md:hidden fixed bottom-5 right-5 flex opacity-70 "

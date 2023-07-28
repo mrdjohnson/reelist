@@ -1,6 +1,7 @@
 import { Button, Popover } from '@mui/material'
 import { PropsWithChildren, useRef, useState } from 'react'
 import Image from 'next/image'
+import Logo from '../../public/images/logo.png'
 
 const activeButton = 'border-red-400 border-1'
 const defaultStyle = 'text-lg text-slate-300 px-5 rounded-l-full rounded-r-full '
@@ -16,14 +17,12 @@ const NavBar = ({ path }: { path: string }) => {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <div className="bg-reelist-gray sticky top-0 left-0 right-0 z-10 px-5 pb-4 pt-3">
+    <div className="bg-reelist-gray sticky top-0 left-0 right-0 z-10 px-5 py-2">
       <div className="flex h-fit w-full justify-between">
         <a className="h-fit w-fit self-center text-slate-300 no-underline" href="/">
           <span className="discover-md:block hidden text-4xl">Reelist</span>
-          <span className="discover-md:hidden flex h-fit text-2xl">
-            {/* todo, get image working on build */}
-            {/* <Image src="/static/logo.png" width={50} height={50} alt="Picture of the author" /> */}
-            Reelist
+          <span className="discover-md:hidden flex h-fit">
+            <Image src={Logo} width={40} height={40} alt="Reelist" priority />
           </span>
         </a>
 
