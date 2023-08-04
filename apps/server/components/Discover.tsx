@@ -130,7 +130,7 @@ const Discover = observer(() => {
     } else {
       console.log('adding to current videos')
 
-      setVideos(videos.concat(filteredVideos))
+      setVideos(_.uniqBy(videos.concat(filteredVideos), 'videoId'))
     }
   }
 
