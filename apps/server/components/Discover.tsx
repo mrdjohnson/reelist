@@ -211,6 +211,7 @@ const Discover = observer(() => {
   })
 
   useEffect(() => {
+    // todo: scroll back to top
     setPage(1)
     loadVideos()
   }, [
@@ -234,7 +235,7 @@ const Discover = observer(() => {
   }, [showSelectedVideo])
 
   useEffect(() => {
-    // loadVideos()
+    loadVideos()
   }, [page, searchText])
 
   const getNextPage = useCallback(() => {
