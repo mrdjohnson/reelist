@@ -17,7 +17,7 @@ const NavBar = ({ path }: { path: string }) => {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <div className="bg-reelist-gray sticky top-0 left-0 right-0 z-10 px-5 py-2">
+    <div className="bg-reelist-gray fixed top-0 left-0 right-0 z-10 px-5 py-2">
       <div className="flex h-fit w-full justify-between">
         <a className="h-fit w-fit self-center text-slate-300 no-underline" href="/">
           <span className="discover-md:block hidden text-4xl">Reelist</span>
@@ -59,20 +59,18 @@ const NavBar = ({ path }: { path: string }) => {
           anchorEl={menuButtonRef.current}
           onClose={() => setIsOpen(false)}
           anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-          }}
-          transformOrigin={{
-            vertical: 'top',
+            vertical: 'bottom',
             horizontal: 'right',
           }}
           PaperProps={{
-            className: 'bg-reelist-gray backdrop-blur-md gap-x-3',
+            className: 'bg-reelist-gray',
           }}
         >
-          <Button {...getButtonProps(path, '/')}>Home</Button>
-          {/* <Button {...getButtonProps(path, '/about')}>About</Button> */}
-          <Button {...getButtonProps(path, '/discover')}>Discover</Button>
+          <div className="gap-x-3 backdrop-blur-md">
+            <Button {...getButtonProps(path, '/')}>Home</Button>
+            {/* <Button {...getButtonProps(path, '/about')}>About</Button> */}
+            <Button {...getButtonProps(path, '/discover')}>Discover</Button>
+          </div>
         </Popover>
       </div>
     </div>
