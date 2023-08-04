@@ -28,7 +28,7 @@ class VideoStore {
   }
 
   makeUiVideo = (json: Video, videoId?: string, videoTableData?: VideoTableType | null) => {
-    return new Video(json, videoTableData, videoId, this, this.videoApi)
+    return new Video(json, videoTableData, videoId, this, this.videoApi, this.storeAuth)
   }
 
   getVideoPath = (videoId: string, seasonNumber?: number) => {

@@ -7,6 +7,7 @@ import { humanizedDuration } from '@reelist/utils/humanizedDuration'
 import VideoStore from './VideoStore'
 import VideoApi from '@reelist/apis/VideoApi'
 import { VideoInfoType, VideoTableType } from 'libs/interfaces/src/lib/tables/VideoTable'
+import Auth from '@reelist/models/Auth'
 
 export type TvEpisode = {
   airDate: string
@@ -139,6 +140,7 @@ class Video {
     videoId: string | null = null,
     private videoStore: VideoStore,
     private videoApi: VideoApi,
+    private storeAuth: Auth
   ) {
     makeAutoObservable(this, {
       adult: false,
@@ -177,7 +179,7 @@ class Video {
 
     if (videoTableData) {
       this._assignFromVideoTable(videoTableData)
-    } else {
+    } else if (storeAuth.loggedIn) {
       this._lazyLoadVideoFromVideoTable()
     }
   }
