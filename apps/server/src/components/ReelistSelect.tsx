@@ -295,12 +295,13 @@ const ReelistSelect = observer(
           }}
         >
           <div
-            className={
-              'no-scrollbar relative mt-3 flex overflow-y-scroll overscroll-none ' +
-              (selectState.isMulti
-                ? 'max-h-500 h-full w-full max-w-[600px] flex-col '
-                : 'mt-0 h-fit w-fit flex-row rounded-md')
-            }
+            className={classNames(
+              'no-scrollbar relative mt-3 flex overflow-y-scroll overscroll-none ',
+              {
+                'max-h-500 h-full w-full max-w-[600px] flex-col ': selectState.isMulti,
+                'mt-0 h-fit w-fit flex-row rounded-md': !selectState.isMulti,
+              },
+            )}
           >
             <div className="p-3">
               {selectState.isMulti && (
