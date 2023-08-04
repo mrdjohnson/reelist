@@ -17,63 +17,67 @@ const NavBar = ({ path }: { path: string }) => {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <div className="bg-reelist-gray fixed top-0 left-0 right-0 z-10 px-5 py-2">
-      <div className="flex h-fit w-full justify-between">
-        <a className="h-fit w-fit self-center text-slate-300 no-underline" href="/">
-          <span className="discover-md:block hidden text-4xl">Reelist</span>
-          <span className="discover-md:hidden flex h-fit">
-            <Image src={Logo} width={40} height={40} alt="Reelist" priority />
-          </span>
-        </a>
+    <>
+      <div className="bg-reelist-gray fixed top-0 left-0 right-0 z-10 px-5 py-2">
+        <div className="flex h-fit w-full justify-between">
+          <a className="h-fit w-fit self-center text-slate-300 no-underline" href="/">
+            <span className="discover-md:block hidden text-4xl">Reelist</span>
+            <span className="discover-md:hidden flex h-fit">
+              <Image src={Logo} width={40} height={40} alt="Reelist" priority />
+            </span>
+          </a>
 
-        <div className="discover-md:flex hidden justify-end">
-          <Button {...getButtonProps(path, '/')}>Home</Button>
-          {/* <Button {...getButtonProps(path, '/about')}>About</Button> */}
-          <Button {...getButtonProps(path, '/discover')}>Discover</Button>
-        </div>
-
-        <div
-          className="discover-md:hidden align flex justify-end text-white"
-          ref={menuButtonRef}
-          onClick={() => setIsOpen(true)}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            className="h-full w-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-            />
-          </svg>
-        </div>
-
-        <Popover
-          id="menu-button-popover"
-          open={isOpen}
-          anchorEl={menuButtonRef.current}
-          onClose={() => setIsOpen(false)}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right',
-          }}
-          PaperProps={{
-            className: 'bg-reelist-gray',
-          }}
-        >
-          <div className="gap-x-3 backdrop-blur-md">
+          <div className="discover-md:flex hidden justify-end">
             <Button {...getButtonProps(path, '/')}>Home</Button>
             {/* <Button {...getButtonProps(path, '/about')}>About</Button> */}
             <Button {...getButtonProps(path, '/discover')}>Discover</Button>
           </div>
-        </Popover>
+
+          <div
+            className="discover-md:hidden align flex justify-end text-white"
+            ref={menuButtonRef}
+            onClick={() => setIsOpen(true)}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              className="h-full w-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+              />
+            </svg>
+          </div>
+
+          <Popover
+            id="menu-button-popover"
+            open={isOpen}
+            anchorEl={menuButtonRef.current}
+            onClose={() => setIsOpen(false)}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+            PaperProps={{
+              className: 'bg-reelist-gray',
+            }}
+          >
+            <div className="gap-x-3 backdrop-blur-md">
+              <Button {...getButtonProps(path, '/')}>Home</Button>
+              {/* <Button {...getButtonProps(path, '/about')}>About</Button> */}
+              <Button {...getButtonProps(path, '/discover')}>Discover</Button>
+            </div>
+          </Popover>
+        </div>
       </div>
-    </div>
+
+      <div className="h-14" />
+    </>
   )
 }
 
