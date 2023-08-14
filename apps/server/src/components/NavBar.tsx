@@ -18,7 +18,7 @@ const NavBar = ({ path }: { path: string }) => {
 
   return (
     <>
-      <div className="bg-reelist-gray fixed top-0 left-0 right-0 z-10 px-5 py-2">
+      <div className="bg-reelist-gray discover-md:px-[55px] fixed left-0 right-0 top-0 z-10 px-[25px] py-2">
         <div className="flex h-fit w-full justify-between">
           <a className="h-fit w-fit self-center text-slate-300 no-underline" href="/">
             <span className="discover-md:block hidden text-4xl">Reelist</span>
