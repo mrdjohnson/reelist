@@ -199,7 +199,7 @@ const ReelistSelect = observer(
       return (
         <Button
           key={option.id}
-          className={classNames({
+          className={classNames('font-semibold', {
             'hover:bg-reelist-red rounded-md text-white hover:text-black': singleSelect,
             'border-reelist-red bg-reelist-red rounded-l-full rounded-r-full border border-solid text-black hover:text-white':
               remove,
@@ -220,7 +220,7 @@ const ReelistSelect = observer(
         {selectState.isMulti ? (
           <Button
             className={
-              'font-inter group flex w-fit justify-start self-center rounded-l-md rounded-r-md pl-4 pr-2 text-left align-baseline text-lg text-black hover:text-white' +
+              'font-inter group flex w-fit justify-start self-center rounded-l-full rounded-r-full pl-4 pr-2 text-left align-baseline text-lg font-semibold text-black hover:text-white' +
               (disabled ? ' pointer-events-none bg-gray-500 opacity-40' : ' bg-reelist-red ')
             }
             onClick={() => setIsOpen(true)}
@@ -230,20 +230,16 @@ const ReelistSelect = observer(
           >
             {label}
 
-            {/* close icon */}
+            {/* chevron icon */}
             <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
+              viewBox="0 0 16 11"
               fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
               className={
-                'ml-2 h-5 w-5 transition-transform duration-200 ' + (isOpen && '-rotate-90 ')
+                'ml-2 h-3 w-3 transition-transform duration-200 ' + (isOpen && '-rotate-90 ')
               }
             >
-              <path
-                fillRule="evenodd"
-                d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-                clipRule="evenodd"
-              />
+              <path d="M7.60536 10.7899C7.82333 11.07 8.17667 11.07 8.39465 10.7899L15.8365 1.22464C15.9961 1.01949 16.0439 0.710927 15.9575 0.442861C15.8711 0.174785 15.6676 0 15.4419 0H0.558157C0.332408 0 0.128896 0.174785 0.0425036 0.442861C-0.0438888 0.710927 0.00386559 1.01949 0.163493 1.22464L7.60536 10.7899Z" />
             </svg>
           </Button>
         ) : (
@@ -261,20 +257,16 @@ const ReelistSelect = observer(
               <div className="transition-color flex  items-center justify-center border-0 border-b border-solid border-transparent duration-200 group-hover:border-white">
                 {_.values(selectedOptions)[0]}
 
-                {/* close icon */}
+                {/* chevron icon */}
                 <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
+                  viewBox="0 0 16 11"
                   fill="currentColor"
+                  xmlns="http://www.w3.org/2000/svg"
                   className={
-                    'ml-2 h-4 w-5 transition-transform duration-200 ' + (isOpen && '-rotate-90 ')
+                    'ml-2 h-3 w-2 transition-transform duration-200 ' + (isOpen && '-rotate-90 ')
                   }
                 >
-                  <path
-                    fillRule="evenodd"
-                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-                    clipRule="evenodd"
-                  />
+                  <path d="M7.60536 10.7899C7.82333 11.07 8.17667 11.07 8.39465 10.7899L15.8365 1.22464C15.9961 1.01949 16.0439 0.710927 15.9575 0.442861C15.8711 0.174785 15.6676 0 15.4419 0H0.558157C0.332408 0 0.128896 0.174785 0.0425036 0.442861C-0.0438888 0.710927 0.00386559 1.01949 0.163493 1.22464L7.60536 10.7899Z" />
                 </svg>
               </div>
             </Button>
