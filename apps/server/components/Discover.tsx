@@ -331,10 +331,7 @@ const Discover = observer(() => {
   return (
     <div
       suppressHydrationWarning
-      className="flex min-h-screen w-screen flex-col"
-      style={{
-        background: 'radial-gradient(50% 50% at 50% 50%, #1A200F 0%, #131313 100%)',
-      }}
+      className="flex min-h-screen w-screen flex-col bg-reelist-gradient-green "
     >
       <Head>
         <title>Discover</title>
