@@ -79,7 +79,7 @@ const Discover = observer(() => {
   const [searchText, setSearchText] = useState('')
 
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null)
-  const [showSelectedVideo, setShowSelectedVideo] = useState(true)
+  const [showSelectedVideo, setShowSelectedVideo] = useState(false)
   const [showMobileFilterOptions, setShowMobileFilterOptions] = useState(false)
   const [mobileFilterText, setMobileFilterText] = useState('')
 
