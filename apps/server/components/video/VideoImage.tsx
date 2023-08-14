@@ -41,17 +41,17 @@ const VideoImage = observer(({ video, onPress, isPoster }: VideoImageProps) => {
 
       {!isPoster && (
         <div
-          className="transition-min-height discover-md:group-hover:min-h-[40px] absolute bottom-0 flex min-h-[70px] w-full flex-col justify-end pt-3 pb-1 duration-300 ease-in-out"
+          className="transition-min-height discover-md:group-hover:min-h-[40px] absolute bottom-0 flex min-h-[70px] w-full flex-col justify-end pb-1 pt-3 duration-300 ease-in-out"
           style={{
             background:
               'linear-gradient(180deg, rgba(0, 0, 0, 0.54) 0%, rgba(0, 0, 0, 0) 0.01%, rgba(0, 0, 0, 0.54) 33.85%)',
           }}
         >
-          <div className="line-clamp-2 font-inter transition-margin-top discover-md:group-hover:mt-3 px-2 text-2xl  text-white duration-300 ease-in-out">
+          <div className="font-inter transition-margin-top discover-md:group-hover:mt-3 line-clamp-2 px-2 text-2xl  text-white duration-300 ease-in-out">
             {video.videoName}
           </div>
 
-          <div className="line-clamp-2 font-inter transition-max-height discover-md:roup-hover:max-h-0 max-h-8 overflow-hidden px-2 text-lg text-white duration-300 ease-in-out">
+          <div className="font-inter transition-max-height discover-md:roup-hover:max-h-0 line-clamp-2 max-h-8 overflow-hidden px-2 text-lg text-white duration-300 ease-in-out group-hover:max-h-0">
             {video.durationOrSeasons}
           </div>
         </div>
