@@ -380,9 +380,8 @@ const Discover = observer(() => {
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
-                      strokeWidth={1.5}
                       stroke="currentColor"
-                      className="h-5 justify-self-center pl-4 text-center align-baseline "
+                      className="h-5 justify-self-center pl-4 text-center align-baseline font-semibold stroke-2"
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -475,10 +474,10 @@ const Discover = observer(() => {
                 _.map(selectState.selectedOptions, (name, id) => (
                   <Button
                     className={
-                      'font-inter mt-4 rounded-full border border-solid px-3  hover:border-red-600 hover:text-red-600' +
+                      'font-inter group mt-4 rounded-full border border-solid px-3 ' +
                       (searchText
                         ? ' pointer-events-none border-gray-500 text-gray-500 opacity-40'
-                        : ' border-red-400 text-white')
+                        : ' border-reelist-red text-white')
                     }
                     onClick={() => selectState.removeOption(id)}
                     key={id}
@@ -493,7 +492,7 @@ const Discover = observer(() => {
                       viewBox="0 0 24 24"
                       strokeWidth={1.5}
                       stroke="currentColor"
-                      className="h-4 pl-2"
+                      className="group-hover:text-reelist-red h-4 pl-2 transition-colors duration-200"
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
