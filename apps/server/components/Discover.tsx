@@ -103,6 +103,8 @@ const Discover = observer(() => {
   const videoFilter = (video: Video) => {
     if (_.isEmpty(video.posterPath || video.backdropPath)) return false
 
+    if (_.isEmpty(regionSelectState.selectedOptions)) return true
+
     const mustIncludeAllRegions = regionSeparationType === 'includes_every'
 
     // if there is a regions filter, actualy filter by it
