@@ -1,23 +1,12 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import NavBar from '~/components/NavBar'
+import Logo from '../public/images/logo.png'
 
-const DynamicComponentWithNoSSR = dynamic(
-  () => import('../components/Discover'),
-  { ssr: false }
-)
+const DynamicComponentWithNoSSR = dynamic(() => import('../components/Discover'), { ssr: false })
 
 const Page = () => {
-  return (
-    <>
-
-    <NavBar path="/discover" />
-
-    <DynamicComponentWithNoSSR />
-    
-    </>
-  )
+  return <DynamicComponentWithNoSSR logo={Logo} />
 }
 
 export default Page

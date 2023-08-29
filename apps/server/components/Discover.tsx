@@ -21,6 +21,7 @@ import InfiniteScroll from './InfiniteScroll'
 import VideoModal from './video/VideoModal'
 import VideoImage from './video/VideoImage'
 import ReelistAccordion, { ReelistAccordionSection } from '~/components/ReelistAccordion'
+import NavBar from '~/components/NavBar'
 
 const DescendingIcon = (
   <svg
@@ -67,7 +68,7 @@ const useWindowWidth = () => {
   return width
 }
 
-const Discover = observer(() => {
+const Discover = observer(({ logo }: { logo: string }) => {
   const router = useRouter()
 
   const { videoStore } = useStore()
@@ -336,6 +337,11 @@ const Discover = observer(() => {
       <Head>
         <title>Discover</title>
       </Head>
+
+      <NavBar
+        path="/discover"
+        logo={logo}
+      />
 
       <Fab
         className="bg-reelist-red discover-md:hidden fixed bottom-5 right-5 flex opacity-70 "

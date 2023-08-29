@@ -12,10 +12,14 @@ const getButtonProps = (path: string, href: string) => {
   return { className: defaultStyle + activeStyle, href }
 }
 
-const NavBar = ({ path }: { path: string }) => {
-  const menuButtonRef = useRef()
-  const [isOpen, setIsOpen] = useState(false)
+type NavBarProps = PropsWithChildren<{
+  logo: string
+  path: string
+  rightButton?: ReactNode
+  onRightButtonPressed: () => void
+}>
 
+const NavBar = ({ logo, path }: { logo: string, path: string }) => {
   return (
     <>
       <div className="bg-reelist-gray discover-md:px-[55px] fixed left-0 right-0 top-0 z-10 px-[25px] py-2">
@@ -23,7 +27,7 @@ const NavBar = ({ path }: { path: string }) => {
           <a className="h-fit w-fit self-center text-slate-300 no-underline" href="/">
             <span className="discover-md:block hidden text-4xl">Reelist</span>
             <span className="discover-md:hidden flex h-fit">
-              <Image src={Logo} width={40} height={40} alt="Reelist" priority />
+              <Image src={logo || Logo} width={40} height={40} alt="Reelist" priority />
             </span>
           </a>
 
