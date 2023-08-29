@@ -491,40 +491,33 @@ const Discover = observer(({ logo }: { logo: string }) => {
             </div>
 
             <div className="flex flex-row flex-wrap gap-x-2">
-              {[
-                videoTypesSelectState,
-                regionSelectState,
-                genreSelectState,
-                watchProviderSelectState,
-              ].flatMap(selectState =>
-                _.map(selectState.selectedOptions, (name, id) => (
-                  <Button
-                    className={
-                      'font-inter group mt-4 rounded-full border border-solid px-3 ' +
-                      (searchText
-                        ? ' pointer-events-none border-gray-500 text-gray-500 opacity-40'
-                        : ' border-reelist-red text-white')
-                    }
-                    onClick={() => selectState.removeOption(id)}
-                    key={id}
-                    disableRipple
-                  >
-                    {name}
+              {_.map(selectedItems, ({ name, id, selectState }) => (
+                <Button
+                  className={
+                    'font-inter group mt-4 rounded-full border border-solid px-3 ' +
+                    (searchText
+                      ? ' pointer-events-none border-gray-500 text-gray-500 opacity-40'
+                      : ' border-reelist-red text-white')
+                  }
+                  onClick={() => selectState.removeOption(id)}
+                  key={id}
+                  disableRipple
+                >
+                  {name}
 
-                    {/* close icon */}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="currentColor"
-                      className="group-hover:text-reelist-red h-4 pl-2 transition-colors duration-200"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </Button>
-                )),
-              )}
+                  {/* close icon */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="group-hover:text-reelist-red h-4 pl-2 transition-colors duration-200"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </Button>
+              ))}
             </div>
           </div>
 
@@ -532,7 +525,6 @@ const Discover = observer(({ logo }: { logo: string }) => {
             className="discover-md:justify-items-stretch mb-4 grid w-full  flex-1 justify-center justify-items-center gap-x-5"
             style={{ gridTemplateColumns: `repeat(${numItemsPerRow}, minmax(0, 1fr))` }}
           >
-
             {videos.map(video => (
               <VideoImage
                 video={video}
