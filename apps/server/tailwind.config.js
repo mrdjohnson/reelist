@@ -24,6 +24,8 @@ module.exports = {
         'reelist-red': '#FE5365',
         'transparent-dark': 'rgba(0, 0, 0, 0.59)',
         'reelist-gray': 'rgb(19, 19, 19)',
+        'reelist-light-gray': '#2C2C2C',
+        'reelist-dark': '#141414',
       },
       spacing: {
         500: '500px',

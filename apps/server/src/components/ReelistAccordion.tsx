@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { Button } from '@mui/material'
 import { SelectOption, SelectState, StringOrNumber } from './ReelistSelect'
 
-const HEADER_HEIGHT = 41
+const HEADER_HEIGHT = 45
 
 type SubSectionContextType = {
   scrollToElement: (element: HTMLElement, index: number) => void
@@ -16,16 +16,28 @@ const ReelistAccordionContext = createContext<SubSectionContextType>({
 
 export const useReelistAccordionContext = () => useContext(ReelistAccordionContext)
 
-type ReelistAccordionSectionProps<T extends StringOrNumber> = PropsWithChildren<{
+type SelectedStatePropType<T extends StringOrNumber> = {
   selectState: SelectState<T>
-  index: number
-  totalCount: number
-  filterText: string
-}>
+  label?: never
+}
+
+type SelectedOptionsPropType = {
+  selectState?: never
+  label: string
+}
+
+type ReelistAccordionSectionProps<T extends StringOrNumber> = PropsWithChildren<
+  {
+    index: number
+    totalCount: number
+    filterText: string
+  } & (SelectedStatePropType<T> | SelectedOptionsPropType)
+>
 
 const ReelistAccordionSection = observer(
   <T extends StringOrNumber>({
     selectState,
+    label: presetLabel,
     children,
     index,
     totalCount,
@@ -34,7 +46,8 @@ const ReelistAccordionSection = observer(
     const labelRef = useRef(null)
     const { scrollToElement } = useReelistAccordionContext()
 
-    const { label, options = [], selectedOptions, toggleOption, isMulti } = selectState || {}
+    const { selectedOptions, options = [], toggleOption, isMulti } = selectState || {}
+    const label = selectState?.label || presetLabel
 
     const filteredOptions = useMemo(() => {
       return _.chain(options)
@@ -101,41 +114,54 @@ const ReelistAccordionSection = observer(
       )
     }
 
+    const hasFilteredOptions = !_.isEmpty(filteredOptions)
+    const hadContent = options.length > 0
+    const hasContent =(!hadContent && children) || hasFilteredOptions
+    const contentIsEmpty = hadContent && !hasFilteredOptions
+
     return (
       <>
-        <div
-          className={
-            'bg-transparent-dark sticky z-10 m-0 w-full border-0 border-b border-solid border-gray-100 border-opacity-50 p-2 backdrop-blur-lg ' +
-            (_.isEmpty(filteredOptions) ? 'text-gray-500' : 'text-white')
-          }
-          style={{
-            bottom: (totalCount - (index + 1)) * HEADER_HEIGHT + 'px',
-            top: index * HEADER_HEIGHT + 'px',
-          }}
-          onClick={() => scrollToElement(labelRef.current, index)}
-        >
-          {label}
-        </div>
-
-        <div className={'p-3'} ref={labelRef}>
-          {children && <div className="w-full pb-1">{children}</div>}
-
-          <div className="my-3 flex w-full flex-wrap gap-3 ">
-            {filteredOptions.map(option => {
-              const isChecked = selectedOptions[0] === option.id || !!selectedOptions[option.id]
-              return renderOption(option, isChecked)
-            })}
+        {label && (
+          <div
+            className={
+              'sticky z-10 m-0 w-full border-0 border-b border-solid border-gray-100 border-opacity-50 bg-black p-2 text-lg  ' +
+              (contentIsEmpty ? 'text-gray-500' : 'text-white')
+            }
+            style={{
+              bottom: (totalCount - (index + 1)) * HEADER_HEIGHT + 'px',
+              top: index * HEADER_HEIGHT + 'px',
+            }}
+            onClick={() => scrollToElement(labelRef.current, index)}
+          >
+            {label} {contentIsEmpty && ' (Empty)'}
           </div>
-        </div>
+        )}
+
+        {hasContent && (
+          <div className="p-3" ref={labelRef}>
+            {children && <div className="w-full pb-1">{children}</div>}
+
+            {hasFilteredOptions && (
+              <div className="my-3 flex w-full flex-wrap gap-3 ">
+                {filteredOptions.map(option => {
+                  const isChecked = selectedOptions[0] === option.id || !!selectedOptions[option.id]
+                  return renderOption(option, isChecked)
+                })}
+              </div>
+            )}
+          </div>
+        )}
       </>
     )
   },
 )
 
-const ReelistAccordion = observer(({ children }) => {
+const ReelistAccordion = observer(({ children }: PropsWithChildren) => {
   const scrollingDivRef = useRef(null)
 
   const scrollToElement = (element: HTMLElement, index: number) => {
+    if (!element) return
+
     const div = scrollingDivRef.current
     if (!div) return
 
@@ -147,7 +173,7 @@ const ReelistAccordion = observer(({ children }) => {
 
   return (
     <ReelistAccordionContext.Provider value={{ scrollToElement }}>
-      <div ref={scrollingDivRef} className="relative h-fit overflow-scroll no-scrollbar">
+      <div ref={scrollingDivRef} className="no-scrollbar relative h-fit overflow-scroll">
         {children}
       </div>
     </ReelistAccordionContext.Provider>

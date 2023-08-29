@@ -1,5 +1,5 @@
-import { Button, Popover } from '@mui/material'
-import { PropsWithChildren, useRef, useState } from 'react'
+import { AppBar, Button, Drawer, Popover, Toolbar } from '@mui/material'
+import { PropsWithChildren, ReactNode, useRef, useState } from 'react'
 import Image from 'next/image'
 import Logo from '../../public/images/logo.png'
 
@@ -19,10 +19,13 @@ type NavBarProps = PropsWithChildren<{
   onRightButtonPressed: () => void
 }>
 
-const NavBar = ({ logo, path }: { logo: string, path: string }) => {
+const NavBar = ({ logo, path, children, rightButton, onRightButtonPressed }: NavBarProps) => {
   return (
     <>
-      <div className="bg-reelist-gray discover-md:px-[55px] fixed left-0 right-0 top-0 z-10 px-[25px] py-2">
+      <AppBar
+        className=" bg-reelist-light-gray discover-md:bg-reelist-gray discover-md:px-[55px] fixed left-0 right-0 top-0 h-14 px-[25px] py-2 shadow-none"
+        sx={{ zIndex: theme => theme.zIndex.drawer + 1 }}
+      >
         <div className="flex h-fit w-full justify-between">
           <a className="h-fit w-fit self-center text-slate-300 no-underline" href="/">
             <span className="discover-md:block hidden text-4xl">Reelist</span>
@@ -37,50 +40,25 @@ const NavBar = ({ logo, path }: { logo: string, path: string }) => {
             <Button {...getButtonProps(path, '/discover')}>Discover</Button>
           </div>
 
-          <div
-            className="discover-md:hidden align flex justify-end text-white"
-            ref={menuButtonRef}
-            onClick={() => setIsOpen(true)}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              className="h-full w-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-              />
-            </svg>
-          </div>
-
-          <Popover
-            id="menu-button-popover"
-            open={isOpen}
-            anchorEl={menuButtonRef.current}
-            onClose={() => setIsOpen(false)}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'right',
-            }}
-            PaperProps={{
-              className: 'bg-reelist-gray',
-            }}
-          >
-            <div className="gap-x-3 backdrop-blur-md">
-              <Button {...getButtonProps(path, '/')}>Home</Button>
-              {/* <Button {...getButtonProps(path, '/about')}>About</Button> */}
-              <Button {...getButtonProps(path, '/discover')}>Discover</Button>
-            </div>
-          </Popover>
+          {rightButton && <div onClick={onRightButtonPressed}>{rightButton}</div>}
         </div>
-      </div>
+      </AppBar>
 
-      <div className="h-14" />
+      <Drawer
+        id="menu-button-popover"
+        open={!!children}
+        anchor="right"
+        onClose={onRightButtonPressed}
+        PaperProps={{
+          className: 'bg-reelist-light-gray h-full mt-14',
+        }}
+      >
+        <div className="bg-reelist-gradient-green h-full w-screen gap-x-3 px-[25px]">
+          {children}
+        </div>
+      </Drawer>
+
+      <Toolbar />
     </>
   )
 }
