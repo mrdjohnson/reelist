@@ -23,6 +23,7 @@ import VideoModal from './video/VideoModal'
 import VideoImage from './video/VideoImage'
 import ReelistAccordion, { ReelistAccordionSection } from '~/components/ReelistAccordion'
 import NavBar from '~/components/NavBar'
+import classNames from 'classnames'
 
 const DescendingIcon = (
   <svg
@@ -283,7 +284,7 @@ const Discover = observer(({ logo }: { logo: string }) => {
     const nextWidth = numItemsPerRow * itemWidth + (numItemsPerRow - 1) * spacing
 
     if (windowWidth <= 673) {
-      return windowWidth - totalContainerPadding
+      return windowWidth
     }
 
     return nextWidth
@@ -654,12 +655,7 @@ const Discover = observer(({ logo }: { logo: string }) => {
                   ({ name, id, selectState }) =>
                     name.toLowerCase().includes(mobileFilterText.toLowerCase()) && (
                       <Button
-                        className={
-                          'font-inter rounded-full border border-solid p-3  hover:border-red-600 hover:text-red-600' +
-                          (searchText
-                            ? ' pointer-events-none border-gray-500 text-gray-500 opacity-40'
-                            : ' border-red-400 text-white')
-                        }
+                        className="font-inter rounded-full border border-solid border-red-400  p-3 text-white hover:border-red-600 hover:text-red-600"
                         onClick={() => selectState.removeOption(id)}
                         key={id}
                         disableRipple
