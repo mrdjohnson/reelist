@@ -883,6 +883,7 @@ const getProvidersByType = async (type: string) => {
     .then(items => _.keyBy(items, 'original.id'))
 }
 
+// todo; fill in the region when asking for the providers; or sort by selected region code using the (unused) displayPriorities field
 // initial options: navigator.languages.filter(language => language.includes('-')).map(language => language.match(/-(.*)/)[1])
 const getProviders = async () => {
   const tvProvidersById = await getProvidersByType('tv')
