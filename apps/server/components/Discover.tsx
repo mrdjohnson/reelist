@@ -931,4 +931,13 @@ const getSortTypes = async () => [
   { id: 'vote_average.asc', name: 'Vote Average (Asc)', icon: AscendingIcon },
 ]
 
+// hard coded popular generes 
+const popularGeneres = {
+  comedy: [{ shared: [35] }],
+  actionAndAdventure: [{ tv: [10759] }, { movie: [28, 12] }],
+  drama: [{ shared: [18] }],
+  horror: [{ shared: [27] }],
+  scifi: [{ tv: [11] }, { movie: [878] }],
+}
+
 export default Discover
