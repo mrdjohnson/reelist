@@ -24,6 +24,8 @@ import VideoImage from './video/VideoImage'
 import ReelistAccordion, { ReelistAccordionSection } from '~/components/ReelistAccordion'
 import NavBar from '~/components/NavBar'
 import classNames from 'classnames'
+import PillButton from './PillButton'
+import CloseIcon from './heroIcons/CloseIcon'
 
 const DescendingIcon = (
   <svg
@@ -493,31 +495,17 @@ const Discover = observer(({ logo }: { logo: string }) => {
 
             <div className="flex flex-row flex-wrap gap-x-2">
               {_.map(selectedItems, ({ name, id, selectState }) => (
-                <Button
+                <PillButton
                   className={
-                    'font-inter group mt-4 rounded-full border border-solid px-3 ' +
-                    (searchText
-                      ? ' pointer-events-none border-gray-500 text-gray-500 opacity-40'
-                      : ' border-reelist-red text-white')
+                    searchText
+                      ? ' mt-4 pointer-events-none border-gray-500 text-gray-500 opacity-40'
+                      : ' mt-4 border-reelist-red text-white'
                   }
                   onClick={() => selectState.removeOption(id)}
                   key={id}
-                  disableRipple
-                >
-                  {name}
-
-                  {/* close icon */}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="group-hover:text-reelist-red h-4 pl-2 transition-colors duration-200"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </Button>
+                  rightIcon={<CloseIcon />}
+                  label={name}
+                />
               ))}
             </div>
           </div>
@@ -654,31 +642,32 @@ const Discover = observer(({ logo }: { logo: string }) => {
                   selectedItems,
                   ({ name, id, selectState }) =>
                     name.toLowerCase().includes(mobileFilterText.toLowerCase()) && (
-                      <Button
-                        className="font-inter rounded-full border border-solid border-red-400  p-3 text-white hover:border-red-600 hover:text-red-600"
+                      <PillButton
+                        className="border-reelist-red p-3 text-white"
                         onClick={() => selectState.removeOption(id)}
                         key={id}
-                        disableRipple
-                      >
-                        {name}
+                        label={name}
+                        rightIcon={<CloseIcon />}
+                      />
+                      // {name}
 
-                        {/* close icon */}
+                      //   {/* close icon */}
 
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="h-5 justify-self-center pl-4 text-center align-baseline "
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                      </Button>
+                      //   <svg
+                      //     xmlns="http://www.w3.org/2000/svg"
+                      //     fill="none"
+                      //     viewBox="0 0 24 24"
+                      //     strokeWidth={1.5}
+                      //     stroke="currentColor"
+                      //     className="h-5 justify-self-center pl-4 text-center align-baseline "
+                      //   >
+                      //     <path
+                      //       strokeLinecap="round"
+                      //       strokeLinejoin="round"
+                      //       d="M6 18L18 6M6 6l12 12"
+                      //     />
+                      //   </svg>
+                      // </Button>
                     ),
                 )}
               </div>
@@ -931,7 +920,7 @@ const getSortTypes = async () => [
   { id: 'vote_average.asc', name: 'Vote Average (Asc)', icon: AscendingIcon },
 ]
 
-// hard coded popular generes 
+// hard coded popular generes
 const popularGeneres = {
   comedy: [{ shared: [35] }],
   actionAndAdventure: [{ tv: [10759] }, { movie: [28, 12] }],

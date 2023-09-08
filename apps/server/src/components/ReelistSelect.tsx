@@ -5,10 +5,10 @@ import { makeAutoObservable } from 'mobx'
 import { useStore } from '@reelist/utils/hooks/useStore'
 import { IStorage } from '~/utils/storage'
 import { Button, Link, Popover, TextField } from '@mui/material'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import AddIcon from '@mui/icons-material/Add'
-import RemoveIcon from '@mui/icons-material/Remove'
 import classNames from 'classnames'
+import PillButton from 'apps/server/components/PillButton'
+import DashIcon from 'apps/server/components/heroIcons/DashIcon'
+import PlusIcon from 'apps/server/components/heroIcons/PlusIcon'
 
 export type StringOrNumber = string | number
 
@@ -172,46 +172,24 @@ const ReelistSelect = observer(
       } else if (isChecked) {
         remove = true
 
-        icon = (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            className="h-5 w-5"
-          >
-            <path d="M6.75 9.25a.75.75 0 000 1.5h6.5a.75.75 0 000-1.5h-6.5z" />
-          </svg>
-        )
+        icon = <DashIcon />
       } else {
         add = true
-        icon = (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            className="h-5 w-5"
-          >
-            <path d="M10.75 6.75a.75.75 0 00-1.5 0v2.5h-2.5a.75.75 0 000 1.5h2.5v2.5a.75.75 0 001.5 0v-2.5h2.5a.75.75 0 000-1.5h-2.5v-2.5z" />
-          </svg>
-        )
+        icon =  <PlusIcon />
       }
 
       return (
-        <Button
+        <PillButton
           key={option.id}
-          className={classNames('font-semibold', {
-            'hover:bg-reelist-red rounded-md text-white hover:text-black': singleSelect,
-            'border-reelist-red bg-reelist-red rounded-l-full rounded-r-full border border-solid text-black hover:text-white':
-              remove,
-            'border-reelist-red hover:text-reelist-red rounded-l-full rounded-r-full border border-solid bg-black bg-opacity-30 text-white':
-              add,
+          label={option.name}
+          className={classNames('border-reelist-red font-semibold', {
+            'hover:bg-reelist-red rounded-md text-white hover:text-black border-none': singleSelect,
+            ' bg-reelist-red text-black hover:text-white': remove,
+            ' hover:text-reelist-red  bg-black bg-opacity-30 text-white': add,
           })}
           onClick={() => toggleOption(option)}
-        >
-          {option.name}
-
-          {icon}
-        </Button>
+          rightIcon={icon}
+        />
       )
     }
 
@@ -291,7 +269,7 @@ const ReelistSelect = observer(
               'no-scrollbar relative mt-3 flex overflow-y-scroll overscroll-none ',
               {
                 'max-h-500 h-full w-full max-w-[600px] flex-col ': selectState.isMulti,
-                'mt-0 h-fit w-fit flex-row rounded-md': !selectState.isMulti,
+                '!mt-0 h-fit w-fit flex-row rounded-md': !selectState.isMulti,
               },
             )}
           >
@@ -313,7 +291,7 @@ const ReelistSelect = observer(
               <div
                 className={
                   'my-3 flex w-full flex-wrap gap-3 ' +
-                  (!selectState.isMulti && ' flex-col rounded-md')
+                  (!selectState.isMulti && ' !my-0 flex-col rounded-md')
                 }
               >
                 {filteredOptions.map(option => {

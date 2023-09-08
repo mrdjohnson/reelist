@@ -1,8 +1,11 @@
 import React, { PropsWithChildren, useMemo, useRef, createContext, useContext } from 'react'
 import _ from 'lodash'
 import { observer } from 'mobx-react-lite'
-import { Button } from '@mui/material'
 import { SelectOption, SelectState, StringOrNumber } from './ReelistSelect'
+import DashIcon from 'apps/server/components/heroIcons/DashIcon'
+import PlusIcon from 'apps/server/components/heroIcons/PlusIcon'
+import PillButton from 'apps/server/components/PillButton'
+import classNames from 'classnames'
 
 const HEADER_HEIGHT = 45
 
@@ -68,49 +71,24 @@ const ReelistAccordionSection = observer(
       } else if (isChecked) {
         remove = true
 
-        icon = (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            className="h-5 w-5"
-          >
-            <path d="M6.75 9.25a.75.75 0 000 1.5h6.5a.75.75 0 000-1.5h-6.5z" />
-          </svg>
-        )
+        icon = <DashIcon />
       } else {
         add = true
-
-        icon = (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            className="h-5 w-5"
-          >
-            <path d="M10.75 6.75a.75.75 0 00-1.5 0v2.5h-2.5a.75.75 0 000 1.5h2.5v2.5a.75.75 0 001.5 0v-2.5h2.5a.75.75 0 000-1.5h-2.5v-2.5z" />
-          </svg>
-        )
+        icon =  <PlusIcon />
       }
 
       return (
-        <Button
+        <PillButton
           key={option.id}
-          className={
-            'p-3 ' +
-            ((singleSelect &&
-              'rounded-l-full rounded-r-full ' +
-                (isChecked ? ' bg-reelist-red  text-black ' : 'text-white')) ||
-              (remove && 'bg-reelist-red rounded-l-full rounded-r-full text-black') ||
-              (add &&
-                'border-reelist-red rounded-l-full rounded-r-full border border-solid bg-black bg-opacity-30 text-white'))
-          }
+          label={option.name}
+          className={classNames('border-reelist-red font-semibold p-3', {
+            'hover:bg-reelist-red rounded-md text-white hover:text-black border-none': singleSelect,
+            ' bg-reelist-red !text-black hover:text-white': remove,
+            ' hover:text-reelist-red  bg-black bg-opacity-30 !text-white': add,
+          })}
           onClick={() => toggleOption(option)}
-        >
-          {option.name}
-
-          {icon}
-        </Button>
+          rightIcon={icon}
+        />
       )
     }
 
