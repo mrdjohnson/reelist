@@ -104,6 +104,7 @@ const Discover = observer(({ logo }: { logo: string }) => {
   const [page, setPage] = useState(1)
   const [videos, setVideos] = useState<Video[]>([])
   const [isLoadingVideos, setIsLoadingVideos] = useState(false)
+  const videoCountRef = useRef(0)
 
   const videoFilter = (video: Video) => {
     if (_.isEmpty(video.posterPath || video.backdropPath)) return false
@@ -139,6 +140,8 @@ const Discover = observer(({ logo }: { logo: string }) => {
 
       setVideos(_.uniqBy(videos.concat(filteredVideos), 'videoId'))
     }
+
+    finishLoadingVideos(filteredVideos)
   }
 
   const discover = () => {
@@ -177,23 +180,22 @@ const Discover = observer(({ logo }: { logo: string }) => {
       movieProviders: sharedProviders.concat(movieProviders).map(withoutIdentifier).join(','),
     })
       .then(handleVideos)
-      .catch(e => {})
-      .finally(() => {
-        setIsLoadingVideos(false)
+      .catch(e => {
+        finishLoadingVideos([])
       })
   }
 
   const search = () => {
     videoSearch(searchText, { deepSearch: true, page: page.toString() })
       .then(handleVideos)
-      .catch(e => {})
-      .finally(() => {
-        setIsLoadingVideos(false)
+      .catch(e => {
+        finishLoadingVideos([])
       })
   }
 
   const loadVideos = () => {
-    if (page > 10 || isLoadingVideos) {
+    if (page > 10) {
+      setIsLoadingVideos(false)
       return
     }
 
@@ -203,6 +205,18 @@ const Discover = observer(({ logo }: { logo: string }) => {
       search()
     } else {
       discover()
+    }
+  }
+
+  const finishLoadingVideos = (loadedVideos: Video[]) => {
+    if (page >= 10) {
+      setIsLoadingVideos(false)
+    }
+
+    if (_.isEmpty(loadedVideos)) {
+      setPage(page + 1)
+    } else {
+      setIsLoadingVideos(false)
     }
   }
 
@@ -219,8 +233,13 @@ const Discover = observer(({ logo }: { logo: string }) => {
 
   useEffect(() => {
     // todo: scroll back to top
-    setPage(1)
-    loadVideos()
+    if (page === 1) {
+      loadVideos()
+    } else {
+      setPage(1)
+    }
+
+    console.log('filter changed')
   }, [
     videoTypesSelectState.selectedOptions,
     sortTypesSelectState.selectedOptions,
@@ -243,7 +262,7 @@ const Discover = observer(({ logo }: { logo: string }) => {
 
   useEffect(() => {
     loadVideos()
-  }, [page, searchText])
+  }, [page])
 
   const getNextPage = useCallback(() => {
     if (isLoadingVideos) return
@@ -498,8 +517,8 @@ const Discover = observer(({ logo }: { logo: string }) => {
                 <PillButton
                   className={
                     searchText
-                      ? ' mt-4 pointer-events-none border-gray-500 text-gray-500 opacity-40'
-                      : ' mt-4 border-reelist-red text-white'
+                      ? ' pointer-events-none mt-4 border-gray-500 text-gray-500 opacity-40'
+                      : ' border-reelist-red mt-4 text-white'
                   }
                   onClick={() => selectState.removeOption(id)}
                   key={id}
