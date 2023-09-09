@@ -275,6 +275,7 @@ const Discover = observer(({ logo }: { logo: string }) => {
 
     if (!videoId) {
       setShowSelectedVideo(false)
+      setSelectedVideo(null)
     } else if (!_.isArray(videoId)) {
       videoStore.getVideo(videoId).then(setSelectedVideo)
       setShowSelectedVideo(true)
