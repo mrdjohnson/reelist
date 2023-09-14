@@ -3,9 +3,10 @@ import { useEffect, useRef } from 'react'
 type Props = {
   children: React.ReactNode
   onRefresh: () => void
+  isInfinite: boolean
 }
 
-const InfiniteScroll: React.FC<Props> = ({ children, onRefresh }) => {
+const InfiniteScroll: React.FC<Props> = ({ children, onRefresh, isInfinite }) => {
   const infiniteRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -33,10 +34,10 @@ const InfiniteScroll: React.FC<Props> = ({ children, onRefresh }) => {
   }, [onRefresh])
 
   return (
-    <div className="w-full h-full min-h-[100] relative">
+    <div className="relative h-full min-h-[100] w-full">
       {children}
 
-      <div ref={infiniteRef} className="h-4 absolute bottom-10" />
+      {isInfinite && <div ref={infiniteRef} className="absolute bottom-10 h-4" />}
     </div>
   )
 }

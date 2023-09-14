@@ -26,6 +26,14 @@ import NavBar from '~/components/NavBar'
 import classNames from 'classnames'
 import PillButton from './PillButton'
 import CloseIcon from './heroIcons/CloseIcon'
+import VideoGroup from './VideoGroup'
+import useAsyncState from '@reelist/utils/hooks/useAsyncState'
+
+enum HomePageState {
+  IS_HOMEPAGE = 'IS_HOMEPAGE',
+  NOT_HOMEPAGE = 'NOT_HOMEPAGE',
+  NOT_LOADED = 'NOT_LOADED',
+}
 
 const DescendingIcon = (
   <svg
@@ -104,7 +112,26 @@ const Discover = observer(({ logo }: { logo: string }) => {
   const [page, setPage] = useState(1)
   const [videos, setVideos] = useState<Video[]>([])
   const [isLoadingVideos, setIsLoadingVideos] = useState(false)
-  const videoCountRef = useRef(0)
+
+  const [homepageSections, setHomepageSections] = useState([])
+
+  const initHomepageVideos = async () => {
+    const base = await getVideos(null)
+    const comedy = await getVideos(popularGeneres.comedy)
+    const actionAndAdventure = await getVideos(popularGeneres.actionAndAdventure)
+    const drama = await getVideos(popularGeneres.drama)
+    const horror = await getVideos(popularGeneres.horror)
+    const scifi = await getVideos(popularGeneres.scifi)
+
+    setHomepageSections([
+      { title: '', videos: base, name: 'base' },
+      { title: 'Comedy', videos: comedy, name: 'comedy' },
+      { title: 'Action & Adventure', videos: actionAndAdventure, name: 'actionAndAdventure' },
+      { title: 'Drama', videos: drama, name: 'drama' },
+      { title: 'Horror', videos: horror, name: 'horror' },
+      { title: 'Scifi', videos: scifi, name: 'scifi' },
+    ])
+  }
 
   const videoFilter = (video: Video) => {
     if (_.isEmpty(video.posterPath || video.backdropPath)) return false
@@ -127,30 +154,27 @@ const Discover = observer(({ logo }: { logo: string }) => {
     return false
   }
 
-  const handleVideos = (nextVideos: Video[]) => {
+  const handleVideos = (nextVideos: Video[], name: string = 'base') => {
     const filteredVideos = searchText
       ? nextVideos
       : _.chain(nextVideos).filter(videoFilter).compact().value()
 
     if (page === 1) {
       console.log('making new videos')
-      setVideos(filteredVideos)
+      return filteredVideos
     } else {
       console.log('adding to current videos')
 
-      setVideos(_.uniqBy(videos.concat(filteredVideos), 'videoId'))
+      return _.uniqBy(videos.concat(filteredVideos), 'videoId')
     }
-
-    finishLoadingVideos(filteredVideos)
   }
 
-  const discover = () => {
+  const getVideos = async (selectedGenres: string[]) => {
     const withoutIdentifier = (item: string) => item.split(':')[1]
 
     const selectedVideoTypes = videoTypesSelectState.selectedOptions
     const selectedSortType = _.keys(sortTypesSelectState.selectedOptions)[0]
     const selectedRegions = regionSelectState.selectedOptions
-    const selectedGenres = _.keys(genreSelectState.selectedOptions)
     const selectedWatchProviders = _.keys(watchProviderSelectState.selectedOptions)
 
     const {
@@ -167,7 +191,7 @@ const Discover = observer(({ logo }: { logo: string }) => {
 
     const genreSeparator = genreSeparationType === 'includes_any' ? ',' : '|'
 
-    videoDiscover({
+    return await videoDiscover({
       with_type: _.keys(selectedVideoTypes).join(
         typesSeparationType === 'includes_any' ? ',' : '|',
       ),
@@ -178,8 +202,14 @@ const Discover = observer(({ logo }: { logo: string }) => {
       movieGenres: sharedGenres.concat(movieGenres).map(withoutIdentifier).join(genreSeparator),
       tvProviders: sharedProviders.concat(tvProviders).map(withoutIdentifier).join(','),
       movieProviders: sharedProviders.concat(movieProviders).map(withoutIdentifier).join(','),
-    })
+    }).then(handleVideos)
+  }
+
+  // this needs to be set up to be callsed for each genre, then pass the videos to the video group
+  const discover = () => {
+    getVideos(_.keys(genreSelectState.selectedOptions))
       .then(handleVideos)
+      .then(finishLoadingVideos)
       .catch(e => {
         finishLoadingVideos([])
       })
@@ -188,12 +218,18 @@ const Discover = observer(({ logo }: { logo: string }) => {
   const search = () => {
     videoSearch(searchText, { deepSearch: true, page: page.toString() })
       .then(handleVideos)
+      .then(finishLoadingVideos)
       .catch(e => {
         finishLoadingVideos([])
       })
   }
 
   const loadVideos = () => {
+    if (homepageState === HomePageState.IS_HOMEPAGE) {
+      initHomepageVideos()
+      return
+    }
+
     if (page > 10) {
       setIsLoadingVideos(false)
       return
@@ -209,6 +245,8 @@ const Discover = observer(({ logo }: { logo: string }) => {
   }
 
   const finishLoadingVideos = (loadedVideos: Video[]) => {
+    setVideos(loadedVideos)
+
     if (page >= 10) {
       setIsLoadingVideos(false)
     }
@@ -231,6 +269,32 @@ const Discover = observer(({ logo }: { logo: string }) => {
     getAlternativeDefaults: () => ['popularity.desc'],
   })
 
+  const selectStatesLoaded = useMemo(() => {
+    return (
+      videoTypesSelectState.isLoadedFromSave &&
+      sortTypesSelectState.isLoadedFromSave &&
+      genreSelectState.isLoadedFromSave &&
+      watchProviderSelectState.isLoadedFromSave &&
+      regionSelectState.isLoadedFromSave
+    )
+  }, [
+    videoTypesSelectState.isLoadedFromSave,
+    sortTypesSelectState.isLoadedFromSave,
+    genreSelectState.isLoadedFromSave,
+    watchProviderSelectState.isLoadedFromSave,
+    regionSelectState.isLoadedFromSave,
+  ])
+
+  const homepageState = useMemo(() => {
+    if (!selectStatesLoaded) return HomePageState.NOT_LOADED
+
+    return _.isEmpty(genreSelectState.selectedOptions)
+      ? HomePageState.IS_HOMEPAGE
+      : HomePageState.NOT_HOMEPAGE
+  }, [selectStatesLoaded, genreSelectState.selectedOptions])
+
+  console.log('homepage state: ', homepageState.toString(), _.isEmpty(genreSelectState.selectedOptions))
+
   useEffect(() => {
     // todo: scroll back to top
     if (page === 1) {
@@ -238,9 +302,8 @@ const Discover = observer(({ logo }: { logo: string }) => {
     } else {
       setPage(1)
     }
-
-    console.log('filter changed')
   }, [
+    selectStatesLoaded,
     videoTypesSelectState.selectedOptions,
     sortTypesSelectState.selectedOptions,
     genreSelectState.selectedOptions,
@@ -265,7 +328,7 @@ const Discover = observer(({ logo }: { logo: string }) => {
   }, [page])
 
   const getNextPage = useCallback(() => {
-    if (isLoadingVideos) return
+    if (isLoadingVideos || homepageState === HomePageState.NOT_HOMEPAGE) return
 
     setPage(page + 1)
   }, [page, isLoadingVideos])
@@ -323,6 +386,8 @@ const Discover = observer(({ logo }: { logo: string }) => {
       genreSeparationType === 'includes_every' ? 'includes_any' : 'includes_every',
     )
   }
+
+  // todo toggle watch provider based on regions (or make it the default option?)
 
   const handleKeyDown = event => {
     if (event.keyCode === 13) {
@@ -384,7 +449,10 @@ const Discover = observer(({ logo }: { logo: string }) => {
         className="discover-md:mt-[20px] flex h-full flex-col self-center px-[20px]"
         style={{ width }}
       >
-        <InfiniteScroll onRefresh={getNextPage}>
+        <InfiniteScroll
+          onRefresh={getNextPage}
+          isInfinite={homepageState === HomePageState.IS_HOMEPAGE}
+        >
           <div className="discover-md:hidden my-4 text-center text-2xl font-semibold text-gray-300">
             Discover
           </div>
@@ -530,19 +598,20 @@ const Discover = observer(({ logo }: { logo: string }) => {
             </div>
           </div>
 
-          <div
-            className="discover-md:justify-items-stretch mb-4 grid w-full  flex-1 justify-center justify-items-center gap-x-5"
-            style={{ gridTemplateColumns: `repeat(${numItemsPerRow}, minmax(0, 1fr))` }}
-          >
-            {videos.map(video => (
-              <VideoImage
-                video={video}
-                containerProps={{ width: '307px' }}
-                onPress={() => handleVideoSelection(video)}
-                key={video.videoId}
+          {homepageState === HomePageState.IS_HOMEPAGE ? (
+            homepageSections.map(({ name, videos, title }) => (
+              <VideoGroup
+                title={title}
+                videos={videos}
+                numItemsPerRow={numItemsPerRow}
+                // todo: this should set the selected genres to the popular genres
+                onViewMoreClicked={() => console.log(name + ' clicked: ' + popularGeneres[name])}
+                clippedOverride
               />
-            ))}
-          </div>
+            ))
+          ) : (
+            <VideoGroup videos={videos} numItemsPerRow={numItemsPerRow} />
+          )}
 
           {isLoadingVideos && (
             <div className="flex justify-center ">
@@ -942,11 +1011,12 @@ const getSortTypes = async () => [
 
 // hard coded popular generes
 const popularGeneres = {
-  comedy: [{ shared: [35] }],
-  actionAndAdventure: [{ tv: [10759] }, { movie: [28, 12] }],
-  drama: [{ shared: [18] }],
-  horror: [{ shared: [27] }],
-  scifi: [{ tv: [11] }, { movie: [878] }],
+  base: [],
+  comedy: ['shared:35'],
+  actionAndAdventure: ['tv:10759', 'movie:28', 'movie:12'],
+  drama: ['shared:18'],
+  horror: ['shared:27'],
+  scifi: ['tv:11', 'movie:878'],
 }
 
 export default Discover

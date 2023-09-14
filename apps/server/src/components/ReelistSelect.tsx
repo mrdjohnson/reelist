@@ -23,6 +23,7 @@ export class SelectState<T extends StringOrNumber> {
   selectedOptions: Record<StringOrNumber, string> = {}
   storageKey: string
   options: Array<SelectOption<T>>
+  isLoadedFromSave: boolean = false
 
   constructor(
     public label: string,
@@ -51,6 +52,8 @@ export class SelectState<T extends StringOrNumber> {
 
     if (!_.isEmpty(storedValues)) {
       this.selectedOptions = storedValues
+
+      this.isLoadedFromSave = true
 
       return
     }
@@ -81,6 +84,8 @@ export class SelectState<T extends StringOrNumber> {
       // todo:
       // this.selectedOptions = {0: this.selectedOptions[0]}
     }
+
+    this.isLoadedFromSave = true
   }
 
   toggleOption = (option: SelectOption<T>) => {
