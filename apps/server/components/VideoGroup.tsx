@@ -21,6 +21,7 @@ type VideoGroupProps = {
   title?: string
   clippedOverride?: boolean
   videos?: Video[]
+  isLoading: boolean
 } & (PropsWithTitle | PropsWithoutTitle)
 
 const VideoGroup = ({
@@ -29,6 +30,7 @@ const VideoGroup = ({
   title,
   clippedOverride,
   onViewMoreClicked,
+  isLoading,
 }: VideoGroupProps) => {
   const router = useRouter()
 
@@ -44,15 +46,13 @@ const VideoGroup = ({
     return isClipped ? _.take(videos, maxViewCount) : videos
   }, [isClipped, videos, numItemsPerRow])
 
-  if (_.isEmpty(videosToDisplay)) return null
-
-  // todo: video group loading? use skeleton instead of loading icon
+  if (!isLoading && _.isEmpty(videosToDisplay)) return null
 
   return (
     <>
       {title && (
         <div
-          className="mb-5 cursor-pointer text-3xl font-semibold text-white hover:font-bold hover:underline w-fit"
+          className="mb-5 w-fit cursor-pointer text-3xl font-semibold text-white hover:font-bold hover:underline"
           onClick={onViewMoreClicked}
         >
           {title}
@@ -74,16 +74,17 @@ const VideoGroup = ({
             key={video.videoId}
           />
         ))}
+
+        {isLoading && _.times(numItemsPerRow, () => <VideoImage loading />)}
       </div>
 
       {title && videosToDisplay?.length === maxViewCount && (
         <div className="flex h-[70px] justify-center">
           <Button
             onClick={onViewMoreClicked}
-            className="h-fit cursor-pointer rounded-md bg-transparent align-middle text-lg text-white mb-1 border-solid border-transparent hover:border-white border-2"
+            className="mb-1 h-fit cursor-pointer rounded-md border-2 border-solid border-transparent bg-transparent align-middle text-lg text-white hover:border-white"
             disableRipple
           >
-            
             <span className="border-0 border-b border-solid border-white">View More</span>
           </Button>
         </div>

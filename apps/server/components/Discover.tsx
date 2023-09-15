@@ -34,6 +34,12 @@ enum HomePageState {
   NOT_LOADED = 'NOT_LOADED',
 }
 
+enum HomePageVideosState {
+  LOADED = 'LOADED',
+  LOADING = 'LOADING',
+  NOT_LOADED = 'NOT_LOADED',
+}
+
 const useWindowWidth = () => {
   const [width, setWidth] = useState(window?.innerWidth)
   const handleResize = () => setWidth(window?.innerWidth)
@@ -81,28 +87,28 @@ const Discover = observer(({ logo }: { logo: string }) => {
   const [page, setPage] = useState(1)
   const [videos, setVideos] = useState<Video[]>([])
   const [isLoadingVideos, setIsLoadingVideos] = useState(false)
-  const [hasLoadedHomepageVideos, setHasLoadedomepageVideos] = useState(false)
+  const [homepageVideosState, setHomepageVideosState] = useState(HomePageVideosState.NOT_LOADED)
 
-  const [homepageSections, setHomepageSections] = useState([])
+  const [homepageSections, setHomepageSections] = useState({})
 
   const initHomepageVideos = async () => {
     const base = await getVideos(null)
-    const comedy = await getVideos(popularGeneres.comedy)
-    const actionAndAdventure = await getVideos(popularGeneres.actionAndAdventure)
-    const drama = await getVideos(popularGeneres.drama)
-    const horror = await getVideos(popularGeneres.horror)
-    const scifi = await getVideos(popularGeneres.scifi)
+    const comedy = await getVideos(popularGeneresIdsByName.comedy)
+    const actionAndAdventure = await getVideos(popularGeneresIdsByName.actionAndAdventure)
+    const drama = await getVideos(popularGeneresIdsByName.drama)
+    const horror = await getVideos(popularGeneresIdsByName.horror)
+    const scifi = await getVideos(popularGeneresIdsByName.scifi)
 
-    setHomepageSections([
-      { title: '', videos: base, name: 'base' },
-      { title: 'Comedy', videos: comedy, name: 'comedy' },
-      { title: 'Action & Adventure', videos: actionAndAdventure, name: 'actionAndAdventure' },
-      { title: 'Drama', videos: drama, name: 'drama' },
-      { title: 'Horror', videos: horror, name: 'horror' },
-      { title: 'Scifi', videos: scifi, name: 'scifi' },
-    ])
+    setHomepageSections({
+      base,
+      comedy,
+      actionAndAdventure,
+      drama,
+      horror,
+      scifi,
+    })
 
-    setHasLoadedomepageVideos(true)
+    setHomepageVideosState(HomePageVideosState.LOADED)
   }
 
   const videoFilter = (video: Video) => {
@@ -196,7 +202,10 @@ const Discover = observer(({ logo }: { logo: string }) => {
   }
 
   const loadVideos = () => {
+    if (homepageState === HomePageState.NOT_LOADED) return
+
     if (homepageState === HomePageState.IS_HOMEPAGE) {
+      setHomepageVideosState(HomePageVideosState.LOADING)
       initHomepageVideos()
       return
     }
@@ -415,7 +424,6 @@ const Discover = observer(({ logo }: { logo: string }) => {
           <div className="discover-md:hidden my-4 text-center text-2xl font-semibold text-gray-300">
             Discover
           </div>
-
           <div className="flex h-12 flex-row gap-2">
             <div className=" discover-md:border-b-0  border-reelist-red discover-md:mb-0 mb-2 flex h-12 w-full flex-row items-baseline border-0 border-b border-solid ">
               <SearchIcon className="mr-4 h-full justify-center self-center text-3xl text-gray-300" />
@@ -472,7 +480,6 @@ const Discover = observer(({ logo }: { logo: string }) => {
               </svg>
             </div>
           </div>
-
           <div className="discover-md:block mb-4 hidden w-full ">
             <div className="bg-reelist-red mb-6 mt-3 h-[1px]" />
 
@@ -558,39 +565,27 @@ const Discover = observer(({ logo }: { logo: string }) => {
           </div>
 
           {homepageState === HomePageState.IS_HOMEPAGE ? (
-            homepageSections.map(({ name, videos, title }) => (
+            _.keys(popularGenereTitleByName).map(name => (
               <VideoGroup
-                title={title}
-                videos={videos}
+                title={popularGenereTitleByName[name]}
+                videos={homepageSections[name]}
                 numItemsPerRow={numItemsPerRow}
-                onViewMoreClicked={() => genreSelectState.setSelectedOptions(popularGeneres[name])}
+                onViewMoreClicked={() =>
+                  genreSelectState.setSelectedOptions(popularGeneresIdsByName[name])
+                }
+                isLoading={homepageVideosState === HomePageVideosState.LOADING}
                 clippedOverride
               />
             ))
           ) : (
-            <VideoGroup videos={videos} numItemsPerRow={numItemsPerRow} />
+            <VideoGroup
+              videos={videos}
+              numItemsPerRow={numItemsPerRow}
+              isLoading={isLoadingVideos}
+            />
           )}
 
-          {homepageState === HomePageState.IS_HOMEPAGE && hasLoadedHomepageVideos && <Footer />}
-
-          {isLoadingVideos && (
-            <div className="flex justify-center ">
-              {/* arrow refresh aka loading icon */}
-
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="mb-8 h-16 w-16 animate-spin text-gray-500"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M4.755 10.059a7.5 7.5 0 0112.548-3.364l1.903 1.903h-3.183a.75.75 0 100 1.5h4.992a.75.75 0 00.75-.75V4.356a.75.75 0 00-1.5 0v3.18l-1.9-1.9A9 9 0 003.306 9.67a.75.75 0 101.45.388zm15.408 3.352a.75.75 0 00-.919.53 7.5 7.5 0 01-12.548 3.364l-1.902-1.903h3.183a.75.75 0 000-1.5H2.984a.75.75 0 00-.75.75v4.992a.75.75 0 001.5 0v-3.18l1.9 1.9a9 9 0 0015.059-4.035.75.75 0 00-.53-.918z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
-          )}
+          {homepageState === HomePageState.IS_HOMEPAGE && <Footer />}
         </InfiniteScroll>
 
         {/* selected video dialog */}
@@ -951,13 +946,22 @@ const getSortTypes = async () => [
 ]
 
 // hard coded popular generes
-const popularGeneres = {
+const popularGeneresIdsByName = {
   base: [],
   comedy: ['shared:35'],
   actionAndAdventure: ['tv:10759', 'movie:28', 'movie:12'],
   drama: ['shared:18'],
   horror: ['shared:27'],
   scifi: ['tv:11', 'movie:878'],
+}
+
+const popularGenereTitleByName = {
+  base: '',
+  comedy: 'Comedy',
+  actionAndAdventure: 'Action and Adventure',
+  drama: 'Drama',
+  horror: 'Horror',
+  scifi: 'Sci-fi',
 }
 
 export default Discover

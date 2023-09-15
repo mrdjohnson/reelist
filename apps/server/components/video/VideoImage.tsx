@@ -7,13 +7,29 @@ import Video from '@reelist/models/Video'
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
 type VideoImageProps = any & {
-  video: Video
+  video?: Video
   isPoster?: boolean
   onPress?: () => void
+  loading?: boolean
 }
 
-const VideoImage = observer(({ video, onPress, isPoster }: VideoImageProps) => {
-  const source = isPoster ? video.posterPath : video.backdropPath
+const VideoImage = observer(({ loading, video, onPress, isPoster }: VideoImageProps) => {
+  const source = isPoster ? video?.posterPath : video?.backdropPath
+
+  if (loading) {
+    return (
+      <div className="animate-pulse opacity-10">
+        <div
+          className={
+            'my-4 flex animate-pulse justify-center overflow-hidden rounded-md bg-gray-500 ' +
+            (isPoster
+              ? 'my-0 '
+              : 'discover-md:w-auto discover-md:aspect-auto h-[207px] m-0  my-4 aspect-video w-full ')
+          }
+        />
+      </div>
+    )
+  }
 
   if (!source) return null
 
