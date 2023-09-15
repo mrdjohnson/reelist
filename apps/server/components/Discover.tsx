@@ -3,9 +3,8 @@
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
-import Image from 'next/image'
 
-import { Box, Dialog, Drawer, Skeleton, SwipeableDrawer, Toolbar, Typography } from '@mui/material'
+import { Dialog, Drawer, Toolbar } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@mui/material'
@@ -20,50 +19,19 @@ import ReelistSelect, { useSelectState } from '~/components/ReelistSelect'
 
 import InfiniteScroll from './InfiniteScroll'
 import VideoModal from './video/VideoModal'
-import VideoImage from './video/VideoImage'
 import ReelistAccordion, { ReelistAccordionSection } from '~/components/ReelistAccordion'
 import NavBar from '~/components/NavBar'
-import classNames from 'classnames'
 import PillButton from './PillButton'
 import CloseIcon from './heroIcons/CloseIcon'
 import VideoGroup from './VideoGroup'
-import useAsyncState from '@reelist/utils/hooks/useAsyncState'
+import DescendingIcon from './icons/DecendingIcon'
+import AscendingIcon from './icons/AscendingIcon'
 
 enum HomePageState {
   IS_HOMEPAGE = 'IS_HOMEPAGE',
   NOT_HOMEPAGE = 'NOT_HOMEPAGE',
   NOT_LOADED = 'NOT_LOADED',
 }
-
-const DescendingIcon = (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 20 20"
-    fill="currentColor"
-    className="h-5 w-5"
-  >
-    <path
-      fillRule="evenodd"
-      d="M2 3.75A.75.75 0 012.75 3h11.5a.75.75 0 010 1.5H2.75A.75.75 0 012 3.75zM2 7.5a.75.75 0 01.75-.75h7.508a.75.75 0 010 1.5H2.75A.75.75 0 012 7.5zM14 7a.75.75 0 01.75.75v6.59l1.95-2.1a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 111.1-1.02l1.95 2.1V7.75A.75.75 0 0114 7zM2 11.25a.75.75 0 01.75-.75h4.562a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75z"
-      clipRule="evenodd"
-    />
-  </svg>
-)
-
-const AscendingIcon = (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 20 20"
-    fill="currentColor"
-    className="h-5 w-5"
-  >
-    <path
-      fillRule="evenodd"
-      d="M2 3.75A.75.75 0 012.75 3h11.5a.75.75 0 010 1.5H2.75A.75.75 0 012 3.75zM2 7.5a.75.75 0 01.75-.75h6.365a.75.75 0 010 1.5H2.75A.75.75 0 012 7.5zM14 7a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02l-1.95-2.1v6.59a.75.75 0 01-1.5 0V9.66l-1.95 2.1a.75.75 0 11-1.1-1.02l3.25-3.5A.75.75 0 0114 7zM2 11.25a.75.75 0 01.75-.75H7A.75.75 0 017 12H2.75a.75.75 0 01-.75-.75z"
-      clipRule="evenodd"
-    />
-  </svg>
-)
 
 const useWindowWidth = () => {
   const [width, setWidth] = useState(window?.innerWidth)
@@ -738,25 +706,6 @@ const Discover = observer(({ logo }: { logo: string }) => {
                         label={name}
                         rightIcon={<CloseIcon />}
                       />
-                      // {name}
-
-                      //   {/* close icon */}
-
-                      //   <svg
-                      //     xmlns="http://www.w3.org/2000/svg"
-                      //     fill="none"
-                      //     viewBox="0 0 24 24"
-                      //     strokeWidth={1.5}
-                      //     stroke="currentColor"
-                      //     className="h-5 justify-self-center pl-4 text-center align-baseline "
-                      //   >
-                      //     <path
-                      //       strokeLinecap="round"
-                      //       strokeLinejoin="round"
-                      //       d="M6 18L18 6M6 6l12 12"
-                      //     />
-                      //   </svg>
-                      // </Button>
                     ),
                 )}
               </div>
