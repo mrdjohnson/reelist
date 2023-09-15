@@ -237,21 +237,13 @@ const Discover = observer(({ logo }: { logo: string }) => {
     getAlternativeDefaults: () => ['popularity.desc'],
   })
 
-  const selectStatesLoaded = useMemo(() => {
-    return (
-      videoTypesSelectState.isLoadedFromSave &&
-      sortTypesSelectState.isLoadedFromSave &&
-      genreSelectState.isLoadedFromSave &&
-      watchProviderSelectState.isLoadedFromSave &&
-      regionSelectState.isLoadedFromSave
-    )
-  }, [
-    videoTypesSelectState.isLoadedFromSave,
-    sortTypesSelectState.isLoadedFromSave,
-    genreSelectState.isLoadedFromSave,
-    watchProviderSelectState.isLoadedFromSave,
-    regionSelectState.isLoadedFromSave,
-  ])
+  // every -> all elements are true
+  const selectStatesLoaded =
+    videoTypesSelectState.isLoadedFromSave &&
+    sortTypesSelectState.isLoadedFromSave &&
+    genreSelectState.isLoadedFromSave &&
+    watchProviderSelectState.isLoadedFromSave &&
+    regionSelectState.isLoadedFromSave
 
   const homepageState = useMemo(() => {
     if (!selectStatesLoaded) return HomePageState.NOT_LOADED
@@ -281,13 +273,15 @@ const Discover = observer(({ logo }: { logo: string }) => {
     searchText,
   ])
 
+  const shouldHideOverflow = showSelectedVideo || showMobileFilterOptions
+
   useEffect(() => {
-    if (showSelectedVideo) {
+    if (shouldHideOverflow) {
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = 'unset'
     }
-  }, [showSelectedVideo])
+  }, [shouldHideOverflow])
 
   useEffect(() => {
     loadVideos()
@@ -361,14 +355,6 @@ const Discover = observer(({ logo }: { logo: string }) => {
       setSearchText(event.target.value)
     }
   }
-
-  useEffect(() => {
-    if (showMobileFilterOptions) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'unset'
-    }
-  }, [open, showMobileFilterOptions])
 
   const rightNavButton = (
     <div className="flex h-full cursor-pointer items-center text-white">
