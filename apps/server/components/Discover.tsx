@@ -173,7 +173,6 @@ const Discover = observer(({ logo }: { logo: string }) => {
     }).then(handleVideos)
   }
 
-  // this needs to be set up to be callsed for each genre, then pass the videos to the video group
   const discover = () => {
     getVideos(_.keys(genreSelectState.selectedOptions))
       .then(handleVideos)
@@ -288,7 +287,7 @@ const Discover = observer(({ logo }: { logo: string }) => {
   }, [page])
 
   const getNextPage = useCallback(() => {
-    if (isLoadingVideos || homepageState === HomePageState.NOT_HOMEPAGE) return
+    if (isLoadingVideos || homepageState === HomePageState.IS_HOMEPAGE) return
 
     setPage(page + 1)
   }, [page, isLoadingVideos])
@@ -403,7 +402,7 @@ const Discover = observer(({ logo }: { logo: string }) => {
       >
         <InfiniteScroll
           onRefresh={getNextPage}
-          isInfinite={homepageState === HomePageState.IS_HOMEPAGE}
+          isInfinite={homepageState === HomePageState.NOT_HOMEPAGE}
         >
           <div className="discover-md:hidden my-4 text-center text-2xl font-semibold text-gray-300">
             Discover
