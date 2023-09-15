@@ -9,7 +9,6 @@ import { Button } from '@mui/material'
 type PropsWithTitle = {
   title: string
   onViewMoreClicked: () => void
-
 }
 
 type PropsWithoutTitle = {
@@ -45,6 +44,10 @@ const VideoGroup = ({
     return isClipped ? _.take(videos, maxViewCount) : videos
   }, [isClipped, videos, numItemsPerRow])
 
+  if (_.isEmpty(videosToDisplay)) return null
+
+  // todo: video group loading? use skeleton instead of loading icon
+
   return (
     <>
       {title && <div className="mb-5 text-3xl font-semibold text-white">{title}</div>}
@@ -69,14 +72,14 @@ const VideoGroup = ({
       {title && videosToDisplay?.length === maxViewCount && (
         <div className="flex justify-center h-[70px]">
 
-        <Button
-          onClick={onViewMoreClicked}
+          <Button
+            onClick={onViewMoreClicked}
           className="rounded-sm bg-transparent text-white underline align-middle h-fit cursor-pointer text-lg"
-          disableRipple
+            disableRipple
           >
-          View More
-        </Button>
-          </div>
+            View More
+          </Button>
+        </div>
       )}
     </>
   )

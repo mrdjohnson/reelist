@@ -43,6 +43,27 @@ export class SelectState<T extends StringOrNumber> {
     })
   }
 
+  setSelectedOptions = (options: string []) => {
+    const allOptionsById = _.chain(this.options).keyBy('id').mapValues('name').value()
+
+    const nextOptions = {}
+
+    if (this.isMulti) {
+      options.forEach(id => {
+        if (allOptionsById[id]) {
+          nextOptions[id] = allOptionsById[id]
+        }
+      })
+    } else {
+      const [id] = options
+      options[id] = allOptionsById[id]
+    }
+
+    this.selectedOptions = nextOptions
+
+    this.save()
+  }
+
   lazyLoadFromStorage = async () => {
     const defaultKey = this.storageKey
 
@@ -59,25 +80,7 @@ export class SelectState<T extends StringOrNumber> {
     }
 
     if (this.alternativeDefaultOptions) {
-      const defaultIds = this.alternativeDefaultOptions()
-      const allOptionsById = _.chain(this.options).keyBy('id').mapValues('name').value()
-
-      const options = {}
-
-      if (this.isMulti) {
-        defaultIds.forEach(id => {
-          if (allOptionsById[id]) {
-            options[id] = allOptionsById[id]
-          }
-        })
-      } else {
-        const [id] = defaultIds
-        options[id] = allOptionsById[id]
-      }
-
-      this.selectedOptions = options
-
-      this.save()
+      this.setSelectedOptions(this.alternativeDefaultOptions())
     }
 
     if (!this.isMulti && !_.isEmpty(this.selectedOptions)) {

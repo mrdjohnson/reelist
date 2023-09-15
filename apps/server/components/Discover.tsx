@@ -261,8 +261,6 @@ const Discover = observer(({ logo }: { logo: string }) => {
       : HomePageState.NOT_HOMEPAGE
   }, [selectStatesLoaded, genreSelectState.selectedOptions])
 
-  console.log('homepage state: ', homepageState.toString(), _.isEmpty(genreSelectState.selectedOptions))
-
   useEffect(() => {
     // todo: scroll back to top
     if (page === 1) {
@@ -572,8 +570,7 @@ const Discover = observer(({ logo }: { logo: string }) => {
                 title={title}
                 videos={videos}
                 numItemsPerRow={numItemsPerRow}
-                // todo: this should set the selected genres to the popular genres
-                onViewMoreClicked={() => console.log(name + ' clicked: ' + popularGeneres[name])}
+                onViewMoreClicked={() => genreSelectState.setSelectedOptions(popularGeneres[name])}
                 clippedOverride
               />
             ))
