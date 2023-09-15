@@ -50,7 +50,14 @@ const VideoGroup = ({
 
   return (
     <>
-      {title && <div className="mb-5 text-3xl font-semibold text-white">{title}</div>}
+      {title && (
+        <div
+          className="mb-5 cursor-pointer text-3xl font-semibold text-white hover:font-bold hover:underline w-fit"
+          onClick={onViewMoreClicked}
+        >
+          {title}
+        </div>
+      )}
 
       <div
         className={classNames(
@@ -70,14 +77,14 @@ const VideoGroup = ({
       </div>
 
       {title && videosToDisplay?.length === maxViewCount && (
-        <div className="flex justify-center h-[70px]">
-
+        <div className="flex h-[70px] justify-center">
           <Button
             onClick={onViewMoreClicked}
-          className="rounded-sm bg-transparent text-white underline align-middle h-fit cursor-pointer text-lg"
+            className="h-fit cursor-pointer rounded-md bg-transparent align-middle text-lg text-white mb-1 border-solid border-transparent hover:border-white border-2"
             disableRipple
           >
-            View More
+            
+            <span className="border-0 border-b border-solid border-white">View More</span>
           </Button>
         </div>
       )}
