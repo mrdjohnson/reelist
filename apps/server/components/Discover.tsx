@@ -26,6 +26,7 @@ import CloseIcon from './heroIcons/CloseIcon'
 import VideoGroup from './VideoGroup'
 import DescendingIcon from './icons/DecendingIcon'
 import AscendingIcon from './icons/AscendingIcon'
+import Footer from './Footer'
 
 enum HomePageState {
   IS_HOMEPAGE = 'IS_HOMEPAGE',
@@ -80,6 +81,7 @@ const Discover = observer(({ logo }: { logo: string }) => {
   const [page, setPage] = useState(1)
   const [videos, setVideos] = useState<Video[]>([])
   const [isLoadingVideos, setIsLoadingVideos] = useState(false)
+  const [hasLoadedHomepageVideos, setHasLoadedomepageVideos] = useState(false)
 
   const [homepageSections, setHomepageSections] = useState([])
 
@@ -99,6 +101,8 @@ const Discover = observer(({ logo }: { logo: string }) => {
       { title: 'Horror', videos: horror, name: 'horror' },
       { title: 'Scifi', videos: scifi, name: 'scifi' },
     ])
+
+    setHasLoadedomepageVideos(true)
   }
 
   const videoFilter = (video: Video) => {
@@ -562,6 +566,8 @@ const Discover = observer(({ logo }: { logo: string }) => {
           ) : (
             <VideoGroup videos={videos} numItemsPerRow={numItemsPerRow} />
           )}
+
+          {homepageState === HomePageState.IS_HOMEPAGE && hasLoadedHomepageVideos && <Footer />}
 
           {isLoadingVideos && (
             <div className="flex justify-center ">
