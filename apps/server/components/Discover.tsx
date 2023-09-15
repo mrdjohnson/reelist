@@ -257,7 +257,11 @@ const Discover = observer(({ logo }: { logo: string }) => {
   }, [selectStatesLoaded, genreSelectState.selectedOptions])
 
   useEffect(() => {
-    // todo: scroll back to top
+    // scroll to top
+    window.scrollTo({
+      top: 0,
+    })
+
     if (page === 1) {
       loadVideos()
     } else {
