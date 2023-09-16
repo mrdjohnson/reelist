@@ -205,8 +205,11 @@ const Discover = observer(({ logo }: { logo: string }) => {
     if (homepageState === HomePageState.NOT_LOADED) return
 
     if (homepageState === HomePageState.IS_HOMEPAGE) {
-      setHomepageVideosState(HomePageVideosState.LOADING)
-      initHomepageVideos()
+      if (homepageVideosState === HomePageVideosState.NOT_LOADED) {
+        setHomepageVideosState(HomePageVideosState.LOADING)
+        initHomepageVideos()
+      }
+
       return
     }
 
@@ -277,6 +280,8 @@ const Discover = observer(({ logo }: { logo: string }) => {
       setPage(1)
     }
   }, [
+    homepageState,
+    homepageVideosState,
     selectStatesLoaded,
     videoTypesSelectState.selectedOptions,
     sortTypesSelectState.selectedOptions,
