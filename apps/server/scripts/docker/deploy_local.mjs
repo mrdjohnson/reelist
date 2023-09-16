@@ -30,13 +30,10 @@ const printSpawnOutput = commandString => {
 const run = async () => {
   await build()
 
-  // create a backup of the current image
-  await printSpawnOutput('docker tag reelist-server:latest reelist-server:previous')
-
   // stop the current container 
   await printSpawnOutput('docker rm -f reelist-server')
 
-  // start the next container
+  // start the next container based on the newest image
   await printSpawnOutput('docker run -d -p 3000:3000 --name reelist-server reelist-server')
 
   // --- Outputs ----
