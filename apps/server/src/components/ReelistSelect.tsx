@@ -34,12 +34,12 @@ export class SelectState<T extends StringOrNumber> {
   ) {
     console.log('is multi: ', isMulti)
     this.storageKey = _.snakeCase(label)
+    
+    makeAutoObservable(this)
 
     loadOptions().then(nextOptions => {
       this.options = nextOptions
       this.lazyLoadFromStorage()
-
-      makeAutoObservable(this)
     })
   }
 
