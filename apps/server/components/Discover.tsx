@@ -397,6 +397,10 @@ const Discover = observer(({ logo }: { logo: string }) => {
     _.map(selectState.selectedOptions, (name, id) => ({ name, id, selectState })),
   )
 
+  const shouldShowFooter =
+    homepageState === HomePageState.IS_HOMEPAGE &&
+    homepageVideosState === HomePageVideosState.LOADED
+
   return (
     <div
       suppressHydrationWarning
@@ -585,7 +589,7 @@ const Discover = observer(({ logo }: { logo: string }) => {
             />
           )}
 
-          {homepageState === HomePageState.IS_HOMEPAGE && <Footer />}
+          {shouldShowFooter && <Footer />}
         </InfiniteScroll>
 
         {/* selected video dialog */}
