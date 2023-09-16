@@ -26,14 +26,14 @@ const printSpawnOutput = commandString => {
   })
 }
 
-const run = async () => {  
-  // create a backup of the current image
-  await printSpawnOutput('docker tag reelist-server:latest reelist-server:previous')
+const run = async () => {
+  // set current image to failed
+  await printSpawnOutput('docker tag reelist-server:latest reelist-server:failed')
 
-  // load in the new image from the saved file
-  await printSpawnOutput('docker load --input reelist-server.tar')
+  // set previous image to latest
+  await printSpawnOutput('docker tag reelist-server:previous reelist-server:latest')
 
-  // stop the current container 
+  // stop the current container
   await printSpawnOutput('docker rm -f reelist-server')
 
   // start the next container
