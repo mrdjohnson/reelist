@@ -172,18 +172,15 @@ const ReelistSelect = observer(
       let singleSelect = false
 
       let icon
-      let remove = false
       let add = false
 
       if (!isMulti) {
         singleSelect = true
       } else if (isChecked) {
-        remove = true
-
         icon = <DashIcon />
       } else {
         add = true
-        icon =  <PlusIcon />
+        icon = <PlusIcon />
       }
 
       return (
@@ -191,9 +188,10 @@ const ReelistSelect = observer(
           key={option.id}
           label={option.name}
           className={classNames('border-reelist-red font-semibold', {
-            'hover:bg-reelist-red rounded-md text-white hover:text-black border-none': singleSelect,
-            ' bg-reelist-red text-black hover:text-white': remove,
-            ' hover:text-reelist-red  bg-black bg-opacity-30 text-white': add,
+            'hover:bg-reelist-red rounded-md border-none': singleSelect,
+            'hover:text-reelist-red bg-opacity-30': add,
+            'bg-reelist-red text-black hover:text-white': isChecked,
+            'bg-transparent text-white': !isChecked,
           })}
           onClick={() => toggleOption(option)}
           rightIcon={icon}
