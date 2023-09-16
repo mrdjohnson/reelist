@@ -46,10 +46,8 @@
         "commands": [
           "nx run server:prep-stage",
           "rm -rf ./dist",
-          "docker image rm -f reelist-server",
           "cd ../../ && nx run server:build",
           "cp ../../yarn.lock ./dist",
-          "docker rm -f reelist-server",
           "node scripts/docker/deploy_local.mjs"
         ],
         "parallel": false
