@@ -28,9 +28,10 @@ import DescendingIcon from './icons/DecendingIcon'
 import AscendingIcon from './icons/AscendingIcon'
 import Footer from './Footer'
 
-enum HomePageState {
-  IS_HOMEPAGE = 'IS_HOMEPAGE',
-  NOT_HOMEPAGE = 'NOT_HOMEPAGE',
+enum PageState {
+  HOME = 'HOME',
+  SEARCH = 'SEARCH',
+  INFINITE = 'INFINITE',
   NOT_LOADED = 'NOT_LOADED',
 }
 
@@ -202,9 +203,9 @@ const Discover = observer(({ logo }: { logo: string }) => {
   }
 
   const loadVideos = () => {
-    if (homepageState === HomePageState.NOT_LOADED) return
+    if (pageState === PageState.NOT_LOADED) return
 
-    if (homepageState === HomePageState.IS_HOMEPAGE) {
+    if (pageState === PageState.HOME) {
       if (homepageVideosState === HomePageVideosState.NOT_LOADED) {
         setHomepageVideosState(HomePageVideosState.LOADING)
         initHomepageVideos()
@@ -220,7 +221,7 @@ const Discover = observer(({ logo }: { logo: string }) => {
 
     setIsLoadingVideos(true)
 
-    if (searchText) {
+    if (pageState === PageState.SEARCH) {
       search()
     } else {
       discover()
@@ -260,13 +261,13 @@ const Discover = observer(({ logo }: { logo: string }) => {
     watchProviderSelectState.isLoadedFromSave &&
     regionSelectState.isLoadedFromSave
 
-  const homepageState = useMemo(() => {
-    if (!selectStatesLoaded) return HomePageState.NOT_LOADED
+  const pageState = useMemo(() => {
+    if (!selectStatesLoaded) return PageState.NOT_LOADED
 
-    return _.isEmpty(genreSelectState.selectedOptions)
-      ? HomePageState.IS_HOMEPAGE
-      : HomePageState.NOT_HOMEPAGE
-  }, [selectStatesLoaded, genreSelectState.selectedOptions])
+    if (searchText) return PageState.SEARCH
+
+    return _.isEmpty(genreSelectState.selectedOptions) ? PageState.HOME : PageState.INFINITE
+  }, [selectStatesLoaded, genreSelectState.selectedOptions, searchText])
 
   useEffect(() => {
     // scroll to top
@@ -280,7 +281,7 @@ const Discover = observer(({ logo }: { logo: string }) => {
       setPage(1)
     }
   }, [
-    homepageState,
+    pageState,
     homepageVideosState,
     selectStatesLoaded,
     videoTypesSelectState.selectedOptions,
@@ -291,7 +292,6 @@ const Discover = observer(({ logo }: { logo: string }) => {
     genreSeparationType,
     typesSeparationType,
     regionSeparationType,
-    searchText,
   ])
 
   const shouldHideOverflow = showSelectedVideo || showMobileFilterOptions
@@ -309,10 +309,12 @@ const Discover = observer(({ logo }: { logo: string }) => {
   }, [page])
 
   const getNextPage = useCallback(() => {
-    if (isLoadingVideos || homepageState === HomePageState.IS_HOMEPAGE) return
+    if (isLoadingVideos || pageState === PageState.HOME || pageState === PageState.NOT_LOADED) {
+      return
+    }
 
     setPage(page + 1)
-  }, [page, isLoadingVideos])
+  }, [page, isLoadingVideos, pageState])
 
   useEffect(() => {
     const { videoId } = router.query
@@ -403,8 +405,7 @@ const Discover = observer(({ logo }: { logo: string }) => {
   )
 
   const shouldShowFooter =
-    homepageState === HomePageState.IS_HOMEPAGE &&
-    homepageVideosState === HomePageVideosState.LOADED
+    pageState === PageState.HOME && homepageVideosState === HomePageVideosState.LOADED
 
   return (
     <div
@@ -428,7 +429,7 @@ const Discover = observer(({ logo }: { logo: string }) => {
       >
         <InfiniteScroll
           onRefresh={getNextPage}
-          isInfinite={homepageState === HomePageState.NOT_HOMEPAGE}
+          isInfinite={pageState === PageState.SEARCH || pageState === PageState.INFINITE}
         >
           <div className="discover-md:hidden my-4 text-center text-2xl font-semibold text-gray-300">
             Discover
@@ -494,7 +495,10 @@ const Discover = observer(({ logo }: { logo: string }) => {
 
             <div className="discover-lg:grid-cols-2 grid-rows-auto mb-1 grid grid-cols-1 gap-2 max-[673px]:flex-col">
               <div className="discover-lg:row-start-1 discover-lg:col-span-2 discover-lg:col-start-1 row-start-2 flex flex-grow gap-2 max-[673px]:flex-col">
-                <ReelistSelect selectState={videoTypesSelectState} disabled={searchText}>
+                <ReelistSelect
+                  selectState={videoTypesSelectState}
+                  disabled={pageState === PageState.SEARCH}
+                >
                   <div
                     className="flex cursor-pointer justify-center"
                     onClick={() =>
@@ -516,7 +520,10 @@ const Discover = observer(({ logo }: { logo: string }) => {
                   </div>
                 </ReelistSelect>
 
-                <ReelistSelect selectState={regionSelectState} disabled={searchText}>
+                <ReelistSelect
+                  selectState={regionSelectState}
+                  disabled={pageState === PageState.SEARCH}
+                >
                   <div
                     className="flex cursor-pointer justify-center"
                     onClick={toggleRegionSeparationType}
@@ -532,7 +539,10 @@ const Discover = observer(({ logo }: { logo: string }) => {
                   </div>
                 </ReelistSelect>
 
-                <ReelistSelect selectState={genreSelectState} disabled={searchText}>
+                <ReelistSelect
+                  selectState={genreSelectState}
+                  disabled={pageState === PageState.SEARCH}
+                >
                   <div
                     className="flex cursor-pointer justify-center"
                     onClick={toggleGenreSeparationType}
@@ -548,11 +558,17 @@ const Discover = observer(({ logo }: { logo: string }) => {
                   </div>
                 </ReelistSelect>
 
-                <ReelistSelect selectState={watchProviderSelectState} disabled={searchText} />
+                <ReelistSelect
+                  selectState={watchProviderSelectState}
+                  disabled={pageState === PageState.SEARCH}
+                />
               </div>
 
               <div className="discover-md:justify-self-end discover-lg:col-start-2 row-start-1 justify-self-center">
-                <ReelistSelect selectState={sortTypesSelectState} disabled={searchText} />
+                <ReelistSelect
+                  selectState={sortTypesSelectState}
+                  disabled={pageState === PageState.SEARCH}
+                />
               </div>
             </div>
 
@@ -573,7 +589,7 @@ const Discover = observer(({ logo }: { logo: string }) => {
             </div>
           </div>
 
-          {homepageState === HomePageState.IS_HOMEPAGE ? (
+          {pageState === PageState.HOME ? (
             _.keys(popularGenereTitleByName).map(name => (
               <VideoGroup
                 title={popularGenereTitleByName[name]}
