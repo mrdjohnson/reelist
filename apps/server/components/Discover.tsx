@@ -113,8 +113,6 @@ const Discover = observer(({ logo }: { logo: string }) => {
   }
 
   const videoFilter = (video: Video) => {
-    if (_.isEmpty(video.posterPath || video.backdropPath)) return false
-
     if (_.isEmpty(regionSelectState.selectedOptions)) return true
 
     const mustIncludeAllRegions = regionSeparationType === 'includes_every'
@@ -231,10 +229,6 @@ const Discover = observer(({ logo }: { logo: string }) => {
   const finishLoadingVideos = (loadedVideos: Video[]) => {
     setVideos(loadedVideos)
 
-    if (page >= 10) {
-      setIsLoadingVideos(false)
-    }
-
     if (_.isEmpty(loadedVideos)) {
       setPage(page + 1)
     } else {
@@ -282,7 +276,6 @@ const Discover = observer(({ logo }: { logo: string }) => {
     }
   }, [
     pageState,
-    homepageVideosState,
     selectStatesLoaded,
     videoTypesSelectState.selectedOptions,
     sortTypesSelectState.selectedOptions,

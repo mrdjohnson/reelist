@@ -13,6 +13,10 @@ module.exports = {
   important: '#__next',
   theme: {
     extend: {
+      aspectRatio: {
+        poster: '2 / 3',
+        backdrop: '16 / 9',
+      },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
