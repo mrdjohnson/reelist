@@ -24,6 +24,8 @@ type VideoGroupProps = {
   isLoading: boolean
 } & (PropsWithTitle | PropsWithoutTitle)
 
+const ROW_COUNT = 2
+
 const VideoGroup = ({
   videos = [],
   numItemsPerRow,
@@ -40,7 +42,7 @@ const VideoGroup = ({
 
   const isClipped = title || clippedOverride
 
-  const maxViewCount = numItemsPerRow * 3
+  const maxViewCount = numItemsPerRow * (isClipped ? 2 : 1)
 
   const videosToDisplay = useMemo(() => {
     return isClipped ? _.take(videos, maxViewCount) : videos
@@ -75,7 +77,7 @@ const VideoGroup = ({
           />
         ))}
 
-        {isLoading && _.times(numItemsPerRow, () => <VideoImage loading />)}
+        {isLoading && _.times(maxViewCount, () => <VideoImage loading />)}
       </div>
 
       {title && videosToDisplay?.length === maxViewCount && (
