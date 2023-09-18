@@ -969,17 +969,17 @@ const popularGeneresIdsByName = {
   comedy: ['shared:35'],
   actionAndAdventure: ['tv:10759', 'movie:28', 'movie:12'],
   drama: ['shared:18'],
-  horror: ['shared:27'],
-  scifi: ['tv:11', 'movie:878'],
+  horror: ['shared:9648'],
+  scifi: ['tv:10765', 'movie:878', 'movie:14'],
 }
 
 const popularGenereTitleByName = {
   base: '',
   comedy: 'Comedy',
-  actionAndAdventure: 'Action and Adventure',
+  actionAndAdventure: 'Action & Adventure',
   drama: 'Drama',
-  horror: 'Horror',
-  scifi: 'Sci-fi',
+  horror: 'Mystery',
+  scifi: 'Sci-fi & Fantasy',
 }
 
 export default Discover
