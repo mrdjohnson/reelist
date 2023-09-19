@@ -4,7 +4,7 @@ export default function Document() {
   return (
     <Html>
       <Head>
-        <link rel="shortcut icon" href="/static/favicon.ico" />
+        <link rel="icon" href="/images/logo.png" />
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
 
