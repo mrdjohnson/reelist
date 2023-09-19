@@ -27,14 +27,19 @@ const printSpawnOutput = (commandString) => {
   })
 }
 
+// expected to be called through `nx run server:deploy-prod` (might need to be run from in apps/server)
 const run = async () => {
   await build()
   
-  // remove the old server file and create a new one
+  // // remove the old docker image and create a new one
   await printSpawnOutput('rm reelist-server.tar')
-  // await printSpawnOutput('docker save reelist-server > reelist-server.tar')
+  await printSpawnOutput('docker save --output reelist-server.tar reelist-server')
 
-  // await printSpawnOutput('scp -P 48199  reelist-server.tar  djohnson@reelist.app:~/app/')
+  // send the new docker image to the server
+  await printSpawnOutput('scp -P 48199 reelist-server.tar djohnson@reelist.app:~/app/')
+  
+
+  await printSpawnOutput('scp -P 48199 reelist-server.tar djohnson@reelist.app:~/app/')
 }
 
 run()
