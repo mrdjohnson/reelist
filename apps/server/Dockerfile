@@ -3,6 +3,8 @@ WORKDIR /app
 
 ENV NODE_ENV production
 
+COPY ./public ./public
+
 COPY ./dist/.next ./.next
 COPY ./dist/package.json ./package.json
 
