@@ -2,7 +2,6 @@
 
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import Head from 'next/head'
 
 import { Dialog, Drawer, Toolbar } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
@@ -56,7 +55,7 @@ const useWindowWidth = () => {
   return width
 }
 
-const Discover = observer(({ logo }: { logo: string }) => {
+const Discover = observer(() => {
   const router = useRouter()
 
   const { videoStore } = useStore()
@@ -405,13 +404,8 @@ const Discover = observer(({ logo }: { logo: string }) => {
       suppressHydrationWarning
       className="bg-reelist-gradient-green flex min-h-screen w-screen flex-col "
     >
-      <Head>
-        <title>Discover</title>
-      </Head>
-
       <NavBar
         path="/discover"
-        logo={logo}
         rightButton={showMobileFilterOptions && rightNavButton}
         onRightButtonPressed={() => setShowMobileFilterOptions(false)}
       />

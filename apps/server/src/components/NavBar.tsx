@@ -1,7 +1,6 @@
 import { AppBar, Button, Drawer, Popover, Toolbar } from '@mui/material'
 import { PropsWithChildren, ReactNode, useRef, useState } from 'react'
 import Image from 'next/image'
-import Logo from '../../public/images/logo.png'
 
 const activeButton = 'border-red-400 border-1'
 const defaultStyle = 'text-lg text-slate-300 px-5 rounded-l-full rounded-r-full '
@@ -13,7 +12,6 @@ const getButtonProps = (path: string, href: string) => {
 }
 
 type NavBarProps = PropsWithChildren<{
-  logo: string
   path: string
   rightButton?: ReactNode
   onRightButtonPressed: () => void
@@ -30,7 +28,7 @@ const NavBar = ({ logo, path, children, rightButton, onRightButtonPressed }: Nav
           <a className="h-fit w-fit self-center text-slate-300 no-underline" href="/">
             <span className="discover-md:block hidden text-4xl">Reelist</span>
             <span className="discover-md:hidden flex h-fit">
-              <Image src={logo || Logo} width={40} height={40} alt="Reelist" priority />
+              <Image src="/images/logo.png" width={40} height={40} alt="Reelist" priority />
             </span>
           </a>
 
