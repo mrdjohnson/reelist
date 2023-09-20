@@ -437,8 +437,11 @@ const Discover = observer(() => {
   )
 
   const closeNavBar = () => {
-    showMobileFilterOptions && setShowMobileFilterOptions(false)
-    showSelectedVideo && closePopup()
+    if (showMobileFilterOptions) {
+      setShowMobileFilterOptions(false)
+    } else if (showSelectedPerson || showSelectedVideo) {
+      closePopup()
+    }
   }
 
   const toggleRegionSeparationType = () => {
@@ -463,7 +466,7 @@ const Discover = observer(() => {
   }
 
   const rightNavButton = (
-    <div className="flex h-full cursor-pointer items-center text-white">
+    <div className="flex h-full w-fit cursor-pointer items-center text-white">
       {/* close icon */}
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -471,7 +474,7 @@ const Discover = observer(() => {
         viewBox="0 0 24 24"
         strokeWidth={1.5}
         stroke="currentColor"
-        className="group-hover:text-reelist-red h-8 pl-2 transition-colors duration-200"
+        className="group-hover:text-reelist-red h-8 transition-colors duration-200"
       >
         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
       </svg>
@@ -490,6 +493,9 @@ const Discover = observer(() => {
   const shouldShowFooter =
     pageState === PageState.HOME && homepageVideosState === HomePageVideosState.LOADED
 
+  const shouldShowCloseButton =
+    isMobile && (showMobileFilterOptions || showSelectedVideo || showSelectedPerson)
+
   return (
     <div
       suppressHydrationWarning
@@ -497,7 +503,7 @@ const Discover = observer(() => {
     >
       <NavBar
         path="/discover"
-        rightButton={(showMobileFilterOptions || (isMobile && showSelectedVideo)) && rightNavButton}
+        rightButton={shouldShowCloseButton && rightNavButton}
         onRightButtonPressed={closeNavBar}
       />
 

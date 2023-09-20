@@ -18,7 +18,8 @@
       "@reelist/utils/*": ["libs/utils/src/lib/*"],
       "@reelist/apis/*": ["libs/apis/src/lib/*"],
       "@reelist/components/*": ["libs/components/src/lib/*"],
-    },
+      "@reelist/interfaces/*": ["libs/interfaces/src/lib/*"]
+    }
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "next-env.d.ts", "libs/**/*.js"],
   "exclude": ["node_modules", "jest.config.ts"]
