@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 
 import { Dialog, Drawer, Toolbar } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@mui/material'
 import _ from 'lodash'
 import { useStore } from '@reelist/utils/hooks/useStore'
@@ -53,6 +53,19 @@ const useWindowWidth = () => {
   }, [])
 
   return width
+}
+
+const DialogPaperProps = {
+  style: {
+    background:
+      'radial-gradient(50% 50% at 50% 50%, rgba(21, 30, 1, 0.25) 0%, rgba(0, 0, 0, 0.45) 100%)',
+    backdropFilter: 'blur(15px)',
+    maxWidth: '1619px',
+    position: 'relative',
+    overflowY: 'scroll',
+    overflowX: 'clip',
+    cursor: 'default',
+  },
 }
 
 const Discover = observer(() => {
@@ -350,6 +363,71 @@ const Discover = observer(() => {
     return nextWidth
   }, [windowWidth])
 
+  const isMobile = windowWidth < 674
+
+  const VideoModalWrapper = useCallback(
+    ({ children }: PropsWithChildren) => {
+      if (isMobile) {
+        return (
+          <Drawer
+            open={showSelectedVideo}
+            onClose={closeVideo}
+            anchor="bottom"
+            PaperProps={DialogPaperProps}
+            classes={{ paper: 'm-1 relative p-2 pb-6 w-full h-full' }}
+            className=" bg-transparent-dark cursor-pointer backdrop-blur-md"
+            transitionDuration={{ exit: 50 }}
+            hideBackdrop
+          >
+            <Toolbar />
+
+            {children}
+          </Drawer>
+        )
+      }
+
+      return (
+        <Dialog
+          open={showSelectedVideo}
+          onClose={closeVideo}
+          PaperProps={DialogPaperProps}
+          classes={{
+            paper:
+              'discover-md:p-[38px] discover-md:pr-[60px] discover-md:my-0 discover-md:mx-8 discover-md:h-auto discover-md:w-auto absolute top-0 left-0 h-screen w-screen p-3 m-2',
+          }}
+          className="bg-transparent-dark h-screen w-screen cursor-pointer backdrop-blur-md"
+          transitionDuration={{ exit: 50 }}
+          hideBackdrop
+        >
+          <div
+            className="text-reelist-red absolute right-2 top-2 cursor-pointer lg:top-2"
+            onClick={closeVideo}
+          >
+            {/* close icon */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="h-8"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </div>
+
+          {children}
+        </Dialog>
+      )
+    },
+    [isMobile, showSelectedVideo, selectedVideo],
+  )
+
+  const closeNavBar = () => {
+    showMobileFilterOptions && setShowMobileFilterOptions(false)
+    showSelectedVideo && closeVideo()
+  }
+
   const toggleRegionSeparationType = () => {
     setRegionSeparationType(
       regionSeparationType === 'includes_every' ? 'includes_any' : 'includes_every',
@@ -406,8 +484,8 @@ const Discover = observer(() => {
     >
       <NavBar
         path="/discover"
-        rightButton={showMobileFilterOptions && rightNavButton}
-        onRightButtonPressed={() => setShowMobileFilterOptions(false)}
+        rightButton={(showMobileFilterOptions || (isMobile && showSelectedVideo)) && rightNavButton}
+        onRightButtonPressed={closeNavBar}
       />
 
       <div
@@ -601,46 +679,8 @@ const Discover = observer(() => {
         </InfiniteScroll>
 
         {/* selected video dialog */}
-        <Dialog
-          open={showSelectedVideo}
-          onClose={closeVideo}
-          hideBackdrop
-          PaperProps={{
-            style: {
-              background:
-                'radial-gradient(50% 50% at 50% 50%, rgba(21, 30, 1, 0.25) 0%, rgba(0, 0, 0, 0.45) 100%)',
-              backdropFilter: 'blur(15px)',
-              maxWidth: '1619px',
-              position: 'relative',
-              padding: '38px',
-              paddingRight: '60px',
-              overflowY: 'scroll',
-              overflowX: 'clip',
-              cursor: 'default',
-            },
-          }}
-          classes={{ paper: 'my-4 discover-md:my-0' }}
-          className="bg-transparent-dark cursor-pointer backdrop-blur-md"
-          transitionDuration={{ exit: 50 }}
-        >
-          <div
-            className="text-reelist-red absolute right-2 top-2 cursor-pointer lg:top-2"
-            onClick={closeVideo}
-          >
-            {/* close icon */}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="h-8"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </div>
-
-          <div className="no-scrollbar relative overflow-scroll overscroll-none">
+        <VideoModalWrapper>
+          <div className="no-scrollbar discover-md:pt-0 relative overflow-scroll overscroll-none pt-6">
             {selectedVideo && (
               <VideoModal
                 video={selectedVideo}
@@ -648,24 +688,14 @@ const Discover = observer(() => {
               />
             )}
           </div>
-        </Dialog>
+        </VideoModalWrapper>
 
         {/* mobile filter options dialog sdaffa */}
         <Drawer
           open={showMobileFilterOptions}
           onClose={() => setShowMobileFilterOptions(false)}
-          anchor="right"
-          PaperProps={{
-            style: {
-              background:
-                'radial-gradient(50% 50% at 50% 50%, rgba(21, 30, 1, 0.25) 0%, rgba(0, 0, 0, 0.45) 100%)',
-              backdropFilter: 'blur(15px)',
-              position: 'relative',
-              overflowY: 'hidden',
-              overflowX: 'clip',
-              cursor: 'default',
-            },
-          }}
+          anchor="bottom"
+          PaperProps={DialogPaperProps}
           classes={{ paper: 'm-1 relative p-2 w-full h-full' }}
           className="bg-reelist-dark cursor-pointer backdrop-blur-md"
           transitionDuration={{ exit: 50 }}
