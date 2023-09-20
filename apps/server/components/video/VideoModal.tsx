@@ -5,7 +5,7 @@ import React, { useMemo } from 'react'
 import _ from 'lodash'
 import Video, { Provider } from '@reelist/models/Video'
 
-import VideoImage from './VideoImage'
+import EntityImage from '../EntityImage'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
@@ -45,10 +45,8 @@ const VideoModal = observer(
     return (
       <div className="discover-lg:flex-row discover-lg:flex-nowrap flex max-w-7xl flex-col flex-wrap justify-center text-white">
         <div className="discover-lg:mr-12 flex w-fit max-w-full flex-1 justify-center self-center rounded-lg">
-          <VideoImage
+          <EntityImage
             video={video}
-            containerProps={{ alignSelf: 'center' }}
-            rounded="lg"
             className=""
             isPoster
           />
@@ -110,7 +108,7 @@ const VideoModal = observer(
                       key={relatedVideo.id}
                       onClick={() => handleVideoSelection(relatedVideo)}
                     >
-                      <VideoImage
+                      <EntityImage
                         video={relatedVideo}
                         className="!h-[200px] !min-h-0 max-w-fit"
                         isPoster

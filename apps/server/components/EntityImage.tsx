@@ -4,15 +4,18 @@ import React, { useMemo, useState } from 'react'
 import _ from 'lodash'
 import Video from '@reelist/models/Video'
 import classNames from 'classnames'
+import Person from '@reelist/models/Person'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
 type VideoImageProps = {
   video?: Video
+  person?: Person
   isPoster?: boolean
   onPress?: () => void
   loading?: boolean
-  className: string
+  className?: string
+  isPerson?: boolean
 }
 
 const TvIcon = () => (
@@ -49,8 +52,33 @@ const MovieIcon = () => (
   </svg>
 )
 
-const VideoImage = observer(
-  ({ loading, video = {}, onPress, isPoster, className }: VideoImageProps) => {
+const UserIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.5}
+    stroke="currentColor"
+    className="transition-max-height h-[125px] duration-300 ease-in-out group-hover:h-[155px]"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+    />
+  </svg>
+)
+
+const EntityImage = observer(
+  ({
+    loading,
+    video = {},
+    person = {},
+    onPress,
+    isPoster,
+    isPerson,
+    className,
+  }: VideoImageProps) => {
     const [imageErrored, setImageErrored] = useState(false)
 
     // default to poster or backdrop path, or either if one does not exist
@@ -58,12 +86,14 @@ const VideoImage = observer(
       // if we failed to get an image, return nothing
       if (imageErrored) return ''
 
+      const posterPath = video.posterPath || person.profilePath
+
       // if it is a poster, and we have a poster, show the poster
-      if (isPoster && video.posterPath) return video.posterPath
+      if (isPoster && posterPath) return posterPath
 
       // show whatever is available
-      return video.backdropPath || video.posterPath
-    }, [imageErrored, isPoster, video.posterPath, video.backdropPath])
+      return video.backdropPath || posterPath
+    }, [imageErrored, isPoster, video.posterPath, video.backdropPath, person.profilePath])
 
     if (loading) {
       return (
@@ -115,7 +145,7 @@ const VideoImage = observer(
               'aspect-poster  max-h-[609px]': isPoster && !source,
             })}
           >
-            {video.isTv ? <TvIcon /> : <MovieIcon />}
+            {isPerson ? <UserIcon /> : video.isTv ? <TvIcon /> : <MovieIcon />}
           </div>
         )}
 
@@ -141,4 +171,4 @@ const VideoImage = observer(
   },
 )
 
-export default VideoImage
+export default EntityImage

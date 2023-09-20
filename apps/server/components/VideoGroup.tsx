@@ -1,6 +1,6 @@
 import Video from '@reelist/models/Video'
 import { useRouter } from 'next/router'
-import VideoImage from './video/VideoImage'
+import EntityImage from './EntityImage'
 import classNames from 'classnames'
 import _ from 'lodash'
 import { useMemo } from 'react'
@@ -69,7 +69,7 @@ const VideoGroup = ({
         style={{ gridTemplateColumns: `repeat(${numItemsPerRow}, minmax(0, 1fr))` }}
       >
         {videosToDisplay.map(video => (
-          <VideoImage
+          <EntityImage
             video={video}
             containerProps={{ width: '307px' }}
             onPress={() => handleVideoSelection(video)}
@@ -77,7 +77,7 @@ const VideoGroup = ({
           />
         ))}
 
-        {isLoading && _.times(maxViewCount, () => <VideoImage loading />)}
+        {isLoading && _.times(maxViewCount, () => <EntityImage loading />)}
       </div>
 
       {title && videosToDisplay?.length === maxViewCount && (
