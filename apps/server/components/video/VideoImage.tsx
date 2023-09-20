@@ -12,6 +12,7 @@ type VideoImageProps = {
   isPoster?: boolean
   onPress?: () => void
   loading?: boolean
+  className: string
 }
 
 const TvIcon = () => (
@@ -48,94 +49,96 @@ const MovieIcon = () => (
   </svg>
 )
 
-const VideoImage = observer(({ loading, video = {}, onPress, isPoster }: VideoImageProps) => {
-  const [imageErrored, setImageErrored] = useState(false)
+const VideoImage = observer(
+  ({ loading, video = {}, onPress, isPoster, className }: VideoImageProps) => {
+    const [imageErrored, setImageErrored] = useState(false)
 
-  // default to poster or backdrop path, or either if one does not exist
-  const source = useMemo(() => {
-    // if we failed to get an image, return nothing
-    if (imageErrored) return ''
+    // default to poster or backdrop path, or either if one does not exist
+    const source = useMemo(() => {
+      // if we failed to get an image, return nothing
+      if (imageErrored) return ''
 
-    // if it is a poster, and we have a poster, show the poster
-    if (isPoster && video.posterPath) return video.posterPath
+      // if it is a poster, and we have a poster, show the poster
+      if (isPoster && video.posterPath) return video.posterPath
 
-    // show whatever is available
-    return video.backdropPath || video.posterPath
-  }, [imageErrored, isPoster, video.posterPath, video.backdropPath])
+      // show whatever is available
+      return video.backdropPath || video.posterPath
+    }, [imageErrored, isPoster, video.posterPath, video.backdropPath])
 
-  if (loading) {
+    if (loading) {
+      return (
+        <div
+          className={classNames(
+            'my-4 flex animate-pulse justify-center overflow-hidden rounded-md bg-gray-500 opacity-30 ',
+            {
+              'aspect-poster my-0': isPoster,
+              'discover-md:w-auto discover-md:aspect-auto aspect-backdrop m-0  my-4 h-[207px] w-full ':
+                !isPoster,
+            },
+          )}
+        />
+      )
+    }
+
+    const hasBackdrop = !isPoster && source
+
     return (
       <div
         className={classNames(
-          'my-4 flex animate-pulse justify-center overflow-hidden rounded-md bg-gray-500 opacity-30 ',
+          'relative my-4 flex justify-center overflow-hidden rounded-md transition-all duration-300 ease-in-out',
           {
-            'aspect-poster my-0': isPoster,
-            'discover-md:w-auto discover-md:aspect-auto aspect-backdrop m-0  my-4 h-[207px] w-full ':
-              !isPoster,
+            '!my-0 max-w-full': isPoster,
+            'discover-md:h-[207px] aspect-backdrop group m-0 w-full': !isPoster,
+            'discover-md:hover:my-0 discover-md:hover:h-[237px] my-4': hasBackdrop,
+            'cursor-pointer': onPress,
           },
         )}
-      />
+        onClick={onPress}
+      >
+        {source ? (
+          <img
+            src={IMAGE_PATH + source}
+            alt={source}
+            height="100%"
+            onError={() => setImageErrored(true)}
+            className={classNames(className, {
+              'aspect-poster discover-lg:max-w-none h-fit max-h-[609px] min-h-[400px] max-w-full object-contain':
+                isPoster,
+              'discover-md:w-[307px] discover-md:object-cover discover-md:-mt-4 discover-md:h-[270px] discover-md:group-hover:mt-0 h-full w-full object-contain transition-[margin-top] duration-300  ease-in-out':
+                !isPoster,
+            })}
+          />
+        ) : (
+          <div
+            className={classNames('flex flex-1 justify-center bg-slate-500 text-black', className, {
+              'min-h-[400px] items-center': isPoster,
+              'aspect-poster  max-h-[609px]': isPoster && !source,
+            })}
+          >
+            {video.isTv ? <TvIcon /> : <MovieIcon />}
+          </div>
+        )}
+
+        {!isPoster && (
+          <div
+            className="transition-min-height discover-md:group-hover:min-h-[40px] absolute bottom-0 flex min-h-[70px] w-full flex-col justify-end pb-1 pt-3 duration-300 ease-in-out"
+            style={{
+              background:
+                'linear-gradient(180deg, rgba(0, 0, 0, 0.54) 0%, rgba(0, 0, 0, 0) 0.01%, rgba(0, 0, 0, 0.54) 33.85%)',
+            }}
+          >
+            <div className="font-inter transition-margin-top discover-md:group-hover:mt-3 line-clamp-2 px-2 text-2xl  text-white duration-300 ease-in-out">
+              {video.videoName}
+            </div>
+
+            <div className="font-inter transition-max-height discover-md:roup-hover:max-h-0 line-clamp-2 max-h-8 overflow-hidden px-2 text-lg text-white duration-300 ease-in-out group-hover:max-h-0">
+              {video.durationOrSeasons}
+            </div>
+          </div>
+        )}
+      </div>
     )
-  }
-
-  const hasBackdrop = !isPoster && source
-
-  return (
-    <div
-      className={classNames(
-        'relative my-4 flex justify-center overflow-hidden rounded-md transition-all duration-300 ease-in-out',
-        {
-          'my-0 max-w-full': isPoster,
-          'discover-md:h-[207px] aspect-backdrop group m-0 w-full': !isPoster,
-          'discover-md:hover:my-0 discover-md:hover:h-[237px] my-4': hasBackdrop,
-          'cursor-pointer': onPress,
-        },
-      )}
-      onClick={onPress}
-    >
-      {source ? (
-        <img
-          src={IMAGE_PATH + source}
-          alt={source}
-          height="100%"
-          onError={() => setImageErrored(true)}
-          className={classNames({
-            'aspect-poster discover-lg:max-w-none h-fit max-h-[609px] min-h-[400px] max-w-full object-contain':
-              isPoster,
-            'discover-md:w-[307px] discover-md:object-cover discover-md:-mt-4 discover-md:h-[270px] discover-md:group-hover:mt-0 h-full w-full object-contain transition-[margin-top] duration-300  ease-in-out':
-              !isPoster,
-          })}
-        />
-      ) : (
-        <div
-          className={classNames('flex flex-1 justify-center bg-slate-500 text-black', {
-            'min-h-[400px] items-center': isPoster,
-            'aspect-poster  max-h-[609px]': isPoster && !source,
-          })}
-        >
-          {video.isTv ? <TvIcon /> : <MovieIcon />}
-        </div>
-      )}
-
-      {!isPoster && (
-        <div
-          className="transition-min-height discover-md:group-hover:min-h-[40px] absolute bottom-0 flex min-h-[70px] w-full flex-col justify-end pb-1 pt-3 duration-300 ease-in-out"
-          style={{
-            background:
-              'linear-gradient(180deg, rgba(0, 0, 0, 0.54) 0%, rgba(0, 0, 0, 0) 0.01%, rgba(0, 0, 0, 0.54) 33.85%)',
-          }}
-        >
-          <div className="font-inter transition-margin-top discover-md:group-hover:mt-3 line-clamp-2 px-2 text-2xl  text-white duration-300 ease-in-out">
-            {video.videoName}
-          </div>
-
-          <div className="font-inter transition-max-height discover-md:roup-hover:max-h-0 line-clamp-2 max-h-8 overflow-hidden px-2 text-lg text-white duration-300 ease-in-out group-hover:max-h-0">
-            {video.durationOrSeasons}
-          </div>
-        </div>
-      )}
-    </div>
-  )
-})
+  },
+)
 
 export default VideoImage
