@@ -37,11 +37,12 @@ const VideoModal = observer(
 
     return (
       <div className="discover-lg:flex-row discover-lg:flex-nowrap flex max-w-7xl flex-col flex-wrap justify-center text-white">
-        <div className="discover-lg:mr-12 flex w-fit flex-1 justify-center rounded-lg self-center">
+        <div className="discover-lg:mr-12 flex w-fit max-w-full flex-1 justify-center self-center rounded-lg">
           <VideoImage
             video={video}
             containerProps={{ alignSelf: 'center' }}
             rounded="lg"
+            className=""
             isPoster
           />
         </div>

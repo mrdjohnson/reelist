@@ -374,7 +374,7 @@ const Discover = observer(() => {
             onClose={closeVideo}
             anchor="bottom"
             PaperProps={DialogPaperProps}
-            classes={{ paper: 'm-1 relative p-2 pb-6 w-full h-full' }}
+            classes={{ paper: 'relative p-2 pb-6 w-full h-full' }}
             className=" bg-transparent-dark cursor-pointer backdrop-blur-md"
             transitionDuration={{ exit: 50 }}
             hideBackdrop
@@ -680,7 +680,7 @@ const Discover = observer(() => {
 
         {/* selected video dialog */}
         <VideoModalWrapper>
-          <div className="no-scrollbar discover-md:pt-0 relative overflow-scroll overscroll-none pt-6">
+          <div className="no-scrollbar relative overflow-scroll overscroll-none">
             {selectedVideo && (
               <VideoModal
                 video={selectedVideo}
@@ -696,7 +696,7 @@ const Discover = observer(() => {
           onClose={() => setShowMobileFilterOptions(false)}
           anchor="bottom"
           PaperProps={DialogPaperProps}
-          classes={{ paper: 'm-1 relative p-2 w-full h-full' }}
+          classes={{ paper: 'relative p-2 w-full h-full' }}
           className="bg-reelist-dark cursor-pointer backdrop-blur-md"
           transitionDuration={{ exit: 50 }}
         >
