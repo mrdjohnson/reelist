@@ -708,6 +708,10 @@ class Video {
     return '/' + this.mediaType + '/' + this.id
   }
 
+  get relatedVideos() {
+    return this.fetchRelated()
+  }
+
   // previously these values will still be stored on the server for now
   // but may just stick to the computed method entirely later
   get lastWatchedSeasonNumber() {

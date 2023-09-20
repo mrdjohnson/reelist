@@ -1,4 +1,5 @@
 import { observer } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
 
 import React, { useMemo } from 'react'
 import _ from 'lodash'
@@ -10,6 +11,8 @@ const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
 const VideoModal = observer(
   ({ video, selectedRegions }: { video: Video; selectedRegions: string[] }) => {
+    const router = useRouter()
+
     const getProvidersByType = (type): Provider[] =>
       _.chain(selectedRegions)
         .flatMap(region => video.providers[region]?.[type])
@@ -34,6 +37,10 @@ const VideoModal = observer(
         'displayPriority',
       )
     }, [video.providers])
+
+    const handleVideoSelection = (video: Video) => {
+      router.push(`/discover?videoId=${video.videoId}`, undefined, { shallow: true })
+    }
 
     return (
       <div className="discover-lg:flex-row discover-lg:flex-nowrap flex max-w-7xl flex-col flex-wrap justify-center text-white">
@@ -90,6 +97,28 @@ const VideoModal = observer(
                         </div>
                       ),
                   )}
+                </div>
+              </div>
+
+              <div className="no-scrollbar relative w-full overflow-x-auto overscroll-x-none">
+                <div className="sticky left-0 z-20 w-full pb-3 text-2xl">Related Videos</div>
+
+                <div className="relative flex  gap-x-3 pb-4">
+                  {video.relatedVideos.map(relatedVideo => (
+                    <div
+                      className=" flex scale-90 cursor-pointer flex-col justify-center text-center transition-all duration-200 ease-in-out hover:scale-100"
+                      key={relatedVideo.id}
+                      onClick={() => handleVideoSelection(relatedVideo)}
+                    >
+                      <VideoImage
+                        video={relatedVideo}
+                        className="!h-[200px] !min-h-0 max-w-fit"
+                        isPoster
+                      />
+
+                      <span className=" line-clamp-2 h-[3rem] text-base">{relatedVideo.name}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
