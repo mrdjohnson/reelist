@@ -14,6 +14,7 @@ import useVideoDiscover from '@reelist/utils/hooks/useVideoDiscover'
 import useVideoSearch from '@reelist/utils/hooks/useVideoSearch'
 import { callTmdb } from '@reelist/apis/api'
 import Video from '@reelist/models/Video'
+import Person from '@reelist/models/Person'
 import ReelistSelect, { useSelectState } from '~/components/ReelistSelect'
 
 import InfiniteScroll from './InfiniteScroll'
@@ -26,6 +27,7 @@ import VideoGroup from './VideoGroup'
 import DescendingIcon from './icons/DecendingIcon'
 import AscendingIcon from './icons/AscendingIcon'
 import Footer from './Footer'
+import PersonModal from './video/PersonModal'
 
 enum PageState {
   HOME = 'HOME',
@@ -71,13 +73,16 @@ const DialogPaperProps = {
 const Discover = observer(() => {
   const router = useRouter()
 
-  const { videoStore } = useStore()
+  const { videoStore, personStore } = useStore()
   const videoDiscover = useVideoDiscover()
   const videoSearch = useVideoSearch()
 
   const windowWidth = useWindowWidth()
 
   const [searchText, setSearchText] = useState('')
+
+  const [selectedPerson, setSelectedPerson] = useState<Person | null>(null)
+  const [showSelectedPerson, setShowSelectedPerson] = useState(false)
 
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null)
   const [showSelectedVideo, setShowSelectedVideo] = useState(false)
@@ -299,7 +304,7 @@ const Discover = observer(() => {
     regionSeparationType,
   ])
 
-  const shouldHideOverflow = showSelectedVideo || showMobileFilterOptions
+  const shouldHideOverflow = showSelectedVideo || showMobileFilterOptions || showSelectedPerson
 
   useEffect(() => {
     if (shouldHideOverflow) {
@@ -322,7 +327,7 @@ const Discover = observer(() => {
   }, [page, isLoadingVideos, pageState])
 
   useEffect(() => {
-    const { videoId } = router.query
+    const { videoId, personId } = router.query
 
     if (!videoId) {
       setShowSelectedVideo(false)
@@ -331,13 +336,21 @@ const Discover = observer(() => {
       videoStore.getVideo(videoId).then(setSelectedVideo)
       setShowSelectedVideo(true)
     }
+
+    if (!personId) {
+      setShowSelectedPerson(false)
+      setSelectedPerson(null)
+    } else if (!_.isArray(personId)) {
+      personStore.getPerson(personId).then(setSelectedPerson)
+      setShowSelectedPerson(true)
+    }
   }, [router.query])
 
   const handleVideoSelection = (video: Video) => {
     router.push(`/discover?videoId=${video.videoId}`, undefined, { shallow: true })
   }
 
-  const closeVideo = () => {
+  const closePopup = () => {
     router.replace('/discover', undefined, { shallow: true })
   }
 
@@ -365,13 +378,13 @@ const Discover = observer(() => {
 
   const isMobile = windowWidth < 674
 
-  const VideoModalWrapper = useCallback(
-    ({ children }: PropsWithChildren) => {
+  const Popup = useCallback(
+    ({ children, isOpen = false }: PropsWithChildren<{ isOpen: boolean }>) => {
       if (isMobile) {
         return (
           <Drawer
-            open={showSelectedVideo}
-            onClose={closeVideo}
+            open={isOpen}
+            onClose={closePopup}
             anchor="bottom"
             PaperProps={DialogPaperProps}
             classes={{ paper: 'relative p-2 pb-6 w-full h-full' }}
@@ -388,8 +401,8 @@ const Discover = observer(() => {
 
       return (
         <Dialog
-          open={showSelectedVideo}
-          onClose={closeVideo}
+          open={isOpen}
+          onClose={closePopup}
           PaperProps={DialogPaperProps}
           classes={{
             paper:
@@ -401,7 +414,7 @@ const Discover = observer(() => {
         >
           <div
             className="text-reelist-red absolute right-2 top-2 cursor-pointer lg:top-2"
-            onClick={closeVideo}
+            onClick={closePopup}
           >
             {/* close icon */}
             <svg
@@ -425,7 +438,7 @@ const Discover = observer(() => {
 
   const closeNavBar = () => {
     showMobileFilterOptions && setShowMobileFilterOptions(false)
-    showSelectedVideo && closeVideo()
+    showSelectedVideo && closePopup()
   }
 
   const toggleRegionSeparationType = () => {
@@ -679,7 +692,7 @@ const Discover = observer(() => {
         </InfiniteScroll>
 
         {/* selected video dialog */}
-        <VideoModalWrapper>
+        <Popup isOpen={showSelectedVideo}>
           <div className="no-scrollbar relative overflow-scroll overscroll-none">
             {selectedVideo && (
               <VideoModal
@@ -688,7 +701,13 @@ const Discover = observer(() => {
               />
             )}
           </div>
-        </VideoModalWrapper>
+        </Popup>
+
+        <Popup isOpen={showSelectedPerson}>
+          <div className="no-scrollbar relative overflow-scroll overscroll-none">
+            {selectedPerson && <PersonModal person={selectedPerson} />}
+          </div>
+        </Popup>
 
         {/* mobile filter options dialog sdaffa */}
         <Drawer
