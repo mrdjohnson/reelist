@@ -74,17 +74,18 @@ const ReelistAccordionSection = observer(
         icon = <DashIcon />
       } else {
         add = true
-        icon =  <PlusIcon />
+        icon = <PlusIcon />
       }
 
       return (
         <PillButton
           key={option.id}
           label={option.name}
-          className={classNames('border-reelist-red font-semibold p-3', {
-            'hover:bg-reelist-red rounded-md text-white hover:text-black border-none': singleSelect,
-            ' bg-reelist-red !text-black hover:text-white': remove,
-            ' hover:text-reelist-red  bg-black bg-opacity-30 !text-white': add,
+          className={classNames('border-reelist-red p-3 font-semibold', {
+            'rounded-md': singleSelect,
+            'border-transparent text-white': singleSelect && !isChecked,
+            'bg-reelist-red !text-black': isChecked,
+            'bg-black bg-opacity-30 !text-white': add,
           })}
           onClick={() => toggleOption(option)}
           rightIcon={icon}
@@ -94,7 +95,7 @@ const ReelistAccordionSection = observer(
 
     const hasFilteredOptions = !_.isEmpty(filteredOptions)
     const hadContent = options.length > 0
-    const hasContent =(!hadContent && children) || hasFilteredOptions
+    const hasContent = (!hadContent && children) || hasFilteredOptions
     const contentIsEmpty = hadContent && !hasFilteredOptions
 
     return (
