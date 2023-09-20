@@ -85,7 +85,8 @@ const VideoImage = observer(({ loading, video = {}, onPress, isPoster }: VideoIm
       className={classNames(
         'relative my-4 flex justify-center overflow-hidden rounded-md transition-all duration-300 ease-in-out',
         {
-          'aspect-poster my-0 min-h-[500px]': isPoster,
+          'aspect-poster my-0': isPoster,
+          'min-h-[400px]': isPoster && !source,
           'discover-md:h-[207px] aspect-backdrop group m-0 w-full': !isPoster,
           'discover-md:hover:my-0 discover-md:hover:h-[237px] my-4': hasBackdrop,
           'cursor-pointer': onPress,
