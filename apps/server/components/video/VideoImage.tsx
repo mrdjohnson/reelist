@@ -85,8 +85,7 @@ const VideoImage = observer(({ loading, video = {}, onPress, isPoster }: VideoIm
       className={classNames(
         'relative my-4 flex justify-center overflow-hidden rounded-md transition-all duration-300 ease-in-out',
         {
-          'aspect-poster my-0': isPoster,
-          'min-h-[400px]': isPoster && !source,
+          'my-0 ' : isPoster,
           'discover-md:h-[207px] aspect-backdrop group m-0 w-full': !isPoster,
           'discover-md:hover:my-0 discover-md:hover:h-[237px] my-4': hasBackdrop,
           'cursor-pointer': onPress,
@@ -101,7 +100,7 @@ const VideoImage = observer(({ loading, video = {}, onPress, isPoster }: VideoIm
           height="100%"
           onError={() => setImageErrored(true)}
           className={classNames({
-            'discover-md:max-h-[609px] aspect-poster w-full object-contain': isPoster,
+            'max-h-[609px] h-fit min-h-[400px] aspect-poster object-contain': isPoster,
             'discover-md:w-[307px] discover-md:object-cover discover-md:-mt-4 discover-md:h-[270px] discover-md:group-hover:mt-0 h-full w-full object-contain transition-[margin-top] duration-300  ease-in-out':
               !isPoster,
           })}
@@ -109,7 +108,8 @@ const VideoImage = observer(({ loading, video = {}, onPress, isPoster }: VideoIm
       ) : (
         <div
           className={classNames('flex flex-1 justify-center bg-slate-500 text-black', {
-            'items-center': isPoster,
+            'items-center min-h-[400px]': isPoster,
+            'aspect-poster  max-h-[609px]': isPoster && !source,
           })}
         >
           {video.isTv ? <TvIcon /> : <MovieIcon />}
