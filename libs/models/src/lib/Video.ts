@@ -8,6 +8,7 @@ import VideoStore from './VideoStore'
 import VideoApi from '@reelist/apis/VideoApi'
 import { VideoInfoType, VideoTableType } from 'libs/interfaces/src/lib/tables/VideoTable'
 import Auth from '@reelist/models/Auth'
+import Person from './Person'
 
 export type TvEpisode = {
   airDate: string
@@ -74,12 +75,9 @@ type VideoImageType = {
   // iso6391
 }
 
-type CastMember = {
-  id: number
-  name: string
+type CastMember = Person & {
   character: string
   order: number
-  profilePath: string
 }
 
 type Credits = {
