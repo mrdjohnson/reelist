@@ -21,7 +21,7 @@ export default LoginPage
 export const getStaticProps = async () => {
   return {
     props: {
-      path: process.env.NEXT_BASE_PATH,
+      path: process.env.NEXT_PUBLIC_BASE_URL,
     },
   }
 }
