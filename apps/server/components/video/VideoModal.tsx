@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import React, { useMemo } from 'react'
 import _ from 'lodash'
 import Video, { Provider } from '@reelist/models/Video'
+import Person from '@reelist/models/Person'
 
 import EntityImage from '../EntityImage'
 
@@ -42,6 +43,10 @@ const VideoModal = observer(
       router.push(`/discover?videoId=${video.videoId}`, undefined, { shallow: true })
     }
 
+    const handlePersonSelection = (person: Person) => {
+      router.push(`/discover?personId=${person.id}`, undefined, { shallow: true })
+    }
+
     return (
       <div className="discover-lg:flex-row discover-lg:flex-nowrap flex max-w-7xl flex-col flex-wrap justify-center text-white">
         <div className="discover-lg:mr-12 flex w-fit max-w-full flex-1 justify-center self-center rounded-lg">
@@ -75,15 +80,15 @@ const VideoModal = observer(
                     castMember =>
                       castMember.profilePath && (
                         <div
-                          className="flex flex-col justify-center text-center"
+                          className="flex scale-90 cursor-pointer flex-col justify-center text-center transition-all duration-200 ease-in-out hover:scale-100 "
+                          onClick={() => handlePersonSelection(castMember)}
                           key={castMember.id}
                         >
-                          <img
-                            src={IMAGE_PATH + castMember.profilePath}
-                            className="mb-3 rounded-md object-cover"
-                            alt={castMember.name}
-                            width="100px"
-                            height="100px"
+                          <EntityImage
+                            person={castMember}
+                            className="!h-[200px] !min-h-0 max-w-fit"
+                            isPoster
+                            isPerson
                           />
 
                           <span className="line-clamp-2 h-[3rem] text-base">
