@@ -3,9 +3,8 @@
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
-import { Dialog, Drawer, Toolbar } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
-import React, { PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@mui/material'
 import _ from 'lodash'
 import { useStore } from '@reelist/utils/hooks/useStore'
@@ -28,6 +27,7 @@ import DescendingIcon from './icons/DecendingIcon'
 import AscendingIcon from './icons/AscendingIcon'
 import Footer from './Footer'
 import PersonModal from './video/PersonModal'
+import Popup from '~/components/Popup'
 
 enum PageState {
   HOME = 'HOME',
@@ -55,19 +55,6 @@ const useWindowWidth = () => {
   }, [])
 
   return width
-}
-
-const DialogPaperProps = {
-  style: {
-    background:
-      'radial-gradient(50% 50% at 50% 50%, rgba(21, 30, 1, 0.25) 0%, rgba(0, 0, 0, 0.45) 100%)',
-    backdropFilter: 'blur(15px)',
-    maxWidth: '1619px',
-    position: 'relative',
-    overflowY: 'scroll',
-    overflowX: 'clip',
-    cursor: 'default',
-  },
 }
 
 const Discover = observer(() => {
@@ -378,64 +365,6 @@ const Discover = observer(() => {
 
   const isMobile = windowWidth < 674
 
-  const Popup = useCallback(
-    ({ children, isOpen = false }: PropsWithChildren<{ isOpen: boolean }>) => {
-      if (isMobile) {
-        return (
-          <Drawer
-            open={isOpen}
-            onClose={closePopup}
-            anchor="bottom"
-            PaperProps={DialogPaperProps}
-            classes={{ paper: 'relative p-2 pb-6 w-full h-full' }}
-            className=" bg-transparent-dark cursor-pointer backdrop-blur-md"
-            transitionDuration={{ exit: 50 }}
-            hideBackdrop
-          >
-            <Toolbar />
-
-            {children}
-          </Drawer>
-        )
-      }
-
-      return (
-        <Dialog
-          open={isOpen}
-          onClose={closePopup}
-          PaperProps={DialogPaperProps}
-          classes={{
-            paper:
-              'discover-md:p-[38px] discover-md:pr-[60px] discover-md:my-0 discover-md:mx-8 discover-md:h-auto discover-md:w-auto absolute top-0 left-0 h-screen w-screen p-3 m-2',
-          }}
-          className="bg-transparent-dark h-screen w-screen cursor-pointer backdrop-blur-md"
-          transitionDuration={{ exit: 50 }}
-          hideBackdrop
-        >
-          <div
-            className="text-reelist-red absolute right-2 top-2 cursor-pointer lg:top-2"
-            onClick={closePopup}
-          >
-            {/* close icon */}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="h-8"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </div>
-
-          {children}
-        </Dialog>
-      )
-    },
-    [isMobile, showSelectedVideo, selectedVideo],
-  )
-
   const closeNavBar = () => {
     if (showMobileFilterOptions) {
       setShowMobileFilterOptions(false)
@@ -698,7 +627,7 @@ const Discover = observer(() => {
         </InfiniteScroll>
 
         {/* selected video dialog */}
-        <Popup isOpen={showSelectedVideo}>
+        <Popup isOpen={showSelectedVideo} isMobile={isMobile}>
           <div className="no-scrollbar relative overflow-scroll overscroll-none">
             {selectedVideo && (
               <VideoModal
@@ -709,24 +638,19 @@ const Discover = observer(() => {
           </div>
         </Popup>
 
-        <Popup isOpen={showSelectedPerson}>
+        <Popup isOpen={showSelectedPerson} isMobile={isMobile}>
           <div className="no-scrollbar relative overflow-scroll overscroll-none">
             {selectedPerson && <PersonModal person={selectedPerson} />}
           </div>
         </Popup>
 
         {/* mobile filter options dialog sdaffa */}
-        <Drawer
-          open={showMobileFilterOptions}
+        <Popup
+          isOpen={showMobileFilterOptions}
+          isMobile={isMobile}
           onClose={() => setShowMobileFilterOptions(false)}
-          anchor="bottom"
-          PaperProps={DialogPaperProps}
           classes={{ paper: 'relative p-2 w-full h-full' }}
-          className="bg-reelist-dark cursor-pointer backdrop-blur-md"
-          transitionDuration={{ exit: 50 }}
         >
-          <Toolbar />
-
           <ReelistAccordion>
             <div className="discover-md:hidden my-4 text-center text-2xl font-semibold text-gray-300">
               Filters
@@ -846,7 +770,7 @@ const Discover = observer(() => {
               totalCount={6}
             />
           </ReelistAccordion>
-        </Drawer>
+        </Popup>
       </div>
     </div>
   )
