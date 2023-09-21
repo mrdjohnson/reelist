@@ -74,7 +74,9 @@ const VideoModal = observer(
                       isPerson
                     />
 
-                    <span className="line-clamp-2 h-[3rem] text-base">{castMember.character}</span>
+                    <span className="mt-2 line-clamp-2 h-[3rem] text-base">
+                      {castMember.character}
+                    </span>
                     <span className="line-clamp-2 h-[2.50rem] text-sm  opacity-75">
                       {castMember.name}
                     </span>
@@ -100,7 +102,7 @@ const VideoModal = observer(
                   isPoster
                 />
 
-                <span className=" line-clamp-2 h-[3rem] text-base">{relatedVideo.name}</span>
+                <span className="mt-2 line-clamp-2 h-[3rem] text-base">{relatedVideo.name}</span>
               </div>
             ))}
           </div>

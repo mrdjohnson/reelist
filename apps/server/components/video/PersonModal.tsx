@@ -32,7 +32,7 @@ const PersonModal = observer(({ person }: { person: Person }) => {
             >
               <EntityImage video={video} className="!h-[200px] !min-h-0 max-w-fit" isPoster />
 
-              <span className=" line-clamp-4 h-[3rem] text-base font-semibold text-white">
+              <span className="mt-2 line-clamp-4 h-[3rem] text-base font-semibold text-white">
                 {video.title}
               </span>
             </div>
