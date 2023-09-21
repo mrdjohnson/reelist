@@ -544,7 +544,7 @@ const Discover = observer(() => {
                 </Button>
               ) : (
                 <input
-                  className="focus:shadow-outline w-full appearance-none border-0 bg-transparent py-2 text-xl leading-tight text-gray-300 shadow outline-none"
+                  className="focus:shadow-outline discover-md:leading-[35px] w-full appearance-none border-0 bg-transparent py-2 text-xl leading-[30px] text-gray-300 shadow outline-none"
                   type="text"
                   autoComplete="off"
                   placeholder="Search"
