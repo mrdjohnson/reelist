@@ -816,7 +816,11 @@ class Video {
   }
 
   get cast() {
-    return (this.credits || this.aggregateCredits).cast || []
+    const allCastMembers = _.toArray(this.credits?.cast).concat(
+      _.toArray(this.aggregateCredits?.cast),
+    )
+
+    return _.uniqBy(allCastMembers, 'id')
   }
 }
 
