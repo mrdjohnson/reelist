@@ -3,6 +3,8 @@ import { useRouter } from 'next/router'
 
 import React from 'react'
 import _ from 'lodash'
+import moment from 'moment'
+
 import Person from '@reelist/models/Person'
 import Video from '@reelist/models/Video'
 
@@ -18,8 +20,16 @@ const PersonModal = observer(({ person }: { person: Person }) => {
     router.push(`/discover?videoId=${mediaType + video.id}`, undefined, { shallow: true })
   }
 
+  const birthday = moment(person.birthday).format('MMM YYYY')
+  const deathday = person.deathday ? moment(person.deathday).format('MMM YYYY') : ''
+
   return (
-    <EntityModal title={person.name} person={person} description={person.biography}>
+    <EntityModal
+      title={person.name}
+      person={person}
+      subTitle={`${person.knownForDepartment} ‧ ${birthday} - ${deathday}`}
+      description={person.biography}
+    >
       <div className="no-scrollbar relative w-full overflow-x-auto overscroll-x-none">
         <div className="sticky left-0 z-20 w-full pb-3 text-2xl">Known For</div>
 
