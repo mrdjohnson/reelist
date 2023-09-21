@@ -546,8 +546,10 @@ class Video {
   fetchRelated = () => {
     if (this._relatedVideos || !this.similar?.results) return this._relatedVideos || []
 
+    const mediaTypePrefix = this.mediaType === 'tv' ? 'tv' : 'mv'
+
     this._relatedVideos = this.similar.results.map(similarVideoJson =>
-      this.videoStore.makeUiVideo(similarVideoJson, this.mediaType + similarVideoJson.id),
+      this.videoStore.makeUiVideo(similarVideoJson, mediaTypePrefix + similarVideoJson.id),
     )
 
     return this._relatedVideos
