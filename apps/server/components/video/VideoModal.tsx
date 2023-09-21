@@ -102,7 +102,7 @@ const VideoModal = observer(
                   isPoster
                 />
 
-                <span className="mt-2 line-clamp-2 h-[3rem] text-base">{relatedVideo.name}</span>
+                <span className="mt-2 line-clamp-2 h-[3rem] text-base">{relatedVideo.videoName}</span>
               </div>
             ))}
           </div>
