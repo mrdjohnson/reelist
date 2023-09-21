@@ -58,7 +58,7 @@ const VideoModal = observer(
         <div className="no-scrollbar relative w-full overflow-x-auto overscroll-x-none">
           <div className="sticky left-0 z-20 w-full pb-3 text-2xl">Cast</div>
 
-          <div className="relative flex  w-[100px] gap-x-5 pb-4">
+          <div className="relative flex  w-[100px] gap-x-5 pb-4 pl-2">
             {video.cast.map(
               castMember =>
                 castMember.profilePath && (
@@ -89,7 +89,7 @@ const VideoModal = observer(
         <div className="no-scrollbar relative w-full overflow-x-auto overscroll-x-none">
           <div className="sticky left-0 z-20 w-full pb-3 text-2xl">Related Videos</div>
 
-          <div className="relative flex  gap-x-3 pb-4">
+          <div className="relative flex  gap-x-3 pb-4 pl-2">
             {video.relatedVideos.map(relatedVideo => (
               <div
                 className="discover-md:scale-90 flex cursor-pointer flex-col justify-center text-center transition-all duration-200 ease-in-out hover:scale-100"
@@ -114,7 +114,7 @@ const VideoModal = observer(
           </div>
 
           <div
-            className="discover-lg:gap-x-8 no-scrollbar flex gap-x-5 overflow-x-auto overscroll-x-none pb-2"
+            className="discover-lg:gap-x-8 no-scrollbar flex gap-x-5 overflow-x-auto overscroll-x-none pb-2 pl-2"
             style={{ scrollbarWidth: 'none' }}
           >
             {providers.map(provider => (

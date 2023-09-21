@@ -33,7 +33,7 @@ const PersonModal = observer(({ person }: { person: Person }) => {
       <div className="no-scrollbar relative w-full overflow-x-auto overscroll-x-none">
         <div className="sticky left-0 z-20 w-full pb-3 text-2xl">Known For</div>
 
-        <div className="relative flex  gap-x-3 pb-4">
+        <div className="relative flex  gap-x-3 pb-4 pl-2">
           {person.media.map(video => (
             <div
               className="discover-md:scale-90 flex cursor-pointer flex-col justify-center text-center transition-all duration-200 ease-in-out hover:scale-100"
