@@ -50,11 +50,7 @@ const VideoModal = observer(
     return (
       <div className="discover-lg:flex-row discover-lg:flex-nowrap flex max-w-7xl flex-col flex-wrap justify-center text-white">
         <div className="discover-lg:mr-12 flex w-fit max-w-full flex-1 justify-center self-center rounded-lg">
-          <EntityImage
-            video={video}
-            className=""
-            isPoster
-          />
+          <EntityImage video={video} className="max-w-full discover-md:max-w-none" isPoster />
         </div>
 
         <div className="flex w-full flex-col overflow-clip">
@@ -80,7 +76,7 @@ const VideoModal = observer(
                     castMember =>
                       castMember.profilePath && (
                         <div
-                          className="flex scale-90 cursor-pointer flex-col justify-center text-center transition-all duration-200 ease-in-out hover:scale-100 "
+                          className="discover-md:scale-90 flex cursor-pointer flex-col justify-center text-center transition-all duration-200 ease-in-out hover:scale-100 "
                           onClick={() => handlePersonSelection(castMember)}
                           key={castMember.id}
                         >
@@ -109,7 +105,7 @@ const VideoModal = observer(
                 <div className="relative flex  gap-x-3 pb-4">
                   {video.relatedVideos.map(relatedVideo => (
                     <div
-                      className=" flex scale-90 cursor-pointer flex-col justify-center text-center transition-all duration-200 ease-in-out hover:scale-100"
+                      className="discover-md:scale-90 flex cursor-pointer flex-col justify-center text-center transition-all duration-200 ease-in-out hover:scale-100"
                       key={relatedVideo.id}
                       onClick={() => handleVideoSelection(relatedVideo)}
                     >

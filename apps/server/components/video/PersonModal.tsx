@@ -20,11 +20,7 @@ const PersonModal = observer(({ person }: { person: Person }) => {
   return (
     <div className="discover-lg:flex-row discover-lg:flex-nowrap flex max-w-7xl flex-col flex-wrap justify-center text-white">
       <div className="discover-lg:mr-12 flex w-fit max-w-full flex-1 justify-center self-center rounded-lg">
-        <EntityImage
-          person={person}
-          className=""
-          isPoster
-        />
+        <EntityImage person={person} className="max-w-full discover-md:max-w-none" isPoster />
       </div>
 
       <div className="flex w-full flex-col overflow-clip">
@@ -34,7 +30,7 @@ const PersonModal = observer(({ person }: { person: Person }) => {
 
         <div className="bg-reelist-red mb-6 mt-3 h-[1px]" />
 
-        <div className="max-h-72 min-h-20 overflow-scroll whitespace-normal break-words">
+        <div className="min-h-20 max-h-72 overflow-scroll whitespace-normal break-words">
           {person.biography}
         </div>
 
@@ -46,7 +42,7 @@ const PersonModal = observer(({ person }: { person: Person }) => {
               <div className="relative flex  gap-x-3 pb-4">
                 {person.media.map(video => (
                   <div
-                    className=" flex scale-90 cursor-pointer flex-col justify-center text-center transition-all duration-200 ease-in-out hover:scale-100"
+                    className="discover-md:scale-90 flex cursor-pointer flex-col justify-center text-center transition-all duration-200 ease-in-out hover:scale-100"
                     key={video.id}
                     onClick={() => handleVideoSelection(video)}
                   >

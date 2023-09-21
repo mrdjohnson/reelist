@@ -132,7 +132,7 @@ const EntityImage = observer(
             height="100%"
             onError={() => setImageErrored(true)}
             className={classNames(className, {
-              'aspect-poster discover-lg:max-w-none h-fit max-h-[609px] min-h-[400px] max-w-full object-contain':
+              'aspect-poster h-fit max-h-[609px] min-h-[400px] object-contain':
                 isPoster,
               'discover-md:w-[307px] discover-md:object-cover discover-md:-mt-4 discover-md:h-[270px] discover-md:group-hover:mt-0 h-full w-full object-contain transition-[margin-top] duration-300  ease-in-out':
                 !isPoster,
