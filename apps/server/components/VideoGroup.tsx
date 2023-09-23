@@ -54,7 +54,7 @@ const VideoGroup = ({
     <>
       {title && (
         <div
-          className="mb-5 w-fit cursor-pointer text-3xl font-semibold text-white hover:font-bold hover:underline"
+          className="mb-2 mt-4 w-fit cursor-pointer text-3xl font-semibold text-white hover:font-bold hover:underline"
           onClick={onViewMoreClicked}
         >
           {title}
@@ -63,7 +63,7 @@ const VideoGroup = ({
 
       <div
         className={classNames(
-          'discover-md:justify-items-stretch mb-4 grid w-full  flex-1 justify-center justify-items-center gap-x-5',
+          'discover-md:justify-items-stretch grid w-full flex-1 justify-center justify-items-center gap-x-5',
           { 'line-clamp-3': isClipped },
         )}
         style={{ gridTemplateColumns: `repeat(${numItemsPerRow}, minmax(0, 1fr))` }}
@@ -81,7 +81,7 @@ const VideoGroup = ({
       </div>
 
       {title && videosToDisplay?.length === maxViewCount && (
-        <div className="flex h-[70px] justify-center">
+        <div className="flex justify-center">
           <Button
             onClick={onViewMoreClicked}
             className="mb-1 h-fit cursor-pointer rounded-md border-2 border-solid border-transparent bg-transparent align-middle text-lg text-white hover:border-white"
