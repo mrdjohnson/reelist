@@ -1,7 +1,7 @@
 import React, { PropsWithChildren, useMemo, useRef, createContext, useContext } from 'react'
 import _ from 'lodash'
 import { observer } from 'mobx-react-lite'
-import { SelectOption, SelectState, StringOrNumber } from './ReelistSelect'
+import { SelectOption, SelectState } from './ReelistSelect'
 import DashIcon from 'apps/server/components/heroIcons/DashIcon'
 import PlusIcon from 'apps/server/components/heroIcons/PlusIcon'
 import PillButton from 'apps/server/components/PillButton'
@@ -19,7 +19,7 @@ const ReelistAccordionContext = createContext<SubSectionContextType>({
 
 export const useReelistAccordionContext = () => useContext(ReelistAccordionContext)
 
-type SelectedStatePropType<T extends StringOrNumber> = {
+type SelectedStatePropType<T extends SelectOption> = {
   selectState: SelectState<T>
   label?: never
 }
@@ -29,7 +29,7 @@ type SelectedOptionsPropType = {
   label: string
 }
 
-type ReelistAccordionSectionProps<T extends StringOrNumber> = PropsWithChildren<
+type ReelistAccordionSectionProps<T extends SelectOption> = PropsWithChildren<
   {
     index: number
     totalCount: number
@@ -38,7 +38,7 @@ type ReelistAccordionSectionProps<T extends StringOrNumber> = PropsWithChildren<
 >
 
 const ReelistAccordionSection = observer(
-  <T extends StringOrNumber>({
+  <T extends SelectOption>({
     selectState,
     label: presetLabel,
     children,
@@ -59,7 +59,7 @@ const ReelistAccordionSection = observer(
         .value()
     }, [options, filterText])
 
-    const renderOption = (option: SelectOption<T>, isChecked) => {
+    const renderOption = (option: T, isChecked) => {
       let singleSelect = false
 
       let icon

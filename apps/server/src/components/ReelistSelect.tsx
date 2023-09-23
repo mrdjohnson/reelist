@@ -10,31 +10,29 @@ import PillButton from 'apps/server/components/PillButton'
 import DashIcon from 'apps/server/components/heroIcons/DashIcon'
 import PlusIcon from 'apps/server/components/heroIcons/PlusIcon'
 
-export type StringOrNumber = string | number
-
-export type SelectOption<T extends StringOrNumber> = {
-  id: T
+export type SelectOption = {
+  id: string
   name: string
   selected?: boolean
   icon?: ReactNode
 }
 
-export class SelectState<T extends StringOrNumber> {
-  selectedOptions: Record<StringOrNumber, string> = {}
+export class SelectState<T extends SelectOption> {
+  selectedOptions: Record<string, string> = {}
   storageKey: string
-  options: Array<SelectOption<T>>
+  options: Array<T>
   isLoadedFromSave: boolean = false
 
   constructor(
     public label: string,
-    public loadOptions: () => Promise<Array<SelectOption<T>>>,
+    public loadOptions: () => Promise<Array<T>>,
     private storage: IStorage,
     private alternativeDefaultOptions?: () => Array<string>,
     public isMulti: boolean = true,
   ) {
     console.log('is multi: ', isMulti)
     this.storageKey = _.snakeCase(label)
-    
+
     makeAutoObservable(this)
 
     loadOptions().then(nextOptions => {
@@ -43,7 +41,7 @@ export class SelectState<T extends StringOrNumber> {
     })
   }
 
-  setSelectedOptions = (options: string []) => {
+  setSelectedOptions = (options: string[]) => {
     const allOptionsById = _.chain(this.options).keyBy('id').mapValues('name').value()
 
     const nextOptions = {}
@@ -91,7 +89,7 @@ export class SelectState<T extends StringOrNumber> {
     this.isLoadedFromSave = true
   }
 
-  toggleOption = (option: SelectOption<T>) => {
+  toggleOption = (option: T) => {
     const removingOption = !!this.selectedOptions[option.id]
 
     if (this.isMulti) {
@@ -106,7 +104,7 @@ export class SelectState<T extends StringOrNumber> {
     this.save()
   }
 
-  removeOption = (optionId: StringOrNumber) => {
+  removeOption = (optionId: string) => {
     this.selectedOptions = _.omit(this.selectedOptions, optionId)
 
     this.save()
@@ -117,9 +115,9 @@ export class SelectState<T extends StringOrNumber> {
   }
 }
 
-export const useSelectState = <T extends StringOrNumber>(
+export const useSelectState = <T extends SelectOption>(
   label: string,
-  loadOptions: () => Promise<Array<SelectOption<T>>>,
+  loadOptions: () => Promise<Array<T>>,
   config: { getAlternativeDefaults?: () => Array<string>; isMulti?: boolean } = {},
 ) => {
   const { storage } = useStore()
@@ -137,13 +135,13 @@ export const useSelectState = <T extends StringOrNumber>(
   return selectState
 }
 
-type ReelistSelectProps<T extends StringOrNumber> = PropsWithChildren<{
+type ReelistSelectProps<T extends SelectOption> = PropsWithChildren<{
   selectState: SelectState<T>
   disabled: boolean
 }>
 
 const ReelistSelect = observer(
-  <T extends StringOrNumber>({ selectState, children, disabled }: ReelistSelectProps<T>) => {
+  <T extends SelectOption>({ selectState, children, disabled }: ReelistSelectProps<T>) => {
     const [isOpen, setIsOpen] = useState(false)
     const [filterText, setFilterText] = useState('')
     const { label, options = [], selectedOptions, toggleOption, isMulti } = selectState || {}
@@ -168,7 +166,7 @@ const ReelistSelect = observer(
       }
     }, [isOpen])
 
-    const renderOption = (option: SelectOption<T>, isChecked) => {
+    const renderOption = (option: T, isChecked) => {
       let singleSelect = false
 
       let icon
