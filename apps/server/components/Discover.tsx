@@ -589,7 +589,25 @@ const Discover = observer(() => {
                 <ReelistSelect
                   selectState={watchProviderSelectState}
                   disabled={pageState === PageState.SEARCH}
-                />
+                >
+                  <div className="pb-3">
+                    <p className="mb-2 text-xl  text-white">
+                      {_.isEmpty(regionSelectState.selectedOptions)
+                        ? `No Region filter selected, displaying all ${watchProviderSelectState.options?.length} items`
+                        : `${watchProviderSelectState.options?.length} Watch Providers are available based on selected Regions:`}
+                    </p>
+
+                    {_.map(regionSelectState.selectedOptions, (name, id) => (
+                      <PillButton
+                        className="border-reelist-red text-white"
+                        onClick={() => regionSelectState.removeOption(id)}
+                        key={id}
+                        label={name}
+                        rightIcon={<CloseIcon />}
+                      />
+                    ))}
+                  </div>
+                </ReelistSelect>
               </div>
 
               <div className="discover-md:justify-self-end discover-lg:col-start-2 row-start-1 justify-self-center">
@@ -783,7 +801,25 @@ const Discover = observer(() => {
               filterText={mobileFilterText}
               index={5}
               totalCount={6}
-            />
+            >
+              <div className="pb-3">
+                <p className="mb-2 text-xl  text-white">
+                  {_.isEmpty(regionSelectState.selectedOptions)
+                    ? `No Region filter selected, displaying all ${watchProviderSelectState.options?.length} items`
+                    : `${watchProviderSelectState.options?.length} Watch Providers are available based on selected Regions:`}
+                </p>
+
+                {_.map(regionSelectState.selectedOptions, (name, id) => (
+                  <PillButton
+                    className="border-reelist-red text-white p-3"
+                    onClick={() => regionSelectState.removeOption(id)}
+                    key={id}
+                    label={name}
+                    rightIcon={<CloseIcon />}
+                  />
+                ))}
+              </div>
+            </ReelistAccordionSection>
           </ReelistAccordion>
         </Popup>
       </div>
