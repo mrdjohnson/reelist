@@ -21,6 +21,7 @@ export class SelectState<T extends SelectOption> {
   selectedOptions: Record<string, string> = {}
   storageKey: string
   options: Array<T>
+  private allOptions: Array<T>
   isLoadedFromSave: boolean = false
 
   constructor(
@@ -102,6 +103,14 @@ export class SelectState<T extends SelectOption> {
     }
 
     this.save()
+  }
+
+  setOptionsFilter = (filter?: (option: T) => boolean) => {
+    this.allOptions ||= this.options
+    this.options = _.filter(this.allOptions, filter)
+
+    // remove any selected options that no longer pass the filter
+    this.setSelectedOptions(_.map(this.selectedOptions, 'id'))
   }
 
   removeOption = (optionId: string) => {

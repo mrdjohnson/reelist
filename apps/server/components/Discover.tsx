@@ -14,7 +14,7 @@ import useVideoSearch from '@reelist/utils/hooks/useVideoSearch'
 import { callTmdb } from '@reelist/apis/api'
 import Video from '@reelist/models/Video'
 import Person from '@reelist/models/Person'
-import ReelistSelect, { useSelectState } from '~/components/ReelistSelect'
+import ReelistSelect, { SelectOption, useSelectState } from '~/components/ReelistSelect'
 
 import InfiniteScroll from './InfiniteScroll'
 import VideoModal from './video/VideoModal'
@@ -332,6 +332,21 @@ const Discover = observer(() => {
       setShowSelectedPerson(true)
     }
   }, [router.query])
+
+  // changing a region affects which providers are available
+  useEffect(() => {
+    const regions = _.keys(regionSelectState.selectedOptions)
+
+    if (_.isEmpty(regions)) {
+      watchProviderSelectState.setOptionsFilter(null)
+      return
+    }
+
+    watchProviderSelectState.setOptionsFilter((option: WatchProvider) => {
+      // true if selected regions include any watch provider
+      return _.intersection(option.displayPriorities, regions).length > 0
+    })
+  }, [regionSelectState.selectedOptions])
 
   const handleVideoSelection = (video: Video) => {
     router.push(`/discover?videoId=${video.videoId}`, undefined, { shallow: true })
@@ -856,6 +871,10 @@ const getGenres = async () => {
   return allGenres
 }
 
+type WatchProvider = SelectOption & {
+  displayPriorities: string[]
+}
+
 const getProvidersByType = async (type: string) => {
   const typeLabel = _.capitalize(type)
 
@@ -863,6 +882,7 @@ const getProvidersByType = async (type: string) => {
     .then(
       item =>
         _.get(item, 'data.data.results') as Array<{
+          displayPriorities: Record<string, number>
           displayPriority: string
           logoPath: string
           providerName: string
@@ -871,16 +891,23 @@ const getProvidersByType = async (type: string) => {
     )
     .then(items => _.sortBy(items, 'displayPriority'))
     .then(items =>
-      items.map(item => ({
-        original: {
-          id: 'shared:' + item.providerId,
-          name: item.providerName,
-        },
-        alternative: {
-          id: type + ':' + item.providerId,
-          name: `${item.providerName} (${typeLabel})`,
-        },
-      })),
+      items.map(item => {
+        const displayPriorities = _.keys(item.displayPriorities).map(_.toUpper)
+
+        return {
+          original: {
+            id: 'shared:' + item.providerId,
+            name: item.providerName,
+            displayPriorities,
+          },
+
+          alternative: {
+            id: type + ':' + item.providerId,
+            name: `${item.providerName} (${typeLabel})`,
+            displayPriorities,
+          },
+        }
+      }),
     )
     .then(items => _.keyBy(items, 'original.id'))
 }
