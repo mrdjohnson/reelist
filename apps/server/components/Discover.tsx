@@ -817,9 +817,8 @@ const getGenresByType = async (type: string) => {
           name: string
         }>,
     )
-    .then(_.toArray)
     .then(items =>
-      items.map(item => ({
+      _.map(items, item => ({
         original: {
           id: 'shared:' + item.id,
           name: item.name,
@@ -839,9 +838,7 @@ const getGenres = async () => {
 
   const genreIds = _.uniq(_.keys(tvGenresById).concat(_.keys(movieGenresById)))
 
-  const allGenres = []
-
-  genreIds.forEach(genreId => {
+  const allGenres = genreIds.map(genreId => {
     const tvGenre = tvGenresById[genreId]
     const movieGenre = movieGenresById[genreId]
 
@@ -850,13 +847,13 @@ const getGenres = async () => {
 
     // the id is already the same, make sure the name is too
     if (tvGenre?.original?.name === movieGenre?.original?.name) {
-      allGenres.push(original)
+      return original
     } else {
-      allGenres.push(alternative)
+      return alternative
     }
   })
 
-  return _.sortBy(allGenres, 'name')
+  return allGenres
 }
 
 const getProvidersByType = async (type: string) => {
@@ -896,9 +893,7 @@ const getProviders = async () => {
 
   const providerIds = _.uniq(_.keys(tvProvidersById).concat(_.keys(movieProvidersById)))
 
-  const allProviders = []
-
-  providerIds.forEach(providerId => {
+  const allProviders = providerIds.map(providerId => {
     const tvProvider = tvProvidersById[providerId]
     const movieProvider = movieProvidersById[providerId]
 
@@ -907,9 +902,9 @@ const getProviders = async () => {
 
     // the id is already the same, make sure the name is too
     if (tvProvider?.original?.name === movieProvider?.original?.name) {
-      allProviders.push(original)
+      return original
     } else {
-      allProviders.push(alternative)
+      return alternative
     }
   })
 
