@@ -176,63 +176,42 @@ const ReelistSelect = observer(
     }, [isOpen])
 
     const renderOption = (option: T, isChecked) => {
-      let singleSelect = false
-
-      let icon
-      let add = false
-
-      if (!isMulti) {
-        singleSelect = true
-      } else if (isChecked) {
-        icon = <DashIcon />
-      } else {
-        add = true
-        icon = <PlusIcon />
-      }
-
       return (
         <PillButton
           key={option.id}
           label={option.name}
-          className={classNames('border-reelist-red font-semibold', {
-            'hover:bg-reelist-red rounded-md border-none': singleSelect,
-            'hover:text-reelist-red bg-opacity-30': add,
-            'bg-reelist-red text-black hover:text-white': isChecked,
-            'bg-transparent text-white': !isChecked,
-          })}
+          className="!rounded-md"
           onClick={() => toggleOption(option)}
-          rightIcon={icon}
+          rightIcon={isChecked ? <DashIcon /> : <PlusIcon />}
+          inverted={isChecked}
+          noBorder={!isMulti}
         />
       )
     }
 
+    const Chevron = (
+      <svg
+        viewBox="0 0 16 11"
+        fill="currentColor"
+        xmlns="http://www.w3.org/2000/svg"
+        className={'ml-2 h-3 w-3 transition-transform duration-200 ' + (isOpen && '-rotate-90 ')}
+      >
+        <path d="M7.60536 10.7899C7.82333 11.07 8.17667 11.07 8.39465 10.7899L15.8365 1.22464C15.9961 1.01949 16.0439 0.710927 15.9575 0.442861C15.8711 0.174785 15.6676 0 15.4419 0H0.558157C0.332408 0 0.128896 0.174785 0.0425036 0.442861C-0.0438888 0.710927 0.00386559 1.01949 0.163493 1.22464L7.60536 10.7899Z" />
+      </svg>
+    )
+
     return (
       <>
         {selectState.isMulti ? (
-          <Button
-            className={
-              'font-inter group flex w-fit justify-start self-center rounded-l-full rounded-r-full pl-4 pr-2 text-left align-baseline text-lg font-semibold text-black hover:text-white' +
-              (disabled ? ' pointer-events-none bg-gray-500 opacity-40' : ' bg-reelist-red ')
-            }
+          <PillButton
+            label={label}
+            rightIcon={Chevron}
             onClick={() => setIsOpen(true)}
             aria-describedby={label}
-            ref={buttonRef}
+            pillButtonRef={buttonRef}
+            solid
             disableRipple
-          >
-            {label}
-
-            {/* chevron icon */}
-            <svg
-              viewBox="0 0 16 11"
-              fill="currentColor"
-              xmlns="http://www.w3.org/2000/svg"
-              className={
-                'ml-2 h-3 w-3 transition-transform duration-200 ' + (isOpen && '-rotate-90 ')
-              }
-            >
-              <path d="M7.60536 10.7899C7.82333 11.07 8.17667 11.07 8.39465 10.7899L15.8365 1.22464C15.9961 1.01949 16.0439 0.710927 15.9575 0.442861C15.8711 0.174785 15.6676 0 15.4419 0H0.558157C0.332408 0 0.128896 0.174785 0.0425036 0.442861C-0.0438888 0.710927 0.00386559 1.01949 0.163493 1.22464L7.60536 10.7899Z" />
-            </svg>
-          </Button>
+          />
         ) : (
           <div className="flex flex-col justify-end">
             <Button
@@ -248,17 +227,7 @@ const ReelistSelect = observer(
               <div className="transition-color flex  items-center justify-center border-0 border-b border-solid border-transparent duration-200 group-hover:border-white">
                 {_.values(selectedOptions)[0]}
 
-                {/* chevron icon */}
-                <svg
-                  viewBox="0 0 16 11"
-                  fill="currentColor"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className={
-                    'ml-2 h-3 w-2 transition-transform duration-200 ' + (isOpen && '-rotate-90 ')
-                  }
-                >
-                  <path d="M7.60536 10.7899C7.82333 11.07 8.17667 11.07 8.39465 10.7899L15.8365 1.22464C15.9961 1.01949 16.0439 0.710927 15.9575 0.442861C15.8711 0.174785 15.6676 0 15.4419 0H0.558157C0.332408 0 0.128896 0.174785 0.0425036 0.442861C-0.0438888 0.710927 0.00386559 1.01949 0.163493 1.22464L7.60536 10.7899Z" />
-                </svg>
+                <div className=' scale-75'>{Chevron}</div>
               </div>
             </Button>
           </div>
@@ -303,7 +272,7 @@ const ReelistSelect = observer(
 
               <div
                 className={
-                  'my-3 flex w-full flex-wrap gap-3 ' +
+                  'my-3 flex w-full flex-wrap gap-x-1 ' +
                   (!selectState.isMulti && ' !my-0 flex-col rounded-md')
                 }
               >

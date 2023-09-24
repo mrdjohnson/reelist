@@ -81,14 +81,9 @@ const ReelistAccordionSection = observer(
         <PillButton
           key={option.id}
           label={option.name}
-          className={classNames('border-reelist-red p-3 font-semibold', {
-            'rounded-md': singleSelect,
-            'border-transparent text-white': singleSelect && !isChecked,
-            'bg-reelist-red !text-black': isChecked,
-            'bg-black bg-opacity-30 !text-white': add,
-          })}
           onClick={() => toggleOption(option)}
           rightIcon={icon}
+          inverted={isChecked}
         />
       )
     }

@@ -599,7 +599,6 @@ const Discover = observer(() => {
 
                     {_.map(regionSelectState.selectedOptions, (name, id) => (
                       <PillButton
-                        className="border-reelist-red text-white"
                         onClick={() => regionSelectState.removeOption(id)}
                         key={id}
                         label={name}
@@ -621,15 +620,11 @@ const Discover = observer(() => {
             <div className="flex flex-row flex-wrap gap-x-2">
               {_.map(selectedItems, ({ name, id, selectState }) => (
                 <PillButton
-                  className={
-                    searchText
-                      ? ' pointer-events-none mt-4 border-gray-500 text-gray-500 opacity-40'
-                      : ' border-reelist-red mt-4 text-white'
-                  }
                   onClick={() => selectState.removeOption(id)}
                   key={id}
                   rightIcon={<CloseIcon />}
                   label={name}
+                  disabled={!!searchText}
                 />
               ))}
             </div>
@@ -711,7 +706,6 @@ const Discover = observer(() => {
                   ({ name, id, selectState }) =>
                     name.toLowerCase().includes(mobileFilterText.toLowerCase()) && (
                       <PillButton
-                        className="border-reelist-red p-3 text-white"
                         onClick={() => selectState.removeOption(id)}
                         key={id}
                         label={name}
@@ -811,7 +805,6 @@ const Discover = observer(() => {
 
                 {_.map(regionSelectState.selectedOptions, (name, id) => (
                   <PillButton
-                    className="border-reelist-red text-white p-3"
                     onClick={() => regionSelectState.removeOption(id)}
                     key={id}
                     label={name}
