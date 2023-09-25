@@ -162,6 +162,10 @@ const Discover = observer(() => {
       return
     }
 
+    if(page === 1) {
+      setVideos([])
+    }
+
     setIsLoadingVideos(true)
 
     if (pageState === PageState.SEARCH) {
