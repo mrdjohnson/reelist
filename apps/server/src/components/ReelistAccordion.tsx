@@ -5,6 +5,7 @@ import { SelectState, SelectOption } from '@reelist/utils/hooks/useSelectState'
 import DashIcon from 'apps/server/components/heroIcons/DashIcon'
 import PlusIcon from 'apps/server/components/heroIcons/PlusIcon'
 import PillButton from 'apps/server/components/PillButton'
+import classNames from 'classnames'
 
 const HEADER_HEIGHT = 45
 
@@ -115,7 +116,12 @@ const ReelistAccordionSection = observer(
             {children && <div className="w-full pb-1">{children}</div>}
 
             {hasFilteredOptions && (
-              <div className="my-3 flex w-full flex-wrap gap-3 ">
+              <div
+                className={classNames('my-3 w-full gap-3', {
+                  'flex w-full flex-wrap': isMulti,
+                  grid: !isMulti,
+                })}
+              >
                 {filteredOptions.map(option => {
                   const isChecked = selectedOptions[0] === option.id || !!selectedOptions[option.id]
                   return renderOption(option, isChecked)
