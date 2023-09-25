@@ -24,6 +24,7 @@ import VideoGroup from './VideoGroup'
 import Footer from './Footer'
 import PersonModal from './video/PersonModal'
 import Popup from '~/components/Popup'
+import classNames from 'classnames'
 
 enum PageState {
   HOME = 'HOME',
@@ -347,8 +348,8 @@ const Discover = observer(() => {
           <div className="discover-md:hidden my-4 text-center text-2xl font-semibold text-gray-300">
             Discover
           </div>
-          <div className="flex h-12 flex-row gap-2">
-            <div className=" discover-md:border-b-0  border-reelist-red discover-md:mb-0 mb-2 flex h-12 w-full flex-row items-baseline border-0 border-b border-solid ">
+          <div className="flex h-12 flex-row gap-2 discover-md:mb-5">
+            <div className=" border-reelist-red mb-2 flex h-12 w-full flex-row items-baseline border-0 border-b border-solid ">
               <SearchIcon className="mr-4 h-full justify-center self-center text-3xl text-gray-300" />
 
               {searchText ? (
@@ -403,9 +404,10 @@ const Discover = observer(() => {
               </svg>
             </div>
           </div>
-          <div className="discover-md:block mb-4 hidden w-full ">
-            <div className="bg-reelist-red mb-6 mt-3 h-[1px]" />
 
+          <div
+            className={classNames('discover-md:block mb-4 hidden w-full ', searchText && '!hidden')}
+          >
             <div className="discover-lg:grid-cols-2 grid-rows-auto mb-1 grid grid-cols-1 gap-2 max-[673px]:flex-col">
               <div className="discover-lg:row-start-1 discover-lg:col-span-2 discover-lg:col-start-1 row-start-2 flex flex-grow gap-2 max-[673px]:flex-col">
                 <ReelistSelect
