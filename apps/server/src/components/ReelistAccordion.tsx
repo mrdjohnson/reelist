@@ -1,11 +1,10 @@
 import React, { PropsWithChildren, useMemo, useRef, createContext, useContext } from 'react'
 import _ from 'lodash'
 import { observer } from 'mobx-react-lite'
-import { SelectOption, SelectState } from './ReelistSelect'
+import { SelectState, SelectOption } from '@reelist/utils/hooks/useSelectState'
 import DashIcon from 'apps/server/components/heroIcons/DashIcon'
 import PlusIcon from 'apps/server/components/heroIcons/PlusIcon'
 import PillButton from 'apps/server/components/PillButton'
-import classNames from 'classnames'
 
 const HEADER_HEIGHT = 45
 

@@ -1,148 +1,12 @@
-import React, { PropsWithChildren, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
+import React, { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
 import _ from 'lodash'
 import { observer } from 'mobx-react-lite'
-import { makeAutoObservable } from 'mobx'
-import { useStore } from '@reelist/utils/hooks/useStore'
-import { IStorage } from '~/utils/storage'
-import { Button, Link, Popover, TextField } from '@mui/material'
+import { Button, Popover } from '@mui/material'
 import classNames from 'classnames'
 import PillButton from 'apps/server/components/PillButton'
 import DashIcon from 'apps/server/components/heroIcons/DashIcon'
 import PlusIcon from 'apps/server/components/heroIcons/PlusIcon'
-
-export type SelectOption = {
-  id: string
-  name: string
-  selected?: boolean
-  icon?: ReactNode
-}
-
-export class SelectState<T extends SelectOption> {
-  selectedOptions: Record<string, string> = {}
-  storageKey: string
-  options: Array<T>
-  private allOptions: Array<T>
-  isLoadedFromSave: boolean = false
-
-  constructor(
-    public label: string,
-    public loadOptions: () => Promise<Array<T>>,
-    private storage: IStorage,
-    private alternativeDefaultOptions?: () => Array<string>,
-    public isMulti: boolean = true,
-  ) {
-    console.log('is multi: ', isMulti)
-    this.storageKey = _.snakeCase(label)
-
-    makeAutoObservable(this)
-
-    loadOptions().then(nextOptions => {
-      this.options = nextOptions
-      this.lazyLoadFromStorage()
-    })
-  }
-
-  setSelectedOptions = (options: string[]) => {
-    const allOptionsById = _.chain(this.options).keyBy('id').mapValues('name').value()
-
-    const nextOptions = {}
-
-    if (this.isMulti) {
-      options.forEach(id => {
-        if (allOptionsById[id]) {
-          nextOptions[id] = allOptionsById[id]
-        }
-      })
-    } else {
-      const [id] = options
-      options[id] = allOptionsById[id]
-    }
-
-    this.selectedOptions = nextOptions
-
-    this.save()
-  }
-
-  lazyLoadFromStorage = async () => {
-    const defaultKey = this.storageKey
-
-    const storedValues = await this.storage.load<typeof this.selectedOptions>(defaultKey)
-
-    console.log('loaded ' + defaultKey + ':', storedValues)
-
-    if (!_.isEmpty(storedValues)) {
-      this.selectedOptions = storedValues
-
-      this.isLoadedFromSave = true
-
-      return
-    }
-
-    if (this.alternativeDefaultOptions) {
-      this.setSelectedOptions(this.alternativeDefaultOptions())
-    }
-
-    if (!this.isMulti && !_.isEmpty(this.selectedOptions)) {
-      // todo:
-      // this.selectedOptions = {0: this.selectedOptions[0]}
-    }
-
-    this.isLoadedFromSave = true
-  }
-
-  toggleOption = (option: T) => {
-    const removingOption = !!this.selectedOptions[option.id]
-
-    if (this.isMulti) {
-      if (removingOption) return this.removeOption(option.id)
-
-      this.selectedOptions = { ...this.selectedOptions, [option.id]: option.name }
-      // if this is not multi select, there should always be a selected option
-    } else if (!removingOption) {
-      this.selectedOptions = { [option.id]: option.name }
-    }
-
-    this.save()
-  }
-
-  setOptionsFilter = (filter?: (option: T) => boolean) => {
-    this.allOptions ||= this.options
-    this.options = _.filter(this.allOptions, filter)
-
-    // remove any selected options that no longer pass the filter
-    this.setSelectedOptions(_.map(this.selectedOptions, 'id'))
-  }
-
-  removeOption = (optionId: string) => {
-    this.selectedOptions = _.omit(this.selectedOptions, optionId)
-
-    this.save()
-  }
-
-  save = () => {
-    this.storage.save(this.storageKey, this.selectedOptions)
-  }
-}
-
-export const useSelectState = <T extends SelectOption>(
-  label: string,
-  loadOptions: () => Promise<Array<T>>,
-  config: { getAlternativeDefaults?: () => Array<string>; isMulti?: boolean } = {},
-) => {
-  const { storage } = useStore()
-
-  const [selectState] = useState<SelectState<T>>(() => {
-    return new SelectState(
-      label,
-      loadOptions,
-      storage,
-      config.getAlternativeDefaults,
-      config.isMulti,
-    )
-  })
-
-  return selectState
-}
+import { SelectState, SelectOption } from '@reelist/utils/hooks/useSelectState'
 
 type ReelistSelectProps<T extends SelectOption> = PropsWithChildren<{
   selectState: SelectState<T>
@@ -227,7 +91,7 @@ const ReelistSelect = observer(
               <div className="transition-color flex  items-center justify-center border-0 border-b border-solid border-transparent duration-200 group-hover:border-white">
                 {_.values(selectedOptions)[0]}
 
-                <div className=' scale-75'>{Chevron}</div>
+                <div className=" scale-75">{Chevron}</div>
               </div>
             </Button>
           </div>
