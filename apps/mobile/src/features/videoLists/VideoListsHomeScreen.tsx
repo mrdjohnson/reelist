@@ -9,7 +9,7 @@ import _ from 'lodash'
 import SearchBar from '~/shared/components/SearchBar'
 import { ReelistScreen } from '~/utils/navigation'
 import useRefresh from '~/hooks/useRefresh'
-import AppButton from '@reelist/components/AppButton'
+import AppButton from '~/components/AppButton'
 
 const VideoListListItem = observer(
   ({

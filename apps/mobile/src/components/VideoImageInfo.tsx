@@ -14,8 +14,8 @@ import {
   Popover,
   Pressable,
 } from 'native-base'
-import PillButton from '@reelist/components/PillButton'
-import AppButton from '@reelist/components/AppButton'
+import PillButton from '~/components/PillButton'
+import AppButton from '~/components/AppButton'
 import _ from 'lodash'
 import { observer } from 'mobx-react-lite'
 

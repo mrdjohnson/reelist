@@ -1,5 +1,5 @@
 import React from 'react'
-import ActionButton, { ActionButtonProps } from '@reelist/components/ActionButton'
+import ActionButton, { ActionButtonProps } from '~/components/ActionButton'
 
 const LinkButton = (props: ActionButtonProps) => {
   return (

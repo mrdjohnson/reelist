@@ -1,6 +1,6 @@
 import React from 'react'
 import { Button, IButtonProps, Text } from 'native-base'
-import ActionButton, { ActionButtonProps } from '@reelist/components/ActionButton'
+import ActionButton, { ActionButtonProps } from '~/components/ActionButton'
 
 type PillButtonProps = {
   label: string

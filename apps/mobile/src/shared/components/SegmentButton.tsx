@@ -1,7 +1,7 @@
 import React from 'react'
 import { IButtonProps, Row } from 'native-base'
 import { IconButtonProps } from 'react-native-vector-icons/Icon'
-import ActionButton from '@reelist/components/ActionButton'
+import ActionButton from '~/components/ActionButton'
 import { IViewProps } from 'native-base/lib/typescript/components/basic/View/types'
 
 type Segment = {

@@ -7,7 +7,7 @@ import { Column, Pressable, Text, View } from 'native-base'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import moment from 'moment'
 import { useReelistNavigation } from '~/utils/navigation'
-import AppButton from '@reelist/components/AppButton'
+import AppButton from '~/components/AppButton'
 import VideoImage from './VideoImage'
 
 type VideoItemProps = {

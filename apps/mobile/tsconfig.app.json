@@ -7,8 +7,7 @@
       "~/*": ["apps/mobile/src/*"],
       "@reelist/models/*": ["libs/models/src/lib/*"],
       "@reelist/utils/*": ["libs/utils/src/lib/*"],
-      "@reelist/apis/*": ["libs/apis/src/lib/*"],
-      "@reelist/components/*": ["libs/components/src/lib/*"]
+      "@reelist/apis/*": ["libs/apis/src/lib/*"]
     },
     "noEmit": false
   },

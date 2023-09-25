@@ -5,8 +5,8 @@ import { useStore } from '@reelist/utils/hooks/useStore'
 import _ from 'lodash'
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import { BackHandler } from 'react-native'
-import AppButton from '@reelist/components/AppButton'
-import ActionButton from '@reelist/components/ActionButton'
+import AppButton from '~/components/AppButton'
+import ActionButton from '~/components/ActionButton'
 
 const CAN_GO_BACK = false
 const CANNOT_GO_BACK = true
