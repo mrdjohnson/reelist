@@ -419,7 +419,7 @@ const Discover = observer(() => {
                   disabled={pageState === PageState.SEARCH}
                 >
                   <div
-                    className="flex cursor-pointer justify-center"
+                    className="flex cursor-pointer justify-center text-xl"
                     onClick={() =>
                       setTypesSeparationType(
                         typesSeparationType === 'includes_every'
@@ -469,7 +469,7 @@ const Discover = observer(() => {
                   disabled={pageState === PageState.SEARCH}
                 >
                   <div
-                    className="flex cursor-pointer justify-center"
+                    className="flex cursor-pointer justify-center text-xl"
                     onClick={toggleGenreSeparationType}
                   >
                     <input
@@ -627,7 +627,7 @@ const Discover = observer(() => {
               totalCount={6}
             >
               <div
-                className="flex cursor-pointer justify-center"
+                className="flex cursor-pointer justify-center text-xl"
                 onClick={() =>
                   setTypesSeparationType(
                     typesSeparationType === 'includes_every' ? 'includes_any' : 'includes_every',
@@ -679,7 +679,7 @@ const Discover = observer(() => {
               totalCount={6}
             >
               <div
-                className="flex cursor-pointer justify-center"
+                className="flex cursor-pointer justify-center text-xl"
                 onClick={toggleGenreSeparationType}
               >
                 <input
