@@ -4,18 +4,15 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
 import SearchIcon from '@mui/icons-material/Search'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Button } from '@mui/material'
 import _ from 'lodash'
 import { useStore } from '@reelist/utils/hooks/useStore'
-import useLocalStorageState from '@reelist/utils/hooks/useLocalStorageState'
 import useVideoDiscover from '@reelist/utils/hooks/useVideoDiscover'
 import useVideoSearch from '@reelist/utils/hooks/useVideoSearch'
-import { callTmdb } from '@reelist/apis/api'
 import Video from '@reelist/models/Video'
 import Person from '@reelist/models/Person'
 import ReelistSelect from '~/components/ReelistSelect'
-import useSelectState, { SelectOption } from '@reelist/utils/hooks/useSelectState'
 
 import InfiniteScroll from './InfiniteScroll'
 import VideoModal from './video/VideoModal'
@@ -24,8 +21,6 @@ import NavBar from '~/components/NavBar'
 import PillButton from './PillButton'
 import CloseIcon from './heroIcons/CloseIcon'
 import VideoGroup from './VideoGroup'
-import DescendingIcon from './icons/DecendingIcon'
-import AscendingIcon from './icons/AscendingIcon'
 import Footer from './Footer'
 import PersonModal from './video/PersonModal'
 import Popup from '~/components/Popup'
@@ -62,7 +57,24 @@ const Discover = observer(() => {
   const router = useRouter()
 
   const { videoStore, personStore } = useStore()
-  const videoDiscover = useVideoDiscover()
+  const {
+    getVideos,
+    videoTypesSelectState,
+    genreSelectState,
+    watchProviderSelectState,
+    regionSelectState,
+    sortTypesSelectState,
+    genreSeparationType,
+    typesSeparationType,
+    setTypesSeparationType,
+    regionSeparationType,
+    page,
+    setPage,
+    toggleRegionSeparationType,
+    toggleGenreSeparationType,
+    selectedItems,
+    selectStatesLoaded,
+  } = useVideoDiscover()
   const videoSearch = useVideoSearch()
 
   const windowWidth = useWindowWidth()
@@ -77,20 +89,6 @@ const Discover = observer(() => {
   const [showMobileFilterOptions, setShowMobileFilterOptions] = useState(false)
   const [mobileFilterText, setMobileFilterText] = useState('')
 
-  const [genreSeparationType, setGenreSeparationType] = useLocalStorageState(
-    'genreSeparationType',
-    'includes_any',
-  )
-  const [typesSeparationType, setTypesSeparationType] = useLocalStorageState(
-    'typesSeparationType',
-    'includes_any',
-  )
-  const [regionSeparationType, setRegionSeparationType] = useLocalStorageState(
-    'regionSeparationType',
-    'includes_any',
-  )
-
-  const [page, setPage] = useState(1)
   const [videos, setVideos] = useState<Video[]>([])
   const [isLoadingVideos, setIsLoadingVideos] = useState(false)
   const [homepageVideosState, setHomepageVideosState] = useState(HomePageVideosState.NOT_LOADED)
@@ -117,74 +115,15 @@ const Discover = observer(() => {
     setHomepageVideosState(HomePageVideosState.LOADED)
   }
 
-  const videoFilter = (video: Video) => {
-    if (_.isEmpty(regionSelectState.selectedOptions)) return true
-
-    const mustIncludeAllRegions = regionSeparationType === 'includes_every'
-
-    // if there is a regions filter, actualy filter by it
-    for (const region in regionSelectState.selectedOptions) {
-      const regionExists = !_.isEmpty(video.providers[region])
-
-      if (mustIncludeAllRegions && !regionExists) {
-        return false
-      } else if (regionExists) {
-        return true
-      }
-    }
-
-    return false
-  }
-
-  const handleVideos = (nextVideos: Video[], name: string = 'base') => {
-    const filteredVideos = searchText
-      ? nextVideos
-      : _.chain(nextVideos).filter(videoFilter).compact().value()
-
+  const handleVideos = (nextVideos: Video[]) => {
     if (page === 1) {
       console.log('making new videos')
-      return filteredVideos
+      return nextVideos
     } else {
       console.log('adding to current videos')
 
-      return _.uniqBy(videos.concat(filteredVideos), 'videoId')
+      return _.uniqBy(videos.concat(nextVideos), 'videoId')
     }
-  }
-
-  const getVideos = async (selectedGenres: string[]) => {
-    const withoutIdentifier = (item: string) => item.split(':')[1]
-
-    const selectedVideoTypes = videoTypesSelectState.selectedOptions
-    const selectedSortType = _.keys(sortTypesSelectState.selectedOptions)[0]
-    const selectedRegions = regionSelectState.selectedOptions
-    const selectedWatchProviders = _.keys(watchProviderSelectState.selectedOptions)
-
-    const {
-      shared: sharedGenres = [],
-      tv: tvGenres = [],
-      movie: movieGenres = [],
-    } = _.groupBy(selectedGenres, item => item.split(':')[0])
-
-    const {
-      shared: sharedProviders = [],
-      tv: tvProviders = [],
-      movie: movieProviders = [],
-    } = _.groupBy(selectedWatchProviders, item => item.split(':')[0])
-
-    const genreSeparator = genreSeparationType === 'includes_any' ? ',' : '|'
-
-    return await videoDiscover({
-      with_type: _.keys(selectedVideoTypes).join(
-        typesSeparationType === 'includes_any' ? ',' : '|',
-      ),
-      page: page.toString(),
-      sort_by: selectedSortType,
-      watch_region: _.keys(selectedRegions).join(','),
-      tvGenres: sharedGenres.concat(tvGenres).map(withoutIdentifier).join(genreSeparator),
-      movieGenres: sharedGenres.concat(movieGenres).map(withoutIdentifier).join(genreSeparator),
-      tvProviders: sharedProviders.concat(tvProviders).map(withoutIdentifier).join(','),
-      movieProviders: sharedProviders.concat(movieProviders).map(withoutIdentifier).join(','),
-    }).then(handleVideos)
   }
 
   const discover = () => {
@@ -240,25 +179,6 @@ const Discover = observer(() => {
       setIsLoadingVideos(false)
     }
   }
-
-  const videoTypesSelectState = useSelectState('Types', getVideoTypes)
-  const genreSelectState = useSelectState('Genres', getGenres)
-  const watchProviderSelectState = useSelectState('Watch Providers', getProviders)
-  const regionSelectState = useSelectState('Regions', getRegions, {
-    getAlternativeDefaults: getDefaultRegions,
-  })
-  const sortTypesSelectState = useSelectState('Sort By', getSortTypes, {
-    isMulti: false,
-    getAlternativeDefaults: () => ['popularity.desc'],
-  })
-
-  // every -> all elements are true
-  const selectStatesLoaded =
-    videoTypesSelectState.isLoadedFromSave &&
-    sortTypesSelectState.isLoadedFromSave &&
-    genreSelectState.isLoadedFromSave &&
-    watchProviderSelectState.isLoadedFromSave &&
-    regionSelectState.isLoadedFromSave
 
   const pageState = useMemo(() => {
     if (!selectStatesLoaded) return PageState.NOT_LOADED
@@ -334,21 +254,6 @@ const Discover = observer(() => {
     }
   }, [router.query])
 
-  // changing a region affects which providers are available
-  useEffect(() => {
-    const regions = _.keys(regionSelectState.selectedOptions)
-
-    if (_.isEmpty(regions)) {
-      watchProviderSelectState.setOptionsFilter(null)
-      return
-    }
-
-    watchProviderSelectState.setOptionsFilter((option: WatchProvider) => {
-      // true if selected regions include any watch provider
-      return _.intersection(option.displayPriorities, regions).length > 0
-    })
-  }, [regionSelectState.selectedOptions])
-
   const handleVideoSelection = (video: Video) => {
     router.push(`/discover?videoId=${video.videoId}`, undefined, { shallow: true })
   }
@@ -389,18 +294,6 @@ const Discover = observer(() => {
     }
   }
 
-  const toggleRegionSeparationType = () => {
-    setRegionSeparationType(
-      regionSeparationType === 'includes_every' ? 'includes_any' : 'includes_every',
-    )
-  }
-
-  const toggleGenreSeparationType = () => {
-    setGenreSeparationType(
-      genreSeparationType === 'includes_every' ? 'includes_any' : 'includes_every',
-    )
-  }
-
   // todo toggle watch provider based on regions (or make it the default option?)
 
   const handleKeyDown = event => {
@@ -424,15 +317,6 @@ const Discover = observer(() => {
         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
       </svg>
     </div>
-  )
-
-  const selectedItems = [
-    videoTypesSelectState,
-    regionSelectState,
-    genreSelectState,
-    watchProviderSelectState,
-  ].flatMap(selectState =>
-    _.map(selectState.selectedOptions, (name, id) => ({ name, id, selectState })),
   )
 
   const shouldShowFooter =
@@ -820,173 +704,6 @@ const Discover = observer(() => {
     </div>
   )
 })
-
-// export default Discover
-
-const getRegions = () => {
-  return callTmdb('/watch/providers/regions')
-    .then(
-      item =>
-        _.get(item, 'data.data.results') as Array<{
-          iso31661: string
-          englishName: string
-          nativeName: string
-        }>,
-    )
-    .then(items =>
-      items.map(item => ({
-        id: item.iso31661,
-        name: item.englishName,
-      })),
-    )
-}
-
-const getDefaultRegions = () => {
-  if (!navigator) return []
-
-  const options = navigator.languages // options look like: en-US, en
-    .filter(language => language.includes('-')) // only grab 'en-US' like options
-    .map(language => language.match(/-(.*)/)[1]) // only grab 'US' from each option
-
-  return options
-}
-
-const getGenresByType = async (type: string) => {
-  const typeLabel = _.capitalize(type)
-
-  return callTmdb(`/genre/${type}/list`)
-    .then(
-      item =>
-        _.get(item, 'data.data.genres') as Array<{
-          id: string
-          name: string
-        }>,
-    )
-    .then(items =>
-      _.map(items, item => ({
-        original: {
-          id: 'shared:' + item.id,
-          name: item.name,
-        },
-        alternative: {
-          id: type + ':' + item.id,
-          name: `${item.name} (${typeLabel})`,
-        },
-      })),
-    )
-    .then(items => _.keyBy(items, 'original.id'))
-}
-
-const getGenres = async () => {
-  const tvGenresById = await getGenresByType('tv')
-  const movieGenresById = await getGenresByType('movie')
-
-  const genreIds = _.uniq(_.keys(tvGenresById).concat(_.keys(movieGenresById)))
-
-  const allGenres = genreIds.map(genreId => {
-    const tvGenre = tvGenresById[genreId]
-    const movieGenre = movieGenresById[genreId]
-
-    const genre = tvGenre || movieGenre
-    const { original, alternative } = genre
-
-    // the id is already the same, make sure the name is too
-    if (tvGenre?.original?.name === movieGenre?.original?.name) {
-      return original
-    } else {
-      return alternative
-    }
-  })
-
-  return allGenres
-}
-
-type WatchProvider = SelectOption & {
-  displayPriorities: string[]
-}
-
-const getProvidersByType = async (type: string) => {
-  const typeLabel = _.capitalize(type)
-
-  return callTmdb(`/watch/providers/${type}`)
-    .then(
-      item =>
-        _.get(item, 'data.data.results') as Array<{
-          displayPriorities: Record<string, number>
-          displayPriority: string
-          logoPath: string
-          providerName: string
-          providerId: string
-        }>,
-    )
-    .then(items => _.sortBy(items, 'displayPriority'))
-    .then(items =>
-      items.map(item => {
-        const displayPriorities = _.keys(item.displayPriorities).map(_.toUpper)
-
-        return {
-          original: {
-            id: 'shared:' + item.providerId,
-            name: item.providerName,
-            displayPriorities,
-          },
-
-          alternative: {
-            id: type + ':' + item.providerId,
-            name: `${item.providerName} (${typeLabel})`,
-            displayPriorities,
-          },
-        }
-      }),
-    )
-    .then(items => _.keyBy(items, 'original.id'))
-}
-
-// todo; fill in the region when asking for the providers; or sort by selected region code using the (unused) displayPriorities field
-// initial options: navigator.languages.filter(language => language.includes('-')).map(language => language.match(/-(.*)/)[1])
-const getProviders = async () => {
-  const tvProvidersById = await getProvidersByType('tv')
-  const movieProvidersById = await getProvidersByType('movie')
-
-  const providerIds = _.uniq(_.keys(tvProvidersById).concat(_.keys(movieProvidersById)))
-
-  const allProviders = providerIds.map(providerId => {
-    const tvProvider = tvProvidersById[providerId]
-    const movieProvider = movieProvidersById[providerId]
-
-    const provider = tvProvider || movieProvider
-    const { original, alternative } = provider
-
-    // the id is already the same, make sure the name is too
-    if (tvProvider?.original?.name === movieProvider?.original?.name) {
-      return original
-    } else {
-      return alternative
-    }
-  })
-
-  return allProviders
-}
-
-//todo make sure this works for tv shows AND movies
-const getVideoTypes = async () => [
-  { id: '0', name: 'Documentary' },
-  { id: '1', name: 'News' },
-  { id: '2', name: 'Miniseries' },
-  { id: '3', name: 'Reality' },
-  { id: '4', name: 'Scripted' },
-  { id: '5', name: 'Talk Show' },
-  { id: '6', name: 'Video' },
-]
-
-const getSortTypes = async () => [
-  { id: 'popularity.desc', name: 'Popularity (Desc)', icon: DescendingIcon },
-  { id: 'popularity.asc', name: 'Popularity (Asc)', icon: AscendingIcon },
-  { id: 'first_air_date.desc', name: 'First Air Date (Desc)', icon: DescendingIcon },
-  { id: 'first_air_date.asc', name: 'First Air Date (Asc)', icon: AscendingIcon },
-  { id: 'vote_average.desc', name: 'Vote Average (Desc)', icon: DescendingIcon },
-  { id: 'vote_average.asc', name: 'Vote Average (Asc)', icon: AscendingIcon },
-]
 
 // hard coded popular generes
 const popularGeneresIdsByName = {
