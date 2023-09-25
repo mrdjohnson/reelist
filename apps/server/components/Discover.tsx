@@ -438,7 +438,7 @@ const Discover = observer(() => {
                   disabled={pageState === PageState.SEARCH}
                 >
                   <div
-                    className="flex cursor-pointer justify-center"
+                    className="flex cursor-pointer justify-center text-xl"
                     onClick={toggleRegionSeparationType}
                   >
                     <input
@@ -450,6 +450,12 @@ const Discover = observer(() => {
 
                     <div className="ml-2 text-white">Regions Must Include All Selected</div>
                   </div>
+
+                  <p className="my-2 text-xl text-white">
+                    {_.isEmpty(regionSelectState.selectedOptions)
+                      ? `No Region filter selected, all watch providers are selectable`
+                      : `${watchProviderSelectState.options?.length} Watch Providers are available based on selected Regions`}
+                  </p>
                 </ReelistSelect>
 
                 <ReelistSelect
@@ -640,7 +646,7 @@ const Discover = observer(() => {
               totalCount={6}
             >
               <div
-                className="flex cursor-pointer justify-center"
+                className="flex cursor-pointer justify-center text-xl"
                 onClick={toggleRegionSeparationType}
               >
                 <input
@@ -652,6 +658,12 @@ const Discover = observer(() => {
 
                 <div className="ml-2 text-white">Regions Must Include All Selected</div>
               </div>
+
+              <p className="my-2 text-xl text-white">
+                {_.isEmpty(regionSelectState.selectedOptions)
+                  ? `No Region filter selected, all watch providers are selectable`
+                  : `${watchProviderSelectState.options?.length} Watch Providers are available based on selected Regions`}
+              </p>
             </ReelistAccordionSection>
 
             <ReelistAccordionSection

@@ -7,7 +7,7 @@ import useSelectState, { SelectOption } from '@reelist/utils/hooks/useSelectStat
 import useLocalStorageState from '@reelist/utils/hooks/useLocalStorageState'
 import getGenres from '@reelist/utils/tmdbHelpers/getGenres'
 import getWatchProviders from '@reelist/utils/tmdbHelpers/getWatchProviders'
-import getRegions, {getDefaultRegions} from '@reelist/utils/tmdbHelpers/getRegions'
+import getRegions, { getDefaultRegions } from '@reelist/utils/tmdbHelpers/getRegions'
 
 type WatchProvider = SelectOption & {
   displayPriorities: string[]
@@ -118,10 +118,14 @@ const useVideoDiscover = () => {
     }
 
     watchProviderSelectState.setOptionsFilter((option: WatchProvider) => {
+      if (regionSeparationType === 'includes_every') {
+        return _.every(regions, region => option.displayPriorities.includes(region))
+      }
+
       // true if selected regions include any watch provider
-      return _.intersection(option.displayPriorities, regions).length > 0
+      return !!_.find(regions, region => option.displayPriorities.includes(region))
     })
-  }, [regionSelectState.selectedOptions])
+  }, [regionSelectState.selectedOptions, regionSeparationType])
 
   const getVideos = async (selectedGenres: string[]) => {
     const withoutIdentifier = (item: string) => item.split(':')[1]
