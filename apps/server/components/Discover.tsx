@@ -162,7 +162,7 @@ const Discover = observer(() => {
       return
     }
 
-    if(page === 1) {
+    if (page === 1) {
       setVideos([])
     }
 
@@ -352,7 +352,7 @@ const Discover = observer(() => {
           <div className="discover-md:hidden my-4 text-center text-2xl font-semibold text-gray-300">
             Discover
           </div>
-          <div className="flex h-12 flex-row gap-2 discover-md:mb-5">
+          <div className="discover-md:mb-5 flex h-12 flex-row gap-2">
             <div className=" border-reelist-red mb-2 flex h-12 w-full flex-row items-baseline border-0 border-b border-solid ">
               <SearchIcon className="mr-4 h-full justify-center self-center text-3xl text-gray-300" />
 
@@ -576,21 +576,25 @@ const Discover = observer(() => {
           onClose={() => setShowMobileFilterOptions(false)}
           classes={{ paper: 'relative p-2 w-full h-full' }}
         >
-          <ReelistAccordion>
-            <div className="discover-md:hidden my-4 text-center text-2xl font-semibold text-gray-300">
-              Filters
-            </div>
+          <ReelistAccordion
+            header={
+              <>
+                <div className="discover-md:hidden my-4 text-center text-2xl font-semibold text-gray-300">
+                  Filters
+                </div>
 
-            <div className="left-0 right-0 top-0 bg-black">
-              <input
-                className="focus:shadow-outline border-reelist-red mb-4 w-full appearance-none border-0 border-b bg-transparent py-2 text-lg leading-tight text-gray-300 shadow outline-none"
-                type="text"
-                autoComplete="off"
-                placeholder="Search Filter"
-                onChange={e => setMobileFilterText(e.target.value)}
-              />
-            </div>
-
+                <div className="left-0 right-0 top-0 bg-black">
+                  <input
+                    className="focus:shadow-outline border-reelist-red mb-4 w-full appearance-none border-0 border-b bg-transparent py-2 text-lg leading-tight text-gray-300 shadow outline-none"
+                    type="text"
+                    autoComplete="off"
+                    placeholder="Search Filter"
+                    onChange={e => setMobileFilterText(e.target.value)}
+                  />
+                </div>
+              </>
+            }
+          >
             <ReelistAccordionSection
               filterText={mobileFilterText}
               label={selectedItems.length + ' Selected'}

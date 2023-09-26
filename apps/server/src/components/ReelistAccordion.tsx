@@ -1,4 +1,11 @@
-import React, { PropsWithChildren, useMemo, useRef, createContext, useContext } from 'react'
+import React, {
+  PropsWithChildren,
+  useMemo,
+  useRef,
+  createContext,
+  useContext,
+  ReactNode,
+} from 'react'
 import _ from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { SelectState, SelectOption } from '@reelist/utils/hooks/useSelectState'
@@ -135,7 +142,11 @@ const ReelistAccordionSection = observer(
   },
 )
 
-const ReelistAccordion = observer(({ children }: PropsWithChildren) => {
+type ReelistAccordionProps = PropsWithChildren<{
+  header: ReactNode
+}>
+
+const ReelistAccordion = observer(({ header, children }: ReelistAccordionProps) => {
   const scrollingDivRef = useRef(null)
 
   const scrollToElement = (element: HTMLElement, index: number) => {
@@ -152,6 +163,8 @@ const ReelistAccordion = observer(({ children }: PropsWithChildren) => {
 
   return (
     <ReelistAccordionContext.Provider value={{ scrollToElement }}>
+      {header}
+
       <div ref={scrollingDivRef} className="no-scrollbar relative h-fit overflow-scroll">
         {children}
       </div>
