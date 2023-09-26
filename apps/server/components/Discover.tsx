@@ -294,6 +294,7 @@ const Discover = observer(() => {
   const closeNavBar = () => {
     if (showMobileFilterOptions) {
       setShowMobileFilterOptions(false)
+      setMobileFilterText('')
     } else if (showSelectedPerson || showSelectedVideo) {
       closePopup()
     }
