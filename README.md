@@ -1,15 +1,40 @@
+# Reelist
 
-  
-    
-  
-#  Reelist  
-This project is backed by [Supabase](https://supabase.com/) and [TMDB](https://www.themoviedb.org/) and made so that users can watch shows together and keep each other up to date with what has been watched, hopefully to help facilitate discussions about episodes as well  
-  
-  This readme is powered by [https://stackedit.io/app](https://stackedit.io/app)  
-  
-    
-  
-**Supabase:** [Supabase cli docs](https://supabase.com/docs/reference/cli/installing-and-updating)  
+**Web / Discover:** This project allows user's to find new shows or movies to watch! The inspiration behind this was the many times I was finding something to watch, but getting many options from Streaming services that I did not have, or that were not available in the country I was visiting. See it in action on the Discover page: https://reelist.app/discover
+Current Abilities:
+
+- Find a specific show or movie
+- Discover shows by region, by Streaming service, by Genre, or by video "type"
+
+Tools: [React](https://react.dev/) [Tailwind](https://tailwindcss.com/) [Mobx](https://mobx.js.org/README.html) [Docker](https://www.docker.com/)
+Data Source: [TMDB](https://www.themoviedb.org/)
+
+**Mobile:** This project allows users to mark the shows they have watched, find shows or movies; create lists of shows and share them with friends, join a list, see public lists, see the estimated progress of the list, and keep each other up to date with what has been watched, hopefully to help facilitate discussions about episodes as well.
+Current Abilities:
+
+- [x] Find a specific show or movie
+- [x] Create a list of shows and movies for friends to see
+- [x] Mark individual episodes of shows as watched
+- [x] Shared watched status with friends
+- [ ] Discover shows by region, by Streaming service, by Genre, or by video "type"
+- [ ] Get notifications when a list item has been added or removed
+- [ ] Get notifications when a list item has been watched
+
+Tools: [React Native](https://reactnative.dev/) [Nativebase](https://nativebase.io/) [Mobx](https://mobx.js.org/README.html)
+Data Source: [TMDB](https://www.themoviedb.org/) [Supabase](https://supabase.com/)
+
+**Reelist Codebase**
+This is a mono repo powered by NX for web and mobile where the `lib/` folder is shared between the `mobile` and `server` projects. Both projects are initiated using Inversify to easily instantiate any platform specific tools (like storage).
+
+Tools: [NX](https://nx.dev/) [Inversify](https://inversify.io/)
+
+This readme is powered by [https://stackedit.io/app](https://stackedit.io/app)
+
+**Supabase:** [Supabase cli docs](https://supabase.com/docs/reference/cli/installing-and-updating) 
+
+## Funding
+
+This project receives no funding at all. This is 100% a passion project with no expected revenue, not even in coffee form. 
   
 ## Getting started  
 clone the project, and run `yarn install` in the root directory
