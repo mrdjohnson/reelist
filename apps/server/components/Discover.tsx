@@ -149,10 +149,11 @@ const Discover = observer(() => {
     if (pageState === PageState.NOT_LOADED) return
 
     if (pageState === PageState.HOME) {
-      if (homepageVideosState === HomePageVideosState.NOT_LOADED) {
-        setHomepageVideosState(HomePageVideosState.LOADING)
-        initHomepageVideos()
-      }
+      if (homepageVideosState === HomePageVideosState.LOADING) return;
+
+      setHomepageVideosState(HomePageVideosState.LOADING)
+      setHomepageSections({})
+      initHomepageVideos()
 
       return
     }
