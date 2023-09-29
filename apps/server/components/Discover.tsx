@@ -301,6 +301,12 @@ const Discover = observer(() => {
     }
   }
 
+  useEffect(() => {
+    if(!isMobile) {
+      closeNavBar()
+    }
+  }, [isMobile]);
+
   // todo toggle watch provider based on regions (or make it the default option?)
 
   const handleKeyDown = event => {
