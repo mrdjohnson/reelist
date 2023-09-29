@@ -49,7 +49,7 @@ export class SelectState<T extends SelectOption> {
       })
     } else {
       const [id] = options
-      options[id] = allOptionsById[id]
+      nextOptions[id] = allOptionsById[id]
     }
 
     this.selectedOptions = nextOptions
