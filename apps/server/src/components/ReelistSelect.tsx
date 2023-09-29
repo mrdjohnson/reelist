@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
+import React, {PropsWithChildren, ReactNode, useEffect, useMemo, useRef, useState} from 'react'
 import _ from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { Button, Popover } from '@mui/material'
@@ -40,13 +40,19 @@ const ReelistSelect = observer(
     }, [isOpen])
 
     const renderOption = (option: T, isChecked) => {
+      let icon: ReactNode
+
+      if (isMulti) {
+        icon = isChecked ? <DashIcon/> : <PlusIcon/>
+      }
+
       return (
         <PillButton
           key={option.id}
           label={option.name}
           className="!rounded-md"
           onClick={() => toggleOption(option)}
-          rightIcon={isChecked ? <DashIcon /> : <PlusIcon />}
+          rightIcon={icon}
           inverted={isChecked}
           noBorder={!isMulti}
         />
