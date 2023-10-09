@@ -22,7 +22,7 @@ const Page = ({ path }: { path: string }) => {
         />
       </Head>
 
-      <DynamicComponentWithNoSSR />
+      <DynamicComponentWithNoSSR beta={false} />
     </>
   )
 }

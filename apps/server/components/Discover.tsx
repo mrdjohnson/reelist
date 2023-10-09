@@ -54,7 +54,7 @@ const useWindowWidth = () => {
   return width
 }
 
-const Discover = observer(() => {
+const Discover = observer(({ beta }: { beta: boolean }) => {
   const router = useRouter()
 
   const { videoStore, personStore } = useStore()
