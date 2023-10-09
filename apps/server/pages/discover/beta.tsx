@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
 
-const DynamicComponentWithNoSSR = dynamic(() => import('../components/Discover'), { ssr: false })
+const DynamicComponentWithNoSSR = dynamic(() => import('../../components/Discover'), { ssr: false })
 
 const Page = ({ path }: { path: string }) => {
   return (
