@@ -75,7 +75,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
     toggleGenreSeparationType,
     selectedItems,
     selectStatesLoaded,
-  } = useVideoDiscover()
+  } = useVideoDiscover(beta)
   const videoSearch = useVideoSearch()
 
   const windowWidth = useWindowWidth()
@@ -149,7 +149,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
     if (pageState === PageState.NOT_LOADED) return
 
     if (pageState === PageState.HOME) {
-      if (homepageVideosState === HomePageVideosState.LOADING) return;
+      if (homepageVideosState === HomePageVideosState.LOADING) return
 
       setHomepageVideosState(HomePageVideosState.LOADING)
       setHomepageSections({})
@@ -302,10 +302,10 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
   }
 
   useEffect(() => {
-    if(!isMobile) {
+    if (!isMobile) {
       closeNavBar()
     }
-  }, [isMobile]);
+  }, [isMobile])
 
   // todo toggle watch provider based on regions (or make it the default option?)
 

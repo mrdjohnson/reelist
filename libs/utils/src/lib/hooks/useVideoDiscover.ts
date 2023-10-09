@@ -8,6 +8,7 @@ import useLocalStorageState from '@reelist/utils/hooks/useLocalStorageState'
 import getGenres from '@reelist/utils/tmdbHelpers/getGenres'
 import getWatchProviders from '@reelist/utils/tmdbHelpers/getWatchProviders'
 import getRegions, { getDefaultRegions } from '@reelist/utils/tmdbHelpers/getRegions'
+import axios from 'axios'
 
 type WatchProvider = SelectOption & {
   displayPriorities: string[]
@@ -33,7 +34,7 @@ const getSortTypes = async () => [
   { id: 'vote_average.asc', name: 'Vote Average (Asc)' },
 ]
 
-const useVideoDiscover = () => {
+const useVideoDiscover = (beta = false) => {
   const { videoStore } = useStore()
 
   const [page, setPage] = useState(1)
@@ -165,7 +166,7 @@ const useVideoDiscover = () => {
       .then(_.compact)
   }
 
-  const videoDiscover = async (params: Record<string, string>) => {
+  let videoDiscover = async (params: Record<string, string>) => {
     const { tvGenres, movieGenres, tvProviders, movieProviders, ...sharedParams } = params
 
     const tvParams = {
@@ -203,6 +204,14 @@ const useVideoDiscover = () => {
     return videoStore.getVideos(searchResults)
   }
 
+  if (beta) {
+    videoDiscover = async (params: Record<string, string>) => {
+      const { data: results } = await axios.post<Video[]>('/api/discover', params)
+
+      return _.map(results, video => videoStore.makeUiVideo(video))
+    }
+  }
+
   return {
     getVideos,
     videoTypesSelectState,
@@ -223,6 +232,16 @@ const useVideoDiscover = () => {
     selectedItems,
     selectStatesLoaded,
   }
+}
+
+// hard coded popular generes
+const popularGeneresIdsByName = {
+  base: [],
+  comedy: ['shared:35'],
+  actionAndAdventure: ['tv:10759', 'movie:28', 'movie:12'],
+  drama: ['shared:18'],
+  horror: ['shared:9648'],
+  scifi: ['tv:10765', 'movie:878', 'movie:14'],
 }
 
 export default useVideoDiscover
