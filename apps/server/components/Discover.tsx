@@ -64,7 +64,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
     genreSelectState,
     watchProviderSelectState,
     regionSelectState,
-    sortTypesSelectState,
+    mediaTypeSelectState,
     genreSeparationType,
     typesSeparationType,
     setTypesSeparationType,
@@ -209,7 +209,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
     pageState,
     selectStatesLoaded,
     videoTypesSelectState.selectedOptions,
-    sortTypesSelectState.selectedOptions,
+    mediaTypeSelectState.selectedOptions,
     genreSelectState.selectedOptions,
     watchProviderSelectState.selectedOptions,
     regionSelectState.selectedOptions,
@@ -516,7 +516,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
 
               <div className="discover-md:justify-self-end discover-lg:col-start-2 row-start-1 justify-self-center">
                 <ReelistSelect
-                  selectState={sortTypesSelectState}
+                  selectState={mediaTypeSelectState}
                   disabled={pageState === PageState.SEARCH}
                 />
               </div>
@@ -626,7 +626,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
             </ReelistAccordionSection>
 
             <ReelistAccordionSection
-              selectState={sortTypesSelectState}
+              selectState={mediaTypeSelectState}
               filterText={mobileFilterText}
               index={1}
               totalCount={6}

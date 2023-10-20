@@ -25,13 +25,10 @@ const getVideoTypes = async () => [
   { id: '6', name: 'Video' },
 ]
 
-const getSortTypes = async () => [
-  { id: 'popularity.desc', name: 'Popularity (Desc)' },
-  { id: 'popularity.asc', name: 'Popularity (Asc)' },
-  { id: 'first_air_date.desc', name: 'First Air Date (Desc)' },
-  { id: 'first_air_date.asc', name: 'First Air Date (Asc)' },
-  { id: 'vote_average.desc', name: 'Vote Average (Desc)' },
-  { id: 'vote_average.asc', name: 'Vote Average (Asc)' },
+const getMediaTypes = async () => [
+  { id: 'both', name: 'Movies & Shows' },
+  { id: 'movies', name: 'Movies Only' },
+  { id: 'shows', name: 'Shows Only' },
 ]
 
 const useVideoDiscover = (beta = false) => {
@@ -45,9 +42,9 @@ const useVideoDiscover = (beta = false) => {
   const regionSelectState = useSelectState('Regions', getRegions, {
     getAlternativeDefaults: getDefaultRegions,
   })
-  const sortTypesSelectState = useSelectState('Sort By', getSortTypes, {
+  const mediaTypeSelectState = useSelectState('Movies & Shows', getMediaTypes, {
     isMulti: false,
-    getAlternativeDefaults: () => ['popularity.desc'],
+    getAlternativeDefaults: () => ['both'],
   })
   const [genreSeparationType, setGenreSeparationType] = useLocalStorageState(
     'genreSeparationType',
@@ -76,7 +73,7 @@ const useVideoDiscover = (beta = false) => {
 
   const selectStatesLoaded =
     videoTypesSelectState.isLoadedFromSave &&
-    sortTypesSelectState.isLoadedFromSave &&
+    mediaTypeSelectState.isLoadedFromSave &&
     genreSelectState.isLoadedFromSave &&
     watchProviderSelectState.isLoadedFromSave &&
     regionSelectState.isLoadedFromSave
@@ -132,7 +129,6 @@ const useVideoDiscover = (beta = false) => {
     const withoutIdentifier = (item: string) => item.split(':')[1]
 
     const selectedVideoTypes = videoTypesSelectState.selectedOptions
-    const selectedSortType = _.keys(sortTypesSelectState.selectedOptions)[0]
     const selectedRegions = regionSelectState.selectedOptions
     const selectedWatchProviders = _.keys(watchProviderSelectState.selectedOptions)
 
@@ -155,7 +151,6 @@ const useVideoDiscover = (beta = false) => {
         typesSeparationType === 'includes_any' ? ',' : '|',
       ),
       page: page.toString(),
-      sort_by: selectedSortType,
       watch_region: _.keys(selectedRegions).join(','),
       tvGenres: sharedGenres.concat(tvGenres).map(withoutIdentifier).join(genreSeparator),
       movieGenres: sharedGenres.concat(movieGenres).map(withoutIdentifier).join(genreSeparator),
@@ -169,22 +164,34 @@ const useVideoDiscover = (beta = false) => {
   let videoDiscover = async (params: Record<string, string>) => {
     const { tvGenres, movieGenres, tvProviders, movieProviders, ...sharedParams } = params
 
-    const tvParams = {
-      ...sharedParams,
-      with_genres: tvGenres,
-      with_providers: tvProviders,
+    const mediaType = _.keys(mediaTypeSelectState.selectedOptions)[0]
+    const tmdbCalls: Array<null | Promise<any>> = []
+
+    if (mediaType === 'both' || mediaType === 'shows') {
+      const tvParams = {
+        ...sharedParams,
+        with_genres: tvGenres,
+        with_providers: tvProviders,
+      }
+
+      tmdbCalls.push(callTmdb('/discover/tv', tvParams))
+    } else {
+      tmdbCalls.push(null)
     }
 
-    const movieParams = {
-      ...sharedParams,
-      with_genres: movieGenres,
-      with_providers: movieProviders,
+    if (mediaType === 'both' || mediaType === 'movies') {
+      const movieParams = {
+        ...sharedParams,
+        with_genres: movieGenres,
+        with_providers: movieProviders,
+      }
+
+      tmdbCalls.push(callTmdb('/discover/movie', movieParams))
+    } else {
+      tmdbCalls.push(null)
     }
 
-    const searchResults = await Promise.allSettled([
-      callTmdb('/discover/tv', tvParams),
-      callTmdb('/discover/movie', movieParams),
-    ])
+    const searchResults = await Promise.allSettled(tmdbCalls)
       .then(([tvShows, movies]) => {
         return [
           (_.get(tvShows, 'value.data.data.results') || []) as Video[],
@@ -192,11 +199,10 @@ const useVideoDiscover = (beta = false) => {
         ]
       })
       .then(([tvShows, movies]) => {
-        return [
-          ...tvShows.map(tvShow => 'tv' + tvShow.id),
-          ...movies.map(tvShow => 'mv' + tvShow.id),
-        ]
+        return [tvShows.map(tvShow => 'tv' + tvShow.id), movies.map(tvShow => 'mv' + tvShow.id)]
       })
+      .then(all => _.zip(...all))
+      .then(_.flatten)
       .then(_.compact)
 
     if (!searchResults) return []
@@ -218,7 +224,7 @@ const useVideoDiscover = (beta = false) => {
     genreSelectState,
     watchProviderSelectState,
     regionSelectState,
-    sortTypesSelectState,
+    mediaTypeSelectState,
     genreSeparationType,
     setGenreSeparationType,
     typesSeparationType,
