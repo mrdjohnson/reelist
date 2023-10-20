@@ -2,14 +2,14 @@ import { observer } from 'mobx-react-lite'
 
 import React, { useMemo, useState } from 'react'
 import _ from 'lodash'
-import Video from '@reelist/models/Video'
+import { DiscoverVideoType } from '@reelist/models/DiscoverVideo'
 import classNames from 'classnames'
 import Person from '@reelist/models/Person'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
 type VideoImageProps = {
-  video?: Video
+  video?: DiscoverVideoType
   person?: Person
   isPoster?: boolean
   onPress?: () => void
@@ -132,8 +132,7 @@ const EntityImage = observer(
             height="100%"
             onError={() => setImageErrored(true)}
             className={classNames(className, {
-              'aspect-poster h-fit max-h-[609px] min-h-[400px] object-contain':
-                isPoster,
+              'aspect-poster h-fit max-h-[609px] min-h-[400px] object-contain': isPoster,
               'discover-md:w-[307px] discover-md:object-cover discover-md:-mt-4 discover-md:h-[270px] discover-md:group-hover:mt-0 h-full w-full object-contain transition-[margin-top] duration-300  ease-in-out':
                 !isPoster,
             })}
@@ -151,7 +150,7 @@ const EntityImage = observer(
 
         {!isPoster && (
           <div
-            className="transition-min-height discover-md:group-hover:min-h-[40px] absolute bottom-0 flex min-h-[70px] w-full flex-col justify-end pb-1 pt-3 duration-300 ease-in-out"
+            className="transition-min-height absolute bottom-0 flex min-h-[70px] w-full flex-col justify-end pb-1 pt-3 duration-300 ease-in-out"
             style={{
               background:
                 'linear-gradient(180deg, rgba(0, 0, 0, 0.54) 0%, rgba(0, 0, 0, 0) 0.01%, rgba(0, 0, 0, 0.54) 33.85%)',
@@ -161,8 +160,12 @@ const EntityImage = observer(
               {video.videoName}
             </div>
 
-            <div className="font-inter transition-max-height discover-md:roup-hover:max-h-0 line-clamp-2 max-h-8 overflow-hidden px-2 text-lg text-white duration-300 ease-in-out group-hover:max-h-0">
-              {video.durationOrSeasons}
+            <div className="font-inter transition-max-height discover-md:roup-hover:max-h-0 line-clamp-2 flex max-h-16 flex-wrap overflow-hidden px-2 text-lg text-white duration-300 ease-in-out group-hover:max-h-0 ">
+              {_.dropRight(video.uiGenres).map(genre => (
+                <span>{genre}/</span>
+              ))}
+
+              <span>{_.last(video.uiGenres)}</span>
             </div>
           </div>
         )}

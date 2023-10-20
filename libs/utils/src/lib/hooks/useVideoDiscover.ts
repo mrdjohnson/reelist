@@ -1,6 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { callTmdb } from '@reelist/apis/api'
 import _ from 'lodash'
+import {
+  createDiscoverMovie,
+  createDiscoverShow,
+  DiscoverVideoResponseType,
+} from '@reelist/models/DiscoverVideo'
 import Video from '@reelist/models/Video'
 import { useStore } from '@reelist/utils/hooks/useStore'
 import useSelectState, { SelectOption } from '@reelist/utils/hooks/useSelectState'
@@ -59,6 +64,24 @@ const useVideoDiscover = (beta = false) => {
     'includes_any',
   )
 
+  const [tvGenreMap, movieGenreMap] = useMemo(() => {
+    const tvMap = {}
+    const movieMap = {}
+
+    genreSelectState.options?.forEach(({ id: genreId, originalId, originalName }) => {
+      if (genreId.startsWith('shared:')) {
+        tvMap[originalId] = originalName
+        movieMap[originalId] = originalName
+      } else if (genreId.startsWith('tv:')) {
+        tvMap[originalId] = originalName
+      } else if (genreId.startsWith('movie:')) {
+        movieMap[originalId] = originalName
+      }
+    })
+
+    return [tvMap, movieMap]
+  }, [genreSelectState.options])
+
   const toggleRegionSeparationType = () => {
     setRegionSeparationType(
       regionSeparationType === 'includes_every' ? 'includes_any' : 'includes_every',
@@ -86,25 +109,6 @@ const useVideoDiscover = (beta = false) => {
   ].flatMap(selectState =>
     _.map(selectState.selectedOptions, (name, id) => ({ name, id, selectState })),
   )
-
-  const videoFilter = (video: Video) => {
-    if (_.isEmpty(regionSelectState.selectedOptions)) return true
-
-    const mustIncludeAllRegions = regionSeparationType === 'includes_every'
-
-    // if there is a regions filter, actualy filter by it
-    for (const region in regionSelectState.selectedOptions) {
-      const regionExists = !_.isEmpty(video.providers[region])
-
-      if (mustIncludeAllRegions && !regionExists) {
-        return false
-      } else if (regionExists) {
-        return true
-      }
-    }
-
-    return false
-  }
 
   // changing a region affects which providers are available
   useEffect(() => {
@@ -157,8 +161,6 @@ const useVideoDiscover = (beta = false) => {
       tvProviders: sharedProviders.concat(tvProviders).map(withoutIdentifier).join(','),
       movieProviders: sharedProviders.concat(movieProviders).map(withoutIdentifier).join(','),
     })
-      .then(nextVideos => _.filter(nextVideos, videoFilter))
-      .then(_.compact)
   }
 
   let videoDiscover = async (params: Record<string, string>) => {
@@ -194,20 +196,21 @@ const useVideoDiscover = (beta = false) => {
     const searchResults = await Promise.allSettled(tmdbCalls)
       .then(([tvShows, movies]) => {
         return [
-          (_.get(tvShows, 'value.data.data.results') || []) as Video[],
-          (_.get(movies, 'value.data.data.results') || []) as Video[],
+          (_.get(tvShows, 'value.data.data.results') || []) as DiscoverVideoResponseType[],
+          (_.get(movies, 'value.data.data.results') || []) as DiscoverVideoResponseType[],
         ]
       })
       .then(([tvShows, movies]) => {
-        return [tvShows.map(tvShow => 'tv' + tvShow.id), movies.map(tvShow => 'mv' + tvShow.id)]
+        return [
+          tvShows.map(tvShow => createDiscoverShow(tvShow, tvGenreMap)),
+          movies.map(movie => createDiscoverMovie(movie, movieGenreMap)),
+        ]
       })
       .then(all => _.zip(...all))
       .then(_.flatten)
       .then(_.compact)
 
-    if (!searchResults) return []
-
-    return videoStore.getVideos(searchResults)
+    return searchResults
   }
 
   if (beta) {

@@ -13,6 +13,7 @@ import useVideoSearch from '@reelist/utils/hooks/useVideoSearch'
 import Video from '@reelist/models/Video'
 import Person from '@reelist/models/Person'
 import ReelistSelect from '~/components/ReelistSelect'
+import { DiscoverVideoType } from '@reelist/models/DiscoverVideo'
 
 import InfiniteScroll from './InfiniteScroll'
 import VideoModal from './video/VideoModal'
@@ -90,7 +91,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
   const [showMobileFilterOptions, setShowMobileFilterOptions] = useState(false)
   const [mobileFilterText, setMobileFilterText] = useState('')
 
-  const [videos, setVideos] = useState<Video[]>([])
+  const [videos, setVideos] = useState<DiscoverVideoType[]>([])
   const [isLoadingVideos, setIsLoadingVideos] = useState(false)
   const [homepageVideosState, setHomepageVideosState] = useState(HomePageVideosState.NOT_LOADED)
 
@@ -116,7 +117,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
     setHomepageVideosState(HomePageVideosState.LOADED)
   }
 
-  const handleVideos = (nextVideos: Video[]) => {
+  const handleVideos = (nextVideos: DiscoverVideoType[]) => {
     if (page === 1) {
       console.log('making new videos')
       return nextVideos
@@ -128,7 +129,9 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
   }
 
   const discover = () => {
-    getVideos(_.keys(genreSelectState.selectedOptions))
+    const result = getVideos(_.keys(genreSelectState.selectedOptions))
+
+    result
       .then(handleVideos)
       .then(finishLoadingVideos)
       .catch(e => {
@@ -176,7 +179,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
     }
   }
 
-  const finishLoadingVideos = (loadedVideos: Video[]) => {
+  const finishLoadingVideos = (loadedVideos: DiscoverVideoType[]) => {
     setVideos(loadedVideos)
 
     if (_.isEmpty(loadedVideos)) {
@@ -260,7 +263,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
     }
   }, [router.query])
 
-  const handleVideoSelection = (video: Video) => {
+  const handleVideoSelection = (video: DiscoverVideoType) => {
     router.push(`/discover?videoId=${video.videoId}`, undefined, { shallow: true })
   }
 
