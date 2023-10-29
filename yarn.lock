@@ -19667,16 +19667,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-screens@npm:^3.15.0":
-  version: 3.20.0
-  resolution: "react-native-screens@npm:3.20.0"
+"react-native-screens@npm:^3.27.0":
+  version: 3.27.0
+  resolution: "react-native-screens@npm:3.27.0"
   dependencies:
     react-freeze: ^1.0.0
     warn-once: ^0.1.0
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 94ab21378ee82765d329ccb8c92f5ca7cb15df916496fac7ce9a03c45e22579715000dae9c16f0a7d734a8fc1c2d0569fd82ecb71119a0b56046b5ea7533e7c2
+  checksum: 3a6f54bd755ba8c7909beb4888f96d159639221cbcdb56fccd460cd129ff9b144c7c20dc4c0b7eec23aa38698bbd0cf21bb9b6c99833e9d1399ee75da52f18ed
   languageName: node
   linkType: hard
 
@@ -20074,7 +20074,7 @@ __metadata:
     react-native-reanimated: ^2.9.1
     react-native-safe-area-context: 3.3.2
     react-native-safe-area-view: ^1.1.1
-    react-native-screens: ^3.15.0
+    react-native-screens: ^3.27.0
     react-native-svg: 12.1.1
     react-native-svg-transformer: 1.0.0
     react-native-url-polyfill: ^1.3.0
