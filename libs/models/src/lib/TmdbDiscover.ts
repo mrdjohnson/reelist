@@ -18,6 +18,16 @@ import LocalStorageValue from '@reelist/utils/storage/LocalStorageValue'
 import _ from 'lodash'
 import { callTmdb } from '@reelist/apis/api'
 
+// hard coded popular generes
+const popularGeneresIdsByName = {
+  base: [],
+  comedy: ['shared:35'],
+  actionAndAdventure: ['tv:10759', 'movie:28', 'movie:12'],
+  drama: ['shared:18'],
+  horror: ['shared:9648'],
+  scifi: ['tv:10765', 'movie:878', 'movie:14'],
+}
+
 const getVideoTypes = async () => [
   { id: '0', name: 'Documentary' },
   { id: '1', name: 'News' },
@@ -42,6 +52,7 @@ class TmdbDiscover {
   regionSelectState: SelectState<SelectOption>
   mediaTypeSelectState: SelectState<SelectOption>
   page = 1
+  homepageSections = {}
 
   genreSeparationTypeStorage = new LocalStorageValue(
     'genreSeparationType',
@@ -202,6 +213,28 @@ class TmdbDiscover {
       .then(_.compact)
 
     return searchResults
+  }
+
+  fetchHomepageVideos = async () => {
+    const base = await this.getVideos(null)
+    const comedy = await this.getVideos(popularGeneresIdsByName.comedy)
+    const actionAndAdventure = await this.getVideos(popularGeneresIdsByName.actionAndAdventure)
+    const drama = await this.getVideos(popularGeneresIdsByName.drama)
+    const horror = await this.getVideos(popularGeneresIdsByName.horror)
+    const scifi = await this.getVideos(popularGeneresIdsByName.scifi)
+
+    this.homepageSections = {
+      base,
+      comedy,
+      actionAndAdventure,
+      drama,
+      horror,
+      scifi,
+    }
+  }
+
+  clearHomepageVideos = () => {
+    this.homepageSections = {}
   }
 
   private get genreMap() {

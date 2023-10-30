@@ -26,6 +26,7 @@ import Footer from './Footer'
 import PersonModal from './video/PersonModal'
 import Popup from '~/components/Popup'
 import classNames from 'classnames'
+import tmdbDiscover from '@reelist/models/TmdbDiscover'
 
 enum PageState {
   HOME = 'HOME',
@@ -76,6 +77,9 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
     toggleGenreSeparationType,
     selectedItems,
     selectStatesLoaded,
+    clearHomepageVideos,
+    homepageSections,
+    fetchHomepageVideos,
   } = useVideoDiscover(beta)
   const videoSearch = useVideoSearch()
 
@@ -95,24 +99,8 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
   const [isLoadingVideos, setIsLoadingVideos] = useState(false)
   const [homepageVideosState, setHomepageVideosState] = useState(HomePageVideosState.NOT_LOADED)
 
-  const [homepageSections, setHomepageSections] = useState({})
-
   const initHomepageVideos = async () => {
-    const base = await getVideos(null)
-    const comedy = await getVideos(popularGeneresIdsByName.comedy)
-    const actionAndAdventure = await getVideos(popularGeneresIdsByName.actionAndAdventure)
-    const drama = await getVideos(popularGeneresIdsByName.drama)
-    const horror = await getVideos(popularGeneresIdsByName.horror)
-    const scifi = await getVideos(popularGeneresIdsByName.scifi)
-
-    setHomepageSections({
-      base,
-      comedy,
-      actionAndAdventure,
-      drama,
-      horror,
-      scifi,
-    })
+    await fetchHomepageVideos()
 
     setHomepageVideosState(HomePageVideosState.LOADED)
   }
@@ -155,7 +143,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
       if (homepageVideosState === HomePageVideosState.LOADING) return
 
       setHomepageVideosState(HomePageVideosState.LOADING)
-      setHomepageSections({})
+      clearHomepageVideos()
       initHomepageVideos()
 
       return
