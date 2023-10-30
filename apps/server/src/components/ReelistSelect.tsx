@@ -1,4 +1,4 @@
-import React, {PropsWithChildren, ReactNode, useEffect, useMemo, useRef, useState} from 'react'
+import React, { PropsWithChildren, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import _ from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { Button, Popover } from '@mui/material'
@@ -6,7 +6,7 @@ import classNames from 'classnames'
 import PillButton from 'apps/server/components/PillButton'
 import DashIcon from 'apps/server/components/heroIcons/DashIcon'
 import PlusIcon from 'apps/server/components/heroIcons/PlusIcon'
-import { SelectState, SelectOption } from '@reelist/utils/hooks/useSelectState'
+import SelectState, { SelectOption } from '@reelist/utils/SelectState'
 
 type ReelistSelectProps<T extends SelectOption> = PropsWithChildren<{
   selectState: SelectState<T>
@@ -43,7 +43,7 @@ const ReelistSelect = observer(
       let icon: ReactNode
 
       if (isMulti) {
-        icon = isChecked ? <DashIcon/> : <PlusIcon/>
+        icon = isChecked ? <DashIcon /> : <PlusIcon />
       }
 
       return (
@@ -86,7 +86,7 @@ const ReelistSelect = observer(
           <div className="flex flex-col justify-end">
             <Button
               className={
-                'font-inter group w-fit text-right text-lg  hover:bg-transparent ' +
+                'group w-fit text-right font-sans text-lg  hover:bg-transparent ' +
                 (disabled ? ' pointer-events-none text-gray-500 opacity-40' : ' text-white')
               }
               onClick={() => setIsOpen(true)}

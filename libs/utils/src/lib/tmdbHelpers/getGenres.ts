@@ -31,7 +31,14 @@ const getGenresByType = async (type: string) => {
     .then(items => _.keyBy(items, 'original.id'))
 }
 
-const getGenres = async () => {
+export type GenreOptionType = {
+  id: string
+  name: string
+  originalName: string
+  originalId: string
+}
+
+const getGenres = async (): Promise<Array<GenreOptionType>> => {
   const tvGenresById = await getGenresByType('tv')
   const movieGenresById = await getGenresByType('movie')
 

@@ -68,7 +68,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
     mediaTypeSelectState,
     genreSeparationType,
     typesSeparationType,
-    setTypesSeparationType,
+    toggleTypesSeparationType,
     regionSeparationType,
     page,
     setPage,
@@ -431,13 +431,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
                 >
                   <div
                     className="flex cursor-pointer justify-center text-xl"
-                    onClick={() =>
-                      setTypesSeparationType(
-                        typesSeparationType === 'includes_every'
-                          ? 'includes_any'
-                          : 'includes_every',
-                      )
-                    }
+                    onClick={toggleTypesSeparationType}
                   >
                     <input
                       type="checkbox"
@@ -643,11 +637,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
             >
               <div
                 className="flex cursor-pointer justify-center text-xl"
-                onClick={() =>
-                  setTypesSeparationType(
-                    typesSeparationType === 'includes_every' ? 'includes_any' : 'includes_every',
-                  )
-                }
+                onClick={toggleTypesSeparationType}
               >
                 <input
                   type="checkbox"

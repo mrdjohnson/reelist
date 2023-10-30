@@ -156,11 +156,11 @@ const EntityImage = observer(
                 'linear-gradient(180deg, rgba(0, 0, 0, 0.54) 0%, rgba(0, 0, 0, 0) 0.01%, rgba(0, 0, 0, 0.54) 33.85%)',
             }}
           >
-            <div className="font-inter transition-margin-top discover-md:group-hover:mt-3 line-clamp-2 px-2 text-2xl  text-white duration-300 ease-in-out">
+            <div className="transition-margin-top discover-md:group-hover:mt-3 line-clamp-2 px-2 font-sans text-2xl  text-white duration-300 ease-in-out">
               {video.videoName}
             </div>
 
-            <div className="font-inter transition-max-height discover-md:roup-hover:max-h-0 line-clamp-2 flex max-h-16 flex-wrap overflow-hidden px-2 text-lg text-white duration-300 ease-in-out group-hover:max-h-0 ">
+            <div className="transition-max-height discover-md:roup-hover:max-h-0 line-clamp-2 flex max-h-16 flex-wrap overflow-hidden px-2 font-sans text-lg text-white duration-300 ease-in-out group-hover:max-h-0 ">
               {_.dropRight(video.uiGenres).map(genre => (
                 <span>{genre}/</span>
               ))}

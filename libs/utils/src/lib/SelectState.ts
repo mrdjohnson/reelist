@@ -1,8 +1,8 @@
 import { ReactNode, useState } from 'react'
 import _ from 'lodash'
 import { makeAutoObservable } from 'mobx'
-import { useStore } from '@reelist/utils/hooks/useStore'
-import { IStorage } from '~/utils/storage'
+// import { useStore } from '@reelist/utils/hooks/useStore'
+import type IStorage from './storage/storage.interface'
 
 export type SelectOption = {
   id: string
@@ -11,17 +11,17 @@ export type SelectOption = {
   icon?: ReactNode
 }
 
-export class SelectState<T extends SelectOption> {
+class SelectState<T extends SelectOption> {
   selectedOptions: Record<string, string> = {}
   storageKey: string
   options: Array<T>
   private allOptions: Array<T>
   isLoadedFromSave: boolean = false
+  private storage: IStorage
 
   constructor(
     public label: string,
     public loadOptions: () => Promise<Array<T>>,
-    private storage: IStorage,
     private alternativeDefaultOptions?: () => Array<string>,
     public isMulti: boolean = true,
   ) {
@@ -32,7 +32,6 @@ export class SelectState<T extends SelectOption> {
 
     loadOptions().then(nextOptions => {
       this.options = nextOptions
-      this.lazyLoadFromStorage()
     })
   }
 
@@ -57,7 +56,9 @@ export class SelectState<T extends SelectOption> {
     this.save()
   }
 
-  lazyLoadFromStorage = async () => {
+  lazyLoadFromStorage = async (storage: IStorage) => {
+    this.storage = storage
+
     const defaultKey = this.storageKey
 
     const storedValues = await this.storage.load<typeof this.selectedOptions>(defaultKey)
@@ -113,24 +114,4 @@ export class SelectState<T extends SelectOption> {
   }
 }
 
-const useSelectState = <T extends SelectOption>(
-  label: string,
-  loadOptions: () => Promise<Array<T>>,
-  config: { getAlternativeDefaults?: () => Array<string>; isMulti?: boolean } = {},
-) => {
-  const { storage } = useStore()
-
-  const [selectState] = useState<SelectState<T>>(() => {
-    return new SelectState(
-      label,
-      loadOptions,
-      storage,
-      config.getAlternativeDefaults,
-      config.isMulti,
-    )
-  })
-
-  return selectState
-}
-
-export default useSelectState
+export default SelectState

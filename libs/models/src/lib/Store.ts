@@ -4,6 +4,7 @@ import AppState from '@reelist/models/AppState'
 import Auth from '@reelist/models/Auth'
 import VideoListStore from '@reelist/models/VideoListStore'
 import VideoStore from '@reelist/models/VideoStore'
+import TmdbDiscover from '@reelist/models/TmdbDiscover'
 import PersonStore from '@reelist/models/PersonStore'
 import UserStore from '@reelist/models/UserStore'
 import { SupabaseClient } from '@supabase/supabase-js'
@@ -18,6 +19,7 @@ class Store {
     @inject(Auth) public auth: Auth,
     @inject(AppState) public appState: AppState,
     @inject(VideoStore) public videoStore: VideoStore,
+    @inject(TmdbDiscover) public tmdbDiscover: TmdbDiscover,
     @inject(UserStore) public userStore: UserStore,
     @inject(VideoListStore) public videoListStore: VideoListStore,
     @inject(SupabaseClient) public supabase: SupabaseClient,

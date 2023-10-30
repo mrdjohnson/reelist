@@ -1,8 +1,6 @@
 import _ from 'lodash'
 import { callTmdb } from '@reelist/apis/api'
-import { SelectOption } from '@reelist/utils/hooks/useSelectState'
-
-
+import { SelectOption } from '@reelist/utils/SelectState'
 
 const getProvidersByType = async (type: string) => {
   const typeLabel = _.capitalize(type)
@@ -41,9 +39,15 @@ const getProvidersByType = async (type: string) => {
     .then(items => _.keyBy(items, 'original.id'))
 }
 
+export type WatchProviderOptionType = {
+  id: string
+  name: string
+  displayPriorities: string[]
+}
+
 // todo; fill in the region when asking for the providers; or sort by selected region code using the (unused) displayPriorities field
 // initial options: navigator.languages.filter(language => language.includes('-')).map(language => language.match(/-(.*)/)[1])
-const getWatchProviders = async () => {
+const getWatchProviders = async (): Promise<Array<WatchProviderOptionType>> => {
   const tvProvidersById = await getProvidersByType('tv')
   const movieProvidersById = await getProvidersByType('movie')
 
