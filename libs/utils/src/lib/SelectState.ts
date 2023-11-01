@@ -1,8 +1,7 @@
-import { ReactNode, useState } from 'react'
+import {ReactNode} from 'react'
 import _ from 'lodash'
 import { makeAutoObservable } from 'mobx'
-// import { useStore } from '@reelist/utils/hooks/useStore'
-import type IStorage from './storage/storage.interface'
+import type IStorage from '@reelist/utils/storage/storage.interface'
 
 export type SelectOption = {
   id: string
@@ -96,7 +95,7 @@ class SelectState<T extends SelectOption> {
   }
 
   setOptionsFilter = (filter?: (option: T) => boolean) => {
-    this.allOptions ||= this.options
+    this.allOptions = this.allOptions || this.options
     this.options = _.filter(this.allOptions, filter)
 
     // remove any selected options that no longer pass the filter
