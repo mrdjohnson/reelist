@@ -28,6 +28,7 @@ import AppActionSheets from '~/shared/components/AppActionSheets'
 import VideosModal from '~/features/videos/VideosModal'
 import VideoSeasonModal from '~/features/video/VideoSeasonModal'
 import VideoUpdateWatchedModal from '~/features/video/VideoUpdateWatchedModal'
+import DiscoverScreen from "~/features/discover/DiscoverScreen";
 
 const Stack = createNativeStackNavigator<NavigatorParamList>()
 const Tab = createBottomTabNavigator<NavigatorParamList>()
@@ -79,7 +80,7 @@ const createSubStack = (name: keyof ReelistTabParamList, component: React.Compon
 
 const TrackingTabs = () => createSubStack('tracking', TrackingScreen)
 const HomeTabs = () => createSubStack('home', HomeScreen)
-const SearchTabs = () => createSubStack('search', SearchScreen)
+const DiscoverTabs = () => createSubStack('discover', DiscoverScreen)
 
 const AppTabs = () => {
   return (
@@ -107,10 +108,10 @@ const AppTabs = () => {
       />
 
       <Tab.Screen
-        name="search"
-        component={SearchTabs}
+        name="discover"
+        component={DiscoverTabs}
         options={{
-          tabBarLabel: 'Search',
+          tabBarLabel: 'Discover',
         }}
       />
     </Tab.Navigator>

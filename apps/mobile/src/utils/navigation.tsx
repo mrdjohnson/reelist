@@ -6,6 +6,7 @@ export type ReelistTabParamList = {
   tracking: undefined
   home: undefined
   search?: { initialSearchValue?: string }
+  discover: undefined
 }
 
 export type NavigatorParamList = {
@@ -27,6 +28,7 @@ export type NavigatorParamList = {
   settings: undefined
   splash: undefined
   home: undefined
+  discover: undefined
 }
 
 export type ReelistScreenFrom<T extends keyof NavigatorParamList> = NativeStackScreenProps<
