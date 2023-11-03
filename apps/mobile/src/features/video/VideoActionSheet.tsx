@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Actionsheet, Column, Row } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@reelist/utils/hooks/useStore'
@@ -10,12 +10,15 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import SegmentButton from '~/shared/components/SegmentButton'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import VideoWatchedStatusRow from '~/shared/components/VideoWatchedStatusRow'
+import Video from '@reelist/models/Video'
 
 const VideoActionSheet = observer(() => {
-  const { appState } = useStore()
+  const { appState, videoStore } = useStore()
   const navigation = useReelistNavigation()
 
-  const { isOpen, video } = appState.actionSheets.video
+  const [video, setVideo] = useState<Video | null>(null)
+
+  const { isOpen, videoId } = appState.actionSheets.video
 
   const closeSheet = appState.clearActionSheetVideo
 
@@ -25,6 +28,14 @@ const VideoActionSheet = observer(() => {
     appState.setCurrentVideo(video)
     navigation.navigate('videoListManagementModal')
   }
+
+  useEffect(() => {
+    if (!videoId) return
+
+    setVideo(null)
+
+    videoStore.getVideo(videoId).then(setVideo)
+  }, [videoId])
 
   useEffect(() => {
     if (!video) return
