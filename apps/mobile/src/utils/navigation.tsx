@@ -6,8 +6,7 @@ import { DiscoverVideoType } from '@reelist/models/DiscoverVideo'
 export type ReelistTabParamList = {
   tracking: undefined
   home: undefined
-  search?: { initialSearchValue?: string }
-  discover: undefined
+  discover?: { initialSearchValue?: string }
 }
 
 export type NavigatorParamList = {
@@ -15,7 +14,7 @@ export type NavigatorParamList = {
   videoListsHome: undefined
   videoListScreen: undefined
   videoListScreenSettingsModal: undefined
-  search?: { initialSearchValue?: string }
+  discover?: { initialSearchValue?: string }
   videoScreen: { videoId: string }
   videoSeasonModal: { videoId: string; seasonNumber: number }
   videoListManagementModal: undefined

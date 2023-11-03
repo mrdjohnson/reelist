@@ -64,8 +64,8 @@ const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
           videos={searchedVideos}
           showMoreText="See more"
           onShowMore={() =>
-            navigation.navigate('search', {
-              screen: 'search',
+            navigation.navigate('discover', {
+              screen: 'discover',
               params: { initialSearchValue: filterText },
             })
           }

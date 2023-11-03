@@ -12,7 +12,7 @@ import { navigationRef, useBackButtonHandler } from './navigation-utilities'
 import WelcomeScreen from '~/features/welcome/WelcomeScreen'
 import VideoListsHomeScreen from '~/features/videoLists/VideoListsHomeScreen'
 import VideoListScreen from '~/features/videoLists/VideoListScreen'
-import SearchScreen from '~/features/search/SearchScreen'
+import DiscoverScreen from '~/features/discover/DiscoverScreen'
 import VideoScreen from '~/features/video/VideoScreen'
 import AppFooter from '~/shared/components/AppFooter'
 import TrackingScreen from '~/features/tracking/TrackingScreen'
@@ -28,7 +28,6 @@ import AppActionSheets from '~/shared/components/AppActionSheets'
 import VideosModal from '~/features/videos/VideosModal'
 import VideoSeasonModal from '~/features/video/VideoSeasonModal'
 import VideoUpdateWatchedModal from '~/features/video/VideoUpdateWatchedModal'
-import DiscoverScreen from "~/features/discover/DiscoverScreen";
 
 const Stack = createNativeStackNavigator<NavigatorParamList>()
 const Tab = createBottomTabNavigator<NavigatorParamList>()

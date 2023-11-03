@@ -88,8 +88,8 @@ const VideosModal = observer(({ route, navigation }: ReelistScreenFrom<'videosMo
           videos={searchedVideos}
           showMoreText="See more"
           onShowMore={() =>
-            navigation.navigate('search', {
-              screen: 'search',
+            navigation.navigate('discover', {
+              screen: 'discover',
               params: { initialSearchValue: filterText },
             })
           }
