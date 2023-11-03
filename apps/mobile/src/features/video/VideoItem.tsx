@@ -7,6 +7,7 @@ import { Column, IPressableProps, Pressable, Row, Skeleton, Text, View } from 'n
 import VideoImage from './VideoImage'
 import { GestureResponderEvent } from 'react-native'
 
+// todo; this should allow DiscoverVideoType
 type VideoItemProps = IPressableProps & {
   video: Video | null | undefined
   isTile?: boolean
