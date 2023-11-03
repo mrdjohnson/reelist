@@ -1,6 +1,7 @@
 import { RouteProp, useNavigation } from '@react-navigation/native'
 import { NativeStackScreenProps, NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Video from '@reelist/models/Video'
+import { DiscoverVideoType } from '@reelist/models/DiscoverVideo'
 
 export type ReelistTabParamList = {
   tracking: undefined
@@ -21,14 +22,14 @@ export type NavigatorParamList = {
   videoUpdateWatchedModal: { videoId: string }
   videosModal: {
     title: string
-    loadVideos: () => Promise<Video[]>
+    loadVideos: () => Promise<Array<Video | DiscoverVideoType>>
+    allowFiltering?: boolean
   }
   tracking: undefined
   profile: undefined
   settings: undefined
   splash: undefined
   home: undefined
-  discover: undefined
 }
 
 export type ReelistScreenFrom<T extends keyof NavigatorParamList> = NativeStackScreenProps<

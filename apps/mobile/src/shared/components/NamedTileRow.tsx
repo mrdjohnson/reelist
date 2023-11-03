@@ -21,9 +21,10 @@ import { IViewProps } from 'native-base/lib/typescript/components/basic/View/typ
 import useAsyncState from '@reelist/utils/hooks/useAsyncState'
 import User from '@reelist/models/User'
 import ProfileIcon from './ProfileIcon'
+import { DiscoverVideoType } from '@reelist/models/DiscoverVideo'
 
 type NamedTileRowProps = IViewProps & {
-  videos?: Video[]
+  videos?: Array<Video | DiscoverVideoType>
   label: string
   size?: number
   showMoreText?: string
@@ -31,6 +32,7 @@ type NamedTileRowProps = IViewProps & {
   loadVideos?: () => Promise<Video[]>
   loadUsers?: () => Promise<User[]>
   userId?: string
+  allowFiltering?: boolean
 }
 
 const NamedTileRow = ({
@@ -42,6 +44,7 @@ const NamedTileRow = ({
   loadVideos,
   loadUsers,
   userId,
+  allowFiltering = true,
   ...props
 }: NamedTileRowProps) => {
   const { appState, videoStore } = useStore()
@@ -56,8 +59,8 @@ const NamedTileRow = ({
 
   if (_.isEmpty(displayVideos) && _.isEmpty(localUsers)) return null
 
-  const navigateToVideoScreen = (video: Video) => {
-    navigation.push('videoScreen', {videoId: video.videoId})
+  const navigateToVideoScreen = (videoId: string) => {
+    navigation.push('videoScreen', { videoId })
   }
 
   const navigateToProfileScreen = (user: User) => {
@@ -72,13 +75,20 @@ const NamedTileRow = ({
       navigation.navigate('videosModal', {
         title: label,
         loadVideos: async () => displayVideos,
+        allowFiltering,
       })
     }
   }
 
   return (
     <Column marginX="10px" paddingBottom="5px" {...props}>
-      <Text paddingBottom="4px" fontSize="md" paddingRight="20px" adjustsFontSizeToFit numberOfLines={1}>
+      <Text
+        paddingBottom="4px"
+        fontSize="md"
+        paddingRight="20px"
+        adjustsFontSizeToFit
+        numberOfLines={1}
+      >
         {label}
       </Text>
 
@@ -87,7 +97,7 @@ const NamedTileRow = ({
           {_.take(displayVideos, size).map(video => (
             <Pressable
               key={video.videoId}
-              onPress={() => navigateToVideoScreen(video)}
+              onPress={() => navigateToVideoScreen(video.videoId)}
               onLongPress={() => appState.setActionSheetVideo(video)}
             >
               <VideoImage video={video} containerProps={{ height: '120px', width: 'auto' }} />

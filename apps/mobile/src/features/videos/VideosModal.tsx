@@ -15,11 +15,11 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { useStore } from '@reelist/utils/hooks/useStore'
 
 const VideosModal = observer(({ route, navigation }: ReelistScreenFrom<'videosModal'>) => {
-  const {auth} = useStore()
+  const { auth } = useStore()
 
   const videoSearch = useVideoSearch()
 
-  const title = route.params.title
+  const { title, allowFiltering } = route.params
 
   const [videos, refresh, loadingVideos] = useAsyncState([], route.params.loadVideos)
   const [searchedVideos, setSearchedVideos] = useState<Video[]>([])
@@ -69,16 +69,18 @@ const VideosModal = observer(({ route, navigation }: ReelistScreenFrom<'videosMo
         stickyHeaderHiddenOnScroll
         keyboardShouldPersistTaps="handled"
       >
-        <SearchBar
-          placeholder="Filter Tracked Shows & Movies"
-          leftIcon={<MaterialCommunityIcons name="filter-outline" />}
-          value={filterText}
-          onChangeText={setfilterText}
-          returnKeyType="search"
-        />
+        {allowFiltering && (
+          <SearchBar
+            placeholder="Filter Tracked Shows & Movies"
+            leftIcon={<MaterialCommunityIcons name="filter-outline" />}
+            value={filterText}
+            onChangeText={setfilterText}
+            returnKeyType="search"
+          />
+        )}
 
         {sortedVideos.map(video => (
-          <VideoItem video={video} key={video.id} />
+          <VideoItem video={video} key={video.videoId} />
         ))}
 
         <NamedTileRow
