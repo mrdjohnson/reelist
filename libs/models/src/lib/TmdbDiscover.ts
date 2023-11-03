@@ -54,6 +54,8 @@ class TmdbDiscover {
   page = 1
   homepageSections = {}
 
+  isLoadingHomepageSections = false
+
   genreSeparationTypeStorage = new LocalStorageValue(
     'genreSeparationType',
     'includes_any',
@@ -216,6 +218,8 @@ class TmdbDiscover {
   }
 
   fetchHomepageVideos = async () => {
+    this.isLoadingHomepageSections = true
+
     const base = await this.getVideos(null)
     const comedy = await this.getVideos(popularGeneresIdsByName.comedy)
     const actionAndAdventure = await this.getVideos(popularGeneresIdsByName.actionAndAdventure)
@@ -231,6 +235,8 @@ class TmdbDiscover {
       horror,
       scifi,
     }
+
+    this.isLoadingHomepageSections = false
   }
 
   clearHomepageVideos = () => {
