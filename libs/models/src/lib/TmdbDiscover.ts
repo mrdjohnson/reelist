@@ -205,10 +205,7 @@ class TmdbDiscover {
         ]
       })
       .then(([tvShows, movies]) => {
-        return [
-          tvShows.map(tvShow => createDiscoverShow(tvShow, this.tvGenreMap)),
-          movies.map(movie => createDiscoverMovie(movie, this.movieGenreMap)),
-        ]
+        return [tvShows.map(createDiscoverShow), movies.map(createDiscoverMovie)]
       })
       .then(all => _.zip(...all))
       .then(_.flatten)
@@ -267,6 +264,12 @@ class TmdbDiscover {
 
   get movieGenreMap() {
     return this.genreMap.movieMap
+  }
+
+  mapGenres(video: DiscoverVideoType) {
+    const genreMap = video.isTv ? this.tvGenreMap : this.movieGenreMap
+
+    return video.genreIds.map(genreId => genreMap[genreId])
   }
 
   get selectedItems() {

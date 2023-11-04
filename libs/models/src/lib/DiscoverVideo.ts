@@ -16,30 +16,19 @@ export type DiscoverVideoResponseType = {
   voteCount: number
 }
 
-export const createDiscoverShow = (
-  json: DiscoverVideoResponseType,
-  genreIdMap: Record<number, string>,
-) => {
-  return createDiscoverVideo(json, true, genreIdMap)
+export const createDiscoverShow = (json: DiscoverVideoResponseType) => {
+  return createDiscoverVideo(json, true)
 }
 
-export const createDiscoverMovie = (
-  json: DiscoverVideoResponseType,
-  genreIdMap: Record<number, string>,
-) => {
-  return createDiscoverVideo(json, false, genreIdMap)
+export const createDiscoverMovie = (json: DiscoverVideoResponseType) => {
+  return createDiscoverVideo(json, false)
 }
 
-export const createDiscoverVideo = (
-  { id, ...json }: DiscoverVideoResponseType,
-  isTv: boolean,
-  genreIdMap: Record<number, string>,
-) => {
+export const createDiscoverVideo = ({ id, ...json }: DiscoverVideoResponseType, isTv: boolean) => {
   return {
     ...json,
     videoName: json.name || json.title,
     videoId: (isTv ? 'tv' : 'mv') + id,
-    uiGenres: json.genreIds.map(genreId => genreIdMap[genreId]).sort(),
     isTv,
   }
 }

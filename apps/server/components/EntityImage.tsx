@@ -5,6 +5,7 @@ import _ from 'lodash'
 import { DiscoverVideoType } from '@reelist/models/DiscoverVideo'
 import classNames from 'classnames'
 import Person from '@reelist/models/Person'
+import { useStore } from '@reelist/utils/hooks/useStore'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
@@ -79,6 +80,8 @@ const EntityImage = observer(
     isPerson,
     className,
   }: VideoImageProps) => {
+    const { tmdbDiscover } = useStore()
+
     const [imageErrored, setImageErrored] = useState(false)
 
     // default to poster or backdrop path, or either if one does not exist
@@ -94,6 +97,12 @@ const EntityImage = observer(
       // show whatever is available
       return video.backdropPath || posterPath
     }, [imageErrored, isPoster, video.posterPath, video.backdropPath, person.profilePath])
+
+    const genres = useMemo(() => {
+      if (loading) return []
+
+      return tmdbDiscover.mapGenres(video)
+    }, [video.genreIds, loading])
 
     if (loading) {
       return (
@@ -161,11 +170,11 @@ const EntityImage = observer(
             </div>
 
             <div className="transition-max-height discover-md:roup-hover:max-h-0 line-clamp-2 flex max-h-16 flex-wrap overflow-hidden px-2 font-sans text-lg text-white duration-300 ease-in-out group-hover:max-h-0 ">
-              {_.dropRight(video.uiGenres).map(genre => (
-                <span>{genre}/</span>
+              {_.dropRight(genres).map(genre => (
+                <span key={genre}>{genre}/</span>
               ))}
 
-              <span>{_.last(video.uiGenres)}</span>
+              <span>{_.last(genres)}</span>
             </div>
           </div>
         )}
