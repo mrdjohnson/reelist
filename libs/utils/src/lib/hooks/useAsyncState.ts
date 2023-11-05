@@ -9,7 +9,7 @@ const useAsyncState = <T>(
   defaultValue: T | (() => T),
   callback?: () => Promise<T>,
 ): [T, () => void, boolean] => {
-  const [isRefreshing, setIsRefreshing] = useState(true)
+  const [isRefreshing, setIsRefreshing] = useState(!!callback)
   const [value, setValue] = useState(defaultValue)
 
   const refresh = () => {
@@ -21,7 +21,7 @@ const useAsyncState = <T>(
     if (isRefreshing) {
       callback?.()
         .then(setValue)
-        .then(() => setIsRefreshing(false))
+        .finally(() => setIsRefreshing(false))
     }
   }, [isRefreshing])
 
