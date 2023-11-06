@@ -8,6 +8,7 @@ import {
   Pressable,
   Center,
   Spacer,
+  Skeleton,
 } from 'native-base'
 import React, { useMemo, useState } from 'react'
 import Video from '@reelist/models/Video'
@@ -33,6 +34,7 @@ type NamedTileRowProps = IViewProps & {
   loadUsers?: () => Promise<User[]>
   userId?: string
   allowFiltering?: boolean
+  isLoadingOverride?: boolean
 }
 
 const NamedTileRow = ({
@@ -45,19 +47,20 @@ const NamedTileRow = ({
   loadUsers,
   userId,
   allowFiltering = true,
+  isLoadingOverride = false,
   ...props
 }: NamedTileRowProps) => {
   const { appState, videoStore } = useStore()
 
   const navigation = useReelistNavigation()
-  const [localVideos] = useAsyncState([], loadVideos)
-  const [localUsers] = useAsyncState([], loadUsers)
+  const [localVideos, _refreshLocalVideos, isLoadingLocalVideos] = useAsyncState([], loadVideos)
+  const [localUsers, _refreshLocalUsers, isLoadingLocalUsers] = useAsyncState([], loadUsers)
 
   const displayVideos = useMemo(() => {
     return videos || localVideos
   }, [localVideos, videos])
 
-  if (_.isEmpty(displayVideos) && _.isEmpty(localUsers)) return null
+  const isLoading = isLoadingOverride || isLoadingLocalVideos || isLoadingLocalUsers
 
   const navigateToVideoScreen = (videoId: string) => {
     navigation.push('videoScreen', { videoId })
@@ -94,45 +97,57 @@ const NamedTileRow = ({
 
       <ScrollView horizontal>
         <Row space="8px" flex={1} paddingLeft="10px">
-          {_.take(displayVideos, size).map(video => (
-            <Pressable
-              key={video.videoId}
-              onPress={() => navigateToVideoScreen(video.videoId)}
-              onLongPress={() => appState.setActionSheetVideo(video)}
-            >
-              <VideoImage video={video} containerProps={{ height: '120px', width: 'auto' }} />
-            </Pressable>
-          ))}
-
-          {_.take(localUsers, size).map(user => (
-            <Pressable key={user.id} onPress={() => navigateToProfileScreen(user)}>
-              <AspectRatio ratio={{ base: 2 / 3 }} height="120px" width="auto">
+          {isLoading ? (
+            _.times(5, num => (
+              <AspectRatio key={num} ratio={{ base: 2 / 3 }} height="120px" width="auto">
                 <Center>
-                  <ProfileIcon user={user} marginBottom="10px" />
-                  <Text numberOfLines={1} adjustsFontSizeToFit>
-                    {user.name}
-                  </Text>
+                  <Skeleton h="120px" />
                 </Center>
               </AspectRatio>
-            </Pressable>
-          ))}
+            ))
+          ) : (
+            <>
+              {_.take(displayVideos, size).map(video => (
+                <Pressable
+                  key={video.videoId}
+                  onPress={() => navigateToVideoScreen(video.videoId)}
+                  onLongPress={() => appState.setActionSheetVideo(video)}
+                >
+                  <VideoImage video={video} containerProps={{ height: '120px', width: 'auto' }} />
+                </Pressable>
+              ))}
 
-          <Pressable backgroundColor="blue.300:alpha.20" rounded="sm" onPress={handleShowMore}>
-            <AspectRatio ratio={{ base: 2 / 3 }} width="100%" height="120px">
-              <View textAlign="center" alignItems="center" justifyContent="center">
-                <MaterialCommunityIcons
-                  size={30}
-                  name="chevron-double-right"
-                  style={{ color: 'black', marginVertical: 'auto' }}
-                />
-              </View>
-            </AspectRatio>
-          </Pressable>
+              {_.take(localUsers, size).map(user => (
+                <Pressable key={user.id} onPress={() => navigateToProfileScreen(user)}>
+                  <AspectRatio ratio={{ base: 2 / 3 }} height="120px" width="auto">
+                    <Center>
+                      <ProfileIcon user={user} marginBottom="10px" />
+                      <Text numberOfLines={1} adjustsFontSizeToFit>
+                        {user.name}
+                      </Text>
+                    </Center>
+                  </AspectRatio>
+                </Pressable>
+              ))}
+
+              <Pressable backgroundColor="blue.300:alpha.20" rounded="sm" onPress={handleShowMore}>
+                <AspectRatio ratio={{ base: 2 / 3 }} width="100%" height="120px">
+                  <View textAlign="center" alignItems="center" justifyContent="center">
+                    <MaterialCommunityIcons
+                      size={30}
+                      name="chevron-double-right"
+                      style={{ color: 'black', marginVertical: 'auto' }}
+                    />
+                  </View>
+                </AspectRatio>
+              </Pressable>
+            </>
+          )}
         </Row>
       </ScrollView>
 
       {showMoreText && (
-        <LinkButton alignSelf="flex-end" onPress={handleShowMore}>
+        <LinkButton alignSelf="flex-end" onPress={handleShowMore} disabled={isLoading}>
           {showMoreText}
         </LinkButton>
       )}

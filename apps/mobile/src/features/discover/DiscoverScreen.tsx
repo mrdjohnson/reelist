@@ -86,6 +86,7 @@ const DiscoverScreen = observer(({ route }: ReelistScreenFrom<'discover'>) => {
                 videos={homepageSections[name]}
                 showMoreText={'See more ' + popularGenereTitleByName[name]}
                 allowFiltering={false}
+                isLoadingOverride={isLoadingHomepageSections}
               />
             ))}
       </ScrollView>
