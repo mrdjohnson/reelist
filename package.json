@@ -5,7 +5,8 @@
   "scripts": {
     "prep": "nx run server:prep-dev",
     "server:start": "nx serve server",
-    "mobile:start": "nx run mobile:start"
+    "mobile:start": "nx run mobile:start",
+    "android:clean": "cd apps/mobile/android &&./gradlew clean"
   },
   "private": true,
   "dependencies": {
