@@ -24,7 +24,7 @@ export const createDiscoverMovie = (json: DiscoverVideoResponseType) => {
   return createDiscoverVideo(json, false)
 }
 
-export const createDiscoverVideo = ({ id, ...json }: DiscoverVideoResponseType, isTv: boolean) => {
+const createDiscoverVideo = ({ id, ...json }: DiscoverVideoResponseType, isTv: boolean) => {
   return {
     ...json,
     videoName: json.name || json.title,
