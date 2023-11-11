@@ -7,10 +7,14 @@
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "types": ["reflect-metadata", "jest"]
   },
   "files": [],
-  "include": [],
+  "include": [
+    "src/**/*",
+    "**/*.test.ts"
+  ],
   "references": [
     {
       "path": "./tsconfig.lib.json"

@@ -14,7 +14,10 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "skipDefaultLibCheck": true,
-    "types": ["reflect-metadata"],
+    "types": [
+      "reflect-metadata",
+      "jest"
+    ],
     "baseUrl": ".",
     "paths": {
       "@reelist/apis/*": ["libs/apis/src/lib/*"],
@@ -23,5 +26,9 @@
       "@reelist/utils/*": ["libs/utils/src/lib/*"]
     }
   },
+  "include": [
+    "src/**/*",
+    "**/*.test.ts"
+  ],
   "exclude": ["node_modules", "tmp"]
 }
