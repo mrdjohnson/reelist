@@ -29,7 +29,7 @@ export type TmdbBaseVideoResponseType = {
   originalName: string
   voteAverage: number
   voteCount: number
-  video: boolean
+  video?: boolean
   status: string
   tagline: string
 } & (BaseMovie | BaseShow)
@@ -40,12 +40,17 @@ export type VideoMediaType = {
 
 export const createTmdbBaseVideo = (json: TmdbBaseVideoResponseType & VideoMediaType) => {
   const isTv = json.mediaType === 'tv'
+  const realMediaType = isTv ? 'tv' : 'movie'
 
   return makeAutoObservable({
     ...json,
     videoId: json.mediaType + json.id,
     videoName: json.name || json.title,
     isTv,
+
+    get tmdbPath() {
+      return '/' + realMediaType + '/' + json.id
+    },
   })
 }
 

@@ -14,6 +14,7 @@ describe('TmdbBaseVideo', () => {
     expect(show.videoName).toBe(name)
     expect(show.videoId).toBe('tv123')
     expect(show.isTv).toBe(true)
+    expect(show.tmdbPath).toBe('/tv/123')
   })
 
   it('should use correct header for movies', () => {
@@ -28,6 +29,7 @@ describe('TmdbBaseVideo', () => {
     expect(movie.videoName).toBe(title)
     expect(movie.videoId).toBe('mv123')
     expect(movie.isTv).toBe(false)
+    expect(movie.tmdbPath).toBe('/movie/123')
   })
 
   it('should create shows and movies correctly', async () => {
