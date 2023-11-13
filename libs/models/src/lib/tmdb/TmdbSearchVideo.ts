@@ -1,14 +1,11 @@
 import {
-  BaseMovie,
-  createTmdbBaseVideo,
-  TmdbBaseVideoResponseType,
-} from '@reelist/models/tmdb/TmdbBaseVideo'
+    BaseMovie,createTmdbBaseVideo, TmdbBaseVideoResponseType } from '@reelist/models/tmdb/TmdbBaseVideo'
 import { extendObservable } from 'mobx'
 
 export type TmdbSearchVideoResultResponseType = TmdbBaseVideoResponseType &
-  BaseMovie & {
+    BaseMovie & {
     mediaType: 'tv' | 'movie'
-  }
+}
 
 export type TmdbSearchPersonResultResponseType = {
   name: string
