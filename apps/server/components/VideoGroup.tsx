@@ -5,6 +5,8 @@ import classNames from 'classnames'
 import _ from 'lodash'
 import { useMemo } from 'react'
 import { Button } from '@mui/material'
+import { DiscoverVideoType } from '@reelist/models/DiscoverVideo'
+import { TmdbSearchVideoResultType } from '@reelist/models/tmdb/TmdbSearchVideo'
 
 type PropsWithTitle = {
   title: string
@@ -20,7 +22,7 @@ type VideoGroupProps = {
   numItemsPerRow: number
   title?: string
   clippedOverride?: boolean
-  videos?: Video[]
+  videos?: DiscoverVideoType[] | TmdbSearchVideoResultType[]
   isLoading: boolean
 } & (PropsWithTitle | PropsWithoutTitle)
 
@@ -71,7 +73,6 @@ const VideoGroup = ({
         {videosToDisplay.map(video => (
           <EntityImage
             video={video}
-            containerProps={{ width: '307px' }}
             onPress={() => handleVideoSelection(video)}
             key={video.videoId}
           />
