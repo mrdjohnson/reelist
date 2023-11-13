@@ -6,11 +6,12 @@ import { DiscoverVideoType } from '@reelist/models/DiscoverVideo'
 import classNames from 'classnames'
 import Person from '@reelist/models/Person'
 import { useStore } from '@reelist/utils/hooks/useStore'
+import { TmdbSearchVideoResultType } from '@reelist/models/tmdb/TmdbSearchVideo'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
 type VideoImageProps = {
-  video?: DiscoverVideoType
+  video?: DiscoverVideoType | TmdbSearchVideoResultType
   person?: Person
   isPoster?: boolean
   onPress?: () => void
@@ -99,10 +100,10 @@ const EntityImage = observer(
     }, [imageErrored, isPoster, video.posterPath, video.backdropPath, person.profilePath])
 
     const genres = useMemo(() => {
-      if (loading) return []
+      if (loading || !tmdbDiscover.genreSelectState.optionsLoaded) return []
 
       return tmdbDiscover.mapGenres(video)
-    }, [video.genreIds, loading])
+    }, [video.genreIds, loading, tmdbDiscover.genreSelectState.optionsLoaded])
 
     if (loading) {
       return (

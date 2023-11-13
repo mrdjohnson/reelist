@@ -1,4 +1,4 @@
-import {ReactNode} from 'react'
+import { ReactNode } from 'react'
 import _ from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import type IStorage from '@reelist/utils/storage/storage.interface'
@@ -16,6 +16,7 @@ class SelectState<T extends SelectOption> {
   options: Array<T>
   private allOptions: Array<T>
   isLoadedFromSave: boolean = false
+  optionsLoaded = false
   private storage: IStorage
 
   constructor(
@@ -31,6 +32,7 @@ class SelectState<T extends SelectOption> {
 
     loadOptions().then(nextOptions => {
       this.options = nextOptions
+      this.optionsLoaded = true
     })
   }
 
