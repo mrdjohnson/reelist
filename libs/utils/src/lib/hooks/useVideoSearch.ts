@@ -1,11 +1,18 @@
 import { callTmdb } from '@reelist/apis/api'
 import _ from 'lodash'
-import Video from '@reelist/models/Video'
-import { useStore } from '@reelist/utils/hooks/useStore'
+import {
+  createTmdbSearchVideoResult,
+  createTmdbSearchVideosResultsFromSearchPerson,
+  TmdbSearchMultiResultResponseType,
+  TmdbSearchVideoResultResponseType,
+  TmdbSearchVideoResultType,
+} from '@reelist/models/tmdb/TmdbSearchVideo'
+
+const isVideo = (
+  json: TmdbSearchMultiResultResponseType,
+): json is TmdbSearchVideoResultResponseType => json.mediaType !== 'person'
 
 const useVideoSearch = () => {
-  const { auth, videoStore } = useStore()
-
   const videoSearch = async (
     searchText: string,
     options: Record<string, string | boolean> = {},
@@ -15,33 +22,26 @@ const useVideoSearch = () => {
     const { deepSearch = false, ...params } = options
 
     const searchResults = await callTmdb('/search/multi', { query: searchText, ...params }).then(
-      item => _.get(item, 'data.data.results') as Video[] | null,
+      item => _.get(item, 'data.data.results') as TmdbSearchMultiResultResponseType[],
     )
 
     if (!searchResults) return []
 
     if (deepSearch) {
-      const getVideoId = (video: Video) => (video.mediaType === 'movie' ? 'mv' : 'tv') + video.id
-
-      const videoIds: Array<string | null> = []
+      const videos: TmdbSearchVideoResultType[] = []
 
       searchResults.forEach(result => {
         if (result.mediaType === 'person') {
-          // todo: actually search the person and then add all their videos
-          videoIds.push(...result.knownFor?.map(getVideoId))
+          videos.push(...createTmdbSearchVideosResultsFromSearchPerson(result))
         } else {
-          videoIds.push(getVideoId(result))
+          videos.push(createTmdbSearchVideoResult(result))
         }
       })
 
-      return videoStore.getVideos(_.compact(videoIds))
+      return videos
     }
 
-    return searchResults
-      .filter(searchResult => ['movie', 'tv'].includes(searchResult.mediaType))
-      .map(video => {
-        return videoStore.makeUiVideo(video)
-      })
+    return _.filter(searchResults, isVideo).map(createTmdbSearchVideoResult)
   }
 
   return videoSearch
