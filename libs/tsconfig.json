@@ -1,13 +1,17 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
     "module": "commonjs",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
+    "resolveJsonModule": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
+    "noImplicitAny": true,
     "types": ["reflect-metadata", "jest"]
   },
   "files": [],

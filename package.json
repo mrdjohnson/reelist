@@ -90,7 +90,7 @@
     "@react-native-community/cli-platform-ios": "10.1.1",
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/jest-native": "5.4.1",
-    "@testing-library/react": "13.4.0",
+    "@testing-library/react": "^14.1.0",
     "@testing-library/react-native": "11.5.2",
     "@tsconfig/react-native": "^2.0.2",
     "@types/humps": "^2.0.2",
