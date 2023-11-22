@@ -117,6 +117,9 @@ const AppTabs = () => {
   )
 }
 
+// step 1: flatten all screens
+// step 2: show discover screen on if not signed in
+
 // no tabs here
 const AppStack = () => {
   return (

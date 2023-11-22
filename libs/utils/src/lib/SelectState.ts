@@ -13,11 +13,11 @@ export type SelectOption = {
 class SelectState<T extends SelectOption> {
   selectedOptions: Record<string, string> = {}
   storageKey: string
-  options: Array<T>
-  private allOptions: Array<T>
+  options?: Array<T>
+  private allOptions?: Array<T>
   isLoadedFromSave: boolean = false
   optionsLoaded = false
-  private storage: IStorage
+  private storage?: IStorage
 
   constructor(
     public label: string,
@@ -25,7 +25,7 @@ class SelectState<T extends SelectOption> {
     private alternativeDefaultOptions?: () => Array<string>,
     public isMulti: boolean = true,
   ) {
-    console.log('is multi: ', isMulti)
+    // console.log('is multi: ', isMulti)
     this.storageKey = _.snakeCase(label)
 
     makeAutoObservable(this)
@@ -39,7 +39,7 @@ class SelectState<T extends SelectOption> {
   setSelectedOptions = (options: string[]) => {
     const allOptionsById = _.chain(this.options).keyBy('id').mapValues('name').value()
 
-    const nextOptions = {}
+    const nextOptions: Record<string, string> = {}
 
     if (this.isMulti) {
       options.forEach(id => {
@@ -64,7 +64,7 @@ class SelectState<T extends SelectOption> {
 
     const storedValues = await this.storage.load<typeof this.selectedOptions>(defaultKey)
 
-    console.log('loaded ' + defaultKey + ':', storedValues)
+    // console.log('loaded ' + defaultKey + ':', storedValues)
 
     if (!_.isEmpty(storedValues)) {
       this.selectedOptions = storedValues
@@ -111,7 +111,11 @@ class SelectState<T extends SelectOption> {
   }
 
   save = () => {
-    this.storage.save(this.storageKey, this.selectedOptions)
+    if (!this.storage) {
+      throw new Error('Storage was not found')
+    }
+
+    return this.storage.save(this.storageKey, this.selectedOptions)
   }
 }
 

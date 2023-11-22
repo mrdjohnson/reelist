@@ -3,26 +3,33 @@ import { useRouter } from 'next/router'
 
 import React, { useMemo } from 'react'
 import _ from 'lodash'
-import Video, { Provider } from '@reelist/models/Video'
-import Person from '@reelist/models/Person'
 
 import EntityImage from '../EntityImage'
 import EntityModal from '../EntityModal'
 
+import { TmdbPersonCreditResponse } from '@reelist/interfaces/tmdb/TmdbPersonResponse'
+import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
+import { TmdbVideoByIdType } from '@reelist/interfaces/tmdb/TmdbVideoByIdType'
+import { TmdbWatchProviderDataResponse } from '@reelist/interfaces/tmdb/TmdbWatchProviderResponse'
+
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
 const VideoModal = observer(
-  ({ video, selectedRegions }: { video: Video; selectedRegions: string[] }) => {
+  ({ video, selectedRegions }: { video: TmdbVideoByIdType; selectedRegions: string[] }) => {
     const router = useRouter()
 
-    const getProvidersByType = (type): Provider[] =>
+    const getProvidersByType = (type): TmdbWatchProviderDataResponse[] =>
       _.chain(selectedRegions)
         .flatMap(region => video.providers[region]?.[type])
         .compact()
         .uniqBy('providerId')
         .value()
 
-    const providers: Array<Provider & { type: string }> = useMemo(() => {
+    const providers: Array<
+      TmdbWatchProviderDataResponse & {
+        type: string
+      }
+    > = useMemo(() => {
       const buyProviders = getProvidersByType('buy').map(provider => ({ ...provider, type: 'Buy' }))
       const flatrateProviders = getProvidersByType('flatrate').map(provider => ({
         ...provider,
@@ -40,11 +47,11 @@ const VideoModal = observer(
       )
     }, [video.providers])
 
-    const handleVideoSelection = (video: Video) => {
+    const handleVideoSelection = (video: TmdbVideoPartialType) => {
       router.push(`/discover?videoId=${video.videoId}`, undefined, { shallow: true })
     }
 
-    const handlePersonSelection = (person: Person) => {
+    const handlePersonSelection = (person: TmdbPersonCreditResponse) => {
       router.push(`/discover?personId=${person.id}`, undefined, { shallow: true })
     }
 
@@ -52,7 +59,7 @@ const VideoModal = observer(
       <EntityModal
         video={video}
         title={video.videoName}
-        subTitle={`${_.map(video.genres, 'name').join('/')} ‧ ${video.durationOrSeasons}`}
+        subTitle={`${_.map(video.genres, 'name').join('/')} ‧ ${video.videoRuntime}`}
         description={video.overview}
       >
         <div className="no-scrollbar relative w-full overflow-x-auto overscroll-x-none">
@@ -90,7 +97,7 @@ const VideoModal = observer(
           <div className="sticky left-0 z-20 w-full pb-3 text-2xl">Related Videos</div>
 
           <div className="relative flex  gap-x-3 pb-4 pl-2">
-            {video.relatedVideos.map(relatedVideo => (
+            {video.similar.map(relatedVideo => (
               <div
                 className="discover-md:scale-90 flex cursor-pointer flex-col justify-center text-center transition-all duration-200 ease-in-out hover:scale-100"
                 key={relatedVideo.id}
@@ -102,7 +109,9 @@ const VideoModal = observer(
                   isPoster
                 />
 
-                <span className="mt-2 line-clamp-2 h-[3rem] text-base">{relatedVideo.videoName}</span>
+                <span className="mt-2 line-clamp-2 h-[3rem] text-base">
+                  {relatedVideo.videoName}
+                </span>
               </div>
             ))}
           </div>

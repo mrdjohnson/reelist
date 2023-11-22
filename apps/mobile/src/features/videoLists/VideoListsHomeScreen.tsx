@@ -67,7 +67,7 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
   const isFollowedListsEmpty = _.isEmpty(filteredFollowedLists)
   const isPublicListsEmpty = _.isEmpty(filteredPublicLists)
 
-  const data = []
+  const data: Array<{ title: string; data: VideoList[] }> = []
 
   if (!isAdminVideoListsEmpty) {
     data.push({
@@ -99,8 +99,7 @@ const VideoListsHomeScreen = observer(({ navigation }: ReelistScreen) => {
   }
 
   const openCreatePage = () => {
-    const nextVideoList = videoListStore.createBlankVideoList()
-    videoListStore.setCurrentVideoList(nextVideoList)
+    videoListStore.setCurrentVideoList(new VideoList())
 
     navigation.push('videoListScreenSettingsModal')
   }

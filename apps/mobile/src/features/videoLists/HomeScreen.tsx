@@ -16,7 +16,6 @@ import useIsPressed from '~/hooks/useIsPressed'
 import ProfileIcon from '~/shared/components/ProfileIcon'
 import { useStore } from '@reelist/utils/hooks/useStore'
 import NamedTileRow from '~/shared/components/NamedTileRow'
-import Video from '@reelist/models/Video'
 
 type HomeScreenTileProps = IBoxProps & {
   start: number[]
@@ -96,6 +95,7 @@ const HomeScreen = observer(({ navigation }: ReelistScreen) => {
           roundedRight="none"
           start={[1, 0]}
           end={[0.5, 0.5]}
+          // @ts-ignore
           onPress={() => navigation.navigate('tracking', { screen: 'tracking' })}
         >
           Bookmarks
@@ -123,8 +123,9 @@ const HomeScreen = observer(({ navigation }: ReelistScreen) => {
       <ScrollView marginTop="10px">
         <NamedTileRow
           label="Bookmarks"
-          loadVideos={() => videoStore.getTrackedVideos({ includeSeasons: false })}
+          loadVideos={() => videoStore.getTrackedVideos({ baseOnly: true })}
           showMoreText="All Bookmarks"
+          // @ts-ignore
           onShowMore={() => navigation.navigate('tracking', { screen: 'tracking' })}
         />
 

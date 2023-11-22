@@ -1,12 +1,14 @@
 import { faker } from '@faker-js/faker'
 import { Factory } from 'fishery'
 
-import { TmdbBaseVideoResponseType } from '@reelist/interfaces/tmdb/TmdbBaseVideoResponseType'
+import { TmdbBaseVideoResponse } from '@reelist/interfaces/tmdb/TmdbBaseVideoResponse'
 
+// any video creation SHOULD call this factory.
+// this factory is reset after each test, ensuring that the id's will always be expected
 export const tmdbBaseVideoFactory = Factory.define<
-  TmdbBaseVideoResponseType,
+  TmdbBaseVideoResponse,
   null,
-  TmdbBaseVideoResponseType
+  TmdbBaseVideoResponse
 >(({ sequence, params }) => {
   return {
     backdropPath: faker.image.imageUrl(),

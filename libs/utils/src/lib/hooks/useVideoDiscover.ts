@@ -21,7 +21,7 @@ const useVideoDiscover = (beta = false) => {
     const regions = _.keys(regionSelectState.selectedOptions)
 
     if (_.isEmpty(regions)) {
-      watchProviderSelectState.setOptionsFilter(null)
+      watchProviderSelectState.setOptionsFilter(undefined)
       return
     }
 

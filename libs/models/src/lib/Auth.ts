@@ -4,6 +4,8 @@ import { Subscription, SupabaseClient } from '@supabase/supabase-js'
 import { inject, injectable } from 'inversify'
 import { StorageInversionKey } from '@reelist/utils/storage/storage.interface'
 import type IStorage from '@reelist/utils/storage/storage.interface'
+import TableApi from '@reelist/apis/TableApi'
+import { UserTableType } from '@reelist/interfaces/tables/UserTable'
 
 @injectable()
 export default class Auth {
@@ -26,7 +28,7 @@ export default class Auth {
 
     if (currentSession?.user) {
       //todo change this to get profile?
-      this.setUser(new User({ user: currentSession.user }, this.supabase))
+      this.setUser(new User({ user: currentSession.user }))
     } else {
       this.setUser(LoggedOutUser)
     }
@@ -53,7 +55,7 @@ export default class Auth {
   }
 
   getCurrentUserProfile = async () => {
-    if (!this.user.loggedIn) return false
+    if (!this.user.loggedIn) return
 
     this.loading = true
 
@@ -65,7 +67,7 @@ export default class Auth {
 
     if (error) {
       this.loading = false
-      this.needsProfile = true
+      // this.needsProfile = true
     }
 
     this.userProfile = profile

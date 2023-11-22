@@ -16,7 +16,6 @@ import {
 } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import { TvEpisode, TvSeason } from '@reelist/models/Video'
 import _ from 'lodash'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import moment from 'moment'
@@ -26,14 +25,16 @@ import { ReelistScreenFrom } from '~/utils/navigation'
 import { useStore } from '@reelist/utils/hooks/useStore'
 import ToggleButton from '~/shared/components/ToggleButton'
 import LoadingSection from '~/shared/components/LoadingSection'
+import { TmdbTvEpisode, TmdbTvSeason } from '@reelist/models/AbstractUserVideo'
+import UserShow from '@reelist/models/UserShow'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
 const IndeterminateIcon = <Icon as={<MaterialIcons name="indeterminate-check-box" />} />
 
-const ascendingSort = (episodeA: TvEpisode, episodeB: TvEpisode) =>
+const ascendingSort = (episodeA: TmdbTvEpisode, episodeB: TmdbTvEpisode) =>
   episodeA.episodeNumber - episodeB.episodeNumber
-const descendingSort = (episodeB: TvEpisode, episodeA: TvEpisode) =>
+const descendingSort = (episodeB: TmdbTvEpisode, episodeA: TmdbTvEpisode) =>
   episodeA.episodeNumber - episodeB.episodeNumber
 
 const CAN_GO_BACK = false
@@ -43,15 +44,15 @@ const VideoSeasonModal = observer(
   ({ route, navigation }: ReelistScreenFrom<'videoSeasonModal'>) => {
     const { videoStore, appState } = useStore()
 
-    const video = appState.currentVideo!
+    const [video, setVideo] = useState<UserShow | null>(null)
 
-    const [season, setSeason] = useState<TvSeason | null>(null)
+    const [season, setSeason] = useState<TmdbTvSeason | null>(null)
 
-    const [episode, setEpisode] = useState<TvEpisode | null>(null)
+    const [episode, setEpisode] = useState<TmdbTvEpisode | null>(null)
     const [ascendingOrder, setAscendingOrder] = useState<boolean>(true)
     const [hideFutureEpisodes, setHideFutureEpisodes] = useState(true)
 
-    const episodes: TvEpisode[] | undefined = useMemo(() => {
+    const episodes: TmdbTvEpisode[] | undefined = useMemo(() => {
       if (!season?.episodes || !video) return
 
       let episodeChain = _.chain(season.episodes)
@@ -65,17 +66,22 @@ const VideoSeasonModal = observer(
       return episodeChain.value()
     }, [season?.episodes, ascendingOrder, hideFutureEpisodes])
 
-    useEffect(() => {
-      if (video) return
+    const initUserVideo = async () => {
+      const video = await videoStore.getVideoProgressForUser(route.params.videoId)
 
-      videoStore.getVideo(route.params.videoId).then(appState.setCurrentVideo)
-    }, [])
-
-    useEffect(() => {
-      if (!video) return
+      if (!video.isTv) {
+        navigation.navigate('home')
+        return
+      }
 
       video.fetchSeason(route.params.seasonNumber).then(setSeason)
-    }, [video])
+
+      setVideo(video)
+    }
+
+    useEffect(() => {
+      initUserVideo()
+    }, [route.params.videoId])
 
     useEffect(() => {
       const onBackButtonPressed = () => {
@@ -93,7 +99,7 @@ const VideoSeasonModal = observer(
       return () => BackHandler.removeEventListener('hardwareBackPress', onBackButtonPressed)
     }, [episode])
 
-    const renderEpisodeLineItem = (episode: TvEpisode) => {
+    const renderEpisodeLineItem = (episode: TmdbTvEpisode) => {
       const aired = moment(episode.airDate).isBefore()
 
       return (
@@ -250,7 +256,7 @@ const VideoSeasonModal = observer(
                   <Text color="light.700">
                     {`S: ${season.seasonNumber} E: ${episode.episodeNumber} | ${moment(
                       episode.airDate,
-                    ).format("MMM Do 'YY")} | ${episode.runtime || 'Unknown'} min`}
+                    ).format('MMM YYYY')} | ${episode.runtime || 'Unknown'} min`}
                   </Text>
 
                   <Row alignItems="center">

@@ -13,21 +13,19 @@ import {
 } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@reelist/utils/hooks/useStore'
-import Video from '@reelist/models/Video'
 import { ReelistScreenFrom } from '~/utils/navigation'
 import TabView from '~/components/TabView'
-import _ from 'lodash'
 import VideoOverviewTab from './VideoOverviewTab'
 import VideoDashboardTab from './VideoDashboardTab'
-import { ActivityIndicator } from 'react-native'
 import LoadingSection from '~/shared/components/LoadingSection'
+import { UserVideoType } from '@reelist/models/UserVideo'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
 const VideoScreen = observer(({ route, navigation }: ReelistScreenFrom<'videoScreen'>) => {
   const { videoStore } = useStore()
 
-  const [video, setVideo] = useState<Video | null>(null)
+  const [video, setVideo] = useState<UserVideoType | null>(null)
   const [showVideoId, setShowVideoId] = useState(false)
 
   const imageSource = video?.backdropPath
@@ -38,14 +36,8 @@ const VideoScreen = observer(({ route, navigation }: ReelistScreenFrom<'videoScr
 
     setVideo(null)
 
-    videoStore.getVideo(videoId).then(setVideo)
+    videoStore.getVideoProgressForUser(videoId).then(setVideo)
   }, [videoId])
-
-  useEffect(() => {
-    if (!video) return
-
-    video.fetchSeasons()
-  }, [video])
 
   const routes = useMemo(() => {
     if (!video) return []

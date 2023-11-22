@@ -2,10 +2,10 @@ import { renderHook } from '@testing-library/react'
 
 import useVideoSearch from '@reelist/utils/hooks/useVideoSearch'
 import {
-  tmdbSearchPersonResultFactory,
-  tmdbSearchVideoResultFactory,
-} from '@reelist/models/tmdb/factories/TmdbSearchVideoFactory'
-import { nockHelper } from '@reelist/apis/__testHelpers__/apiTestHelper'
+  tmdbSearchPersonFactory,
+  tmdbSearchVideoFactory,
+} from '@reelist/interfaces/tmdb/__factories__/TmdbSearchResponseFactory'
+import { mockServer } from '@reelist/apis/__testHelpers__/apiTestHelper'
 
 describe('useVideoSearch', () => {
   let videoSearch: ReturnType<typeof useVideoSearch>
@@ -16,7 +16,8 @@ describe('useVideoSearch', () => {
   })
 
   afterEach(() => {
-    tmdbSearchVideoResultFactory.rewindSequence()
+    tmdbSearchVideoFactory.rewindSequence()
+    tmdbSearchPersonFactory.rewindSequence()
   })
 
   it('should return empty array if no search text', async () => {
@@ -26,10 +27,12 @@ describe('useVideoSearch', () => {
   })
 
   it('should call TMDB API and map results', async () => {
-    const movieResponses = tmdbSearchVideoResultFactory.buildList(2, { mediaType: 'movie' })
-    const showResponses = tmdbSearchVideoResultFactory.buildList(2, { mediaType: 'tv' })
+    const movieResponses = tmdbSearchVideoFactory.buildList(2, { mediaType: 'movie' })
+    const showResponses = tmdbSearchVideoFactory.buildList(2, { mediaType: 'tv' })
 
-    nockHelper.get('/search/multi').reply(200, { results: movieResponses.concat(showResponses) })
+    mockServer.json('https://api.themoviedb.org/3/search/multi', {
+      results: movieResponses.concat(showResponses),
+    })
 
     const videos = await videoSearch('any')
 
@@ -37,19 +40,18 @@ describe('useVideoSearch', () => {
   })
 
   it('should handle person results correctly for deep search', async () => {
-    const showResponse = tmdbSearchVideoResultFactory.build({ mediaType: 'tv' })
-    const personMovieResponses = tmdbSearchVideoResultFactory.buildList(2, { mediaType: 'movie' })
-    const personShowResponses = tmdbSearchVideoResultFactory.buildList(2, { mediaType: 'tv' })
-    const movieResponse = tmdbSearchVideoResultFactory.build({ mediaType: 'movie' })
+    const showResponse = tmdbSearchVideoFactory.build({ mediaType: 'tv' })
+    const personMovieResponses = tmdbSearchVideoFactory.buildList(2, { mediaType: 'movie' })
+    const personShowResponses = tmdbSearchVideoFactory.buildList(2, { mediaType: 'tv' })
+    const movieResponse = tmdbSearchVideoFactory.build({ mediaType: 'movie' })
 
-    const personResponse = tmdbSearchPersonResultFactory.build({
+    const personResponse = tmdbSearchPersonFactory.build({
       knownFor: personMovieResponses.concat(personShowResponses),
     })
 
-    nockHelper
-      .get('/search/multi')
-      .twice()
-      .reply(200, { results: [showResponse, personResponse, movieResponse] })
+    mockServer.json('https://api.themoviedb.org/3/search/multi*', {
+      results: [showResponse, personResponse, movieResponse],
+    })
 
     const videos = await videoSearch('any', { deepSearch: false })
 

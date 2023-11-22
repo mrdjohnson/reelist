@@ -3,13 +3,13 @@ import { Text, Column } from 'native-base'
 import { IViewProps } from 'native-base/lib/typescript/components/basic/View/types'
 import DetailsPanel from './DetailsPanel'
 import User from '@reelist/models/User'
-import Video from '@reelist/models/Video'
 import { humanizedDuration } from '@reelist/utils/humanizedDuration'
 import { observer } from 'mobx-react-lite'
+import { UserVideoType } from '@reelist/models/UserVideo'
 
 type TotalTimeDetailsPanelProps = IViewProps & {
   user: User
-  videos: Video[]
+  videos: UserVideoType[]
 }
 
 const TotalTimeDetailsPanel = observer(({ user, videos, ...props }: TotalTimeDetailsPanelProps) => {

@@ -7,21 +7,22 @@ import {
   TmdbDiscoverShowResponseType,
 } from '@reelist/interfaces/tmdb/TmdbDiscoverVideoResponseType'
 import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
-import { TmdbVideoPartialMapper } from '@reelist/utils/tmdbHelpers/TmdbVideoPartialMapper'
+import { TmdbVideoPartialFormatter } from '@reelist/utils/tmdbHelpers/TmdbVideoPartialFormatter'
+import moment from 'moment/moment'
 
 export const tmdbDiscoverShowFactory = Factory.define<
   TmdbDiscoverShowResponseType,
   null,
   TmdbVideoPartialType
 >(({ sequence, params, onCreate }) => {
-  onCreate(TmdbVideoPartialMapper.fromTmdbDiscoverShow)
+  onCreate(TmdbVideoPartialFormatter.fromTmdbShow)
 
-  const baseVideo = tmdbBaseVideoFactory.build({ id: sequence, ...params })
+  const baseVideo = tmdbBaseVideoFactory.build(params)
 
   return {
     name: faker.random.words(),
     originalName: faker.random.words(),
-    firstAirDate: faker.date.past().toISOString(),
+    firstAirDate: moment(faker.date.past()).format('YYYY-MM-DD'),
     ...baseVideo,
   }
 })
@@ -30,14 +31,14 @@ export const tmdbDiscoverMovieFactory = Factory.define<
   null,
   TmdbVideoPartialType
 >(({ sequence, params, onCreate }) => {
-  onCreate(TmdbVideoPartialMapper.fromTmdbDiscoverMovie)
+  onCreate(TmdbVideoPartialFormatter.fromTmdbMovie)
 
-  const baseVideo = tmdbBaseVideoFactory.build({ id: sequence, ...params })
+  const baseVideo = tmdbBaseVideoFactory.build(params)
 
   return {
     adult: faker.datatype.boolean(),
     originalTitle: faker.random.words(),
-    releaseDate: faker.date.past().toISOString(),
+    releaseDate: moment(faker.date.past()).format('YYYY-MM-DD'),
     title: faker.random.words(),
     video: faker.datatype.boolean(),
     ...baseVideo,

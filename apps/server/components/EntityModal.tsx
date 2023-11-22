@@ -1,17 +1,16 @@
 import { observer } from 'mobx-react-lite'
 
 import React, { PropsWithChildren } from 'react'
-import _ from 'lodash'
-import Video from '@reelist/models/Video'
-import Person from '@reelist/models/Person'
 
 import EntityImage from './EntityImage'
+import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
+import { TmdbPersonType } from '@reelist/interfaces/tmdb/TmdbPersonResponse'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
 type EntityModalProps = PropsWithChildren<{
-  video?: Video
-  person?: Person
+  video?: TmdbVideoPartialType
+  person?: TmdbPersonType
   title: string
   description: string
   subTitle?: string

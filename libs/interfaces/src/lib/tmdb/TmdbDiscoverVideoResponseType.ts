@@ -1,15 +1,11 @@
-import { TmdbBaseVideoResponseType } from '@reelist/interfaces/tmdb/TmdbBaseVideoResponseType'
+import {
+  TmdbBaseMovieResponse,
+  TmdbBaseShowResponse,
+} from '@reelist/interfaces/tmdb/TmdbBaseVideoResponse'
 
-export type TmdbDiscoverShowResponseType = TmdbBaseVideoResponseType & {
-  originalName: string
-  name: string
-  firstAirDate: string
-}
+export type TmdbDiscoverShowResponseType = TmdbBaseShowResponse
 
-export type TmdbDiscoverMovieResponseType = TmdbBaseVideoResponseType & {
+export type TmdbDiscoverMovieResponseType = TmdbBaseMovieResponse & {
   adult: boolean
-  originalTitle: string
-  releaseDate: string
-  title: string
   video: boolean
 }

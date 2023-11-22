@@ -16,20 +16,20 @@ type Credits = {
 }
 
 class Person {
-  id: number
-  adult: boolean
-  alsoKnownAs: string[]
-  biography: string
-  birthday: string
-  deathday: string
-  gender: number
-  homepage: string
-  imdbId: string
-  knownForDepartment: string
-  name: string
-  placeOfBirth: string
-  popularity: number
-  profilePath: string
+  id!: number
+  adult!: boolean
+  alsoKnownAs!: string[]
+  biography!: string
+  birthday!: string
+  deathday!: string
+  gender!: number
+  homepage!: string
+  imdbId!: string
+  knownForDepartment!: string
+  name!: string
+  placeOfBirth!: string
+  popularity!: number
+  profilePath!: string
   combinedCredits?: Credits
   media: Video[] = []
 

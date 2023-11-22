@@ -9,6 +9,17 @@ import VideoApi from '@reelist/apis/VideoApi'
 import { VideoInfoType, VideoTableType } from 'libs/interfaces/src/lib/tables/VideoTable'
 import Auth from '@reelist/models/Auth'
 import Person from './Person'
+import {
+  TmdbBaseVideoType,
+  TmdbVideoResponseType,
+  TmdbVideoType,
+} from '@reelist/interfaces/tmdb/TmdbVideoType'
+import { TmdbVideoByIdFormatter } from '@reelist/utils/tmdbHelpers/TmdbVideoByIdFormatter'
+import inversionContainer from '@reelist/models/inversionContainer'
+import TableApi from '@reelist/apis/TableApi'
+import { SupabaseClient } from '@supabase/supabase-js'
+import { TmdbShowByIdResponseType } from '@reelist/interfaces/tmdb/TmdbShowResponse'
+import { TmdbMovieResponseType } from '@reelist/interfaces/tmdb/TmdbMovieResponse'
 
 export type TvEpisode = {
   airDate: string
@@ -84,11 +95,11 @@ type Credits = {
   cast: CastMember[]
 }
 
-class Video {
+class Video<T = TmdbVideoResponseType> {
   adult?: boolean | undefined
   backdropPath!: string
   genreIds!: number[]
-  id!: string
+  id!: number
   mediaType!: 'movie' | 'tv'
   originalLanguage!: string
   originalTitle?: string | undefined
@@ -123,6 +134,21 @@ class Video {
     posters: VideoImageType[]
   }
 
+  isShow!: T extends TmdbShowByIdResponseType
+    ? TmdbVideoType<infer TmdbShowByIdResponseType>
+    : false
+  baseVideoData!: typeof this.isShow extends true
+    ? TmdbVideoType<TmdbShowByIdResponseType>
+    : TmdbVideoType<TmdbMovieResponseType>
+
+  getData = () => {
+    if (this.isShow) {
+      this.baseVideoData.videoReleaseDate
+    } else {
+      this.baseVideoData.videoId
+    }
+  }
+
   videoId: string
   tracked = false
   videoInfo: VideoInfoType = {}
@@ -132,13 +158,14 @@ class Video {
 
   seasonMap: Record<number, TvSeason | null> = {}
 
+  private storeAuth = inversionContainer.get<Auth>(Auth)
+  private videoStore: VideoStore = inversionContainer.get<VideoStore>(VideoStore)
+  private videoApi: VideoApi
+
   constructor(
-    json: Video,
+    json: TmdbVideoResponseType,
     videoTableData: VideoTableType | null = null,
-    videoId: string | null = null,
-    private videoStore: VideoStore,
-    private videoApi: VideoApi,
-    private storeAuth: Auth
+    videoId: string,
   ) {
     makeAutoObservable(this, {
       adult: false,
@@ -165,6 +192,9 @@ class Video {
       _relatedVideos: false,
     })
 
+    const supabase: SupabaseClient = inversionContainer.get<SupabaseClient>(SupabaseClient)
+    this.videoApi = new VideoApi('videos', supabase)
+
     if (videoId) {
       this.mediaType = videoId.startsWith('mv') ? 'movie' : 'tv'
       this.id = videoId.substring(2)
@@ -177,7 +207,7 @@ class Video {
 
     if (videoTableData) {
       this._assignFromVideoTable(videoTableData)
-    } else if (storeAuth.loggedIn) {
+    } else if (this.storeAuth.loggedIn) {
       this._lazyLoadVideoFromVideoTable()
     }
   }
@@ -491,8 +521,10 @@ class Video {
 
     const videoType = this.isTv ? 'tv' : 'movie'
 
-    const providers = await callTmdb(`/${videoType}/${this.id}/watch/providers`)
-      .then(item => _.get(item, 'data.data.results') as Record<string, ProviderCountry>)
+    const providers = await callTmdb<{ results: Record<string, ProviderCountry> }>(
+      `/${videoType}/${this.id}/watch/providers`,
+    )
+      .then(item => _.get(item, 'data.data.results'))
       .then(providers => _.mapKeys(providers, (_value, key) => _.toUpper(key)))
 
     this.providers = providers

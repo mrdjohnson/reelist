@@ -32,7 +32,7 @@ const EditVideoListPage = observer(({ navigation }: ReelistScreen) => {
   }
 
   const handleSave = () => {
-    if (currentVideoList.id) {
+    if (currentVideoList.id !== 'temp_') {
       currentVideoList
         .save()
         .then(closeEditPage)

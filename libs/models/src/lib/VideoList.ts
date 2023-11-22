@@ -1,71 +1,58 @@
 import _ from 'lodash'
 import { makeAutoObservable } from 'mobx'
-import Auth from './Auth'
+import Auth from '@reelist/models/Auth'
 import humps, { Camelized } from 'humps'
-import VideoListStore from './VideoListStore'
-import Video from './Video'
+import VideoListStore from '@reelist/models/VideoListStore'
 import ShortUniqueId from 'short-unique-id'
 import User from '@reelist/models/User'
 import { createViewModel, IViewModel } from 'mobx-utils'
 import { humanizedDuration } from '@reelist/utils/humanizedDuration'
-import VideoStore from './VideoStore'
-import UserStore from './UserStore'
+import VideoStore from '@reelist/models/VideoStore'
+import UserStore from '@reelist/models/UserStore'
 import { AutoSortType, VideoListTableType } from 'libs/interfaces/src/lib/tables/VideoListTable'
 import TableApi from '@reelist/apis/TableApi'
+import { injectable } from 'inversify'
+import { SupabaseClient } from '@supabase/supabase-js'
+import inversionContainer from '@reelist/models/inversionContainer'
+import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
 
 type VideoListType = Camelized<VideoListTableType>
+@injectable()
 class VideoList implements VideoListType {
-  id!: string
-  adminIds!: string[]
-  isJoinable!: boolean
-  name!: string
-  videoIds!: string[]
-  isPublic!: boolean
-  uniqueId!: string
-  autoSortType!: AutoSortType
-  autoSortIsAscending!: boolean
+  id: string = 'temp_'
+  adminIds: string[] = []
+  isJoinable: boolean = true
+  name: string = ''
+  videoIds: string[] = []
+  isPublic: boolean = true
+  uniqueId: string = ''
+  autoSortType: AutoSortType = AutoSortType.NONE
+  autoSortIsAscending: boolean = true
 
   admins: User[] = []
-  videos: Video[] = []
+  videos: TmdbVideoPartialType[] = []
   videosRetrieved = false
 
-  videoListStore: VideoListStore
-  storeAuth: Auth
-  videoStore: VideoStore
-  userStore: UserStore
   _viewModel?: VideoList & IViewModel<VideoList> = undefined
 
-  constructor(
-    json: VideoListTableType | null,
-    auth: Auth,
-    videoListStore: VideoListStore,
-    videoStore: VideoStore,
-    userStore: UserStore,
-    private videoListApi: TableApi<VideoListTableType>,
-  ) {
+  private videoListApi: TableApi<VideoListType>
+  private storeAuth: Auth = inversionContainer.get<Auth>(Auth)
+  private videoListStore: VideoListStore = inversionContainer.get<VideoListStore>(VideoListStore)
+  private videoStore: VideoStore = inversionContainer.get<VideoStore>(VideoStore)
+  private userStore: UserStore = inversionContainer.get<UserStore>(UserStore)
+  private supabaseClient: SupabaseClient = inversionContainer.get<SupabaseClient>(SupabaseClient)
+
+  constructor(json?: VideoListTableType) {
     if (json) {
       this._assignValuesFromJson(json)
-    } else {
-      this.adminIds = []
-      this.isJoinable = true
-      this.name = ''
-      this.videoIds = []
-      this.isPublic = true
-      this.uniqueId = ''
-      this.autoSortType = AutoSortType.NONE
-      this.autoSortIsAscending = true
     }
 
-    this.storeAuth = auth
-    this.videoListStore = videoListStore
-    this.videoStore = videoStore
-    this.userStore = userStore
+    this.videoListApi = new TableApi<VideoListType>('videoLists', this.supabaseClient)
 
     makeAutoObservable(this, {
       id: false,
-      storeAuth: false,
-      videoListStore: false,
       // this is needed because mobx is confused about something that should not exist for blank items
+      // @ts-ignore
       createdAt: false,
     })
   }
@@ -77,24 +64,26 @@ class VideoList implements VideoListType {
   getVideos = async () => {
     if (this.videosRetrieved) return this.videos
 
-    const videos: Array<Video | null> = await Promise.all(
+    const videos: Array<TmdbVideoPartialType | null> = await Promise.all(
       this.videoIds.map(videoId => this.videoStore.getVideo(videoId)),
     )
 
     this.videos = _.compact(videos)
     this.videosRetrieved = true
+
+    return this.videos
   }
 
-  join = async () => {
+  join = () => {
     this.viewModel.adminIds = this.adminIds.concat(this.storeAuth.user.id)
 
-    this.save()
+    return this.save()
   }
 
-  leave = async () => {
+  leave = () => {
     this.viewModel.adminIds = _.without(this.adminIds, this.storeAuth.user.id)
 
-    this.save()
+    return this.save()
   }
 
   save = async () => {
@@ -111,7 +100,7 @@ class VideoList implements VideoListType {
       videoListViewModel.changedValues.get('autoSortIsAscending'),
     )
     const autoSortTypeChanged = videoListViewModel.changedValues.get('autoSortType')
-    let videos = videoListViewModel.changedValues.get('videos') as Video[]
+    let videos = videoListViewModel.changedValues.get('videos') as TmdbVideoPartialType[]
 
     if (autoSortIsAscendingChanged || autoSortTypeChanged || videos) {
       // if videos werent changed, grab the originals; sort videos
@@ -152,11 +141,11 @@ class VideoList implements VideoListType {
     }
   }
 
-  includes = (video: Video) => {
+  includes = (video: TmdbVideoPartialType) => {
     return this.videoIds.includes(video.videoId)
   }
 
-  addOrRemoveVideo = async (video: Video) => {
+  addOrRemoveVideo = async (video: TmdbVideoPartialType) => {
     const videoId = video.videoId
 
     // make sure al lthe videos are loaded so we can compare them when sorting
@@ -205,13 +194,15 @@ class VideoList implements VideoListType {
 
   get totalDuration() {
     console.log('getting total duration')
-    const totalMinutes = _.chain(this.videos).map('totalDurationMinutes').sum().value()
 
-    return humanizedDuration(totalMinutes)
+    return humanizedDuration(this.totalDurationMinutes)
   }
 }
 
-const sortVideos = (videoListViewModel: IViewModel<VideoList> & VideoList, videos: Video[]) => {
+const sortVideos = (
+  videoListViewModel: IViewModel<VideoList> & VideoList,
+  videos: TmdbVideoPartialType[],
+) => {
   const sortDirection = videoListViewModel.autoSortIsAscending ? 'asc' : 'desc'
 
   switch (videoListViewModel.autoSortType) {

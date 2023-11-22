@@ -5,8 +5,6 @@ import Auth from '@reelist/models/Auth'
 import VideoList from '@reelist/models/VideoList'
 import { VideoListTableType } from 'libs/interfaces/src/lib/tables/VideoListTable'
 import { IViewModel } from 'mobx-utils'
-import VideoStore from '@reelist/models/VideoStore'
-import UserStore from '@reelist/models/UserStore'
 import { inject, injectable } from 'inversify'
 import { SupabaseClient } from '@supabase/supabase-js'
 import TableApi from '@reelist/apis/TableApi'
@@ -23,8 +21,6 @@ class VideoListStore {
 
   constructor(
     @inject(Auth) private storeAuth: Auth,
-    @inject(UserStore) private userStore: UserStore,
-    @inject(VideoStore) private videoStore: VideoStore,
     @inject(SupabaseClient) protected supabase: SupabaseClient,
   ) {
     this.videoListApi = new TableApi<VideoListTableType>('videoLists', supabase)
@@ -36,14 +32,7 @@ class VideoListStore {
   }
 
   makeUiVideoList = (videoList: VideoListTableType) => {
-    return new VideoList(
-      videoList,
-      this.storeAuth,
-      this,
-      this.videoStore,
-      this.userStore,
-      this.videoListApi,
-    )
+    return new VideoList(videoList)
   }
 
   addToAdminVideoList = (videoList: VideoList) => {
@@ -59,6 +48,7 @@ class VideoListStore {
     }
   }
 
+  // TODO: create a getter for these lists that auto sort them based on the user
   addToFollowedVideoList = (videoList: VideoList) => {
     this.followedVideoLists = this.followedVideoLists.concat(videoList)
     this.publicVideoLists = _.without(this.publicVideoLists, videoList)
@@ -94,6 +84,8 @@ class VideoListStore {
     }
 
     this.adminVideoLists = videoLists?.map(this.makeUiVideoList) || []
+
+    return this.adminVideoLists
   }
 
   setCurrentVideoListFromShareId = flow(function* (
@@ -136,10 +128,7 @@ class VideoListStore {
 
     const videoList = this.makeUiVideoList(videoListJson)
 
-    const addToList = (list: VideoList[]) => {
-      const nextList = _.filter(list, { id: videoList.id })
-      return [...nextList, videoList]
-    }
+    const addToList = (list: VideoList[]) => _.filter(list, { id: videoList.id }).concat(videoList)
 
     if (this.storeAuth.user.isAdminOfList(videoList)) {
       this.adminVideoLists = addToList(this.adminVideoLists)
@@ -168,6 +157,8 @@ class VideoListStore {
     }
 
     this.publicVideoLists = videoLists?.map(this.makeUiVideoList) || []
+
+    return this.publicVideoLists
   })
 
   getfollowedVideoLists = flow(function* (this: VideoListStore) {
@@ -182,20 +173,9 @@ class VideoListStore {
     }
 
     this.followedVideoLists = videoLists?.map(this.makeUiVideoList) || []
+
+    return this.followedVideoLists
   })
-
-  createBlankVideoList = () => {
-    const videoList = new VideoList(
-      null,
-      this.storeAuth,
-      this,
-      this.videoStore,
-      this.userStore,
-      this.videoListApi,
-    )
-
-    return videoList
-  }
 
   createVideoList = async (videoListViewModel: VideoList & IViewModel<VideoList>) => {
     const { name, isPublic, isJoinable } = videoListViewModel
@@ -233,11 +213,6 @@ class VideoListStore {
   }
 
   setCurrentVideoList = (videoList: VideoList | null) => {
-    if (videoList === null) {
-      this.currentVideoList = null
-      return
-    }
-
     this.currentVideoList = videoList
   }
 

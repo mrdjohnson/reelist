@@ -2,20 +2,19 @@ import _ from 'lodash'
 import { callTmdb } from '@reelist/apis/api'
 import { SelectOption } from '@reelist/utils/SelectState'
 
+type Provider = {
+  displayPriorities: Record<string, number>
+  displayPriority: string
+  logoPath: string
+  providerName: string
+  providerId: string
+}
+
 const getProvidersByType = async (type: string) => {
   const typeLabel = _.capitalize(type)
 
-  return callTmdb(`/watch/providers/${type}`)
-    .then(
-      item =>
-        _.get(item, 'data.data.results') as Array<{
-          displayPriorities: Record<string, number>
-          displayPriority: string
-          logoPath: string
-          providerName: string
-          providerId: string
-        }>,
-    )
+  return callTmdb<{ results: Provider[] }>(`/watch/providers/${type}`)
+    .then(item => _.get(item, 'data.data.results'))
     .then(items => _.sortBy(items, 'displayPriority'))
     .then(items =>
       items.map(item => {

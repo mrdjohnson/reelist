@@ -1,17 +1,13 @@
 import _ from 'lodash'
 import { callTmdb } from '@reelist/apis/api'
 
+type Genre = { id: string; name: string }
+
 const getGenresByType = async (type: string) => {
   const typeLabel = _.capitalize(type)
 
-  return callTmdb(`/genre/${type}/list`)
-    .then(
-      item =>
-        _.get(item, 'data.data.genres') as Array<{
-          id: string
-          name: string
-        }>,
-    )
+  return callTmdb<{ genres: Genre[] }>(`/genre/${type}/list`)
+    .then(item => _.get(item, 'data.data.genres'))
     .then(items =>
       _.map(items, item => ({
         original: {

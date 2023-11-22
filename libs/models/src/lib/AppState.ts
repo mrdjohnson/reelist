@@ -3,7 +3,8 @@ import _ from 'lodash'
 import User from '@reelist/models/User'
 import Video from '@reelist/models/Video'
 import { injectable } from 'inversify'
-import { DiscoverVideoType } from './DiscoverVideo'
+import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
+import { UserVideoType } from '@reelist/models/UserVideo'
 
 type UpdateType = {
   message: string
@@ -24,7 +25,7 @@ export default class AppState {
   _updateId = 0
   videoListShareId: string | null = null
   profileScreen: ProfileScreenType = { user: null, editing: false }
-  currentVideo?: Video
+  currentVideo?: UserVideoType
   actionSheets: {
     video: { isOpen: boolean; videoId?: string }
   } = {
@@ -81,7 +82,7 @@ export default class AppState {
     this.profileScreen.editing = editing
   }
 
-  setCurrentVideo = (video?: Video) => {
+  setCurrentVideo = (video?: UserVideoType) => {
     this.currentVideo = video
   }
 
@@ -89,7 +90,7 @@ export default class AppState {
     this.currentVideo = undefined
   }
 
-  setActionSheetVideo = (video: Video | DiscoverVideoType) => {
+  setActionSheetVideo = (video: { videoId: string }) => {
     this.actionSheets.video = { videoId: video.videoId, isOpen: true }
   }
 

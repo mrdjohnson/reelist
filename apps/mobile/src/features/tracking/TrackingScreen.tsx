@@ -11,15 +11,15 @@ import { RefreshControl } from 'react-native'
 import useAsyncState from '@reelist/utils/hooks/useAsyncState'
 import useVideoSearch from '@reelist/utils/hooks/useVideoSearch'
 import NamedTileRow from '~/shared/components/NamedTileRow'
-import Video from '@reelist/models/Video'
+import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
 
 const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
   const [filterText, setfilterText] = useState('')
   const { auth, videoStore } = useStore()
   const videoSearch = useVideoSearch()
 
-  const [videos, refresh, loadingVideos] = useAsyncState([], videoStore.getTrackedVideos)
-  const [searchedVideos, setSearchedVideos] = useState<Video[]>([])
+  const [videos, refresh, loadingVideos] = useAsyncState([], () => videoStore.getTrackedVideos())
+  const [searchedVideos, setSearchedVideos] = useState<TmdbVideoPartialType[]>([])
 
   const sortedVideos = useMemo(() => {
     const lowerCaseText = _.toLower(filterText)
@@ -56,7 +56,7 @@ const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
         />
 
         {sortedVideos.map(video => (
-          <TrackedVideoItem video={video} key={video.id} />
+          <TrackedVideoItem video={video} key={video.tmdbVideo.videoId} />
         ))}
 
         {filterText && (
@@ -66,6 +66,7 @@ const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
             showMoreText="See more"
             onShowMore={() =>
               navigation.navigate('discover', {
+                // @ts-ignore
                 screen: 'discover',
                 params: { initialSearchValue: filterText },
               })

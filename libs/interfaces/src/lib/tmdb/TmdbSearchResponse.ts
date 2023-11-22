@@ -1,22 +1,27 @@
-import { TmdbBaseVideoResponseType } from '@reelist/interfaces/tmdb/TmdbBaseVideoResponseType'
+import {
+  TmdbBaseMovieResponse,
+  TmdbBaseShowResponse,
+} from '@reelist/interfaces/tmdb/TmdbBaseVideoResponse'
+import { TmdbBasePersonResponse } from '@reelist/interfaces/tmdb/TmdbPersonResponse'
 
-export type TmdbSearchVideoResponse = TmdbBaseVideoResponseType & {
-  releaseDate: string
-  title: string
-  video: boolean
-  originalTitle: string
+export type TmdbSearchVideoResponse = TmdbSearchShowResponse | TmdbSearchMovieResponse
+
+export type TmdbSearchShowResponse = TmdbBaseShowResponse & {
   adult: boolean
-  mediaType: 'tv' | 'movie'
+  mediaType: 'tv'
 }
 
-export type TmdbSearchPersonResponseType = {
-  name: string
-  gender: number
+export type TmdbSearchMovieResponse = TmdbBaseMovieResponse & {
+  video: boolean
+  adult: boolean
+  mediaType: 'movie'
+}
+
+export type TmdbSearchPersonResponseType = TmdbBasePersonResponse & {
   originalName: string
   adult: boolean
   knownForDepartment: string
   popularity: number
-  profilePath: string
   knownFor: Array<TmdbSearchVideoResponse>
   mediaType: 'person'
 }

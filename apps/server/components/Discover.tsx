@@ -10,10 +10,8 @@ import _ from 'lodash'
 import { useStore } from '@reelist/utils/hooks/useStore'
 import useVideoDiscover from '@reelist/utils/hooks/useVideoDiscover'
 import useVideoSearch from '@reelist/utils/hooks/useVideoSearch'
-import Video from '@reelist/models/Video'
 import Person from '@reelist/models/Person'
 import ReelistSelect from '~/components/ReelistSelect'
-import { DiscoverVideoType } from '@reelist/models/DiscoverVideo'
 
 import InfiniteScroll from './InfiniteScroll'
 import VideoModal from './video/VideoModal'
@@ -26,7 +24,9 @@ import Footer from './Footer'
 import PersonModal from './video/PersonModal'
 import Popup from '~/components/Popup'
 import classNames from 'classnames'
-import tmdbDiscover from '@reelist/models/TmdbDiscover'
+import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
+import { TmdbVideoByIdType } from '@reelist/interfaces/tmdb/TmdbVideoByIdType'
+import { TmdbPersonType } from '@reelist/interfaces/tmdb/TmdbPersonResponse'
 
 enum PageState {
   HOME = 'HOME',
@@ -87,15 +87,15 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
 
   const [searchText, setSearchText] = useState('')
 
-  const [selectedPerson, setSelectedPerson] = useState<Person | null>(null)
+  const [selectedPerson, setSelectedPerson] = useState<TmdbPersonType | null>(null)
   const [showSelectedPerson, setShowSelectedPerson] = useState(false)
 
-  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null)
+  const [selectedVideo, setSelectedVideo] = useState<TmdbVideoByIdType | null>(null)
   const [showSelectedVideo, setShowSelectedVideo] = useState(false)
   const [showMobileFilterOptions, setShowMobileFilterOptions] = useState(false)
   const [mobileFilterText, setMobileFilterText] = useState('')
 
-  const [videos, setVideos] = useState<DiscoverVideoType[]>([])
+  const [videos, setVideos] = useState<TmdbVideoPartialType[]>([])
   const [isLoadingVideos, setIsLoadingVideos] = useState(false)
   const [homepageVideosState, setHomepageVideosState] = useState(HomePageVideosState.NOT_LOADED)
 
@@ -105,7 +105,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
     setHomepageVideosState(HomePageVideosState.LOADED)
   }
 
-  const handleVideos = (nextVideos: DiscoverVideoType[]) => {
+  const handleVideos = (nextVideos: TmdbVideoPartialType[]) => {
     if (page === 1) {
       console.log('making new videos')
       return nextVideos
@@ -167,7 +167,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
     }
   }
 
-  const finishLoadingVideos = (loadedVideos: DiscoverVideoType[]) => {
+  const finishLoadingVideos = (loadedVideos: TmdbVideoPartialType[]) => {
     setVideos(loadedVideos)
 
     if (_.isEmpty(loadedVideos)) {
@@ -239,6 +239,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
       setSelectedVideo(null)
     } else if (!_.isArray(videoId)) {
       videoStore.getVideo(videoId).then(setSelectedVideo)
+      // TODO: handle errors
       setShowSelectedVideo(true)
     }
 
@@ -247,11 +248,12 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
       setSelectedPerson(null)
     } else if (!_.isArray(personId)) {
       personStore.getPerson(personId).then(setSelectedPerson)
+      // TODO: handle errors
       setShowSelectedPerson(true)
     }
   }, [router.query])
 
-  const handleVideoSelection = (video: DiscoverVideoType) => {
+  const handleVideoSelection = (video: TmdbVideoPartialType) => {
     router.push(`/discover?videoId=${video.videoId}`, undefined, { shallow: true })
   }
 

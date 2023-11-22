@@ -1,16 +1,15 @@
 import { callTmdb } from '@reelist/apis/api'
 import _ from 'lodash'
 import {
-  createTmdbSearchVideoResult,
-  createTmdbSearchVideosResultsFromSearchPerson,
-  TmdbSearchMultiResultResponseType,
-  TmdbSearchVideoResultResponseType,
-  TmdbSearchVideoResultType,
-} from '@reelist/models/tmdb/TmdbSearchVideo'
+  TmdbSearchMultiResponseType,
+  TmdbSearchVideoResponse,
+} from '@reelist/interfaces/tmdb/TmdbSearchResponse'
+import { TmdbVideoPartialFormatter } from '@reelist/utils/tmdbHelpers/TmdbVideoPartialFormatter'
+import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
 
-const isVideo = (
-  json: TmdbSearchMultiResultResponseType,
-): json is TmdbSearchVideoResultResponseType => json.mediaType !== 'person'
+const isVideo = (json: TmdbSearchMultiResponseType): json is TmdbSearchVideoResponse => {
+  return json.mediaType !== 'person'
+}
 
 const useVideoSearch = () => {
   const videoSearch = async (
@@ -21,27 +20,30 @@ const useVideoSearch = () => {
 
     const { deepSearch = false, ...params } = options
 
-    const searchResults = await callTmdb('/search/multi', { query: searchText, ...params }).then(
-      item => _.get(item, 'data.data.results') as TmdbSearchMultiResultResponseType[],
+    const searchResults = await callTmdb<{
+      results: TmdbSearchMultiResponseType[]
+    }>('/search/multi', { query: searchText, ...params }).then(item =>
+      _.get(item, 'data.data.results'),
     )
 
     if (!searchResults) return []
 
     if (deepSearch) {
-      const videos: TmdbSearchVideoResultType[] = []
+      const videos: TmdbVideoPartialType[] = []
 
       searchResults.forEach(result => {
+        // TODO: maybe add some kind of wording around if there is a connection here or not?
         if (result.mediaType === 'person') {
-          videos.push(...createTmdbSearchVideosResultsFromSearchPerson(result))
+          videos.push(...TmdbVideoPartialFormatter.fromTmdbSearchPerson(result))
         } else {
-          videos.push(createTmdbSearchVideoResult(result))
+          videos.push(TmdbVideoPartialFormatter.fromTmdbSearchVideo(result))
         }
       })
 
       return videos
     }
 
-    return _.filter(searchResults, isVideo).map(createTmdbSearchVideoResult)
+    return _.filter(searchResults, isVideo).map(TmdbVideoPartialFormatter.fromTmdbSearchVideo)
   }
 
   return videoSearch

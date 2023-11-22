@@ -7,6 +7,13 @@ import {
   TmdbSearchPersonResponseType,
   TmdbSearchVideoResponse,
 } from '@reelist/interfaces/tmdb/TmdbSearchResponse'
+import { TmdbVideoByIdResponse } from '@reelist/interfaces/tmdb/TmdbVideoByIdType'
+import { TmdbMovieByIdResponse } from '@reelist/interfaces/tmdb/TmdbMovieResponse'
+import moment from 'moment'
+import {
+  TmdbBaseMovieResponse,
+  TmdbBaseShowResponse,
+} from '@reelist/interfaces/tmdb/TmdbBaseVideoResponse'
 
 type NeededPartialFields = {
   mediaType: 'tv' | 'mv'
@@ -20,8 +27,8 @@ const createTmdbVideoCommonFields = (json: NeededPartialFields) => {
   }
 }
 
-export class TmdbVideoPartialMapper {
-  static fromTmdbDiscoverShow(json: TmdbDiscoverShowResponseType): TmdbVideoPartialType {
+export class TmdbVideoPartialFormatter {
+  static fromTmdbShow(json: TmdbBaseShowResponse): TmdbVideoPartialType {
     const { name, firstAirDate, originalName } = json
 
     return {
@@ -29,36 +36,31 @@ export class TmdbVideoPartialMapper {
       ...createTmdbVideoCommonFields({ id: json.id, mediaType: 'tv' }),
       videoName: name,
       videoOriginalName: originalName,
-      videoReleaseDate: firstAirDate,
+      videoReleaseDate: moment(firstAirDate),
     }
   }
 
-  static fromTmdbDiscoverMovie(json: TmdbDiscoverMovieResponseType): TmdbVideoPartialType {
-    const { title, releaseDate, originalTitle, adult, video } = json
+  static fromTmdbMovie(json: TmdbBaseMovieResponse): TmdbVideoPartialType {
+    const { title, releaseDate, originalTitle } = json
 
     return {
       ...json,
       ...createTmdbVideoCommonFields({ id: json.id, mediaType: 'mv' }),
       videoName: title,
       videoOriginalName: originalTitle,
-      videoReleaseDate: releaseDate,
+      videoReleaseDate: moment(releaseDate),
     }
   }
 
   static fromTmdbSearchVideo(json: TmdbSearchVideoResponse): TmdbVideoPartialType {
-    const { title, releaseDate, originalTitle, mediaType: originalMediaType } = json
-    const mediaType = originalMediaType === 'tv' ? 'tv' : 'mv'
-
-    return {
-      ...json,
-      ...createTmdbVideoCommonFields({ id: json.id, mediaType }),
-      videoName: title,
-      videoOriginalName: originalTitle,
-      videoReleaseDate: releaseDate,
+    if (json.mediaType === 'tv') {
+      return TmdbVideoPartialFormatter.fromTmdbShow(json)
     }
+
+    return TmdbVideoPartialFormatter.fromTmdbMovie(json)
   }
 
   static fromTmdbSearchPerson(json: TmdbSearchPersonResponseType): TmdbVideoPartialType[] {
-    return json.knownFor.map(TmdbVideoPartialMapper.fromTmdbSearchVideo)
+    return json.knownFor.map(TmdbVideoPartialFormatter.fromTmdbSearchVideo)
   }
 }
