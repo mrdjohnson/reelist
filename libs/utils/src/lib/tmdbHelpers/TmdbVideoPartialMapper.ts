@@ -3,6 +3,10 @@ import {
   TmdbDiscoverShowResponseType,
 } from '@reelist/interfaces/tmdb/TmdbDiscoverVideoResponseType'
 import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
+import {
+  TmdbSearchPersonResponseType,
+  TmdbSearchVideoResponse,
+} from '@reelist/interfaces/tmdb/TmdbSearchResponse'
 
 type NeededPartialFields = {
   mediaType: 'tv' | 'mv'
@@ -39,5 +43,22 @@ export class TmdbVideoPartialMapper {
       videoOriginalName: originalTitle,
       videoReleaseDate: releaseDate,
     }
+  }
+
+  static fromTmdbSearchVideo(json: TmdbSearchVideoResponse): TmdbVideoPartialType {
+    const { title, releaseDate, originalTitle, mediaType: originalMediaType } = json
+    const mediaType = originalMediaType === 'tv' ? 'tv' : 'mv'
+
+    return {
+      ...json,
+      ...createTmdbVideoCommonFields({ id: json.id, mediaType }),
+      videoName: title,
+      videoOriginalName: originalTitle,
+      videoReleaseDate: releaseDate,
+    }
+  }
+
+  static fromTmdbSearchPerson(json: TmdbSearchPersonResponseType): TmdbVideoPartialType[] {
+    return json.knownFor.map(TmdbVideoPartialMapper.fromTmdbSearchVideo)
   }
 }
