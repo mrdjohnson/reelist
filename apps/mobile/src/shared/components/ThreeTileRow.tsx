@@ -2,14 +2,22 @@ import { Row, View } from 'native-base'
 import React from 'react'
 import TrackedVideoItem from '~/features/video/TrackedVideoItem'
 import VideoItem from '~/features/video/VideoItem'
-import Video from '@reelist/models/Video'
+import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
+import { UserVideoType } from '@reelist/models/UserVideo'
 
-export type VideoChunk = [Video, Video?, Video?]
+export type VideoChunk<T = TmdbVideoPartialType> = [T, T?, T?]
 
-type ThreeTileRowProps = {
-  videos: VideoChunk
-  isTracked?: boolean
+type PartialTypeArray = {
+  videos: VideoChunk<TmdbVideoPartialType>
+  isTracked?: false
 }
+
+type FullTypeArray = {
+  videos: VideoChunk<UserVideoType>
+  isTracked: true
+}
+
+type ThreeTileRowProps = PartialTypeArray | FullTypeArray
 
 const ThreeTileRow = ({
   videos: [video1, video2, video3],

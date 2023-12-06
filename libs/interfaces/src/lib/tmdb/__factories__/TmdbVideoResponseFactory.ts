@@ -12,7 +12,9 @@ import {
   TmdbVideoByIdType,
 } from '@reelist/interfaces/tmdb/TmdbVideoByIdType'
 import { TmdbVideoByIdFormatter } from '@reelist/utils/tmdbHelpers/TmdbVideoByIdFormatter'
-import Video from '@reelist/models/Video'
+import { mockServer } from '@reelist/apis/__testHelpers__/apiTestHelper'
+import inversionContainer from '@reelist/models/inversionContainer'
+import VideoStore from '@reelist/models/VideoStore'
 
 export const tmdbEpisodeFactory = Factory.define<TmdbShowEpisodeResponseType>(({ sequence }) => {
   return {
@@ -34,7 +36,21 @@ export const tmdbShowFactory = Factory.define<
   null,
   TmdbVideoByIdType<TmdbShowByIdResponse>
 >(({ params, onCreate }) => {
-  onCreate(TmdbVideoByIdFormatter.fromTmdbShow)
+  onCreate(async showResponse => {
+    mockServer.tmdb.db.createShow(showResponse)
+
+    const videoStore = inversionContainer.get<VideoStore>(VideoStore)
+
+    const show = await videoStore.getVideo('tv' + showResponse.id)
+
+    if (!show) {
+      throw new Error('Show not found')
+    } else if (!show.isTv) {
+      throw new Error('Bad Data: show.isTv is false')
+    }
+
+    return show
+  })
 
   const creator = tmdbPersonCreditFactory.build()
 
@@ -69,7 +85,21 @@ export const tmdbMovieFactory = Factory.define<
   null,
   TmdbVideoByIdType<TmdbMovieByIdResponse>
 >(({ params, onCreate }) => {
-  onCreate(TmdbVideoByIdFormatter.fromTmdbMovie)
+  onCreate(async movieResponse => {
+    mockServer.tmdb.db.createMovie(movieResponse)
+
+    const videoStore = inversionContainer.get<VideoStore>(VideoStore)
+
+    const movie = await videoStore.getVideo('mv' + movieResponse.id)
+
+    if (!movie) {
+      throw new Error('Movie not found')
+    } else if (movie.isTv) {
+      throw new Error('Bad Data: movie.isTv is true')
+    }
+
+    return movie
+  })
 
   const baseMovie = tmdbDiscoverMovieFactory.build(params)
 
@@ -87,7 +117,7 @@ export const tmdbMovieFactory = Factory.define<
   }
 })
 
-const tmdbVideoFactory = Factory.define<
+export const tmdbVideoFactory = Factory.define<
   TmdbVideoByIdResponse,
   {
     isTv?: boolean
@@ -100,7 +130,7 @@ const tmdbVideoFactory = Factory.define<
     return TmdbVideoByIdFormatter.fromTmdbBaseVideo(json, videoId)
   })
 
-  if (transientParams.isTv) return tmdbShowFactory.build()
+  if (transientParams.isTv ?? faker.datatype.boolean()) return tmdbShowFactory.build()
 
   return tmdbMovieFactory.build()
 })

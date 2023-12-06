@@ -7,7 +7,7 @@ process.env = Object.assign(process.env, {
   NEXT_PUBLIC_BASE_URL: 'http://test:3000',
 })
 
-import inversionContainer from '@reelist/models/inversionContainer'
+import inversionContainer, { bindShared } from '@reelist/models/inversionContainer'
 
 import { SupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@supabase/supabase-js'
@@ -38,19 +38,30 @@ inversionContainer.bind<IStorage>(StorageInversionKey).to(MockStorage).inSinglet
 import server, { mockServer } from '@reelist/apis/__testHelpers__/apiTestHelper'
 import { configure } from 'mobx'
 import { tmdbBaseVideoFactory } from '@reelist/interfaces/tmdb/__factories__/TmdbBaseVideoResponseFactory'
+import { tmdbShowFactory } from '@reelist/interfaces/tmdb/__factories__/TmdbVideoResponseFactory'
 
 beforeAll(() => {
   // Start the interception.
   server.listen({ onUnhandledRequest: 'error' })
+  mockServer.supabase.listen()
+  mockServer.tmdb.listen()
 })
 
 afterEach(() => {
   // Remove any handlers you may have added
   // in individual tests (runtime handlers).
   mockServer.reset()
+  mockServer.supabase.listen()
+  mockServer.tmdb.listen()
 
   // Reset the id of all videos
   tmdbBaseVideoFactory.rewindSequence()
+  tmdbShowFactory.rewindSequence()
+
+  inversionContainer.unbindAll()
+  inversionContainer.bind<SupabaseClient>(SupabaseClient).toConstantValue(supbaseClient)
+  inversionContainer.bind<IStorage>(StorageInversionKey).to(MockStorage).inSingletonScope()
+  bindShared()
 })
 
 afterAll(() => {
@@ -59,10 +70,11 @@ afterAll(() => {
   server.close()
 })
 
-configure({
-  enforceActions: 'always',
-  computedRequiresReaction: true,
-  reactionRequiresObservable: true,
-  observableRequiresReaction: true,
-  disableErrorBoundaries: true,
-})
+// todo, this will be useful on the server or mobile, but not in lib
+// configure({
+// enforceActions: 'always',
+// computedRequiresReaction: true,
+// reactionRequiresObservable: true,
+// observableRequiresReaction: true,
+// disableErrorBoundaries: true,
+// })

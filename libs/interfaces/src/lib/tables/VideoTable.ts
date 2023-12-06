@@ -16,7 +16,7 @@ export type VideoTableType = {
   tracked: boolean
   last_watched_season_number?: number
   last_watched_episode_number?: number
-  video_info: VideoInfoType
+  video_info?: VideoInfoType
   user_id: string
   allow_in_history: boolean
   updated_at: Date

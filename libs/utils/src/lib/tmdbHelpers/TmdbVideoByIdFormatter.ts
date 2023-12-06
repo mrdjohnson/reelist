@@ -79,7 +79,7 @@ export class TmdbVideoByIdFormatter {
       seasonPartials,
       providers: _.mapKeys(providers, (_value, key) => _.toUpper(key)),
       videoRuntime: seasonPartials.length === 1 ? '1 season' : `${seasonPartials.length} seasons`,
-      lastVideoReleaseDate: moment(json.lastEpisodeToAir.airDate),
+      lastVideoReleaseDate: moment(json.lastAirDate),
       // deviation from the original Video implementation which removed the future episodes from the count
       totalDurationMinutes: (_.min(json.episodeRunTime) || 0) * json.numberOfEpisodes,
     }

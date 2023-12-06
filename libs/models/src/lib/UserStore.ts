@@ -21,10 +21,10 @@ class UserStore {
     this.userApi = new TableApi<UserTableType>('profiles', supabase)
   }
 
-  makeUiUser = (profileData: UserTableType, loggedIn: boolean = false) => {
+  makeUiUser = (profileData: UserTableType) => {
     const profile = humps.camelizeKeys<UserTableType>(profileData)
 
-    return new User({ profile, loggedIn })
+    return new User({ profile })
   }
 
   getFollowedUsers = async () => {
@@ -74,7 +74,7 @@ class UserStore {
     const { data: userJson, error } = await this.userApi.upsert({ id: authId }).single()
 
     if (userJson) {
-      return this.makeUiUser(userJson, true)
+      return this.makeUiUser(userJson)
     }
 
     if (error) {

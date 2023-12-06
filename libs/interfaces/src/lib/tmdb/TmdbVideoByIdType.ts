@@ -55,5 +55,9 @@ export type TmdbBaseVideoType = TmdbVideoPartialType & {
 
 type TmdbVideoBase = Omit<TmdbBaseVideoType, 'mediaType' | 'isTv'>
 
+export type TmdbShowByIdType = TmdbVideoBase & TmdbShowOnlyFields
+export type TmdbMovieByIdType = TmdbVideoBase & TmdbMovieFields
+
+// todo: do I still need the response check? I think so
 export type TmdbVideoByIdType<T = TmdbVideoByIdResponse> = TmdbVideoBase &
   (T extends TmdbShowByIdResponse ? TmdbShowOnlyFields : TmdbMovieFields)

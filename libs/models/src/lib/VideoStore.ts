@@ -1,7 +1,6 @@
 import _ from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import Auth from '@reelist/models/Auth'
-import Video, { TvSeason } from '@reelist/models/Video'
 import VideoList from '@reelist/models/VideoList'
 import { callTmdb } from '@reelist/apis/api'
 import User from '@reelist/models/User'
@@ -16,14 +15,15 @@ import {
 import { TmdbVideoByIdFormatter } from '@reelist/utils/tmdbHelpers/TmdbVideoByIdFormatter'
 import UserStore from '@reelist/models/UserStore'
 import UserVideo, { UserVideoType } from '@reelist/models/UserVideo'
-import { UserTableType } from '@reelist/interfaces/tables/UserTable'
+import { settleAll } from '@reelist/utils/settleAll'
+import { TmdbTvSeason } from '@reelist/models/UserShow'
 
 @injectable()
 class VideoStore {
   // TODO: do we want separate caches for partials and fulls? do we always need the full when we call for it?
   // for partial video modals, do we have enough information?
   tmdbJsonByVideoId: Record<string, TmdbVideoByIdType | null> = {}
-  videoSeasonMapByVideoId: Record<string, Record<number, TvSeason | null>> = {}
+  videoSeasonMapByVideoId: Record<string, Record<number, TmdbTvSeason | null>> = {}
   userVideoById: Record<string, Record<string, UserVideoType>> = {}
 
   private videoApi: VideoApi
@@ -58,14 +58,6 @@ class VideoStore {
     return UserVideo.create(tmdbVideo, user, userVideoData)
   }
 
-  // makeUiVideo = (
-  //   json: TmdbVideoResponseType,
-  //   videoId: string,
-  //   videoTableData?: VideoTableType | null,
-  // ) => {
-  //   return new Video(json, videoTableData, videoId)
-  // }
-
   getVideoPath = (videoId: string, seasonNumber?: number) => {
     const videoIdMatch = videoId.match(/(..)(.*)/)
 
@@ -87,14 +79,12 @@ class VideoStore {
   getVideos = async (videoIds: string[] | undefined) => {
     if (!videoIds) return []
 
-    const videos: Array<TmdbVideoByIdType | null> = await Promise.all(
-      videoIds.map(videoId => this.getVideo(videoId)),
-    )
+    const videos = await settleAll(videoIds.map(videoId => this.getVideo(videoId)))
 
     return _.compact(videos)
   }
 
-  getVideo = async (videoId: string) => {
+  getVideo = async (videoId: string): Promise<TmdbVideoByIdType | null> => {
     const path = this.getVideoPath(videoId)
 
     if (!path) return null
@@ -115,10 +105,6 @@ class VideoStore {
     }
 
     return video || this.tmdbJsonByVideoId[videoId]
-
-    // const uiVideo = video && this.makeUiVideo(video, videoId, videoTableData)
-    //
-    // return uiVideo
   }
 
   getVideosForVideoList = async (videoList: VideoList) => {
@@ -252,15 +238,6 @@ class VideoStore {
 
     return null
   }
-}
-
-const settleAll = async <T>(promises: Promise<T>[]) => {
-  const videoPromises: Array<{
-    status: string
-    value?: T | null
-  }> = await Promise.allSettled(promises)
-
-  return _.chain(videoPromises).map('value').compact().value()
 }
 
 export default VideoStore

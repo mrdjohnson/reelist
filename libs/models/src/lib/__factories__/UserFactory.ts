@@ -4,15 +4,33 @@ import { Factory } from 'fishery'
 import { UserTableType } from '@reelist/interfaces/tables/UserTable'
 import User from '@reelist/models/User'
 import humps from 'humps'
+import { mockServer } from '@reelist/apis/__testHelpers__/apiTestHelper'
+import inversionContainer from '@reelist/models/inversionContainer'
+import UserStore from '@reelist/models/UserStore'
+import Auth from '@reelist/models/Auth'
 
 export const userFactory = Factory.define<UserTableType, { loggedIn?: boolean }, User>(
   ({ sequence, params, onCreate, transientParams }) => {
-    onCreate(userTableJson => {
+    onCreate(async userTableJson => {
+      mockServer.supabase.db.createProfile(userTableJson)
+
+      const userStore = inversionContainer.get<UserStore>(UserStore)
+
+      const user = await userStore.getUser(userTableJson.id)
+
+      if (!user) {
+        throw new Error('user not found')
+      }
+
       const { loggedIn = false } = transientParams
 
-      const profile = humps.camelizeKeys<UserTableType>(userTableJson)
+      if (loggedIn) {
+        const auth = inversionContainer.get<Auth>(Auth)
 
-      return new User({ profile, loggedIn })
+        await auth.setUser(user)
+      }
+
+      return user
     })
 
     return {

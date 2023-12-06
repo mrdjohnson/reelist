@@ -34,13 +34,13 @@ export default class Auth {
     }
   }
 
-  setUser = (user: User | null) => {
+  setUser = async (user: User | null) => {
     this.user = user || LoggedOutUser
+    if (!user) return
     this.loading = false
 
-    if (this.user.loggedIn) {
-      this.storage.save('has_signed_in', true)
-    }
+    user.login()
+    await this.storage.save('has_signed_in', true)
 
     console.log('logged ' + (this.user.loggedIn ? 'in' : 'out'))
   }

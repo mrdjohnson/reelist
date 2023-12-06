@@ -1,9 +1,7 @@
-import { makeAutoObservable, observable } from 'mobx'
+import { makeAutoObservable } from 'mobx'
 import _ from 'lodash'
 import User from '@reelist/models/User'
-import Video from '@reelist/models/Video'
 import { injectable } from 'inversify'
-import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
 import { UserVideoType } from '@reelist/models/UserVideo'
 
 type UpdateType = {

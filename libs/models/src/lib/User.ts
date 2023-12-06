@@ -7,6 +7,7 @@ import _ from 'lodash'
 import { UserTableType } from '@reelist/interfaces/tables/UserTable'
 import TableApi from '@reelist/apis/TableApi'
 import inversionContainer from '@reelist/models/inversionContainer'
+import Auth from '@reelist/models/Auth'
 
 type ProfileType = Camelized<UserTableType>
 
@@ -17,8 +18,12 @@ type UserType = ProfileType & {
 
 type UserConstructorType = {
   user?: SupabaseUser
-  loggedIn?: boolean
   profile?: ProfileType | null
+}
+
+type ToggleFollowingVideoListOverload = {
+  (videoListId: string): Promise<string | null>
+  (videoList: VideoList): Promise<string | null>
 }
 
 class User implements UserType {
@@ -36,17 +41,17 @@ class User implements UserType {
 
   private userApi: TableApi<UserTableType> | null = null
 
-  constructor({ user, loggedIn = true, profile }: UserConstructorType) {
-    this.loggedIn = loggedIn
-
-    if (loggedIn) {
-      const supabase: SupabaseClient = inversionContainer.get<SupabaseClient>(SupabaseClient)
-      this.userApi = new TableApi<UserTableType>('profiles', supabase)
-    }
-
+  constructor({ user, profile }: UserConstructorType) {
     Object.assign(this, user || profile)
 
     makeAutoObservable(this)
+  }
+
+  login = () => {
+    this.loggedIn = true
+
+    const supabase: SupabaseClient = inversionContainer.get<SupabaseClient>(SupabaseClient)
+    this.userApi = new TableApi<UserTableType>('profiles', supabase)
   }
 
   isAdminOfList = (videoList: VideoList) => {
@@ -58,7 +63,6 @@ class User implements UserType {
 
     return this.save()
   }
-
   toggleFollowingUser = (user: User) => {
     this.viewModel.followedUserIds = _.xor(this.followedUserIds, [user.id])
 
@@ -117,8 +121,6 @@ export const LoggedOutUser = new User({
     notificationId: '',
     name: '',
   },
-
-  loggedIn: false,
 })
 
 const maybePrintError = (error: PostgrestError | null) => {

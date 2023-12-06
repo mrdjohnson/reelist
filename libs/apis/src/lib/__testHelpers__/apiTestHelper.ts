@@ -1,25 +1,19 @@
 import { setupServer } from 'msw/node'
-import { http, HttpResponse, Path, ResponseResolver } from 'msw'
+import { DefaultBodyType, http, HttpResponse, Path, ResponseResolver, StrictRequest } from 'msw'
 import { waitFor } from '@testing-library/react'
-
+import { tmdbDb } from '@reelist/apis/__testHelpers__/tmdbServerFactory'
+import { supabaseDb } from '@reelist/apis/__testHelpers__/supabaseServerFactory'
 const server = setupServer()
 
 export const requestSpy = jest.fn()
 
-server.events.on('request:start', async ({ request }) => {
-  try {
-    await request.clone().json().then(requestSpy)
-  } catch (e) {
-    // this happens because the spied on value is not read from
-    console.error('unable to spy on request for ' + request.url)
-  }
-})
+type HttpType = 'get' | 'post' | 'patch' | 'delete'
+type UrlHandlerType = {
+  httpType: HttpType
+  request: StrictRequest<DefaultBodyType>
+}
 
 const mockServer = {
-  get: (path: Path, response: ResponseResolver) => {
-    server.use(http.get(path, response))
-  },
-
   json: (path: Path, response: Object) => {
     server.use(
       http.get(path, () => {
@@ -28,11 +22,81 @@ const mockServer = {
     )
   },
 
-  supabase: {
-    patch: (path: Path, response: Object) => {
+  tmdb: {
+    db: tmdbDb.db,
+
+    listen: () => {
+      const getTableName = (url: string) =>
+        url.match('.*/3/(?<tableName>[^/]*)/(?<subType>[^/?]*)?.*')?.groups
+
       server.use(
-        http.patch('http://supabase.url/rest/v1' + path, async ({ request }) => {
-          return HttpResponse.json(response)
+        http.get('https://api.themoviedb.org/3*', async ({ request }) => {
+          const { tableName, subType } = getTableName(request.url) || {}
+
+          let data = null
+
+          switch (tableName) {
+            case 'tv':
+              data = await tmdbDb.handleTvUrl(subType)
+              break
+            case 'movie':
+              data = await tmdbDb.handleMovieUrl(subType)
+              break
+
+            // case 'videoLists':
+            //   data = await supabaseDb.handleVideoListUrl({ url: request.url, httpType, request })
+            //   break
+          }
+
+          return HttpResponse.json(data)
+        }),
+      )
+    },
+  },
+
+  supabase: {
+    db: supabaseDb.db,
+
+    listen: () => {
+      const getTableName = (url: string) =>
+        url.match('.*/v1/(?<tableName>[^?]*)')?.groups?.tableName
+
+      const handleRequest = async ({ httpType, request }: UrlHandlerType) => {
+        const tableName = getTableName(request.url)
+
+        let data = null
+
+        // const body = await request.json()
+        // requestSpy(body)
+
+        switch (tableName) {
+          case 'profiles':
+            data = await supabaseDb.handleProfileUrl({ url: request.url, httpType, request })
+            break
+
+          case 'videoLists':
+            data = await supabaseDb.handleVideoListUrl({ url: request.url, httpType, request })
+            break
+        }
+
+        return HttpResponse.json(data)
+      }
+
+      server.use(
+        http.get('http://supabase.url/rest/v1*', async ({ request }) => {
+          return await handleRequest({ httpType: 'get', request })
+        }),
+
+        http.post('http://supabase.url/rest/v1*', async ({ request }) => {
+          return await handleRequest({ httpType: 'post', request })
+        }),
+
+        http.patch('http://supabase.url/rest/v1*', async ({ request }) => {
+          return await handleRequest({ httpType: 'patch', request })
+        }),
+
+        http.delete('http://supabase.url/rest/v1*', async ({ request }) => {
+          return await handleRequest({ httpType: 'delete', request })
         }),
       )
     },
@@ -41,9 +105,12 @@ const mockServer = {
   reset: () => {
     server.resetHandlers()
     requestSpy.mockClear()
+    supabaseDb.reset()
+    tmdbDb.reset()
   },
 }
 
+// todo: figure out how to add this in
 const expectMockServer = {
   toHaveBeenCalledWith: async (data: Object) => {
     await waitFor(() => expect(requestSpy).toHaveBeenCalledWith(data))

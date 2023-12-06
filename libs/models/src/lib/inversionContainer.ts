@@ -10,12 +10,16 @@ import TmdbDiscover from '@reelist/models/TmdbDiscover'
 
 const inversionContainer = new Container()
 
-inversionContainer.bind<Auth>(Auth).toSelf().inSingletonScope()
-inversionContainer.bind<Store>(Store).toSelf().inSingletonScope()
-inversionContainer.bind<AppState>(AppState).toSelf().inSingletonScope()
-inversionContainer.bind<VideoStore>(VideoStore).toSelf().inSingletonScope()
-inversionContainer.bind<UserStore>(UserStore).toSelf().inSingletonScope()
-inversionContainer.bind<VideoListStore>(VideoListStore).toSelf().inSingletonScope()
-inversionContainer.bind<TmdbDiscover>(TmdbDiscover).toSelf().inSingletonScope()
+export function bindShared() {
+  inversionContainer.bind<Auth>(Auth).toSelf().inSingletonScope()
+  inversionContainer.bind<Store>(Store).toSelf().inSingletonScope()
+  inversionContainer.bind<AppState>(AppState).toSelf().inSingletonScope()
+  inversionContainer.bind<VideoStore>(VideoStore).toSelf().inSingletonScope()
+  inversionContainer.bind<UserStore>(UserStore).toSelf().inSingletonScope()
+  inversionContainer.bind<VideoListStore>(VideoListStore).toSelf().inSingletonScope()
+  inversionContainer.bind<TmdbDiscover>(TmdbDiscover).toSelf().inSingletonScope()
+}
+
+bindShared()
 
 export default inversionContainer
