@@ -6,7 +6,8 @@
     "prep": "nx run server:prep-dev",
     "server:start": "nx serve server",
     "mobile:start": "nx run mobile:start",
-    "android:clean": "cd apps/mobile/android &&./gradlew clean"
+    "android:clean": "cd apps/mobile/android &&./gradlew clean",
+    "android:open": "adb shell am start -a android.intent.action.VIEW -d \"reelist://share/${0}\""
   },
   "private": true,
   "dependencies": {
