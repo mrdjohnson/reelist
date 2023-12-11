@@ -6,23 +6,28 @@ import _ from 'lodash'
 import Video, { Provider } from '@reelist/models/Video'
 import Person from '@reelist/models/Person'
 
+import { SnapHoverGroup, SnapHoverItem } from '../SnapHoverGroup'
 import EntityImage from '../EntityImage'
 import EntityModal from '../EntityModal'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
 const VideoModal = observer(
-  ({ video, selectedRegions }: { video: Video; selectedRegions: string[] }) => {
+  ({ video, selectedRegions }: { video: TmdbVideoByIdType; selectedRegions: string[] }) => {
     const router = useRouter()
 
-    const getProvidersByType = (type): Provider[] =>
+    const getProvidersByType = (type): TmdbWatchProviderDataResponse[] =>
       _.chain(selectedRegions)
         .flatMap(region => video.providers[region]?.[type])
         .compact()
         .uniqBy('providerId')
         .value()
 
-    const providers: Array<Provider & { type: string }> = useMemo(() => {
+    const providers: Array<
+      TmdbWatchProviderDataResponse & {
+        type: string
+      }
+    > = useMemo(() => {
       const buyProviders = getProvidersByType('buy').map(provider => ({ ...provider, type: 'Buy' }))
       const flatrateProviders = getProvidersByType('flatrate').map(provider => ({
         ...provider,
@@ -40,11 +45,11 @@ const VideoModal = observer(
       )
     }, [video.providers])
 
-    const handleVideoSelection = (video: Video) => {
+    const handleVideoSelection = (video: TmdbVideoPartialType) => {
       router.push(`/discover?videoId=${video.videoId}`, undefined, { shallow: true })
     }
 
-    const handlePersonSelection = (person: Person) => {
+    const handlePersonSelection = (person: TmdbPersonCreditResponse) => {
       router.push(`/discover?personId=${person.id}`, undefined, { shallow: true })
     }
 
@@ -52,60 +57,66 @@ const VideoModal = observer(
       <EntityModal
         video={video}
         title={video.videoName}
-        subTitle={`${_.map(video.genres, 'name').join('/')} ‧ ${video.durationOrSeasons}`}
+        subTitle={`${_.map(video.genres, 'name').join('/')} ‧ ${video.videoRuntime}`}
         description={video.overview}
       >
         <div className="no-scrollbar relative w-full overflow-x-auto overscroll-x-none">
           <div className="sticky left-0 z-20 w-full pb-3 text-2xl">Cast</div>
 
-          <div className="relative flex  w-[100px] gap-x-5 pb-4 pl-2">
+          <SnapHoverGroup className="relative flex w-full pb-4 pl-2">
             {video.cast.map(
               castMember =>
                 castMember.profilePath && (
-                  <div
-                    className="discover-md:scale-90 flex cursor-pointer flex-col justify-center text-center transition-all duration-200 ease-in-out hover:scale-100 "
+                  <SnapHoverItem
+                    className="flex cursor-pointer flex-col justify-center text-center"
                     onClick={() => handlePersonSelection(castMember)}
                     key={castMember.id}
                   >
-                    <EntityImage
-                      person={castMember}
-                      className="!h-[200px] !min-h-0 max-w-fit"
-                      isPoster
-                      isPerson
-                    />
+                    <div className="discover-md:scale-95 transition-all duration-200 ease-in-out hover:scale-100 ">
+                      <EntityImage
+                        person={castMember}
+                        className="!h-[200px] !min-h-0 max-w-fit"
+                        isPoster
+                        isPerson
+                      />
 
-                    <span className="mt-2 line-clamp-2 h-[3rem] text-base">
-                      {castMember.character}
-                    </span>
-                    <span className="line-clamp-2 h-[2.50rem] text-sm  opacity-75">
-                      {castMember.name}
-                    </span>
-                  </div>
+                      <span className="mt-2 line-clamp-2 h-[3rem] text-base">
+                        {castMember.character}
+                      </span>
+                      <span className="line-clamp-2 h-[2.50rem] text-sm  opacity-75">
+                        {castMember.name}
+                      </span>
+                    </div>
+                  </SnapHoverItem>
                 ),
             )}
-          </div>
+          </SnapHoverGroup>
         </div>
 
         <div className="no-scrollbar relative w-full overflow-x-auto overscroll-x-none">
           <div className="sticky left-0 z-20 w-full pb-3 text-2xl">Related Videos</div>
 
-          <div className="relative flex  gap-x-3 pb-4 pl-2">
-            {video.relatedVideos.map(relatedVideo => (
-              <div
-                className="discover-md:scale-90 flex cursor-pointer flex-col justify-center text-center transition-all duration-200 ease-in-out hover:scale-100"
+          <SnapHoverGroup className="relative gap-x-3 pb-4 pl-2">
+            {video.similar.map(relatedVideo => (
+              <SnapHoverItem
+                className="flex cursor-pointer flex-col justify-center text-center "
                 key={relatedVideo.id}
                 onClick={() => handleVideoSelection(relatedVideo)}
               >
-                <EntityImage
-                  video={relatedVideo}
-                  className="!h-[200px] !min-h-0 max-w-fit"
-                  isPoster
-                />
+                <div className="discover-md:scale-95 transition-all duration-200 ease-in-out hover:scale-100 ">
+                  <EntityImage
+                    video={relatedVideo}
+                    className="!h-[200px] !min-h-0 max-w-fit"
+                    isPoster
+                  />
 
-                <span className="mt-2 line-clamp-2 h-[3rem] text-base">{relatedVideo.videoName}</span>
-              </div>
+                  <span className="mt-2 line-clamp-2 h-[3rem] text-base">
+                    {relatedVideo.videoName}
+                  </span>
+                </div>
+              </SnapHoverItem>
             ))}
-          </div>
+          </SnapHoverGroup>
         </div>
 
         <div className="w-full">
@@ -113,12 +124,12 @@ const VideoModal = observer(
             {providers.length === 0 ? 'Not available in provided regions' : 'Available on'}
           </div>
 
-          <div
-            className="discover-lg:gap-x-8 no-scrollbar flex gap-x-5 overflow-x-auto overscroll-x-none pb-2 pl-2"
-            style={{ scrollbarWidth: 'none' }}
-          >
+          <SnapHoverGroup className="discover-lg:gap-x-8 gap-x-5 pb-2 pl-2">
             {providers.map(provider => (
-              <div className="flex flex-col justify-center text-center" key={provider.providerId}>
+              <SnapHoverItem
+                className="flex flex-col justify-center text-center"
+                key={provider.providerId}
+              >
                 <img
                   src={IMAGE_PATH + provider.logoPath}
                   className="mb-3 rounded-md object-contain"
@@ -128,9 +139,9 @@ const VideoModal = observer(
                 />
 
                 <span>{provider.type}</span>
-              </div>
+              </SnapHoverItem>
             ))}
-          </div>
+          </SnapHoverGroup>
         </div>
       </EntityModal>
     )
