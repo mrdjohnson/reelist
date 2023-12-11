@@ -3,12 +3,15 @@ import { useRouter } from 'next/router'
 
 import React, { useMemo } from 'react'
 import _ from 'lodash'
-import Video, { Provider } from '@reelist/models/Video'
-import Person from '@reelist/models/Person'
 
 import { SnapHoverGroup, SnapHoverItem } from '../SnapHoverGroup'
 import EntityImage from '../EntityImage'
 import EntityModal from '../EntityModal'
+
+import { TmdbPersonCreditResponse } from '@reelist/interfaces/tmdb/TmdbPersonResponse'
+import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
+import { TmdbVideoByIdType } from '@reelist/interfaces/tmdb/TmdbVideoByIdType'
+import { TmdbWatchProviderDataResponse } from '@reelist/interfaces/tmdb/TmdbWatchProviderResponse'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 

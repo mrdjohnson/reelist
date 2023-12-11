@@ -2,23 +2,20 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
 import React from 'react'
-import _ from 'lodash'
 import moment from 'moment'
 
-import Person from '@reelist/models/Person'
-import Video from '@reelist/models/Video'
+import { TmdbPersonType } from '@reelist/interfaces/tmdb/TmdbPersonResponse'
+import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
 
 import EntityImage from '../EntityImage'
 import EntityModal from '../EntityModal'
 import { SnapHoverGroup, SnapHoverItem } from '../SnapHoverGroup'
 
-const PersonModal = observer(({ person }: { person: Person }) => {
+const PersonModal = observer(({ person }: { person: TmdbPersonType }) => {
   const router = useRouter()
 
-  const handleVideoSelection = (video: Video) => {
-    const mediaType = video.mediaType === 'tv' ? 'tv' : 'mv'
-
-    router.push(`/discover?videoId=${mediaType + video.id}`, undefined, { shallow: true })
+  const handleVideoSelection = (video: TmdbVideoPartialType) => {
+    router.push(`/discover?videoId=${video.videoId}`, undefined, { shallow: true })
   }
 
   const birthday = moment(person.birthday).format('MMM YYYY')

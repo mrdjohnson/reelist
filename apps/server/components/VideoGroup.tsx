@@ -1,10 +1,10 @@
-import Video from '@reelist/models/Video'
 import { useRouter } from 'next/router'
 import EntityImage from './EntityImage'
 import classNames from 'classnames'
 import _ from 'lodash'
 import { useMemo } from 'react'
 import { Button } from '@mui/material'
+import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
 
 type PropsWithTitle = {
   title: string
@@ -20,7 +20,7 @@ type VideoGroupProps = {
   numItemsPerRow: number
   title?: string
   clippedOverride?: boolean
-  videos?: Video[]
+  videos?: TmdbVideoPartialType[]
   isLoading: boolean
 } & (PropsWithTitle | PropsWithoutTitle)
 
@@ -36,7 +36,7 @@ const VideoGroup = ({
 }: VideoGroupProps) => {
   const router = useRouter()
 
-  const handleVideoSelection = (video: Video) => {
+  const handleVideoSelection = (video: TmdbVideoPartialType) => {
     router.push(`/discover?videoId=${video.videoId}`, undefined, { shallow: true })
   }
 
@@ -71,7 +71,6 @@ const VideoGroup = ({
         {videosToDisplay.map(video => (
           <EntityImage
             video={video}
-            containerProps={{ width: '307px' }}
             onPress={() => handleVideoSelection(video)}
             key={video.videoId}
           />
