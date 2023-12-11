@@ -1,43 +1,31 @@
 import _ from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import { callTmdb } from '@reelist/apis/api'
-import Person from '@reelist/models/Person'
+import { TmdbPersonType, TmdbPersonByIdResponse } from '@reelist/interfaces/tmdb/TmdbPersonResponse'
+import { TmdbPersonFormatter } from '@reelist/utils/tmdbHelpers/TmdbPersonFormatter'
 
 class PersonStore {
-  tmdbJsonByPersonId: Record<string, Person | null> = {}
+  tmdbJsonByPersonId: Record<string, TmdbPersonType | null> = {}
 
   constructor() {
     makeAutoObservable(this)
   }
 
-  makeUiPerson = (json: Person) => {
-    return new Person(json)
-  }
-
-  getPersons = async (personIds: string[] | undefined) => {
-    if (!_.isEmpty(personIds)) return []
-
-    const persons: Array<Person | null> = await Promise.all(personIds.map(this.getPerson))
-
-    return _.compact(persons)
-  }
-
   getPerson = async (personId: string) => {
     const path = `/person/${personId}`
 
-    let person: Person | null = this.tmdbJsonByPersonId[personId]
+    let person: TmdbPersonType | null = this.tmdbJsonByPersonId[personId]
+    let personResponse: TmdbPersonByIdResponse | null = null
 
     if (_.isUndefined(person)) {
-      person = await callTmdb(path, {
+      personResponse = await callTmdb<TmdbPersonByIdResponse>(path, {
         append_to_response: 'images,combined_credits',
       }).then(item => _.get(item, 'data.data') || null)
 
-      this.tmdbJsonByPersonId[personId] = person || null
+      this.tmdbJsonByPersonId[personId] = TmdbPersonFormatter.fromTmdbPersonById(personResponse)
     }
 
-    const uiPerson = person && this.makeUiPerson(person)
-
-    return uiPerson
+    return this.tmdbJsonByPersonId[personId]
   }
 }
 

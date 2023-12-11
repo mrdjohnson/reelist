@@ -6,17 +6,17 @@ import getWatchProviders, {
   WatchProviderOptionType,
 } from '@reelist/utils/tmdbHelpers/getWatchProviders'
 import getRegions, { getDefaultRegions } from '@reelist/utils/tmdbHelpers/getRegions'
-import {
-  createDiscoverMovie,
-  createDiscoverShow,
-  DiscoverVideoResponseType,
-  DiscoverVideoType,
-} from './DiscoverVideo'
 import type IStorage from '@reelist/utils/storage/storage.interface'
 import { StorageInversionKey } from '@reelist/utils/storage/storage.interface'
 import LocalStorageValue from '@reelist/utils/storage/LocalStorageValue'
 import _ from 'lodash'
 import { callTmdb } from '@reelist/apis/api'
+import {
+  TmdbDiscoverMovieResponseType,
+  TmdbDiscoverShowResponseType,
+} from '@reelist/interfaces/tmdb/TmdbDiscoverVideoResponseType'
+import { TmdbVideoPartialFormatter } from '@reelist/utils/tmdbHelpers/TmdbVideoPartialFormatter'
+import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
 
 // hard coded popular generes
 const popularGeneresIdsByName = {
@@ -133,7 +133,7 @@ class TmdbDiscover {
     this.page = value
   }
 
-  getVideos = async (selectedGenres: string[]) => {
+  getVideos = async (selectedGenres: string[] | null) => {
     const withoutIdentifier = (item: string) => item.split(':')[1]
 
     const selectedVideoTypes = this.videoTypesSelectState.selectedOptions
@@ -197,15 +197,22 @@ class TmdbDiscover {
       tmdbCalls.push(null)
     }
 
+    const getDataList = <T>(data: any): T[] => {
+      return _.get(data, 'value.data.data.results') || []
+    }
+
     const searchResults = await Promise.allSettled(tmdbCalls)
       .then(([tvShows, movies]) => {
-        return [
-          (_.get(tvShows, 'value.data.data.results') || []) as DiscoverVideoResponseType[],
-          (_.get(movies, 'value.data.data.results') || []) as DiscoverVideoResponseType[],
-        ]
+        return {
+          shows: getDataList<TmdbDiscoverShowResponseType>(tvShows),
+          movies: getDataList<TmdbDiscoverMovieResponseType>(movies),
+        }
       })
-      .then(([tvShows, movies]) => {
-        return [tvShows.map(createDiscoverShow), movies.map(createDiscoverMovie)]
+      .then(({ shows, movies }) => {
+        return [
+          shows.map(TmdbVideoPartialFormatter.fromTmdbShow),
+          movies.map(TmdbVideoPartialFormatter.fromTmdbMovie),
+        ]
       })
       .then(all => _.zip(...all))
       .then(_.flatten)
@@ -241,8 +248,8 @@ class TmdbDiscover {
   }
 
   private get genreMap() {
-    const tvMap = {}
-    const movieMap = {}
+    const tvMap: Record<string, string> = {}
+    const movieMap: Record<string, string> = {}
 
     this.genreSelectState.options?.forEach(({ id: genreId, originalId, originalName }) => {
       if (genreId.startsWith('shared:')) {
@@ -266,7 +273,7 @@ class TmdbDiscover {
     return this.genreMap.movieMap
   }
 
-  mapGenres(video: DiscoverVideoType) {
+  mapGenres(video: TmdbVideoPartialType) {
     const genreMap = video.isTv ? this.tvGenreMap : this.movieGenreMap
 
     return video.genreIds.map(genreId => genreMap[genreId])

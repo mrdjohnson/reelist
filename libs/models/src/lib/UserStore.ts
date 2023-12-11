@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import Auth from './Auth'
+import Auth from '@reelist/models/Auth'
 import User from '@reelist/models/User'
 import humps from 'humps'
 import { inject, injectable } from 'inversify'
@@ -21,10 +21,10 @@ class UserStore {
     this.userApi = new TableApi<UserTableType>('profiles', supabase)
   }
 
-  makeUiUser = (profileData: UserTableType, loggedIn: boolean = false) => {
+  makeUiUser = (profileData: UserTableType) => {
     const profile = humps.camelizeKeys<UserTableType>(profileData)
 
-    return new User({ profile, loggedIn }, this.userApi)
+    return new User({ profile })
   }
 
   getFollowedUsers = async () => {
@@ -74,7 +74,7 @@ class UserStore {
     const { data: userJson, error } = await this.userApi.upsert({ id: authId }).single()
 
     if (userJson) {
-      return this.makeUiUser(userJson, true)
+      return this.makeUiUser(userJson)
     }
 
     if (error) {

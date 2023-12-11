@@ -1,11 +1,13 @@
 import { makeAutoObservable } from 'mobx'
-import { PostgrestError, User as SupabaseUser } from '@supabase/supabase-js'
+import { PostgrestError, SupabaseClient, User as SupabaseUser } from '@supabase/supabase-js'
 import humps, { Camelized } from 'humps'
 import { createViewModel, IViewModel } from 'mobx-utils'
-import VideoList from './VideoList'
+import VideoList from '@reelist/models/VideoList'
 import _ from 'lodash'
 import { UserTableType } from '@reelist/interfaces/tables/UserTable'
 import TableApi from '@reelist/apis/TableApi'
+import inversionContainer from '@reelist/models/inversionContainer'
+import Auth from '@reelist/models/Auth'
 
 type ProfileType = Camelized<UserTableType>
 
@@ -16,8 +18,12 @@ type UserType = ProfileType & {
 
 type UserConstructorType = {
   user?: SupabaseUser
-  loggedIn?: boolean
   profile?: ProfileType | null
+}
+
+type ToggleFollowingVideoListOverload = {
+  (videoListId: string): Promise<string | null>
+  (videoList: VideoList): Promise<string | null>
 }
 
 class User implements UserType {
@@ -33,45 +39,34 @@ class User implements UserType {
 
   _viewModel?: User & IViewModel<User> = undefined
 
-  constructor(
-    { user, loggedIn = true, profile }: UserConstructorType,
-    private userApi: TableApi<UserTableType>,
-  ) {
-    makeAutoObservable(this)
+  private userApi: TableApi<UserTableType> | null = null
 
-    this.loggedIn = loggedIn
-
+  constructor({ user, profile }: UserConstructorType) {
     Object.assign(this, user || profile)
 
-    // this.name = user.name
-    // this.imageUrl = user.imageUrl
-    // this.watchedIds = user.watchedIds
+    makeAutoObservable(this)
+  }
+
+  login = () => {
+    this.loggedIn = true
+
+    const supabase: SupabaseClient = inversionContainer.get<SupabaseClient>(SupabaseClient)
+    this.userApi = new TableApi<UserTableType>('profiles', supabase)
   }
 
   isAdminOfList = (videoList: VideoList) => {
     return videoList.adminIds.includes(this.id)
   }
 
-  followVideoList = (videoList: VideoList) => {
-    this.viewModel.followedListIds = [...this.followedListIds, videoList.id]
+  toggleFollowingVideoList = (videoList: VideoList) => {
+    this.viewModel.followedListIds = _.xor(this.followedListIds, [videoList.id])
 
-    this.save()
+    return this.save()
   }
-
   toggleFollowingUser = (user: User) => {
-    if (this.isFollowingUser(user)) {
-      this.viewModel.followedUserIds = _.without(this.followedUserIds, user.id)
-    } else {
-      this.viewModel.followedUserIds = [...this.followedUserIds, user.id]
-    }
+    this.viewModel.followedUserIds = _.xor(this.followedUserIds, [user.id])
 
-    this.save()
-  }
-
-  unFollowVideoList = (videoList: VideoList) => {
-    this.viewModel.followedListIds = _.without(this.viewModel.followedListIds, videoList.id)
-
-    this.save()
+    return this.save()
   }
 
   isFollowingVideoList = (videoList: VideoList) => {
@@ -91,13 +86,16 @@ class User implements UserType {
   }
 
   save = async () => {
+    if (!this.loggedIn) {
+      throw new Error('Cannot save user without being logged in')
+    }
+
     const userViewModel = this.viewModel
 
     // Map{'exampleField' -> 'exampleValue'} -> {example_field: 'exampleValue'}
     const changedFields = humps.decamelizeKeys(Object.fromEntries(userViewModel.changedValues))
 
-    const { data: profile, error } = await this.userApi
-      .update(changedFields)
+    const { data: profile, error } = await this.userApi!.update(changedFields)
       .match({ id: userViewModel.id })
       .single()
 
@@ -107,26 +105,23 @@ class User implements UserType {
     } else if (profile) {
       userViewModel.submit()
     }
+
+    return null
   }
 }
 
-export const LoggedOutUser = new User(
-  {
-    profile: {
-      id: '',
-      followedListIds: [],
-      followedUserIds: [],
-      updatedAt: '',
-      username: '',
-      avatarUrl: '',
-      notificationId: '',
-      name: '',
-    },
-
-    loggedIn: false,
+export const LoggedOutUser = new User({
+  profile: {
+    id: '',
+    followedListIds: [],
+    followedUserIds: [],
+    updatedAt: '',
+    username: '',
+    avatarUrl: '',
+    notificationId: '',
+    name: '',
   },
-  null,
-)
+})
 
 const maybePrintError = (error: PostgrestError | null) => {
   if (error) {
