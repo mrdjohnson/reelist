@@ -57,7 +57,13 @@ class VideoStore {
 
     if (tmdbVideo.isTv) console.log('making user show')
 
-    return UserVideo.create(tmdbVideo, user, userVideoData)
+    const userVideo = UserVideo.create(tmdbVideo, user, userVideoData)
+
+    this.userVideoById[userId] ||= {}
+
+    this.userVideoById[userId][videoId] = userVideo
+
+    return userVideo
   }
 
   getVideoPath = (videoId: string, seasonNumber?: number) => {
