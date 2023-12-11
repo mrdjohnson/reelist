@@ -1,11 +1,19 @@
 import { callTmdb } from '@reelist/apis/api'
 import _ from 'lodash'
-import Video from '@reelist/models/Video'
-import { useStore } from '@reelist/utils/hooks/useStore'
+import {
+  TmdbSearchMultiResponseType,
+  TmdbSearchVideoResponse,
+} from '@reelist/interfaces/tmdb/TmdbSearchResponse'
+import { TmdbVideoPartialFormatter } from '@reelist/utils/tmdbHelpers/TmdbVideoPartialFormatter'
+import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
+
+const isVideo = (json: TmdbSearchMultiResponseType): json is TmdbSearchVideoResponse => {
+  return json.mediaType !== 'person'
+}
+
+type SearchResponseType = { results: TmdbSearchMultiResponseType[] }
 
 const useVideoSearch = () => {
-  const { auth, videoStore } = useStore()
-
   const videoSearch = async (
     searchText: string,
     options: Record<string, string | boolean> = {},
@@ -14,34 +22,31 @@ const useVideoSearch = () => {
 
     const { deepSearch = false, ...params } = options
 
-    const searchResults = await callTmdb('/search/multi', { query: searchText, ...params }).then(
-      item => _.get(item, 'data.data.results') as Video[] | null,
-    )
+    const searchResponse = await callTmdb<SearchResponseType>('/search/multi', {
+      query: searchText,
+      ...params,
+    })
+
+    const searchResults = _.get(searchResponse, 'data.data.results')
 
     if (!searchResults) return []
 
     if (deepSearch) {
-      const getVideoId = (video: Video) => (video.mediaType === 'movie' ? 'mv' : 'tv') + video.id
-
-      const videoIds: Array<string | null> = []
+      const videos: TmdbVideoPartialType[] = []
 
       searchResults.forEach(result => {
+        // TODO: maybe add some kind of wording around if there is a connection here or not?
         if (result.mediaType === 'person') {
-          // todo: actually search the person and then add all their videos
-          videoIds.push(...result.knownFor?.map(getVideoId))
+          videos.push(...TmdbVideoPartialFormatter.fromTmdbSearchPerson(result))
         } else {
-          videoIds.push(getVideoId(result))
+          videos.push(TmdbVideoPartialFormatter.fromTmdbSearchVideo(result))
         }
       })
 
-      return videoStore.getVideos(_.compact(videoIds))
+      return videos
     }
 
-    return searchResults
-      .filter(searchResult => ['movie', 'tv'].includes(searchResult.mediaType))
-      .map(video => {
-        return videoStore.makeUiVideo(video)
-      })
+    return _.filter(searchResults, isVideo).map(TmdbVideoPartialFormatter.fromTmdbSearchVideo)
   }
 
   return videoSearch
