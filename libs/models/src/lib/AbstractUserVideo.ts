@@ -53,7 +53,7 @@ abstract class AbstractUserVideo extends classFromProps<TmdbBaseVideoType>() {
     return this.user.id
   }
 
-  _assignFromVideoTable = (videoTable?: VideoTableType) => {
+  _assignFromVideoTable(videoTable?: VideoTableType) {
     // if we already tried to get the data and nothing was there
     if (!videoTable) return
 

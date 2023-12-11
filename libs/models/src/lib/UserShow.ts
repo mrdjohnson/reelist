@@ -40,7 +40,7 @@ class UserShow extends AbstractUserVideo {
     this._linkEpisodes()
   }
 
-  override _assignFromVideoTable = (userVideoData?: VideoTableType) => {
+  override _assignFromVideoTable(userVideoData?: VideoTableType) {
     super._assignFromVideoTable(userVideoData)
 
     // this.lastWatchedSeasonNumber = userVideoData?.last_watched_season_number
