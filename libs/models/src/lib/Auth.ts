@@ -26,19 +26,20 @@ export default class Auth {
 
     if (currentSession?.user) {
       //todo change this to get profile?
-      this.setUser(new User({ user: currentSession.user }, this.supabase))
+      this.setUser(new User({ user: currentSession.user }))
     } else {
       this.setUser(LoggedOutUser)
     }
   }
 
-  setUser = (user: User | null) => {
+  setUser = async (user: User | null) => {
     this.user = user || LoggedOutUser
     this.loading = false
 
-    if (this.user.loggedIn) {
-      this.storage.save('has_signed_in', true)
-    }
+    if (!this.user.name) return
+
+    this.user.login()
+    await this.storage.save('has_signed_in', true)
 
     console.log('logged ' + (this.user.loggedIn ? 'in' : 'out'))
   }
@@ -53,7 +54,7 @@ export default class Auth {
   }
 
   getCurrentUserProfile = async () => {
-    if (!this.user.loggedIn) return false
+    if (!this.user.loggedIn) return
 
     this.loading = true
 
@@ -65,7 +66,6 @@ export default class Auth {
 
     if (error) {
       this.loading = false
-      this.needsProfile = true
     }
 
     this.userProfile = profile
