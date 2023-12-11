@@ -1,207 +1,50 @@
 import _ from 'lodash'
-import { flow, makeAutoObservable } from 'mobx'
-import { Decamelized } from 'humps'
-import { callTmdb, sendNotifications, UpdateType } from '@reelist/apis/api'
+import { callTmdb } from '@reelist/apis/api'
+import { VideoTableType } from 'libs/interfaces/src/lib/tables/VideoTable'
+import { TmdbTvEpisode, TmdbVideoByIdType } from '@reelist/interfaces/tmdb/TmdbVideoByIdType'
+import {
+  TmdbShowByIdResponse,
+  TmdbShowEpisodeResponseType,
+  TmdbTvSeason,
+} from '@reelist/interfaces/tmdb/TmdbShowResponse'
+import User from '@reelist/models/User'
+import { UserMovie } from '@reelist/models/UserVideo'
+import AbstractUserVideo from '@reelist/models/AbstractUserVideo'
+import { flow } from 'mobx'
 import moment from 'moment'
-import { humanizedDuration } from '@reelist/utils/humanizedDuration'
-import VideoStore from './VideoStore'
-import VideoApi from '@reelist/apis/VideoApi'
-import { VideoInfoType, VideoTableType } from 'libs/interfaces/src/lib/tables/VideoTable'
-import Auth from '@reelist/models/Auth'
-import Person from './Person'
 
-export type TvEpisode = {
-  airDate: string
-  episodeNumber: number
-  id: string
-  name: string
-  overview: string
-  productionCode: string
-  runtime: number
-  seasonNumber: number
-  showId: number
-  stillPath: string
-  voteAverage: 7.6
-  voteCount: number
-  next?: TvEpisode
-  previous?: TvEpisode
-}
-
-export type TvSeason = {
-  airDate: string
-  episodeCount?: number
-  id: string
-  name: string
-  overview: string
-  posterPath: string
-  seasonNumber: number
-  episodes?: TvEpisode[]
-}
-
-type TvNetwork = {
-  name: string
-  id: string
-  logoPath: string
-}
-
-export type Provider = {
-  logoPath: string
-  providerId: number
-  providerName: string
-  displayPriority: number
-}
-
-type ProviderCountry = {
-  link: string
-  flatrate: Provider[]
-  rent: Provider[]
-  buy: Provider[]
-}
-
-type TvGenre = {
-  id: number
-  name: string
-}
-
-type VideoImageType = {
-  aspectRatio: number
-  height: number
-  filePath: string
-  voteAverage: number
-  width: number
-
-  // ignored:
-  // voteCount
-  // iso6391
-}
-
-type CastMember = Person & {
-  character: string
-  order: number
-}
-
-type Credits = {
-  cast: CastMember[]
-}
-
-class Video {
-  adult?: boolean | undefined
-  backdropPath!: string
-  genreIds!: number[]
-  id!: string
-  mediaType!: 'movie' | 'tv'
-  originalLanguage!: string
-  originalTitle?: string | undefined
-  overview!: string
-  popularity!: number
-  posterPath!: string
-  releaseDate?: string | undefined
-  title?: string | undefined
-  name?: string | undefined
-  firstAirDate?: string | undefined
-  video?: boolean | undefined
-  originCountry?: string[] | undefined
-  originalName?: string | undefined
-  voteAverage!: number
-  voteCount!: number
-  runtime?: number
-  episodeRunTime?: number[]
-  numberOfEpisodes?: number
-  seasons?: TvSeason[] | undefined
-  lastEpisodeToAir?: TvEpisode
-  nextEpisodeToAir?: TvEpisode
-  networks: TvNetwork[] = []
-  providers!: Record<string, ProviderCountry> // = {}
-  genres: TvGenre[] = []
-  aggregateCredits?: Credits
-  credits!: Credits
-  similar: { results?: Video[] } = {}
-  _relatedVideos?: Video[]
-  images?: {
-    backdrops: VideoImageType[]
-    logos: VideoImageType[]
-    posters: VideoImageType[]
-  }
-
-  videoId: string
-  tracked = false
-  videoInfo: VideoInfoType = {}
-  serverId: string | undefined
+class UserShow extends AbstractUserVideo {
+  override isTv: true = true
+  protected seasonMap: Record<number, TmdbTvSeason | null> = {}
   unWatchableEpisodeCount = 0
-  allowInHistory = true
 
-  seasonMap: Record<number, TvSeason | null> = {}
+  seasons?: TmdbTvSeason[] | undefined
+
+  lastWatchedEpisode?: TmdbTvEpisode
+  firstEpisode?: TmdbTvEpisode
+
+  lastEpisodeToAir?: TmdbTvEpisode
+  nextEpisodeToAir?: TmdbTvEpisode
 
   constructor(
-    json: Video,
-    videoTableData: VideoTableType | null = null,
-    videoId: string | null = null,
-    private videoStore: VideoStore,
-    private videoApi: VideoApi,
-    private storeAuth: Auth
+    public override tmdbVideo: TmdbVideoByIdType<TmdbShowByIdResponse>,
+    protected override user: User,
+    userVideoData?: VideoTableType,
   ) {
-    makeAutoObservable(this, {
-      adult: false,
-      backdropPath: false,
-      genreIds: false,
-      id: false,
-      mediaType: false,
-      originalLanguage: false,
-      originalTitle: false,
-      overview: false,
-      popularity: false,
-      posterPath: false,
-      releaseDate: false,
-      title: false,
-      name: false,
-      firstAirDate: false,
-      video: false,
-      originCountry: false,
-      originalName: false,
-      voteAverage: false,
-      voteCount: false,
-      seasons: false,
-      similar: false,
-      _relatedVideos: false,
-    })
+    super(tmdbVideo, user, userVideoData)
 
-    if (videoId) {
-      this.mediaType = videoId.startsWith('mv') ? 'movie' : 'tv'
-      this.id = videoId.substring(2)
-      this.videoId = videoId
-    } else {
-      this.videoId = (json.mediaType === 'movie' ? 'mv' : 'tv') + json.id
-    }
+    // if (this.videoId === 'tv116244') {
+    //   debugger
+    // }
 
-    this._assignValuesFromJson(json)
-
-    if (videoTableData) {
-      this._assignFromVideoTable(videoTableData)
-    } else if (storeAuth.loggedIn) {
-      this._lazyLoadVideoFromVideoTable()
-    }
+    this._linkEpisodes()
   }
 
-  _assignValuesFromJson = (json: Video) => {
-    // remove special seasons until we learn how to deal with them
-    json.seasons && _.remove(json.seasons, season => season.name === 'Specials')
+  override _assignFromVideoTable = (userVideoData?: VideoTableType) => {
+    super._assignFromVideoTable(userVideoData)
 
-    Object.assign(this, json)
-
-    if (this.providers) return
-
-    const providers = _.get(json, 'watch/providers.results') || {}
-    this.providers = _.mapKeys(providers, (_value, key) => _.toUpper(key))
-  }
-
-  _assignFromVideoTable = (videoTable: VideoTableType) => {
-    // if we already tried to get the data and nothing was there
-    if (!videoTable.id) return
-
-    this.serverId = videoTable.id
-    this.videoInfo = videoTable.video_info || {}
-    this.tracked = videoTable.tracked
-    this.allowInHistory = videoTable.allow_in_history
+    // this.lastWatchedSeasonNumber = userVideoData?.last_watched_season_number
+    // this.lastWatchedEpisodeNumber = userVideoData?.last_watched_episode_number
   }
 
   _lazyLoadVideoFromVideoTable = async () => {
@@ -217,8 +60,6 @@ class Video {
   }
 
   _calculateUnwatchedEpisodes = () => {
-    if (this.isMovie) return
-
     let episodesAfterLastAired = 0
     let lastEpisode = this.lastEpisodeToAir
 
@@ -232,9 +73,9 @@ class Video {
 
   _linkEpisodes = () => {
     let season = this.seasonMap[1]
-    let previousEpisode: TvEpisode
+    let previousEpisode: TmdbTvEpisode
 
-    const assignPreviousAndNextEpisode = (nextEpisode: TvEpisode) => {
+    const assignPreviousAndNextEpisode = (nextEpisode: TmdbTvEpisode) => {
       if (!previousEpisode) {
         // this should only happen for the very first episode
         previousEpisode = nextEpisode
@@ -273,28 +114,11 @@ class Video {
     this._calculateUnwatchedEpisodes()
   }
 
-  toggleTracked = async () => {
-    console.log('toggling tracked')
-    const nextTracked = !this.tracked
-
-    await this.updateWatched('toggle tracked', {
-      tracked: nextTracked,
-    })
-  }
-
-  toggleHistoryVisibility = async () => {
-    const nextAllowInHistory = !this.allowInHistory
-
-    await this.updateWatched('toggle history visibility', {
-      allow_in_history: nextAllowInHistory,
-    })
-  }
-
-  toggleWatched = async (isWatchedOverride: boolean | null = null) => {
+  override toggleWatched = async (isWatchedOverride: boolean | null = null) => {
     let nextIsWatched = isWatchedOverride
 
     if (nextIsWatched === null) {
-      const seasonIsWatchedOrPartiallyWatched = (season: TvSeason | null) => {
+      const seasonIsWatchedOrPartiallyWatched = (season: TmdbTvSeason | null) => {
         if (season === null) return false
         if (this.getIsSeasonPartiallyWatched(season.seasonNumber)) return true
         return this.getIsSeasonWatched(season.seasonNumber)
@@ -324,11 +148,6 @@ class Video {
       // reset any watched episode data
       lastWatchedEpisodeData = episodeToEpisodeWatchedData(null)
       nextIsWatched = false
-    }
-
-    if (this.isMovie) {
-      lastWatchedEpisodeData = episodeToEpisodeWatchedData(null)
-      nextIsWatched = !this.isWatched
     }
 
     await this.updateWatched('toggle watched', {
@@ -389,7 +208,7 @@ class Video {
   }
 
   toggleEpisodeWatched = async (
-    episode: TvEpisode,
+    episode: TmdbTvEpisode,
     isEpisodeWatchedOverride: boolean | undefined = undefined,
   ) => {
     const { seasonNumber, episodeNumber } = episode
@@ -423,7 +242,7 @@ class Video {
     })
   }
 
-  backfillSeason = (lastEpisodeWatchedInSeason: TvEpisode) => {
+  backfillSeason = (lastEpisodeWatchedInSeason: TmdbTvEpisode) => {
     const seasonNumber = lastEpisodeWatchedInSeason.seasonNumber
     const currentSeasonEpisodes = this.getWatchedSeasonEpisodes(seasonNumber)
 
@@ -443,7 +262,7 @@ class Video {
     }
   }
 
-  backfillWatched = async (lastWatchedEpisodeOverride: TvEpisode | null = null) => {
+  backfillWatched = async (lastWatchedEpisodeOverride: TmdbTvEpisode | null = null) => {
     const lastWatchedEpisode = lastWatchedEpisodeOverride || this.currentBaseEpisode
 
     if (!lastWatchedEpisode) return
@@ -465,7 +284,7 @@ class Video {
     await this.toggleEpisodeWatched(lastWatchedEpisode, true)
   }
 
-  updateWatched = async (type: string, upsertData: Partial<VideoTableType>) => {
+  override updateWatched = async (type: string, upsertData: Partial<VideoTableType>) => {
     const { data: videoJson, error } = await this.videoApi.updateVideo({
       ...upsertData,
       id: this.serverId,
@@ -482,46 +301,28 @@ class Video {
     // this.notifyListsAboutWatched(update)
   }
 
-  notifyListsAboutWatched = async (update: UpdateType) => {
-    await sendNotifications({ ...update })
-  }
-
-  fetchWatchProviders = async () => {
-    if (!_.isEmpty(this.providers)) return
-
-    const videoType = this.isTv ? 'tv' : 'movie'
-
-    const providers = await callTmdb(`/${videoType}/${this.id}/watch/providers`)
-      .then(item => _.get(item, 'data.data.results') as Record<string, ProviderCountry>)
-      .then(providers => _.mapKeys(providers, (_value, key) => _.toUpper(key)))
-
-    this.providers = providers
-  }
-
   fetchSeason = async (seasonNumber: number) => {
     if (this.seasonMap[seasonNumber]) return this.seasonMap[seasonNumber]
 
-    debugger
-
-    // console.log('fetching season: ', seasonNumber, 'for', this.name)
-
     const path = this.tmdbPath + '/season/' + seasonNumber
 
-    let season: TvSeason | null = null
+    let season: TmdbTvSeason | null = null
 
     try {
-      season = (await callTmdb(path).then(item => _.get(item, 'data.data'))) as TvSeason
+      season = (await callTmdb(path).then(item => _.get(item, 'data.data'))) as TmdbTvSeason
     } catch (e) {
       console.error(e)
       throw e
     } finally {
-      this.seasonMap[seasonNumber] = season
+      if (season) {
+        this.seasonMap[seasonNumber] = season
+      }
     }
 
     return this.seasonMap[seasonNumber]
   }
 
-  fetchSeasons = flow(function* (this: Video) {
+  fetchSeasons = flow(function* (this: UserShow) {
     if (!this.seasons) return
 
     const seasonMap = this.videoStore.videoSeasonMapByVideoId[this.videoId]
@@ -542,18 +343,6 @@ class Video {
 
     this._linkEpisodes()
   })
-
-  fetchRelated = () => {
-    if (this._relatedVideos || !this.similar?.results) return this._relatedVideos || []
-
-    const mediaTypePrefix = this.mediaType === 'tv' ? 'tv' : 'mv'
-
-    this._relatedVideos = this.similar.results.map(similarVideoJson =>
-      this.videoStore.makeUiVideo(similarVideoJson, mediaTypePrefix + similarVideoJson.id),
-    )
-
-    return this._relatedVideos
-  }
 
   watchNextEpisode = () => {
     if (this.nextEpisode) {
@@ -624,7 +413,7 @@ class Video {
     return allEpisodes
   }
 
-  getIsEpisodeWatched = (episode: TvEpisode) => {
+  getIsEpisodeWatched = (episode: TmdbTvEpisode) => {
     const { seasonNumber, episodeNumber } = episode
 
     return (
@@ -633,13 +422,11 @@ class Video {
     )
   }
 
-  condenseVideoInfo = () => {
-    // this.seasonMap.forEach(({seasonNumber}) => {
-    //   // const watchedSeason =
-    // })
-  }
+  override compareCompletionTo(otherVideo: UserShow | UserMovie) {
+    if (!otherVideo.isTv) {
+      return super.compareCompletionTo(otherVideo)
+    }
 
-  compareCompletionTo = (otherVideo: Video) => {
     // they cannot watch anymore episodes, can we?
     if (otherVideo.isCompleted) return this.isCompleted ? 0 : 1
 
@@ -653,7 +440,7 @@ class Video {
     return this.isLatestEpisodeWatched ? -1 : 0
   }
 
-  get currentBaseEpisode(): TvEpisode | undefined {
+  get currentBaseEpisode(): TmdbTvEpisode | undefined {
     const seasonNumber = this.lastWatchedSeasonNumber || 1
     const episodeNumber = this.lastWatchedEpisodeNumber || 1
 
@@ -674,42 +461,8 @@ class Video {
     return episodeToWatch
   }
 
-  get isTv() {
-    return this.mediaType === 'tv'
-  }
-
-  get isMovie() {
-    return this.mediaType === 'movie'
-  }
-
-  get isWatched() {
-    return !!this.videoInfo?.watched
-  }
-
   get partiallyWatched() {
     return !_.isEmpty(this.videoInfo?.seasons)
-  }
-
-  get videoName() {
-    return this.name || this.title || 'Un-titled'
-  }
-
-  get videoReleaseDate() {
-    return moment(this.releaseDate || this.firstAirDate)
-  }
-
-  get lastVideoReleaseDate() {
-    if (this.isMovie) return moment(this.releaseDate)
-
-    return moment(this.lastEpisodeToAir?.airDate)
-  }
-
-  get tmdbPath() {
-    return '/' + this.mediaType + '/' + this.id
-  }
-
-  get relatedVideos() {
-    return this.fetchRelated()
   }
 
   // previously these values will still be stored on the server for now
@@ -733,7 +486,7 @@ class Video {
   }
 
   get isLatestEpisodeWatched() {
-    if (this.mediaType === 'movie' || !this.lastEpisodeToAir) return this.isWatched
+    if (!this.lastEpisodeToAir) return this.isWatched
 
     if (!this.lastWatchedSeasonNumber && !this.lastWatchedEpisodeNumber) return false
     if (!this.currentBaseEpisode) return false
@@ -747,8 +500,8 @@ class Video {
     return lastEpisodeNumber === currentEpisodeNumber && lastSeasonNumber === currentSeasonNumber
   }
 
-  get isCompleted() {
-    if (this.mediaType === 'movie' || !this.lastEpisodeToAir) return this.isWatched
+  override get isCompleted() {
+    if (!this.lastEpisodeToAir) return this.isWatched
 
     if (this.nextEpisodeToAir) return false
 
@@ -774,36 +527,24 @@ class Video {
   }
 
   get minEpisodeRunTime() {
-    return _.min(this.episodeRunTime) || 0
+    return _.min(this.tmdbVideo.episodeRunTimes) || 0
   }
 
-  get totalWatchedDurationMinutes() {
+  override get totalWatchedDurationMinutes() {
     if (this.isCompleted) {
       return this.totalDurationMinutes
-    }
-
-    if (this.isMovie) {
-      return 0
     }
 
     return this.watchedEpisodeCount * this.minEpisodeRunTime
   }
 
-  get totalWatchedDuration() {
-    return humanizedDuration(this.totalWatchedDurationMinutes)
-  }
-
-  get totalDurationMinutes() {
-    if (this.isMovie) {
-      return this.runtime || 0
-    }
-
-    if (this.numberOfEpisodes !== undefined) {
-      return (this.numberOfEpisodes - this.unWatchableEpisodeCount) * this.minEpisodeRunTime
-    }
-
-    return 0
-  }
+  // override get totalDurationMinutes() {
+  //   if (this.tmdbVideo.numberOfEpisodes !== undefined) {
+  //     return (this.numberOfEpisodes - this.unWatchableEpisodeCount) * this.minEpisodeRunTime
+  //   }
+  //
+  //   return 0
+  // }
 
   get durationOrSeasons() {
     if (this.isTv) {
@@ -812,21 +553,9 @@ class Video {
 
     return `${this.totalDurationMinutes} min`
   }
-
-  get totalDuration() {
-    return humanizedDuration(this.totalDurationMinutes)
-  }
-
-  get cast() {
-    const allCastMembers = _.toArray(this.credits?.cast).concat(
-      _.toArray(this.aggregateCredits?.cast),
-    )
-
-    return _.uniqBy(allCastMembers, 'id')
-  }
 }
 
-const episodeToEpisodeWatchedData = (episode: TvEpisode | null | undefined) => {
+const episodeToEpisodeWatchedData = (episode: TmdbTvEpisode | null | undefined) => {
   if (!episode) {
     return {
       last_watched_season_number: null,
@@ -840,6 +569,4 @@ const episodeToEpisodeWatchedData = (episode: TvEpisode | null | undefined) => {
   }
 }
 
-export type VideoJsonType = Decamelized<Video>
-
-export default Video
+export default UserShow
