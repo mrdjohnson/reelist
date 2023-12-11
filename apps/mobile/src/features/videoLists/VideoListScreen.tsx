@@ -104,11 +104,11 @@ const VideoListScreen = observer(({ navigation }: ReelistScreen) => {
   }
 
   const followOrUnfollowList = (follow: boolean) => {
+    auth.user.toggleFollowingVideoList(currentVideoList)
+
     if (follow) {
-      auth.user.followVideoList(currentVideoList)
       videoListStore.addToFollowedVideoList(currentVideoList)
     } else {
-      auth.user.unFollowVideoList(currentVideoList)
       videoListStore.removeFromFollowedVideoList(currentVideoList)
     }
 

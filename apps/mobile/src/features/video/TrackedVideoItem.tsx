@@ -1,7 +1,5 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
-import _ from 'lodash'
-import Video from '@reelist/models/Video'
 import { useStore } from '@reelist/utils/hooks/useStore'
 import { Column, Pressable, Text, View } from 'native-base'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -9,9 +7,10 @@ import moment from 'moment'
 import { useReelistNavigation } from '~/utils/navigation'
 import AppButton from '~/components/AppButton'
 import VideoImage from './VideoImage'
+import { UserVideoType } from '@reelist/models/UserVideo'
 
 type VideoItemProps = {
-  video: Video | null | undefined
+  video: UserVideoType | null | undefined
   isTile?: boolean
   isInteractable?: boolean
 }
@@ -23,61 +22,16 @@ const TrackedVideoItem = observer(
 
     if (!video) return null
 
-    const name = video.name || video.title
-
     let bottomRow
 
+    // TODO: this whole section REALLY needs tests
     if (video.isCompleted) {
       bottomRow = (
         <View flexDirection="row-reverse">
           <Text alignSelf="flex-end">Completed</Text>
         </View>
       )
-    } else if (video.isLatestEpisodeWatched) {
-      bottomRow = (
-        <View flexDirection="row-reverse">
-          <Column>
-            <Text alignSelf="flex-end">Currently Live</Text>
-
-            {video.nextEpisodeToAir && (
-              <Text alignSelf="flex-end">
-                {/* Friday, Aug 19th 22 */}
-                Next Air Date:
-                {moment(video.nextEpisodeToAir.airDate).format(' dddd, MMM Do')}
-              </Text>
-            )}
-          </Column>
-        </View>
-      )
-    } else if (!isInteractable || isTile) {
-      if (!video.lastWatchedSeasonNumber && !video.lastWatchedEpisodeNumber) {
-        bottomRow = (
-          <View flexDirection="row-reverse">
-            <Text>Not started</Text>
-          </View>
-        )
-      } else if (isTile) {
-        bottomRow = (
-          <View>
-            <Text>Last watched:</Text>
-
-            <Text>
-              S: {video.lastWatchedSeasonNumber} Ep: {video.lastWatchedEpisodeNumber}
-            </Text>
-          </View>
-        )
-      } else {
-        bottomRow = (
-          <View flexDirection="row-reverse">
-            <View>
-              <Text>Last watched Season: {video.lastWatchedSeasonNumber}</Text>
-
-              <Text>Last watched Episode: {video.lastWatchedEpisodeNumber}</Text>
-            </View>
-          </View>
-        )
-      }
-    } else if (video.mediaType === 'movie') {
+    } else if (!video.isTv) {
       bottomRow = (
         <View flexDirection="row-reverse">
           <AppButton
@@ -87,20 +41,66 @@ const TrackedVideoItem = observer(
         </View>
       )
     } else {
-      bottomRow = (
-        <View flexDirection="row" justifyContent="space-between" alignItems="center">
-          <View>
-            <Text>Season: {video.nextEpisode?.seasonNumber}</Text>
+      if (video.isLatestEpisodeWatched) {
+        bottomRow = (
+          <View flexDirection="row-reverse">
+            <Column>
+              <Text alignSelf="flex-end">Currently Live</Text>
 
-            <Text>Episode: {video.nextEpisode?.episodeNumber}</Text>
+              {video.tmdbVideo.nextEpisodeToAir && (
+                <Text alignSelf="flex-end">
+                  {/* Friday, Aug 19th 22 */}
+                  Next Air Date:
+                  {moment(video.tmdbVideo.nextEpisodeToAir.airDate).format(' dddd, MMM Do')}
+                </Text>
+              )}
+            </Column>
           </View>
+        )
+      } else if (!isInteractable || isTile) {
+        if (!video.lastWatchedSeasonNumber && !video.lastWatchedEpisodeNumber) {
+          bottomRow = (
+            <View flexDirection="row-reverse">
+              <Text>Not started</Text>
+            </View>
+          )
+        } else if (isTile) {
+          bottomRow = (
+            <View>
+              <Text>Last watched:</Text>
 
-          <AppButton
-            icon={<MaterialCommunityIcons name="eye-plus" />}
-            onPress={video.watchNextEpisode}
-          />
-        </View>
-      )
+              <Text>
+                S: {video.lastWatchedSeasonNumber} Ep: {video.lastWatchedEpisodeNumber}
+              </Text>
+            </View>
+          )
+        } else {
+          bottomRow = (
+            <View flexDirection="row-reverse">
+              <View>
+                <Text>Last watched Season: {video.lastWatchedSeasonNumber}</Text>
+
+                <Text>Last watched Episode: {video.lastWatchedEpisodeNumber}</Text>
+              </View>
+            </View>
+          )
+        }
+      } else {
+        bottomRow = (
+          <View flexDirection="row" justifyContent="space-between" alignItems="center">
+            <View>
+              <Text>Season: {video.nextEpisode?.seasonNumber}</Text>
+
+              <Text>Episode: {video.nextEpisode?.episodeNumber}</Text>
+            </View>
+
+            <AppButton
+              icon={<MaterialCommunityIcons name="eye-plus" />}
+              onPress={video.watchNextEpisode}
+            />
+          </View>
+        )
+      }
     }
 
     const goToMediaPage = () => {
@@ -108,7 +108,7 @@ const TrackedVideoItem = observer(
     }
 
     // only fade for YOUR videos that cant be interacted with.
-    let faded = video.isWatched || video.isCompleted || video.isLatestEpisodeWatched
+    let faded = video.isWatched || video.isCompleted || (video.isTv && video.isLatestEpisodeWatched)
 
     if (!isInteractable) faded = false
 
@@ -125,7 +125,7 @@ const TrackedVideoItem = observer(
           onLongPress={() => appState.setActionSheetVideo(video)}
         >
           <Column>
-            <VideoImage video={video} />
+            <VideoImage video={video.tmdbVideo} />
 
             <View>{bottomRow}</View>
           </Column>
@@ -143,7 +143,7 @@ const TrackedVideoItem = observer(
       >
         <View flexShrink={1}>
           <VideoImage
-            video={video}
+            video={video.tmdbVideo}
             containerProps={{ marginRight: '8px', maxHeight: '120px' }}
             backgroundColor="black"
           />
@@ -152,18 +152,18 @@ const TrackedVideoItem = observer(
         <View flex={1} backgroundColor={null} roundedLeft="sm" roundedRight="md">
           <Column flex={1}>
             <Text fontSize="lg" color={'black'}>
-              {name}
+              {video.tmdbVideo.videoName}
             </Text>
 
-            {video.originalName && (
+            {video.tmdbVideo.videoOriginalName && (
               <Text fontSize="sm" color="light.500">
-                {video.originalName}
+                {video.tmdbVideo.videoOriginalName}
               </Text>
             )}
 
-            {video.releaseDate && (
+            {video.tmdbVideo.videoReleaseDate && (
               <Text fontSize="sm" color="light.500">
-                {video.releaseDate}
+                {video.tmdbVideo.videoReleaseDate.format('MMM YYYY')}
               </Text>
             )}
           </Column>

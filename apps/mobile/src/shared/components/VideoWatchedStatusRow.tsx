@@ -1,24 +1,24 @@
 import React from 'react'
 import { Text, View, Row, Column } from 'native-base'
 import { observer } from 'mobx-react-lite'
-import Video from '@reelist/models/Video'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import moment from 'moment'
 import ToggleButton from '~/shared/components/ToggleButton'
 import AppButton from '~/components/AppButton'
 import ActionButton from '~/components/ActionButton'
-import _ from 'lodash'
 import { ViewProps } from 'react-native'
 import { useReelistNavigation } from '~/utils/navigation'
 import { useStore } from '@reelist/utils/hooks/useStore'
+import { UserVideoType } from '@reelist/models/UserVideo'
 
 const sectionDivider = <View borderBottomColor="light.300" borderBottomWidth={1} />
 
 type VideoWatchedStatusRowProps = ViewProps & {
-  video: Video
+  video: UserVideoType
   onModalOpen?: () => void
 }
 
+// TODO: is broken for movies after refactor?
 const VideoWatchedStatusRow = observer(
   ({ video, onModalOpen, ...props }: VideoWatchedStatusRowProps) => {
     const { appState } = useStore()
@@ -28,37 +28,39 @@ const VideoWatchedStatusRow = observer(
 
     if (video.isCompleted) {
       videoStatus = <Text>Completed</Text>
-    } else if (video.isLatestEpisodeWatched) {
-      videoStatus = (
-        <Column>
-          <Text>Currently Live</Text>
+    } else if (video.isTv) {
+      if (video.isLatestEpisodeWatched) {
+        videoStatus = (
+          <Column>
+            <Text>Currently Live</Text>
 
-          {video.nextEpisodeToAir && (
-            <Text>
-              {/* Friday, Aug 19th 22 */}
-              Next Air Date:
-              {moment(video.nextEpisodeToAir.airDate).format(' dddd, MMM Do')}
+            {video.tmdbVideo.nextEpisodeToAir && (
+              <Text>
+                {/* Friday, Aug 19th 22 */}
+                Next Air Date:
+                {moment(video.tmdbVideo.nextEpisodeToAir.airDate).format(' dddd, MMM Do')}
+              </Text>
+            )}
+          </Column>
+        )
+      } else {
+        videoStatus = (
+          <ActionButton
+            onPress={video.watchNextEpisode}
+            endIcon={<MaterialCommunityIcons name="eye-plus" />}
+            flex={1}
+          >
+            <Text color="blue.500" numberOfLines={1}>
+              Season: {video.nextEpisode?.seasonNumber} Episode: {video.nextEpisode?.episodeNumber}
             </Text>
-          )}
-        </Column>
-      )
-    } else {
-      videoStatus = (
-        <ActionButton
-          onPress={video.watchNextEpisode}
-          endIcon={<MaterialCommunityIcons name="eye-plus" />}
-          flex={1}
-        >
-          <Text color="blue.500" numberOfLines={1}>
-            Season: {video.nextEpisode?.seasonNumber} Episode: {video.nextEpisode?.episodeNumber}
-          </Text>
-        </ActionButton>
-      )
+          </ActionButton>
+        )
+      }
     }
 
     const openVideoWatchModal = () => {
       appState.setCurrentVideo(video)
-      navigation.push('videoUpdateWatchedModal', { videoId: video.id })
+      navigation.push('videoUpdateWatchedModal', { videoId: video.videoId })
 
       onModalOpen?.()
     }
@@ -68,7 +70,7 @@ const VideoWatchedStatusRow = observer(
         {sectionDivider}
 
         <Row justifyContent="space-between" alignItems="center" space="2">
-          {video.isMovie ? (
+          {!video.isTv ? (
             <ToggleButton
               marginY="10px"
               active={video.isWatched}

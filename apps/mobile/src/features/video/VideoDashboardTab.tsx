@@ -2,19 +2,18 @@ import React from 'react'
 import { Row, Column } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@reelist/utils/hooks/useStore'
-import Video from '@reelist/models/Video'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import { ReelistNavigation } from '~/utils/navigation'
 import ToggleButton from '~/shared/components/ToggleButton'
 import AppButton from '~/components/AppButton'
 import TotalTimeDetailsPanel from '~/shared/components/TotalTimeDetailsPanel'
-import _ from 'lodash'
 import VideoWatchedStatusRow from '~/shared/components/VideoWatchedStatusRow'
 import SegmentButton from '~/shared/components/SegmentButton'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import { UserVideoType } from '@reelist/models/UserVideo'
 
 const VideoDashboardTab = observer(
-  ({ video, navigation }: { video: Video; navigation: ReelistNavigation }) => {
+  ({ video, navigation }: { video: UserVideoType; navigation: ReelistNavigation }) => {
     const { auth, appState } = useStore()
 
     const openVideoListManagementModal = () => {

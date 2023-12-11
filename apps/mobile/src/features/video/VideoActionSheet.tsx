@@ -10,13 +10,13 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import SegmentButton from '~/shared/components/SegmentButton'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import VideoWatchedStatusRow from '~/shared/components/VideoWatchedStatusRow'
-import Video from '@reelist/models/Video'
+import { UserVideoType } from '@reelist/models/UserVideo'
 
 const VideoActionSheet = observer(() => {
   const { appState, videoStore } = useStore()
   const navigation = useReelistNavigation()
 
-  const [video, setVideo] = useState<Video | null>(null)
+  const [video, setVideo] = useState<UserVideoType | null>(null)
 
   const { isOpen, videoId } = appState.actionSheets.video
 
@@ -34,11 +34,11 @@ const VideoActionSheet = observer(() => {
 
     setVideo(null)
 
-    videoStore.getVideo(videoId).then(setVideo)
+    videoStore.getVideoProgressForUser(videoId).then(setVideo)
   }, [videoId])
 
   useEffect(() => {
-    if (!video) return
+    if (!video?.isTv) return
 
     video.fetchSeasons()
   }, [video])
@@ -47,7 +47,7 @@ const VideoActionSheet = observer(() => {
     <Actionsheet isOpen={isOpen} onClose={closeSheet}>
       {video && (
         <Actionsheet.Content>
-          <VideoItem video={video} margin="0" onPress={closeSheet} />
+          <VideoItem video={video.tmdbVideo} margin="0" onPress={closeSheet} />
 
           <Column space="10px" marginY="20px" width="100%">
             <Row alignItems="center" space="8px" justifyContent="space-between">

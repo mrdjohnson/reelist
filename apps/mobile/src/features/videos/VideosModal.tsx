@@ -10,9 +10,9 @@ import { RefreshControl } from 'react-native'
 import useAsyncState from '@reelist/utils/hooks/useAsyncState'
 import useVideoSearch from '@reelist/utils/hooks/useVideoSearch'
 import NamedTileRow from '~/shared/components/NamedTileRow'
-import Video from '@reelist/models/Video'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import { useStore } from '@reelist/utils/hooks/useStore'
+import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
 
 const VideosModal = observer(({ route, navigation }: ReelistScreenFrom<'videosModal'>) => {
   const { auth } = useStore()
@@ -22,7 +22,7 @@ const VideosModal = observer(({ route, navigation }: ReelistScreenFrom<'videosMo
   const { title, allowFiltering } = route.params
 
   const [videos, refresh, loadingVideos] = useAsyncState([], route.params.loadVideos)
-  const [searchedVideos, setSearchedVideos] = useState<Video[]>([])
+  const [searchedVideos, setSearchedVideos] = useState<TmdbVideoPartialType[]>([])
   const [filterText, setfilterText] = useState('')
 
   const sortedVideos = useMemo(() => {
@@ -89,6 +89,7 @@ const VideosModal = observer(({ route, navigation }: ReelistScreenFrom<'videosMo
           showMoreText="See more"
           onShowMore={() =>
             navigation.navigate('discover', {
+              // @ts-ignore
               screen: 'discover',
               params: { initialSearchValue: filterText },
             })

@@ -16,7 +16,6 @@ import { ListRenderItem, RefreshControl } from 'react-native'
 import VideoItem, { videoItemSkeleton } from '~/features/video/VideoItem'
 import User from '@reelist/models/User'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import Video from '@reelist/models/Video'
 import _ from 'lodash'
 import TrackedVideoItem from '../video/TrackedVideoItem'
 import SegmentButton from '~/shared/components/SegmentButton'
@@ -25,6 +24,8 @@ import ActionButton from '~/components/ActionButton'
 import TotalTimeDetailsPanel from '~/shared/components/TotalTimeDetailsPanel'
 import VideoList from '@reelist/models/VideoList'
 import { observer } from 'mobx-react-lite'
+import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
+import { UserVideoType } from '@reelist/models/UserVideo'
 
 type ListViewTypes = 'list' | 'grid'
 type SortTypes = 'none' | 'alphaAsc' | 'alphaDesc' | 'releaseAsc' | 'releaseDesc'
@@ -45,7 +46,10 @@ type VideoFlatListProps = {
   onProgressPressed: () => void
 }
 
-const formatVideos = (videos: Video[] | null | undefined, sortType: SortTypes): Video[] => {
+const formatVideos = (
+  videos: TmdbVideoPartialType[] | null | undefined,
+  sortType: SortTypes,
+): TmdbVideoPartialType[] => {
   if (!videos) return []
 
   if (sortType === 'none') return videos
@@ -63,7 +67,7 @@ const VideoFlatList = observer(
   ({ videoList, activeUser, onProgressPressed }: VideoFlatListProps) => {
     const { videoListStore, videoStore, auth } = useStore()
 
-    const [trackedVideos, setTrackedVideos] = useState<Video[]>([])
+    const [trackedVideos, setTrackedVideos] = useState<UserVideoType[]>([])
     const [isLoadingVideos, setIsLoadingVideos] = useState(false)
     const [listViewType, setListViewType] = useState<ListViewTypes>('list')
     const [sortType, setSortType] = useState<SortTypes>('none')
@@ -103,10 +107,7 @@ const VideoFlatList = observer(
     const loadVideosForUser = async () => {
       setIsLoadingVideos(true)
 
-      const videos = await videoStore.getVideoProgressesForUser(
-        activeUser || null,
-        videoList?.videoIds,
-      )
+      const videos = await videoStore.getVideoProgressesForUser(activeUser, videoList?.videoIds)
 
       setIsLoadingVideos(false)
       setTrackedVideos(videos)
@@ -123,17 +124,19 @@ const VideoFlatList = observer(
       }
     }, [activeUser, videoList])
 
-    const renderVideo: ListRenderItem<Video> = ({ item: video }) => <VideoItem video={video} />
+    const renderVideo: ListRenderItem<TmdbVideoPartialType> = ({ item: video }) => (
+      <VideoItem video={video} />
+    )
 
     const renderVideoRow: ListRenderItem<VideoChunk> = ({ item: videos }) => (
       <ThreeTileRow videos={videos} />
     )
 
-    const renderTrackedVideo: ListRenderItem<Video> = ({ item: video }) => (
+    const renderTrackedVideo: ListRenderItem<UserVideoType> = ({ item: video }) => (
       <TrackedVideoItem video={video} isInteractable={useInteractibleTiles} />
     )
 
-    const renderTrackedVideoRow: ListRenderItem<VideoChunk> = ({ item: videos }) => (
+    const renderTrackedVideoRow: ListRenderItem<VideoChunk<UserVideoType>> = ({ item: videos }) => (
       <ThreeTileRow videos={videos} isTracked />
     )
 
@@ -285,7 +288,7 @@ const VideoFlatList = observer(
       return (
         <FlatList
           data={formattedVideos}
-          keyExtractor={(video: Video) => video.videoId}
+          keyExtractor={(video: TmdbVideoPartialType) => video.videoId}
           renderItem={renderVideo}
           key={listViewType}
           {...flatListProps}

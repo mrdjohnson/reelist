@@ -1,15 +1,14 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
-import Video from '@reelist/models/Video'
 import { useStore } from '@reelist/utils/hooks/useStore'
 import { useReelistNavigation } from '~/utils/navigation'
 import { Column, IPressableProps, Pressable, Row, Skeleton, Text, View } from 'native-base'
 import VideoImage from './VideoImage'
 import { GestureResponderEvent } from 'react-native'
+import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
 
-// todo; this should allow DiscoverVideoType
 type VideoItemProps = IPressableProps & {
-  video: Video | null | undefined
+  video: TmdbVideoPartialType | null | undefined
   isTile?: boolean
 }
 
@@ -19,12 +18,13 @@ const VideoItem = observer(({ video, isTile = false, onPress, ...props }: VideoI
 
   if (!video) return null
 
-  const name = video.name || video.title
+  const differentOriginalName =
+    video.videoName !== video.videoOriginalName ? video.videoOriginalName : null
 
   const goToMediaPage = (event: GestureResponderEvent) => {
     onPress && onPress(event)
 
-    navigation.push('videoScreen', {videoId: video.videoId})
+    navigation.push('videoScreen', { videoId: video.videoId })
   }
 
   if (isTile) {
@@ -58,17 +58,17 @@ const VideoItem = observer(({ video, isTile = false, onPress, ...props }: VideoI
       <View flex={1} justifyContent="space-between">
         <Column>
           <Text fontSize="lg" color={'black'} adjustsFontSizeToFit numberOfLines={1}>
-            {name}
+            {video.videoName}
           </Text>
 
           <Text fontSize="sm" color="light.500" adjustsFontSizeToFit numberOfLines={1}>
-            {video.originalName}
+            {differentOriginalName}
 
-            {video.originalName && video.videoReleaseDate && (
+            {differentOriginalName && video.videoReleaseDate && (
               <Text color="light.700">{'  |  '}</Text>
             )}
 
-            {video.videoReleaseDate.format("MMM Do 'YY")}
+            {video.videoReleaseDate.format('MMM YYYY')}
           </Text>
         </Column>
 

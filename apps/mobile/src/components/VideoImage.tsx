@@ -1,12 +1,12 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
-import Video from '@reelist/models/Video'
 import { AspectRatio, IAspectRatioProps, IImageProps, Image, View } from 'native-base'
+import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
 type VideoImageProps = IImageProps & {
-  video: Video | null | undefined
+  video: TmdbVideoPartialType | null | undefined
   containerProps?: IAspectRatioProps
 }
 

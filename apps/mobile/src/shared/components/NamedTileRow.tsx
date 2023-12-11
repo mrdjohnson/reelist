@@ -7,11 +7,9 @@ import {
   ScrollView,
   Pressable,
   Center,
-  Spacer,
   Skeleton,
 } from 'native-base'
 import React, { useMemo, useState } from 'react'
-import Video from '@reelist/models/Video'
 import _ from 'lodash'
 import VideoImage from '~/features/video/VideoImage'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
@@ -22,15 +20,15 @@ import { IViewProps } from 'native-base/lib/typescript/components/basic/View/typ
 import useAsyncState from '@reelist/utils/hooks/useAsyncState'
 import User from '@reelist/models/User'
 import ProfileIcon from './ProfileIcon'
-import { DiscoverVideoType } from '@reelist/models/DiscoverVideo'
+import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
 
 type NamedTileRowProps = IViewProps & {
-  videos?: Array<Video | DiscoverVideoType>
+  videos?: Array<TmdbVideoPartialType>
   label: string
   size?: number
   showMoreText?: string
   onShowMore?: () => void
-  loadVideos?: () => Promise<Video[]>
+  loadVideos?: () => Promise<TmdbVideoPartialType[]>
   loadUsers?: () => Promise<User[]>
   userId?: string
   allowFiltering?: boolean

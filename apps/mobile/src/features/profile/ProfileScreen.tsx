@@ -64,7 +64,7 @@ const ProfileScreen = observer(({ navigation }: ReelistScreen) => {
       <Text>Bookmarked Videos:</Text>
 
       {trackedVideos.map(video => (
-        <TrackedVideoItem video={video} key={video.id} isInteractable={isCurrentUser} />
+        <TrackedVideoItem video={video} key={video.videoId} isInteractable={isCurrentUser} />
       ))}
     </ScrollView>
   )
