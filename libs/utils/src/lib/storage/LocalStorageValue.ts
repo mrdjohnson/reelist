@@ -2,7 +2,7 @@ import type IStorage from '@reelist/utils/storage/storage.interface'
 import { makeAutoObservable } from 'mobx'
 
 export default class LocalStorageValue<T> {
-  constructor(private key: string, public value: T, private storage: IStorage) {
+  constructor(private key: string, public value: T | null, private storage: IStorage) {
     makeAutoObservable(this)
   }
 
@@ -14,7 +14,7 @@ export default class LocalStorageValue<T> {
     })
   }
 
-  setValue = (value: T) => {
+  setValue = (value: T | null) => {
     this.value = value
     return this.storage.save(this.key, value)
   }
