@@ -85,6 +85,50 @@ Build output locations are
 
 ### Server:
 
-To test locally,  `yarn nx run server:deploy-prod-local` should stop your local docker, create a new build, and begin running the new docker instance
+To run locally,  `yarn nx run server:deploy-prod-local` should stop your local docker, create a new build, and begin running the new docker instance
 
 If your new docker server fails use `docker logs $(docker ps -aqf "ancestor=reelist-server")` to see the logs of the crashed server
+
+```mermaid
+flowchart TB
+  subgraph Formatters
+    TmdbPartialVideo .-> Video
+    Video
+  end
+
+  subgraph TMDB api
+    subgraph by_id_Api
+      /tv/id
+      /movie/id
+    end
+
+    subgraph DiscoverApi
+      /discover/tv
+      /discover/movie
+
+    end
+
+    subgraph SearchApi
+      /search/multi
+    end
+
+    SearchApi --> TmdbPartialVideo
+    DiscoverApi --> TmdbPartialVideo
+    by_id_Api .-> TmdbPartialVideo
+  end
+
+  subgraph Screens
+    subgraph Mobile
+      direction TB
+      DiscoverScreen --> DiscoverApi
+      DiscoverScreen --> SearchApi
+      VideoListScreen .-> by_id_Api
+      Bookmarks/TrackingScreen .-> by_id_Api
+    end
+    subgraph Web
+      /discover --> DiscoverApi
+      /discover --> SearchApi
+      /discover/id .-> by_id_Api
+    end
+  end
+```
