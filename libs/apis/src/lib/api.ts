@@ -5,7 +5,7 @@ import humps from 'humps'
 const base_url = 'https://api.themoviedb.org/3'
 const apiKey = secrets.TMDB_API_KEY
 
-export const callTmdb = async (path: string, queryParams: Record<string, string> = {}) => {
+export const callTmdb = async <T>(path: string, queryParams: Record<string, string> = {}) => {
   // todo figure out how to get __DEV__ in the libraries
   // if (__DEV__) return await localCallTmdb(path, query, extra)
 
@@ -18,7 +18,7 @@ export const callTmdb = async (path: string, queryParams: Record<string, string>
 
   params = params.replace('%2C', ',')
 
-  return await localCallTmdb(path, params)
+  return await localCallTmdb<T>(path, params)
 
   // const response = await axios.get(secrets.SERVER_URL + '/api/tmdb', {
   //   params: {
@@ -32,7 +32,7 @@ export const callTmdb = async (path: string, queryParams: Record<string, string>
   // return humps.camelizeKeys(response)
 }
 
-const localCallTmdb = async (path: string, params: string) => {
+const localCallTmdb = async <T>(path: string, params: string) => {
   // console.log('faux tmdb endpoint')
 
   try {
@@ -40,9 +40,10 @@ const localCallTmdb = async (path: string, params: string) => {
 
     const { data, status, statusText } = await axios.get(tmdbUrl)
 
-    return { data: { data: humps.camelizeKeys(data), status, statusText } }
+    return { data: { data: humps.camelizeKeys(data) as T, status, statusText } }
   } catch (error) {
-    console.log('got error', error)
+    // error handling needed here
+    // console.log('got error', error)
     return { error }
   }
 }
