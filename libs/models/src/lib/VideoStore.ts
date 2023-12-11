@@ -1,7 +1,6 @@
 import _ from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import Auth from '@reelist/models/Auth'
-import Video, { TvSeason } from '@reelist/models/Video'
 import VideoList from '@reelist/models/VideoList'
 import { callTmdb } from '@reelist/apis/api'
 import User from '@reelist/models/User'
@@ -9,26 +8,56 @@ import { inject, injectable } from 'inversify'
 import { SupabaseClient } from '@supabase/supabase-js'
 import VideoApi from '@reelist/apis/VideoApi'
 import { VideoTableType } from 'libs/interfaces/src/lib/tables/VideoTable'
-import TableApi from '@reelist/apis/TableApi'
+import {
+  TmdbVideoByIdResponse,
+  TmdbVideoByIdType,
+} from '@reelist/interfaces/tmdb/TmdbVideoByIdType'
+import { TmdbVideoByIdFormatter } from '@reelist/utils/tmdbHelpers/TmdbVideoByIdFormatter'
+import UserStore from '@reelist/models/UserStore'
+import UserVideo, { UserVideoType } from '@reelist/models/UserVideo'
+import { settleAll } from '@reelist/utils/settleAll'
+import { TmdbTvSeason } from '@reelist/interfaces/tmdb/TmdbShowResponse'
 
 @injectable()
 class VideoStore {
-  tmdbJsonByVideoId: Record<string, Video | null> = {}
-  videoSeasonMapByVideoId: Record<string, Record<number, TvSeason | null>> = {}
+  // TODO: do we want separate caches for partials and fulls? do we always need the full when we call for it?
+  // for partial video modals, do we have enough information?
+  tmdbJsonByVideoId: Record<string, TmdbVideoByIdType | null> = {}
+  videoSeasonMapByVideoId: Record<string, Record<number, TmdbTvSeason | null>> = {}
+  userVideoById: Record<string, Record<string, UserVideoType>> = {}
 
   private videoApi: VideoApi
 
   constructor(
     @inject(Auth) private storeAuth: Auth,
-    @inject(SupabaseClient) protected supabase: SupabaseClient,
+    @inject(SupabaseClient) supabase: SupabaseClient,
+    @inject(UserStore) private userStore: UserStore,
   ) {
     this.videoApi = new VideoApi('videos', supabase)
 
     makeAutoObservable(this)
   }
 
-  makeUiVideo = (json: Video, videoId?: string, videoTableData?: VideoTableType | null) => {
-    return new Video(json, videoTableData, videoId, this, this.videoApi, this.storeAuth)
+  getCachedUserVideo(userId: string, videoId: string): UserVideoType | null {
+    return this.userVideoById[userId]?.[videoId]
+  }
+
+  getUserVideo = async (videoId: string, user: User, userVideoData?: VideoTableType) => {
+    const userId = user.id
+
+    const cachedUserVideo = this.getCachedUserVideo(userId, videoId)
+
+    if (cachedUserVideo) {
+      return cachedUserVideo
+    }
+
+    const tmdbVideo = await this.getVideo(videoId, userVideoData?.last_watched_season_number)
+
+    if (!tmdbVideo) return null
+
+    if (tmdbVideo.isTv) console.log('making user show')
+
+    return UserVideo.create(tmdbVideo, user, userVideoData)
   }
 
   getVideoPath = (videoId: string, seasonNumber?: number) => {
@@ -52,50 +81,67 @@ class VideoStore {
   getVideos = async (videoIds: string[] | undefined) => {
     if (!videoIds) return []
 
-    const videos: Array<Video | null> = await Promise.all(
-      videoIds.map(videoId => this.getVideo(videoId)),
-    )
+    const videos = await settleAll(videoIds.map(videoId => this.getVideo(videoId)))
 
     return _.compact(videos)
   }
 
-  getVideo = async (videoId: string, videoTableData: VideoTableType | null = null) => {
+  getVideo = async (
+    videoId: string,
+    seasonNumber?: number | null,
+  ): Promise<TmdbVideoByIdType | null> => {
     const path = this.getVideoPath(videoId)
 
     if (!path) return null
 
-    let video: Video | null = this.tmdbJsonByVideoId[videoId]
+    const video = this.tmdbJsonByVideoId[videoId]
+    let videoResponse: TmdbVideoByIdResponse | null
 
-    if (_.isUndefined(video)) {
-      video = await callTmdb(path, {
-        append_to_response: 'images,similar,aggregate_credits,credits,watch/providers',
-      }).then(item => _.get(item, 'data.data') || null)
+    let seasonsStringToRequest = ',season/1'
 
-      this.tmdbJsonByVideoId[videoId] = video || null
+    if (seasonNumber) {
+      seasonsStringToRequest += `,season/${seasonNumber},season/${seasonNumber + 1}`
     }
 
-    const uiVideo = video && this.makeUiVideo(video, videoId, videoTableData)
+    if (_.isUndefined(video)) {
+      videoResponse = await callTmdb<TmdbVideoByIdResponse>(path, {
+        // TODO: images is never used; remove?
+        append_to_response:
+          'images,similar,aggregate_credits,credits,watch/providers' + seasonsStringToRequest,
+      }).then(item => _.get(item, 'data.data') || null)
 
-    return uiVideo
+      this.tmdbJsonByVideoId[videoId] = TmdbVideoByIdFormatter.fromTmdbBaseVideo(
+        videoResponse,
+        videoId,
+      )
+    }
+
+    return video || this.tmdbJsonByVideoId[videoId]
   }
 
   getVideosForVideoList = async (videoList: VideoList) => {
     return this.getVideos(videoList.videoIds)
   }
 
-  _getTrackedVideo = (videoTableData: VideoTableType) => {
-    return this.getVideo(videoTableData.video_id, videoTableData)
-  }
-
-  getTrackedVideos = async ({
+  // getTrackedVideos({userId?: string | null, baseOnly: false}) => Promise<UserVideo[]>;
+  getTrackedVideos(args?: {
+    userId?: string | null
+    baseOnly?: false | undefined
+  }): Promise<UserVideoType[]>
+  getTrackedVideos(args?: { userId?: string | null; baseOnly: true }): Promise<TmdbVideoByIdType[]>
+  async getTrackedVideos({
     userId = null,
-    includeSeasons = true,
+    baseOnly = false,
   }: {
     userId?: string | null
-    includeSeasons?: boolean
-  } = {}): Promise<Video[]> => {
+    baseOnly?: boolean
+  } = {}): Promise<UserVideoType[] | TmdbVideoByIdType[]> {
     console.log('getTrackedVideos for user: ', this.storeAuth.user.id)
-    let videos: Video[] = []
+    const user = await this.userStore.getUser(userId || this.storeAuth.user.id)
+
+    if (!user) return []
+
+    let userVideos: UserVideoType[] = []
     const { data: videoJsons, error } = await this.videoApi.match({
       user_id: userId || this.storeAuth.user.id,
       tracked: true,
@@ -105,25 +151,33 @@ class VideoStore {
       console.error('failed to lazy load tracked videos', error.message)
       throw new Error('failed to lazy load tracked videos: ' + error.message)
     } else if (videoJsons) {
-      const videoPromises = await Promise.allSettled(videoJsons.map(this._getTrackedVideo))
+      userVideos = await settleAll(
+        videoJsons.map(videoTableData => {
+          return this.getUserVideo(videoTableData.video_id, user, videoTableData)
+        }),
+      )
 
-      videos = _.chain(videoPromises).map('value').compact().value()
-
-      if (includeSeasons) {
-        await Promise.allSettled(videos.map(video => video.fetchSeasons()))
-      }
+      await settleAll(
+        userVideos.map(async video => {
+          if (video.isTv) {
+            await video.fetchSeasons()
+          }
+        }),
+      )
     }
 
-    return videos
+    if (baseOnly) {
+      return _.map(userVideos, 'tmdbVideo')
+    }
+
+    return userVideos
   }
 
   getHistoricVideos = async ({
     userId = null,
-    includeSeasons = true,
   }: {
     userId?: string | null
-    includeSeasons?: boolean
-  } = {}): Promise<Video[]> => {
+  } = {}): Promise<TmdbVideoByIdType[]> => {
     console.log('getHistoricVideos for user: ', this.storeAuth.user.id)
 
     const serverUserId = userId || this.storeAuth.user.id
@@ -138,7 +192,6 @@ class VideoStore {
       match.allow_in_history = true
     }
 
-    let videos: Video[] = []
     const { data: videoJsons, error } = await this.videoApi
       .match(match)
       .order('updated_at', { ascending: false })
@@ -148,47 +201,60 @@ class VideoStore {
       console.error('failed to lazy load history videos', error.message)
       throw new Error('failed to lazy load history videos: ' + error.message)
     } else if (videoJsons) {
-      const videoPromises = await Promise.allSettled(videoJsons.map(this._getTrackedVideo))
-
-      videos = _.chain(videoPromises).map('value').compact().value()
-
-      if (includeSeasons) {
-        await Promise.allSettled(videos.map(video => video.fetchSeasons()))
-      }
+      return await settleAll(
+        videoJsons.map(videoTableData => this.getVideo(videoTableData.video_id)),
+      )
     }
 
-    return videos
+    return []
   }
 
   getVideoProgressesForUser = async (user: User | null, videoIds: string[] | undefined) => {
     if (!videoIds || _.isEmpty(videoIds) || !user) return []
-
-    let videos: Video[] = []
 
     const { data: videoJsons, error } = await this.videoApi
       .match({ user_id: user.id })
       .in('video_id', videoIds)
 
     if (error) {
-      console.error('failed to lazy load tracked videos', error.message)
-      throw new Error('failed to lazy load tracked videos: ' + error.message)
+      console.error('failed to lazy load tracked userVideos', error.message)
+      throw new Error('failed to lazy load tracked userVideos: ' + error.message)
     } else if (videoJsons) {
       const videoJsonMap = _.keyBy(videoJsons, 'video_id')
 
-      const videoPromises = await Promise.allSettled(
+      return await settleAll(
         videoIds.map(videoId => {
           const videoJson = videoJsonMap[videoId] || {}
 
-          return this.getVideo(videoId, videoJson)
+          return this.getUserVideo(videoId, user, videoJson)
         }),
       )
-
-      videos = _.chain(videoPromises).map('value').compact().value()
-
-      await Promise.allSettled(videos.map(video => video.fetchSeasons()))
     }
 
-    return videos
+    return []
+  }
+
+  getVideoProgressForUser = async (videoId: string, userToFind?: User) => {
+    const user = userToFind || this.storeAuth.user
+    const userId = user.id
+
+    const cachedUserVideo = this.getCachedUserVideo(userId, videoId)
+
+    // check cache first before doing another db call
+    if (cachedUserVideo) {
+      return cachedUserVideo
+    }
+
+    const { data: videoJson, error } = await this.videoApi
+      .match({ user_id: user.id, video_id: videoId })
+      .maybeSingle()
+
+    if (error) {
+      console.error('failed to lazy load tracked userVideos', error.message)
+      throw new Error('failed to lazy load tracked userVideos: ' + error.message)
+    }
+
+    return this.getUserVideo(videoId, user, videoJson || undefined)
   }
 }
 

@@ -1,30 +1,25 @@
-import Video from '@reelist/models/Video'
 import _ from 'lodash'
 import { flow, makeAutoObservable } from 'mobx'
 import Auth from '@reelist/models/Auth'
 import VideoList from '@reelist/models/VideoList'
 import { VideoListTableType } from 'libs/interfaces/src/lib/tables/VideoListTable'
 import { IViewModel } from 'mobx-utils'
-import VideoStore from '@reelist/models/VideoStore'
-import UserStore from '@reelist/models/UserStore'
 import { inject, injectable } from 'inversify'
 import { SupabaseClient } from '@supabase/supabase-js'
 import TableApi from '@reelist/apis/TableApi'
+import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
 
 @injectable()
 class VideoListStore {
   adminVideoLists: VideoList[] = []
   publicVideoLists: VideoList[] = []
   followedVideoLists: VideoList[] = []
-  currentVideo: Video | null = null
   currentVideoList: VideoList | null = null
 
   private videoListApi: TableApi<VideoListTableType>
 
   constructor(
     @inject(Auth) private storeAuth: Auth,
-    @inject(UserStore) private userStore: UserStore,
-    @inject(VideoStore) private videoStore: VideoStore,
     @inject(SupabaseClient) protected supabase: SupabaseClient,
   ) {
     this.videoListApi = new TableApi<VideoListTableType>('videoLists', supabase)
@@ -36,17 +31,10 @@ class VideoListStore {
   }
 
   makeUiVideoList = (videoList: VideoListTableType) => {
-    return new VideoList(
-      videoList,
-      this.storeAuth,
-      this,
-      this.videoStore,
-      this.userStore,
-      this.videoListApi,
-    )
+    return new VideoList(videoList)
   }
 
-  addToAdminVideoList = (videoList: VideoList) => {
+  _addToAdminVideoList = (videoList: VideoList) => {
     this.adminVideoLists = this.adminVideoLists.concat(videoList)
     this.publicVideoLists = _.without(this.publicVideoLists, videoList)
   }
@@ -59,6 +47,7 @@ class VideoListStore {
     }
   }
 
+  // TODO: create a getter for these lists that auto sort them based on the user
   addToFollowedVideoList = (videoList: VideoList) => {
     this.followedVideoLists = this.followedVideoLists.concat(videoList)
     this.publicVideoLists = _.without(this.publicVideoLists, videoList)
@@ -82,6 +71,23 @@ class VideoListStore {
     }
   }
 
+  getVideoList = async (videoListId: string) => {
+    if (!videoListId) return null
+
+    const { data: videoListResponse, error } = await this.videoListApi
+      .match({ id: videoListId })
+      .maybeSingle()
+
+    if (error) {
+      console.log('getAdminVideoLists error', error)
+    }
+
+    if (!videoListResponse) return null
+
+    // todo: is there a check around the visibility here?
+    return this.makeUiVideoList(videoListResponse)
+  }
+
   getAdminVideoLists = async () => {
     if (!_.isEmpty(this.adminVideoLists)) return this.adminVideoLists
 
@@ -93,7 +99,9 @@ class VideoListStore {
       console.log('getAdminVideoLists error', error)
     }
 
-    this.adminVideoLists = videoLists?.map(this.makeUiVideoList) || []
+    this.adminVideoLists = _.chain(videoLists).map(this.makeUiVideoList).compact().value()
+
+    return this.adminVideoLists
   }
 
   setCurrentVideoListFromShareId = flow(function* (
@@ -136,10 +144,7 @@ class VideoListStore {
 
     const videoList = this.makeUiVideoList(videoListJson)
 
-    const addToList = (list: VideoList[]) => {
-      const nextList = _.filter(list, { id: videoList.id })
-      return [...nextList, videoList]
-    }
+    const addToList = (list: VideoList[]) => _.filter(list, { id: videoList.id }).concat(videoList)
 
     if (this.storeAuth.user.isAdminOfList(videoList)) {
       this.adminVideoLists = addToList(this.adminVideoLists)
@@ -168,33 +173,24 @@ class VideoListStore {
     }
 
     this.publicVideoLists = videoLists?.map(this.makeUiVideoList) || []
+
+    return this.publicVideoLists
   })
 
-  getfollowedVideoLists = flow(function* (this: VideoListStore) {
+  getfollowedVideoLists = async () => {
     if (!_.isEmpty(this.followedVideoLists)) return this.followedVideoLists
 
     const followedListIds = this.storeAuth.user.followedListIds
 
-    const { data: videoLists, error } = yield this.videoListApi.selectAll.in('id', followedListIds)
+    const { data: videoLists, error } = await this.videoListApi.selectAll.in('id', followedListIds)
 
     if (error) {
       console.log('getfollowedVideoLists error', error)
     }
 
-    this.followedVideoLists = videoLists?.map(this.makeUiVideoList) || []
-  })
+    this.followedVideoLists = _.chain(videoLists).map(this.makeUiVideoList).compact().value()
 
-  createBlankVideoList = () => {
-    const videoList = new VideoList(
-      null,
-      this.storeAuth,
-      this,
-      this.videoStore,
-      this.userStore,
-      this.videoListApi,
-    )
-
-    return videoList
+    return this.followedVideoLists
   }
 
   createVideoList = async (videoListViewModel: VideoList & IViewModel<VideoList>) => {
@@ -216,11 +212,11 @@ class VideoListStore {
       console.error('failed to create videolist', error.message)
     } else {
       const videoList = this.makeUiVideoList(videoListJson!)
-      this.addToAdminVideoList(videoList)
+      this._addToAdminVideoList(videoList)
     }
   }
 
-  getAdminVideoListsForVideo = async (video: Video) => {
+  getAdminVideoListsForVideo = async (video: TmdbVideoPartialType) => {
     await this.getAdminVideoLists()
 
     const videoId = video.videoId
@@ -228,16 +224,7 @@ class VideoListStore {
     return _.filter(this.adminVideoLists, videoList => videoList.videoIds.includes(videoId))
   }
 
-  setCurrentVideo = (video: Video | null) => {
-    this.currentVideo = video
-  }
-
   setCurrentVideoList = (videoList: VideoList | null) => {
-    if (videoList === null) {
-      this.currentVideoList = null
-      return
-    }
-
     this.currentVideoList = videoList
   }
 
