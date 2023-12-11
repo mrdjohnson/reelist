@@ -248,8 +248,8 @@ class TmdbDiscover {
   }
 
   private get genreMap() {
-    const tvMap: Record<string, string> = {}
-    const movieMap: Record<string, string> = {}
+    const tvMap: Record<number, string> = {}
+    const movieMap: Record<number, string> = {}
 
     this.genreSelectState.options?.forEach(({ id: genreId, originalId, originalName }) => {
       if (genreId.startsWith('shared:')) {

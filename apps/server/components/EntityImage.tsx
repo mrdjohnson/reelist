@@ -2,16 +2,16 @@ import { observer } from 'mobx-react-lite'
 
 import React, { useMemo, useState } from 'react'
 import _ from 'lodash'
-import { DiscoverVideoType } from '@reelist/models/DiscoverVideo'
 import classNames from 'classnames'
-import Person from '@reelist/models/Person'
 import { useStore } from '@reelist/utils/hooks/useStore'
+import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
+import { TmdbPersonType } from '@reelist/interfaces/tmdb/TmdbPersonResponse'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
 type VideoImageProps = {
-  video?: DiscoverVideoType
-  person?: Person
+  video?: Partial<TmdbVideoPartialType>
+  person?: Partial<TmdbPersonType>
   isPoster?: boolean
   onPress?: () => void
   loading?: boolean
@@ -99,10 +99,11 @@ const EntityImage = observer(
     }, [imageErrored, isPoster, video.posterPath, video.backdropPath, person.profilePath])
 
     const genres = useMemo(() => {
-      if (loading) return []
+      // TODO: the tmdbDiscover.genreSelectState.optionsLoaded check should happen in the parent component
+      if (loading || !tmdbDiscover.genreSelectState.optionsLoaded || !video.genreIds) return []
 
       return tmdbDiscover.mapGenres(video)
-    }, [video.genreIds, loading])
+    }, [video.genreIds, loading, tmdbDiscover.genreSelectState.optionsLoaded])
 
     if (loading) {
       return (
