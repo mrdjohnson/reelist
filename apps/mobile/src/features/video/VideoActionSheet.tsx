@@ -47,7 +47,7 @@ const VideoActionSheet = observer(() => {
     <Actionsheet isOpen={isOpen} onClose={closeSheet}>
       {video && (
         <Actionsheet.Content>
-          <VideoItem video={video.tmdbVideo} margin="0" onPress={closeSheet} />
+          <VideoItem video={video} margin="0" onPress={closeSheet} />
 
           <Column space="10px" marginY="20px" width="100%">
             <Row alignItems="center" space="8px" justifyContent="space-between">

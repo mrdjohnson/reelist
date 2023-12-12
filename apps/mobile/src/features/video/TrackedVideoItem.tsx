@@ -47,11 +47,11 @@ const TrackedVideoItem = observer(
             <Column>
               <Text alignSelf="flex-end">Currently Live</Text>
 
-              {video.tmdbVideo.nextEpisodeToAir && (
+              {video.nextEpisodeToAir && (
                 <Text alignSelf="flex-end">
                   {/* Friday, Aug 19th 22 */}
                   Next Air Date:
-                  {moment(video.tmdbVideo.nextEpisodeToAir.airDate).format(' dddd, MMM Do')}
+                  {moment(video.nextEpisodeToAir.airDate).format(' dddd, MMM Do')}
                 </Text>
               )}
             </Column>
@@ -125,7 +125,7 @@ const TrackedVideoItem = observer(
           onLongPress={() => appState.setActionSheetVideo(video)}
         >
           <Column>
-            <VideoImage video={video.tmdbVideo} />
+            <VideoImage video={video} />
 
             <View>{bottomRow}</View>
           </Column>
@@ -143,7 +143,7 @@ const TrackedVideoItem = observer(
       >
         <View flexShrink={1}>
           <VideoImage
-            video={video.tmdbVideo}
+            video={video}
             containerProps={{ marginRight: '8px', maxHeight: '120px' }}
             backgroundColor="black"
           />
@@ -152,18 +152,18 @@ const TrackedVideoItem = observer(
         <View flex={1} backgroundColor={null} roundedLeft="sm" roundedRight="md">
           <Column flex={1}>
             <Text fontSize="lg" color={'black'}>
-              {video.tmdbVideo.videoName}
+              {video.videoName}
             </Text>
 
-            {video.tmdbVideo.videoOriginalName && (
+            {video.videoOriginalName && (
               <Text fontSize="sm" color="light.500">
-                {video.tmdbVideo.videoOriginalName}
+                {video.videoOriginalName}
               </Text>
             )}
 
-            {video.tmdbVideo.videoReleaseDate && (
+            {video.videoReleaseDate && (
               <Text fontSize="sm" color="light.500">
-                {video.tmdbVideo.videoReleaseDate.format('MMM YYYY')}
+                {video.videoReleaseDate.format('MMM YYYY')}
               </Text>
             )}
           </Column>

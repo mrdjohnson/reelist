@@ -32,11 +32,7 @@ abstract class AbstractUserVideo extends classFromProps<TmdbBaseVideoType>() {
   protected videoStore: VideoStore = inversionContainer.get<VideoStore>(VideoStore)
   protected videoApi: VideoApi
 
-  constructor(
-    public tmdbVideo: TmdbVideoByIdType,
-    protected user: User,
-    userVideoData?: VideoTableType,
-  ) {
+  constructor(tmdbVideo: TmdbVideoByIdType, protected user: User, userVideoData?: VideoTableType) {
     super(tmdbVideo)
 
     const supabase: SupabaseClient = inversionContainer.get<SupabaseClient>(SupabaseClient)
@@ -92,7 +88,7 @@ abstract class AbstractUserVideo extends classFromProps<TmdbBaseVideoType>() {
     const { data: videoJson, error } = await this.videoApi.updateVideo({
       ...upsertData,
       id: this.serverId,
-      video_id: this.tmdbVideo.videoId,
+      video_id: this.videoId,
     })
 
     if (error) {

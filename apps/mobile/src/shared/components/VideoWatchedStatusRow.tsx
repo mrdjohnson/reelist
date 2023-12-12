@@ -34,11 +34,11 @@ const VideoWatchedStatusRow = observer(
           <Column>
             <Text>Currently Live</Text>
 
-            {video.tmdbVideo.nextEpisodeToAir && (
+            {video.nextEpisodeToAir && (
               <Text>
                 {/* Friday, Aug 19th 22 */}
                 Next Air Date:
-                {moment(video.tmdbVideo.nextEpisodeToAir.airDate).format(' dddd, MMM Do')}
+                {moment(video.nextEpisodeToAir.airDate).format(' dddd, MMM Do')}
               </Text>
             )}
           </Column>

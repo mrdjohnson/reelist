@@ -24,7 +24,7 @@ class UserShow extends Mixin(AbstractUserVideo, AbstractBaseShow) {
   firstEpisode?: TmdbTvEpisode
 
   constructor(
-    public override tmdbVideo: TmdbVideoByIdType<TmdbShowByIdResponse>,
+    tmdbVideo: TmdbVideoByIdType<TmdbShowByIdResponse>,
     protected override user: User,
     userVideoData?: VideoTableType,
   ) {
@@ -520,7 +520,7 @@ class UserShow extends Mixin(AbstractUserVideo, AbstractBaseShow) {
   }
 
   get minEpisodeRunTime() {
-    return _.min(this.tmdbVideo.episodeRunTimes) || 0
+    return _.min(this.episodeRunTimes) || 0
   }
 
   override get totalWatchedDurationMinutes() {
