@@ -13,6 +13,7 @@ import {
   AspectRatio,
   Image,
   Column,
+  ChevronRightIcon,
 } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
@@ -107,23 +108,10 @@ const VideoSeasonModal = observer(
         <View
           key={episode.id}
           flexDirection="row"
-          alignItems="center"
+          alignItems="flex-end"
           marginBottom={2}
           opacity={aired ? '100' : '50'}
         >
-          <Pressable flex={1} onPress={() => setEpisode(episode)} disabled={!aired}>
-            <Text fontSize="sm" color="gray.400">
-              Episode {episode.episodeNumber}
-            </Text>
-
-            <Text fontSize="md">{episode.name}</Text>
-          </Pressable>
-
-          <Row alignItems="center" paddingRight="10px">
-            <Icon as={<MaterialIcons name="star-rate" />} size="sm" color="red.600" />
-            <Text color="light.700">{episode.voteAverage.toPrecision(2)}</Text>
-          </Row>
-
           <Checkbox
             value={season?.seasonNumber + ''}
             isChecked={video.getIsEpisodeWatched(episode)}
@@ -131,7 +119,31 @@ const VideoSeasonModal = observer(
             accessibilityLabel={'Episode ' + episode.episodeNumber}
             size="sm"
             colorScheme="reelist"
+            marginRight="10px"
           />
+
+          <Pressable
+            flex={1}
+            onPress={() => setEpisode(episode)}
+            disabled={!aired}
+            flexDirection="row"
+            alignItems="center"
+          >
+            <Column flex={1}>
+              <Text fontSize="sm" color="gray.400">
+                Episode {episode.episodeNumber}
+              </Text>
+
+              <Text fontSize="md">{episode.name}</Text>
+            </Column>
+
+            <Row alignItems="center" paddingRight="10px">
+              <Icon as={<MaterialIcons name="star-rate" />} size="sm" color="red.600" />
+              <Text color="light.700">{episode.voteAverage.toPrecision(2)}</Text>
+            </Row>
+
+            <ChevronRightIcon />
+          </Pressable>
         </View>
       )
     }
@@ -185,7 +197,7 @@ const VideoSeasonModal = observer(
             </Row>
           </View>
 
-          <Row justifyContent="space-between">
+          <Row justifyContent="space-between" alignItems="center">
             <Row alignItems="center">
               <Text>Hide future shows:</Text>
               <Switch
@@ -206,6 +218,8 @@ const VideoSeasonModal = observer(
               size="sm"
             />
           </Row>
+
+          <View borderBottomColor="light.300" borderBottomWidth={1} marginY="4px" />
 
           <ScrollView flex={1} showsVerticalScrollIndicator={false}>
             {episodes?.map(renderEpisodeLineItem)}
