@@ -70,7 +70,7 @@ export class TmdbVideoByIdFormatter {
       seasonMap[season.seasonNumber] = season
     })
 
-    return {
+    return new TmdbShowById({
       ...showPartial,
       ...rest,
       similar,
@@ -85,7 +85,7 @@ export class TmdbVideoByIdFormatter {
       // deviation from the original Video implementation which removed the future episodes from the count
       totalDurationMinutes: (_.min(json.episodeRunTime) || 0) * json.numberOfEpisodes,
       seasonMap,
-    }
+    })
   }
 
   static fromTmdbMovie(json: TmdbMovieByIdResponse): TmdbMovieById {

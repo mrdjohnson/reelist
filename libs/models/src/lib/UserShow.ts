@@ -24,7 +24,7 @@ class UserShow extends Mixin(AbstractUserVideo, AbstractBaseShow) {
   firstEpisode?: TmdbTvEpisode
 
   constructor(
-    tmdbVideo: TmdbVideoByIdType<TmdbShowByIdResponse>,
+    public override tmdbVideo: TmdbShowById,
     protected override user: User,
     userVideoData?: VideoTableType,
   ) {
@@ -294,48 +294,11 @@ class UserShow extends Mixin(AbstractUserVideo, AbstractBaseShow) {
     // this.notifyListsAboutWatched(update)
   }
 
-  fetchSeason = async (seasonNumber: number) => {
-    if (this.seasonMap[seasonNumber]) return this.seasonMap[seasonNumber]
-
-    const path = this.tmdbPath + '/season/' + seasonNumber
-
-    let season: TmdbTvSeason | null = null
-
-    try {
-      season = (await callTmdb(path).then(item => _.get(item, 'data.data'))) as TmdbTvSeason
-    } catch (e) {
-      console.error(e)
-      throw e
-    } finally {
-      if (season) {
-        this.seasonMap[seasonNumber] = season
-      }
-    }
-
-    return this.seasonMap[seasonNumber]
-  }
-
-  fetchSeasons = flow(function* (this: UserShow) {
-    if (!this.seasons) return
-
-    const seasonMap = this.videoStore.videoSeasonMapByVideoId[this.videoId]
-
-    if (!_.isUndefined(seasonMap)) {
-      this.seasonMap = seasonMap
-    } else {
-      console.log('fetching seasons')
-      yield Promise.allSettled(this.seasons?.map(season => this.fetchSeason(season.seasonNumber)))
-
-      // debugger
-      this.videoStore.videoSeasonMapByVideoId[this.videoId] = this.seasonMap || null
-    }
-
-    // if(_.isUndefined(this.videoStore.videoSeasonMapByVideoId[this.videoId]) {
-    //   return
-    // }
+  override fetchSeasons = async () => {
+    super.fetchSeasons()
 
     this._linkEpisodes()
-  })
+  }
 
   watchNextEpisode = () => {
     if (this.nextEpisode) {

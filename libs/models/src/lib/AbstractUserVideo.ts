@@ -20,6 +20,7 @@ import User from '@reelist/models/User'
 import { classFromProps } from '@reelist/utils/ClassHelper'
 import { TmdbMovieByIdResponse } from '@reelist/interfaces/tmdb/TmdbMovieResponse'
 import UserShow from '@reelist/models/UserShow'
+import { TmdbVideoType } from '@reelist/models/Video'
 
 abstract class AbstractUserVideo extends classFromProps<TmdbBaseVideoType>() {
   tracked = false
@@ -32,7 +33,11 @@ abstract class AbstractUserVideo extends classFromProps<TmdbBaseVideoType>() {
   protected videoStore: VideoStore = inversionContainer.get<VideoStore>(VideoStore)
   protected videoApi: VideoApi
 
-  constructor(tmdbVideo: TmdbVideoByIdType, protected user: User, userVideoData?: VideoTableType) {
+  constructor(
+    public tmdbVideo: TmdbVideoType,
+    protected user: User,
+    userVideoData?: VideoTableType,
+  ) {
     super(tmdbVideo)
 
     const supabase: SupabaseClient = inversionContainer.get<SupabaseClient>(SupabaseClient)

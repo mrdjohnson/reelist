@@ -1,32 +1,19 @@
 import User from '@reelist/models/User'
 import UserShow from '@reelist/models/UserShow'
 import AbstractUserVideo from '@reelist/models/AbstractUserVideo'
-import { TmdbVideoByIdType } from '@reelist/interfaces/tmdb/TmdbVideoByIdType'
 import { VideoTableType } from '@reelist/interfaces/tables/VideoTable'
-import { TmdbShowByIdResponse } from '@reelist/interfaces/tmdb/TmdbShowResponse'
-import { TmdbMovieByIdResponse } from '@reelist/interfaces/tmdb/TmdbMovieResponse'
 
 import { Mixin } from 'ts-mixer'
-import { AbstractBaseMovie } from '@reelist/models/tmdb/TmdbMovieById'
+import { AbstractBaseMovie, TmdbMovieById } from '@reelist/models/tmdb/TmdbMovieById'
+import { TmdbShowById } from '@reelist/models/tmdb/TmdbShowById'
+import { TmdbVideoType } from '@reelist/models/Video'
 
 class UserVideo {
+  static create(tmdbVideo: TmdbShowById, user: User, userVideoData?: VideoTableType): UserShow
+  static create(tmdbVideo: TmdbMovieById, user: User, userVideoData?: VideoTableType): UserMovie
+  static create(tmdbVideo: TmdbVideoType, user: User, userVideoData?: VideoTableType): UserVideoType
   static create(
-    tmdbVideo: TmdbVideoByIdType<TmdbShowByIdResponse>,
-    user: User,
-    userVideoData?: VideoTableType,
-  ): UserShow
-  static create(
-    tmdbVideo: TmdbVideoByIdType<TmdbMovieByIdResponse>,
-    user: User,
-    userVideoData?: VideoTableType,
-  ): UserMovie
-  static create(
-    tmdbVideo: TmdbVideoByIdType,
-    user: User,
-    userVideoData?: VideoTableType,
-  ): UserVideoType
-  static create(
-    tmdbVideo: TmdbVideoByIdType,
+    tmdbVideo: TmdbVideoType,
     user: User,
     userVideoData?: VideoTableType,
   ): UserVideoType {

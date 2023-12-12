@@ -18,6 +18,7 @@ import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialT
 import { settleAll } from '@reelist/utils/settleAll'
 import { TmdbVideoByIdType } from '@reelist/interfaces/tmdb/TmdbVideoByIdType'
 import videoStore from '@reelist/models/VideoStore'
+import { TmdbVideoType } from '@reelist/models/Video'
 
 type VideoListType = Camelized<VideoListTableType>
 @injectable()
@@ -189,7 +190,7 @@ class VideoList implements VideoListType {
 
 const sortVideos = (
   videoListViewModel: IViewModel<VideoList> & VideoList,
-  videos: TmdbVideoByIdType[],
+  videos: TmdbVideoType[],
 ) => {
   const sortDirection = videoListViewModel.autoSortIsAscending ? 'asc' : 'desc'
 
