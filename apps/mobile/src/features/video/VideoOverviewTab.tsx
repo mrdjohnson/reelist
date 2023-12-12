@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Pressable, Text, View, Icon, Checkbox, Row } from 'native-base'
+import { Pressable, Text, View, Icon, Checkbox, Row, ChevronRightIcon } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import NamedTileRow from '~/shared/components/NamedTileRow'
@@ -69,10 +69,6 @@ const VideoOverviewTab = observer(({ video }: { video: UserVideoType }) => {
 
             {video.tmdbVideo.seasonPartials.map(season => (
               <Row key={season.id} alignItems="center" marginBottom="10px" marginTop="10px">
-                <Pressable onPress={() => navigateToSeason(season)} flex={1}>
-                  <Text fontSize="md">{season.name}</Text>
-                </Pressable>
-
                 <Checkbox
                   value={season.seasonNumber + ''}
                   isChecked={
@@ -87,7 +83,15 @@ const VideoOverviewTab = observer(({ video }: { video: UserVideoType }) => {
                       : undefined
                   }
                   colorScheme="reelist"
+                  marginRight="10px"
                 />
+
+                <Pressable onPress={() => navigateToSeason(season)} flex={1}>
+                  <Row justifyContent="space-between" alignItems="center">
+                    <Text fontSize="md">{season.name}</Text>
+                    <ChevronRightIcon />
+                  </Row>
+                </Pressable>
               </Row>
             ))}
           </View>
