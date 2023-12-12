@@ -5,6 +5,7 @@ export type TmdbVideoPartialType = TmdbBaseVideoResponse & {
   isTv: boolean
   hasUser: true | any
   mediaType: 'tv' | 'mv'
+  tmdbPath: string
   videoId: string
   videoName: string
   videoOriginalName: string

@@ -14,10 +14,14 @@ type NeededPartialFields = {
   id: number
 }
 const createTmdbVideoCommonFields = (json: NeededPartialFields) => {
+  const isTv = json.mediaType === 'tv'
+  const tmdbPath = '/' + (isTv ? 'tv' : 'movie') + '/' + json.id
+
   return {
-    isTv: json.mediaType === 'tv',
+    isTv,
     videoId: json.mediaType + json.id,
     mediaType: json.mediaType,
+    tmdbPath,
   }
 }
 

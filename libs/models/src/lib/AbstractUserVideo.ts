@@ -109,12 +109,6 @@ abstract class AbstractUserVideo extends classFromProps<TmdbBaseVideoType>() {
     return !!this.videoInfo?.watched
   }
 
-  get tmdbPath() {
-    const mediaType = this.isTv ? 'tv' : 'movie'
-
-    return '/' + mediaType + '/' + this.id
-  }
-
   // this should be based on watched episode count of season and or season status... or just is watched if its a movie
   get isCompleted() {
     return this.isWatched
