@@ -2,20 +2,20 @@ import _ from 'lodash'
 import { callTmdb } from '@reelist/apis/api'
 import { VideoTableType } from 'libs/interfaces/src/lib/tables/VideoTable'
 import { TmdbTvEpisode, TmdbVideoByIdType } from '@reelist/interfaces/tmdb/TmdbVideoByIdType'
-import {
-  TmdbShowByIdResponse,
-  TmdbShowEpisodeResponseType,
-  TmdbTvSeason,
-} from '@reelist/interfaces/tmdb/TmdbShowResponse'
+import { TmdbShowByIdResponse, TmdbTvSeason } from '@reelist/interfaces/tmdb/TmdbShowResponse'
 import User from '@reelist/models/User'
 import { UserMovie } from '@reelist/models/UserVideo'
 import AbstractUserVideo from '@reelist/models/AbstractUserVideo'
 import { flow } from 'mobx'
 import moment from 'moment'
+import { mix, Mixin } from 'ts-mixer'
+import { AbstractBaseShow, TmdbShowById } from '@reelist/models/tmdb/TmdbShowById'
 
-class UserShow extends AbstractUserVideo {
+@mix(TmdbShowById, AbstractUserVideo)
+class UserShow extends Mixin(AbstractUserVideo, AbstractBaseShow) {
   override isTv: true = true
-  protected seasonMap: Record<number, TmdbTvSeason | null> = {}
+  override hasUser: true = true
+
   unWatchableEpisodeCount = 0
 
   seasons?: TmdbTvSeason[] | undefined
@@ -23,19 +23,12 @@ class UserShow extends AbstractUserVideo {
   lastWatchedEpisode?: TmdbTvEpisode
   firstEpisode?: TmdbTvEpisode
 
-  lastEpisodeToAir?: TmdbTvEpisode
-  nextEpisodeToAir?: TmdbTvEpisode
-
   constructor(
     public override tmdbVideo: TmdbVideoByIdType<TmdbShowByIdResponse>,
     protected override user: User,
     userVideoData?: VideoTableType,
   ) {
     super(tmdbVideo, user, userVideoData)
-
-    // if (this.videoId === 'tv116244') {
-    //   debugger
-    // }
 
     this._linkEpisodes()
   }
@@ -476,7 +469,7 @@ class UserShow extends AbstractUserVideo {
   }
 
   get lastWatchedEpisodeFromEnd() {
-    let lastEpisode = this.lastEpisodeToAir
+    let lastEpisode: TmdbTvEpisode | undefined = this.lastEpisodeToAir
 
     while (lastEpisode && !this.getIsEpisodeWatched(lastEpisode)) {
       lastEpisode = lastEpisode.previous

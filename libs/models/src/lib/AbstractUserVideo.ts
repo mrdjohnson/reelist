@@ -27,7 +27,7 @@ abstract class AbstractUserVideo extends classFromProps<TmdbBaseVideoType>() {
   serverId: string | undefined
   allowInHistory = true
 
-  override isTv: boolean
+  abstract override isTv: boolean
 
   protected videoStore: VideoStore = inversionContainer.get<VideoStore>(VideoStore)
   protected videoApi: VideoApi
@@ -38,8 +38,6 @@ abstract class AbstractUserVideo extends classFromProps<TmdbBaseVideoType>() {
     userVideoData?: VideoTableType,
   ) {
     super(tmdbVideo)
-
-    this.isTv = tmdbVideo.isTv
 
     const supabase: SupabaseClient = inversionContainer.get<SupabaseClient>(SupabaseClient)
     this.videoApi = new VideoApi('videos', supabase)

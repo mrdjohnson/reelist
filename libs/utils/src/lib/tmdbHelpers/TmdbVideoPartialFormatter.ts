@@ -1,14 +1,8 @@
-import {
-  TmdbDiscoverMovieResponseType,
-  TmdbDiscoverShowResponseType,
-} from '@reelist/interfaces/tmdb/TmdbDiscoverVideoResponseType'
 import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
 import {
   TmdbSearchPersonResponseType,
   TmdbSearchVideoResponse,
 } from '@reelist/interfaces/tmdb/TmdbSearchResponse'
-import { TmdbVideoByIdResponse } from '@reelist/interfaces/tmdb/TmdbVideoByIdType'
-import { TmdbMovieByIdResponse } from '@reelist/interfaces/tmdb/TmdbMovieResponse'
 import moment from 'moment'
 import {
   TmdbBaseMovieResponse,
@@ -34,6 +28,7 @@ export class TmdbVideoPartialFormatter {
     return {
       ...json,
       ...createTmdbVideoCommonFields({ id: json.id, mediaType: 'tv' }),
+      hasUser: false,
       videoName: name,
       videoOriginalName: originalName,
       videoReleaseDate: moment(firstAirDate),
@@ -46,6 +41,7 @@ export class TmdbVideoPartialFormatter {
     return {
       ...json,
       ...createTmdbVideoCommonFields({ id: json.id, mediaType: 'mv' }),
+      hasUser: false,
       videoName: title,
       videoOriginalName: originalTitle,
       videoReleaseDate: moment(releaseDate),

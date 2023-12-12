@@ -8,21 +8,19 @@ import { inject, injectable } from 'inversify'
 import { SupabaseClient } from '@supabase/supabase-js'
 import VideoApi from '@reelist/apis/VideoApi'
 import { VideoTableType } from 'libs/interfaces/src/lib/tables/VideoTable'
-import {
-  TmdbVideoByIdResponse,
-  TmdbVideoByIdType,
-} from '@reelist/interfaces/tmdb/TmdbVideoByIdType'
+import { TmdbVideoByIdResponse } from '@reelist/interfaces/tmdb/TmdbVideoByIdType'
 import { TmdbVideoByIdFormatter } from '@reelist/utils/tmdbHelpers/TmdbVideoByIdFormatter'
 import UserStore from '@reelist/models/UserStore'
 import UserVideo, { UserVideoType } from '@reelist/models/UserVideo'
 import { settleAll } from '@reelist/utils/settleAll'
 import { TmdbTvSeason } from '@reelist/interfaces/tmdb/TmdbShowResponse'
+import { AnyVideoType, TmdbVideoType } from '@reelist/models/Video'
 
 @injectable()
 class VideoStore {
   // TODO: do we want separate caches for partials and fulls? do we always need the full when we call for it?
   // for partial video modals, do we have enough information?
-  tmdbJsonByVideoId: Record<string, TmdbVideoByIdType | null> = {}
+  tmdbJsonByVideoId: Record<string, TmdbVideoType | null> = {}
   videoSeasonMapByVideoId: Record<string, Record<number, TmdbTvSeason | null>> = {}
   userVideoById: Record<string, Record<string, UserVideoType>> = {}
 
@@ -92,10 +90,7 @@ class VideoStore {
     return _.compact(videos)
   }
 
-  getVideo = async (
-    videoId: string,
-    seasonNumber?: number | null,
-  ): Promise<TmdbVideoByIdType | null> => {
+  getVideo = async (videoId: string, seasonNumber?: number | null) => {
     const path = this.getVideoPath(videoId)
 
     if (!path) return null
@@ -134,14 +129,14 @@ class VideoStore {
     userId?: string | null
     baseOnly?: false | undefined
   }): Promise<UserVideoType[]>
-  getTrackedVideos(args?: { userId?: string | null; baseOnly: true }): Promise<TmdbVideoByIdType[]>
+  getTrackedVideos(args?: { userId?: string | null; baseOnly: true }): Promise<TmdbVideoType[]>
   async getTrackedVideos({
     userId = null,
     baseOnly = false,
   }: {
     userId?: string | null
     baseOnly?: boolean
-  } = {}): Promise<UserVideoType[] | TmdbVideoByIdType[]> {
+  } = {}): Promise<AnyVideoType[]> {
     console.log('getTrackedVideos for user: ', this.storeAuth.user.id)
     const user = await this.userStore.getUser(userId || this.storeAuth.user.id)
 
@@ -183,7 +178,7 @@ class VideoStore {
     userId = null,
   }: {
     userId?: string | null
-  } = {}): Promise<TmdbVideoByIdType[]> => {
+  } = {}): Promise<TmdbVideoType[]> => {
     console.log('getHistoricVideos for user: ', this.storeAuth.user.id)
 
     const serverUserId = userId || this.storeAuth.user.id
@@ -239,6 +234,28 @@ class VideoStore {
 
     return []
   }
+
+  // getShow = async (videoId: string, user?: User): Promise<AnyShowType | null> => {
+  //   let videoGetter
+  //   if (user) {
+  //     videoGetter = (videoId: string) => this.getVideoProgressForUser(videoId, user)
+  //     // const video = await this.getVideoProgressForUser(videoId, user)
+  //     //
+  //     // if (video?.isTv) {
+  //     //   return video
+  //     // }
+  //     //
+  //     // return null
+  //   } else {
+  //     videoGetter = this.getVideo
+  //   }
+  //
+  //   const video = await videoGetter(videoId)
+  //
+  //   if (video?.isTv) return video
+  //
+  //   return null
+  // }
 
   getVideoProgressForUser = async (videoId: string, userToFind?: User) => {
     const user = userToFind || this.storeAuth.user

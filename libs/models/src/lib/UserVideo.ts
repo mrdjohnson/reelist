@@ -6,6 +6,9 @@ import { VideoTableType } from '@reelist/interfaces/tables/VideoTable'
 import { TmdbShowByIdResponse } from '@reelist/interfaces/tmdb/TmdbShowResponse'
 import { TmdbMovieByIdResponse } from '@reelist/interfaces/tmdb/TmdbMovieResponse'
 
+import { Mixin } from 'ts-mixer'
+import { AbstractBaseMovie } from '@reelist/models/tmdb/TmdbMovieById'
+
 class UserVideo {
   static create(
     tmdbVideo: TmdbVideoByIdType<TmdbShowByIdResponse>,
@@ -35,8 +38,9 @@ class UserVideo {
   }
 }
 
-export class UserMovie extends AbstractUserVideo {
+export class UserMovie extends Mixin(AbstractUserVideo, AbstractBaseMovie) {
   override isTv: false = false
+  override hasUser: true = true
 }
 
 export type UserVideoType = UserShow | UserMovie

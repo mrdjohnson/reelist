@@ -3,6 +3,7 @@ import { Moment } from 'moment'
 
 export type TmdbVideoPartialType = TmdbBaseVideoResponse & {
   isTv: boolean
+  hasUser: true | any
   mediaType: 'tv' | 'mv'
   videoId: string
   videoName: string

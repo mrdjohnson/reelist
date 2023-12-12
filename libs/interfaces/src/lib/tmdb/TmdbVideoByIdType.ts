@@ -36,7 +36,7 @@ export type TmdbShowOnlyFields = {
   numberOfEpisodes: number
   numberOfSeasons: number
   episodeRunTimes: number[]
-  seasonMap: Record<number, TmdbTvSeason>
+  seasonMap: Record<number, TmdbTvSeason | null>
 }
 
 export type TmdbBaseVideoType = TmdbVideoPartialType & {

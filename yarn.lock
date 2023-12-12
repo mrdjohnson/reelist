@@ -18337,6 +18337,7 @@ __metadata:
     swr: ^1.3.0
     tailwindcss: ^3.3.6
     ts-jest: 28.0.8
+    ts-mixer: ^6.0.3
     ts-node: ^10.9.1
     tslib: ^2.3.0
     typescript: ^5.2.2
@@ -20082,6 +20083,13 @@ __metadata:
   bin:
     ts-jest: cli.js
   checksum: c72e9292709e77ce47ac7813cb24feaa9d01dc983598d29a821f224b5cc190dc7d67e17379cef089095404c00b9d582ee91c727916f9ec289cb1b723df408ae3
+  languageName: node
+  linkType: hard
+
+"ts-mixer@npm:^6.0.3":
+  version: 6.0.3
+  resolution: "ts-mixer@npm:6.0.3"
+  checksum: 7fbaba0a413bf817835a6a23d46bccf4192dd4d7345b6bae9d594c88acffac35bf4995ef3cce753090c8abcdf2afd16dba8899365584a1f960ccc2a15bf2e2d6
   languageName: node
   linkType: hard
 

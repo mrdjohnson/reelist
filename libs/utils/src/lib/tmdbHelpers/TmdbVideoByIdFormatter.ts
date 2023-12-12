@@ -1,36 +1,26 @@
-import {
-  TmdbShowByIdResponse,
-  TmdbShowSeasonPartialResponseType,
-  TmdbTvSeason,
-} from '@reelist/interfaces/tmdb/TmdbShowResponse'
+import { TmdbShowByIdResponse, TmdbTvSeason } from '@reelist/interfaces/tmdb/TmdbShowResponse'
 import { TmdbMovieByIdResponse } from '@reelist/interfaces/tmdb/TmdbMovieResponse'
 import { TmdbVideoPartialFormatter } from './TmdbVideoPartialFormatter'
 import _ from 'lodash'
-import {
-  TmdbVideoByIdResponse,
-  TmdbVideoByIdType,
-} from '@reelist/interfaces/tmdb/TmdbVideoByIdType'
+import { TmdbVideoByIdResponse } from '@reelist/interfaces/tmdb/TmdbVideoByIdType'
 import moment from 'moment'
+import { TmdbShowById } from '@reelist/models/tmdb/TmdbShowById'
+import { TmdbMovieById } from '@reelist/models/tmdb/TmdbMovieById'
+import { TmdbVideoType } from '@reelist/models/Video'
 
 export class TmdbVideoByIdFormatter {
-  static fromTmdbBaseVideo(
-    json: TmdbShowByIdResponse,
-    videoId: string,
-  ): TmdbVideoByIdType<TmdbShowByIdResponse>
-  static fromTmdbBaseVideo(
-    json: TmdbMovieByIdResponse,
-    videoId: string,
-  ): TmdbVideoByIdType<TmdbMovieByIdResponse>
-  static fromTmdbBaseVideo(json: TmdbVideoByIdResponse, videoId: string): TmdbVideoByIdType
+  static fromTmdbBaseVideo(json: TmdbShowByIdResponse, videoId: string): TmdbShowById
+  static fromTmdbBaseVideo(json: TmdbMovieByIdResponse, videoId: string): TmdbMovieById
+  static fromTmdbBaseVideo(json: TmdbVideoByIdResponse, videoId: string): TmdbVideoType
   static fromTmdbBaseVideo(
     json: TmdbVideoByIdResponse | null,
     videoId: string,
-  ): TmdbVideoByIdType | null
+  ): TmdbVideoType | null
   static fromTmdbBaseVideo(json: null, videoId: string): null
   static fromTmdbBaseVideo(
     json: TmdbVideoByIdResponse | null,
     videoId: string,
-  ): TmdbVideoByIdType | null {
+  ): TmdbVideoType | null {
     if (json === null) return null
 
     if (videoId.startsWith('mv')) {
@@ -40,7 +30,7 @@ export class TmdbVideoByIdFormatter {
     }
   }
 
-  static fromTmdbShow(json: TmdbShowByIdResponse): TmdbVideoByIdType<TmdbShowByIdResponse> {
+  static fromTmdbShow(json: TmdbShowByIdResponse): TmdbShowById {
     const genreIds = _.map(json.genres, 'id')
     const showPartial = TmdbVideoPartialFormatter.fromTmdbShow({
       ...json,
@@ -98,7 +88,7 @@ export class TmdbVideoByIdFormatter {
     }
   }
 
-  static fromTmdbMovie(json: TmdbMovieByIdResponse): TmdbVideoByIdType<TmdbMovieByIdResponse> {
+  static fromTmdbMovie(json: TmdbMovieByIdResponse): TmdbMovieById {
     const genreIds = _.map(json.genres, 'id')
     const moviePartial = TmdbVideoPartialFormatter.fromTmdbMovie({
       ...json,
