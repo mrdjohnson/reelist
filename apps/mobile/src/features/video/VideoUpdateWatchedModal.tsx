@@ -18,17 +18,24 @@ const VideoUpdateWatchedModal = observer(
     const { videoId } = route.params
 
     useEffect(() => {
-      if (video) return
+      if (video?.hasUser) return
 
-      videoStore.getVideo(videoId).then(appState.setCurrentVideo)
+      videoStore.getVideoProgressForUser(videoId).then(appState.setCurrentVideo)
     }, [video, videoId])
 
     useEffect(() => {
       videoListStore.getAdminVideoLists()
     }, [])
 
-    if (!video) {
+    if (!video || !video.hasUser) {
       return <LoadingSection />
+    }
+
+    if (!video.isTv) {
+      //   todo: maybe toast why we are redirecting the user?
+
+      navigation.navigate('videoScreen', { videoId })
+      return null
     }
 
     const handleBackfill = () => {
@@ -85,7 +92,7 @@ const VideoUpdateWatchedModal = observer(
             flex={1}
             backgroundColor="red.600"
           >
-            {video.name}
+            {video.videoName}
           </Text>
         </Row>
 
