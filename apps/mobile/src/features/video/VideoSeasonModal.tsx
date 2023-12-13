@@ -205,13 +205,17 @@ const VideoSeasonModal = observer(
 
           <Row justifyContent="space-between" alignItems="center">
             <Row alignItems="center">
-              <Text>Hide future shows:</Text>
-              <Switch
-                size="sm"
-                onValueChange={setHideFutureEpisodes}
-                defaultIsChecked
-                colorScheme="reelist"
-              />
+              {video.hasFutureEpisodes(season) && (
+                <>
+                  <Text>Hide future shows:</Text>
+                  <Switch
+                    size="sm"
+                    onValueChange={setHideFutureEpisodes}
+                    defaultIsChecked
+                    colorScheme="reelist"
+                  />
+                </>
+              )}
             </Row>
 
             <ActionButton

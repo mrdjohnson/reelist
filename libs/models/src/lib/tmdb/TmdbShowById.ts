@@ -3,6 +3,7 @@ import { TmdbVideoByIdType } from '@reelist/interfaces/tmdb/TmdbVideoByIdType'
 import { classFromProps } from '@reelist/utils/ClassHelper'
 import { callTmdb } from '@reelist/apis/api'
 import _ from 'lodash'
+import moment from 'moment'
 
 export abstract class AbstractBaseShow extends classFromProps<
   TmdbVideoByIdType<TmdbShowByIdResponse>
@@ -36,6 +37,14 @@ export abstract class AbstractBaseShow extends classFromProps<
         return this.fetchSeason(season.seasonNumber)
       }),
     )
+  }
+
+  hasFutureEpisodes = (season: TmdbTvSeason) => {
+    if (!season.episodes) return false
+
+    const currentDate = moment()
+
+    return season.episodes.some(episode => moment(episode.airDate).isAfter(currentDate))
   }
 }
 
