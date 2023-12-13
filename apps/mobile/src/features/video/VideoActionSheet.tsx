@@ -10,13 +10,13 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import SegmentButton from '~/shared/components/SegmentButton'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import VideoWatchedStatusRow from '~/shared/components/VideoWatchedStatusRow'
-import { UserVideoType } from '@reelist/models/UserVideo'
+import { AnyVideoType } from '@reelist/models/Video'
 
 const VideoActionSheet = observer(() => {
   const { appState, videoStore } = useStore()
   const navigation = useReelistNavigation()
 
-  const [video, setVideo] = useState<UserVideoType | null>(null)
+  const [video, setVideo] = useState<AnyVideoType | null>(null)
 
   const { isOpen, videoId } = appState.actionSheets.video
 
@@ -34,7 +34,7 @@ const VideoActionSheet = observer(() => {
 
     setVideo(null)
 
-    videoStore.getVideoProgressForUser(videoId).then(setVideo)
+    videoStore.getVideoOrUserVideo(videoId).then(setVideo)
   }, [videoId])
 
   useEffect(() => {
@@ -49,42 +49,44 @@ const VideoActionSheet = observer(() => {
         <Actionsheet.Content>
           <VideoItem video={video} margin="0" onPress={closeSheet} />
 
-          <Column space="10px" marginY="20px" width="100%">
-            <Row alignItems="center" space="8px" justifyContent="space-between">
-              <AppButton flex={1} onPress={openVideoListManagementModal} size="sm">
-                Manage Lists
-              </AppButton>
+          {video.hasUser && (
+            <Column space="10px" marginY="20px" width="100%">
+              <Row alignItems="center" space="8px" justifyContent="space-between">
+                <AppButton flex={1} onPress={openVideoListManagementModal} size="sm">
+                  Manage Lists
+                </AppButton>
 
-              <ToggleButton
+                <ToggleButton
+                  size="sm"
+                  flex={1}
+                  active={video.tracked}
+                  icon={<MaterialCommunityIcons name="bookmark-plus" />}
+                  activeIcon={<MaterialCommunityIcons name="bookmark-check" />}
+                  content="Add to Bookmarks"
+                  activeContent="Added to Bookmarks"
+                  onPress={() => video.toggleTracked()}
+                />
+              </Row>
+
+              <VideoWatchedStatusRow video={video} onModalOpen={closeSheet} />
+
+              <SegmentButton
+                selectedSegmentIndex={video.allowInHistory ? 0 : 1}
+                onPress={() => video.toggleHistoryVisibility()}
+                segments={[
+                  {
+                    icon: <MaterialIcons name="public" />,
+                    content: 'History visible to all',
+                  },
+                  {
+                    icon: <MaterialIcons name="public-off" />,
+                    content: 'History is private',
+                  },
+                ]}
                 size="sm"
-                flex={1}
-                active={video.tracked}
-                icon={<MaterialCommunityIcons name="bookmark-plus" />}
-                activeIcon={<MaterialCommunityIcons name="bookmark-check" />}
-                content="Add to Bookmarks"
-                activeContent="Added to Bookmarks"
-                onPress={() => video.toggleTracked()}
               />
-            </Row>
-
-            <VideoWatchedStatusRow video={video} onModalOpen={closeSheet} />
-
-            <SegmentButton
-              selectedSegmentIndex={video.allowInHistory ? 0 : 1}
-              onPress={() => video.toggleHistoryVisibility()}
-              segments={[
-                {
-                  icon: <MaterialIcons name="public" />,
-                  content: 'History visible to all',
-                },
-                {
-                  icon: <MaterialIcons name="public-off" />,
-                  content: 'History is private',
-                },
-              ]}
-              size="sm"
-            />
-          </Column>
+            </Column>
+          )}
         </Actionsheet.Content>
       )}
     </Actionsheet>
