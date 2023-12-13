@@ -137,6 +137,8 @@ class VideoStore {
     userId?: string | null
     baseOnly?: boolean
   } = {}): Promise<AnyVideoType[]> {
+    if (!this.storeAuth.loggedIn) return []
+
     console.log('getTrackedVideos for user: ', this.storeAuth.user.id)
     const user = await this.userStore.getUser(userId || this.storeAuth.user.id)
 

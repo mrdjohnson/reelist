@@ -16,6 +16,7 @@ import useIsPressed from '~/hooks/useIsPressed'
 import ProfileIcon from '~/shared/components/ProfileIcon'
 import { useStore } from '@reelist/utils/hooks/useStore'
 import NamedTileRow from '~/shared/components/NamedTileRow'
+import LoginButton from '~/components/LoginButton'
 
 type HomeScreenTileProps = IBoxProps & {
   start: number[]
@@ -74,12 +75,25 @@ const PressableProfileIcon = () => {
 
 const HomeScreen = observer(({ navigation }: ReelistScreen) => {
   const toast = useToast()
-  const { videoStore, userStore } = useStore()
+  const { videoStore, userStore, auth } = useStore()
 
   const alertMissingFavoritesScreen = () => {
     toast.show({
       description: 'Coming soon',
     })
+  }
+
+  if (!auth.loggedIn) {
+    return (
+      <View flex={1}>
+        <Text fontSize="xl" margin="10px" textAlign="center">
+          {' '}
+          Login to see Book marks, Public and private lists, and other users!
+        </Text>
+
+        <LoginButton marginY="30px" marginX="10px" />
+      </View>
+    )
   }
 
   return (

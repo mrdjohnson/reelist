@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { ScrollView, View } from 'native-base'
+import { ScrollView, Text, View } from 'native-base'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '@reelist/utils/hooks/useStore'
 import _ from 'lodash'
@@ -12,6 +12,7 @@ import useAsyncState from '@reelist/utils/hooks/useAsyncState'
 import useVideoSearch from '@reelist/utils/hooks/useVideoSearch'
 import NamedTileRow from '~/shared/components/NamedTileRow'
 import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
+import LoginButton from '~/components/LoginButton'
 
 const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
   const [filterText, setfilterText] = useState('')
@@ -36,6 +37,19 @@ const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
     setSearchedVideos([])
     videoSearch(filterText).then(setSearchedVideos)
   }, [filterText])
+
+  if (!auth.loggedIn) {
+    return (
+      <View flex={1}>
+        <Text fontSize="xl" margin="10px" textAlign="center">
+          {' '}
+          Login to see Book marks, Public and private lists, and other users!
+        </Text>
+
+        <LoginButton />
+      </View>
+    )
+  }
 
   return (
     <View flex={1}>
