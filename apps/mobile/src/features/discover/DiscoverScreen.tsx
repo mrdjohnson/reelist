@@ -56,12 +56,7 @@ const DiscoverScreen = observer(({ route }: ReelistScreenFrom<'discover'>) => {
       <ScrollView
         flex={1}
         color="white"
-        refreshControl={
-          <RefreshControl
-            refreshing={loadingVideos || isLoadingHomepageSections}
-            onRefresh={onRefresh}
-          />
-        }
+        refreshControl={<RefreshControl refreshing={false} onRefresh={onRefresh} />}
         stickyHeaderIndices={[0]}
         stickyHeaderHiddenOnScroll
         keyboardShouldPersistTaps="handled"
