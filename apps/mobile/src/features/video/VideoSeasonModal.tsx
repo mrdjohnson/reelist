@@ -26,9 +26,9 @@ import { ReelistScreenFrom } from '~/utils/navigation'
 import { useStore } from '@reelist/utils/hooks/useStore'
 import ToggleButton from '~/shared/components/ToggleButton'
 import LoadingSection from '~/shared/components/LoadingSection'
-import UserShow from '@reelist/models/UserShow'
 import { TmdbTvSeason } from '@reelist/interfaces/tmdb/TmdbShowResponse'
 import { TmdbTvEpisode } from '@reelist/interfaces/tmdb/TmdbVideoByIdType'
+import { AnyShowType } from '@reelist/models/Video'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
@@ -46,13 +46,15 @@ const VideoSeasonModal = observer(
   ({ route, navigation }: ReelistScreenFrom<'videoSeasonModal'>) => {
     const { videoStore, appState } = useStore()
 
-    const [video, setVideo] = useState<UserShow | null>(null)
+    const [video, setVideo] = useState<AnyShowType | null>(null)
 
     const [season, setSeason] = useState<TmdbTvSeason | null>(null)
 
     const [episode, setEpisode] = useState<TmdbTvEpisode | null>(null)
     const [ascendingOrder, setAscendingOrder] = useState<boolean>(true)
     const [hideFutureEpisodes, setHideFutureEpisodes] = useState(true)
+
+    const isUserShow = video?.hasUser
 
     const episodes: TmdbTvEpisode[] | undefined = useMemo(() => {
       if (!season?.episodes || !video) return
@@ -69,10 +71,10 @@ const VideoSeasonModal = observer(
     }, [season?.episodes, ascendingOrder, hideFutureEpisodes])
 
     const initUserVideo = async () => {
-      const video = await videoStore.getVideoProgressForUser(route.params.videoId)
+      const video = await videoStore.getVideoOrUserVideo(route.params.videoId, route.params.userId)
 
       if (!video.isTv) {
-        navigation.navigate('home')
+        navigation.navigate('videoScreen', { videoId: video.videoId })
         return
       }
 
@@ -112,15 +114,17 @@ const VideoSeasonModal = observer(
           marginBottom={2}
           opacity={aired ? '100' : '50'}
         >
-          <Checkbox
-            value={season?.seasonNumber + ''}
-            isChecked={video.getIsEpisodeWatched(episode)}
-            onChange={() => video.toggleEpisodeWatched(episode)}
-            accessibilityLabel={'Episode ' + episode.episodeNumber}
-            size="sm"
-            colorScheme="reelist"
-            marginRight="10px"
-          />
+          {isUserShow && (
+            <Checkbox
+              value={season?.seasonNumber + ''}
+              isChecked={video.getIsEpisodeWatched(episode)}
+              onChange={() => video.toggleEpisodeWatched(episode)}
+              accessibilityLabel={'Episode ' + episode.episodeNumber}
+              size="sm"
+              colorScheme="reelist"
+              marginRight="10px"
+            />
+          )}
 
           <Pressable
             flex={1}
@@ -179,21 +183,23 @@ const VideoSeasonModal = observer(
                 {season.name}
               </Text>
 
-              <Checkbox
-                value={season.seasonNumber + ''}
-                isChecked={
-                  video.getIsSeasonWatched(season.seasonNumber) ||
-                  video.getIsSeasonPartiallyWatched(season.seasonNumber)
-                }
-                onChange={() => video.toggleSeasonWatched(season.seasonNumber)}
-                accessibilityLabel={'Season ' + season.seasonNumber}
-                icon={
-                  video.getIsSeasonPartiallyWatched(season.seasonNumber)
-                    ? IndeterminateIcon
-                    : undefined
-                }
-                colorScheme="reelist"
-              />
+              {isUserShow && (
+                <Checkbox
+                  value={season.seasonNumber + ''}
+                  isChecked={
+                    video.getIsSeasonWatched(season.seasonNumber) ||
+                    video.getIsSeasonPartiallyWatched(season.seasonNumber)
+                  }
+                  onChange={() => video.toggleSeasonWatched(season.seasonNumber)}
+                  accessibilityLabel={'Season ' + season.seasonNumber}
+                  icon={
+                    video.getIsSeasonPartiallyWatched(season.seasonNumber)
+                      ? IndeterminateIcon
+                      : undefined
+                  }
+                  colorScheme="reelist"
+                />
+              )}
             </Row>
           </View>
 
@@ -253,18 +259,20 @@ const VideoSeasonModal = observer(
                     {episode.name}
                   </Text>
 
-                  <ToggleButton
-                    margin="10px"
-                    active={video.getIsEpisodeWatched(episode)}
-                    color="blue.500"
-                    activeColor="gray.600"
-                    icon={<MaterialCommunityIcons name="eye-plus" />}
-                    activeIcon={<MaterialCommunityIcons name="eye-check" />}
-                    content="Watch"
-                    activeContent="Watched"
-                    onPress={() => video.toggleEpisodeWatched(episode)}
-                    size="sm"
-                  />
+                  {isUserShow && (
+                    <ToggleButton
+                      margin="10px"
+                      active={video.getIsEpisodeWatched(episode)}
+                      color="blue.500"
+                      activeColor="gray.600"
+                      icon={<MaterialCommunityIcons name="eye-plus" />}
+                      activeIcon={<MaterialCommunityIcons name="eye-check" />}
+                      content="Watch"
+                      activeContent="Watched"
+                      onPress={() => video.toggleEpisodeWatched(episode)}
+                      size="sm"
+                    />
+                  )}
                 </Row>
 
                 <Column paddingY="10px">

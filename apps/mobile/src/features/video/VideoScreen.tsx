@@ -18,14 +18,14 @@ import TabView from '~/components/TabView'
 import VideoOverviewTab from './VideoOverviewTab'
 import VideoDashboardTab from './VideoDashboardTab'
 import LoadingSection from '~/shared/components/LoadingSection'
-import { UserVideoType } from '@reelist/models/UserVideo'
+import { AnyVideoType } from '@reelist/models/Video'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
 const VideoScreen = observer(({ route, navigation }: ReelistScreenFrom<'videoScreen'>) => {
-  const { videoStore } = useStore()
+  const { videoStore, auth } = useStore()
 
-  const [video, setVideo] = useState<UserVideoType | null>(null)
+  const [video, setVideo] = useState<AnyVideoType | null>(null)
   const [showVideoId, setShowVideoId] = useState(false)
 
   const imageSource = video?.backdropPath
@@ -36,19 +36,22 @@ const VideoScreen = observer(({ route, navigation }: ReelistScreenFrom<'videoScr
 
     setVideo(null)
 
-    videoStore.getVideoProgressForUser(videoId).then(setVideo)
+    videoStore.getVideoOrUserVideo(videoId, auth.user.id).then(setVideo)
   }, [videoId])
 
   const routes = useMemo(() => {
     if (!video) return []
 
-    return [
-      { name: 'Overview', render: () => <VideoOverviewTab video={video} /> },
-      {
+    const tabs = [{ name: 'Overview', render: () => <VideoOverviewTab video={video} /> }]
+
+    if (video.hasUser) {
+      tabs.push({
         name: 'Dashboard',
         render: () => <VideoDashboardTab video={video} navigation={navigation} />,
-      },
-    ]
+      })
+    }
+
+    return tabs
   }, [video])
 
   if (!video) {
@@ -137,7 +140,7 @@ const VideoScreen = observer(({ route, navigation }: ReelistScreenFrom<'videoScr
         </Row>
       </View>
 
-      <TabView routes={routes} />
+      <TabView routes={routes} showTabBar={video.hasUser} />
     </ScrollView>
   )
 })

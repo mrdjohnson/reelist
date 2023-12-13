@@ -235,27 +235,18 @@ class VideoStore {
     return []
   }
 
-  // getShow = async (videoId: string, user?: User): Promise<AnyShowType | null> => {
-  //   let videoGetter
-  //   if (user) {
-  //     videoGetter = (videoId: string) => this.getVideoProgressForUser(videoId, user)
-  //     // const video = await this.getVideoProgressForUser(videoId, user)
-  //     //
-  //     // if (video?.isTv) {
-  //     //   return video
-  //     // }
-  //     //
-  //     // return null
-  //   } else {
-  //     videoGetter = this.getVideo
-  //   }
-  //
-  //   const video = await videoGetter(videoId)
-  //
-  //   if (video?.isTv) return video
-  //
-  //   return null
-  // }
+  getVideoOrUserVideo = async (videoId: string, userId?: string): Promise<AnyVideoType | null> => {
+    let video: AnyVideoType | null
+    const user = userId ? await this.userStore.getUser(userId) : null
+
+    if (user) {
+      video = await this.getVideoProgressForUser(videoId, user)
+    } else {
+      video = await this.getVideo(videoId)
+    }
+
+    return video
+  }
 
   getVideoProgressForUser = async (videoId: string, userToFind?: User) => {
     const user = userToFind || this.storeAuth.user
