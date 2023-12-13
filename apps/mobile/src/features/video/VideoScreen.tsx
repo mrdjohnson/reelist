@@ -130,7 +130,9 @@ const VideoScreen = observer(({ route, navigation }: ReelistScreenFrom<'videoScr
           width="100%"
           display="flex"
         >
-          <ArrowBackIcon flex={1} />
+          <Pressable flex={1} onPress={navigation.goBack}>
+            <ArrowBackIcon />
+          </Pressable>
 
           <Text flexShrink={1} numberOfLines={2} adjustsFontSizeToFit textAlign="center">
             {video.videoName}
