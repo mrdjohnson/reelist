@@ -183,7 +183,7 @@ const VideoSeasonModal = observer(
                 {season.name}
               </Text>
 
-              {isUserShow && (
+              {isUserShow ? (
                 <Checkbox
                   value={season.seasonNumber + ''}
                   isChecked={
@@ -199,6 +199,8 @@ const VideoSeasonModal = observer(
                   }
                   colorScheme="reelist"
                 />
+              ) : (
+                <View />
               )}
             </Row>
           </View>
