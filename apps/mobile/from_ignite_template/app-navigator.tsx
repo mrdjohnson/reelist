@@ -29,8 +29,7 @@ import VideosModal from '~/features/videos/VideosModal'
 import VideoSeasonModal from '~/features/video/VideoSeasonModal'
 import VideoUpdateWatchedModal from '~/features/video/VideoUpdateWatchedModal'
 
-const Stack = createNativeStackNavigator<NavigatorParamList>()
-const Tab = createBottomTabNavigator<NavigatorParamList>()
+const Tab = createBottomTabNavigator<ReelistTabParamList>()
 
 // this is one way to allow us to access common tabs from any screen
 const createSubStack = (name: keyof ReelistTabParamList, component: React.ComponentType<any>) => {
@@ -85,7 +84,7 @@ const AppTabs = () => {
   return (
     <Tab.Navigator
       tabBar={props => <AppFooter {...props} />}
-      initialRouteName="home"
+      initialRouteName="discover"
       screenOptions={() => ({
         headerShown: false,
       })}
@@ -117,24 +116,6 @@ const AppTabs = () => {
   )
 }
 
-// no tabs here
-const AppStack = () => {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false,
-      }}
-      initialRouteName="splash"
-    >
-      <Stack.Screen name="splash" component={SplashScreen} />
-
-      <Stack.Screen name="welcome" component={WelcomeScreen} />
-
-      <Stack.Screen name="home" component={AppTabs} />
-    </Stack.Navigator>
-  )
-}
-
 type NavigationProps = Partial<React.ComponentProps<typeof NavigationContainer>>
 
 export const AppNavigator = (props: NavigationProps) => {
@@ -142,7 +123,7 @@ export const AppNavigator = (props: NavigationProps) => {
 
   return (
     <NavigationContainer ref={navigationRef} {...props}>
-      <AppStack />
+      <AppTabs />
 
       <AppEventHandler />
     </NavigationContainer>

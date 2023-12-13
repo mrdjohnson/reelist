@@ -12,7 +12,7 @@ export const AppEventHandler = () => {
 
   useEffect(() => {
     // example command: adb shell am start -a android.intent.action.VIEW -d "reelist://share/video/tv116244"
-    
+
     const { remove } = Linking.addEventListener('url', ({ url }) => {
       if (!url.includes('reelist://share/')) return
 
@@ -47,7 +47,7 @@ export const AppEventHandler = () => {
 
       auth.logout()
 
-      navigation.navigate('welcome')
+      navigation.navigate('discover')
 
       toast.show({
         description: 'You have been logged out',

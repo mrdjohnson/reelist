@@ -95,18 +95,18 @@ const AppFooter = observer(({ navigation, state }: BottomTabBarProps) => {
 
       <FooterButton
         routeName={routeName}
-        name="home"
-        icon={<MaterialCommunityIcons name="home-roof" />}
-        text="Home"
+        name="discover"
+        icon={<MaterialIcons name="search" />}
+        text="Discover"
+        iconSize={4}
         navigation={navigation}
       />
 
       <FooterButton
         routeName={routeName}
-        name="discover"
-        icon={<MaterialIcons name="search" />}
-        text="Discover"
-        iconSize={4}
+        name="home"
+        icon={<MaterialCommunityIcons name="home-roof" />}
+        text="Home"
         navigation={navigation}
       />
     </Row>
