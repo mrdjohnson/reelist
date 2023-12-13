@@ -110,7 +110,7 @@ const HomeScreen = observer(({ navigation }: ReelistScreen) => {
           start={[1, 0]}
           end={[0.5, 0.5]}
           // @ts-ignore
-          onPress={() => navigation.navigate('tracking', { screen: 'tracking' })}
+          onPress={() => navigation.navigate('tracking', { screen: 'trackingTab' })}
         >
           Bookmarks
         </HomeScreenTile>
@@ -140,7 +140,7 @@ const HomeScreen = observer(({ navigation }: ReelistScreen) => {
           loadVideos={() => videoStore.getTrackedVideos({ baseOnly: true })}
           showMoreText="All Bookmarks"
           // @ts-ignore
-          onShowMore={() => navigation.navigate('tracking', { screen: 'tracking' })}
+          onShowMore={() => navigation.navigate('tracking', { screen: 'trackingTab' })}
         />
 
         <NamedTileRow

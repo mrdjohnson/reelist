@@ -32,18 +32,21 @@ import VideoUpdateWatchedModal from '~/features/video/VideoUpdateWatchedModal'
 const Tab = createBottomTabNavigator<ReelistTabParamList>()
 
 // this is one way to allow us to access common tabs from any screen
-const createSubStack = (name: keyof ReelistTabParamList, component: React.ComponentType<any>) => {
-  const Stack = createNativeStackNavigator<ReelistTabParamList & NavigatorParamList>()
+const createSubStack = (
+  componentName: keyof NavigatorParamList,
+  component: React.ComponentType<any>,
+) => {
+  const Stack = createNativeStackNavigator<NavigatorParamList>()
 
   return (
     <>
       <Stack.Navigator
-        initialRouteName={name}
+        initialRouteName={componentName}
         screenOptions={{
           headerShown: false,
         }}
       >
-        <Stack.Screen name={name} component={component} />
+        <Stack.Screen name={componentName} component={component} />
 
         <Stack.Group screenOptions={{ animation: 'slide_from_right' }}>
           <Stack.Screen name="videoListsHome" component={VideoListsHomeScreen} />
@@ -84,13 +87,13 @@ const AppTabs = () => {
   return (
     <Tab.Navigator
       tabBar={props => <AppFooter {...props} />}
-      initialRouteName="discover"
+      initialRouteName="discoverTab"
       screenOptions={() => ({
         headerShown: false,
       })}
     >
       <Tab.Screen
-        name="tracking"
+        name="trackingTab"
         component={TrackingTabs}
         options={{
           tabBarLabel: 'Bookmarks',
@@ -98,7 +101,7 @@ const AppTabs = () => {
       />
 
       <Tab.Screen
-        name="home"
+        name="homeTab"
         component={HomeTabs}
         options={{
           tabBarLabel: 'Home',
@@ -106,7 +109,7 @@ const AppTabs = () => {
       />
 
       <Tab.Screen
-        name="discover"
+        name="discoverTab"
         component={DiscoverTabs}
         options={{
           tabBarLabel: 'Discover',

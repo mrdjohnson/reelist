@@ -86,7 +86,7 @@ const AppFooter = observer(({ navigation, state }: BottomTabBarProps) => {
     >
       <FooterButton
         routeName={routeName}
-        name="tracking"
+        name="trackingTab"
         icon={<MaterialCommunityIcons name="bookmark-multiple" />}
         text="Bookmarks"
         iconSize={4}
@@ -95,7 +95,7 @@ const AppFooter = observer(({ navigation, state }: BottomTabBarProps) => {
 
       <FooterButton
         routeName={routeName}
-        name="discover"
+        name="discoverTab"
         icon={<MaterialIcons name="search" />}
         text="Discover"
         iconSize={4}
@@ -104,7 +104,7 @@ const AppFooter = observer(({ navigation, state }: BottomTabBarProps) => {
 
       <FooterButton
         routeName={routeName}
-        name="home"
+        name="homeTab"
         icon={<MaterialCommunityIcons name="home-roof" />}
         text="Home"
         navigation={navigation}

@@ -81,7 +81,7 @@ const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
             onShowMore={() =>
               navigation.navigate('discover', {
                 // @ts-ignore
-                screen: 'discover',
+                screen: 'discoverTab',
                 params: { initialSearchValue: filterText },
               })
             }

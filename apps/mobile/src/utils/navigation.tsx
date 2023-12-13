@@ -3,9 +3,9 @@ import { NativeStackScreenProps, NativeStackNavigationProp } from '@react-naviga
 import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
 
 export type ReelistTabParamList = {
-  tracking: undefined
-  home: undefined
-  discover?: { initialSearchValue?: string }
+  trackingTab: undefined
+  homeTab: undefined
+  discoverTab?: { initialSearchValue?: string }
 }
 
 export type NavigatorParamList = {
