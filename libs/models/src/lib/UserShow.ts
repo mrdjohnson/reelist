@@ -295,7 +295,7 @@ class UserShow extends Mixin(AbstractUserVideo, AbstractBaseShow) {
   }
 
   override fetchSeasons = async () => {
-    super.fetchSeasons()
+    await super.fetchSeasons()
 
     this._linkEpisodes()
   }

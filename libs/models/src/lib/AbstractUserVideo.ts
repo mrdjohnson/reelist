@@ -1,4 +1,4 @@
-import { makeAutoObservable, makeObservable } from 'mobx'
+import { isObservable, makeAutoObservable, makeObservable } from 'mobx'
 import { sendNotifications, UpdateType } from '@reelist/apis/api'
 import { humanizedDuration } from '@reelist/utils/humanizedDuration'
 import VideoStore from './VideoStore'
@@ -56,7 +56,9 @@ abstract class AbstractUserVideo extends classFromProps<TmdbBaseVideoType>() {
     // if we already tried to get the data and nothing was there
     if (!videoTable) return
 
-    makeAutoObservable(videoTable)
+    if (!isObservable(videoTable)) {
+      makeAutoObservable(videoTable)
+    }
 
     this.serverId = videoTable.id
     this.videoInfo = videoTable.video_info || {}
