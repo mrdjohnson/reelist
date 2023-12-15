@@ -4,8 +4,8 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 
 import SearchIcon from '@mui/icons-material/Search'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { Button } from '@mui/material'
+import React, { ChangeEventHandler, useCallback, useEffect, useMemo, useState } from 'react'
+import { Autocomplete, Button, CircularProgress, TextField } from '@mui/material'
 import _ from 'lodash'
 import { useStore } from '@reelist/utils/hooks/useStore'
 import useVideoDiscover from '@reelist/utils/hooks/useVideoDiscover'
@@ -85,6 +85,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
   const windowWidth = useWindowWidth()
 
   const [searchText, setSearchText] = useState('')
+  const [showSearchBubble, setShowSearchBubble] = useState(false)
 
   const [selectedPerson, setSelectedPerson] = useState<TmdbPersonType | null>(null)
   const [showSelectedPerson, setShowSelectedPerson] = useState(false)
@@ -126,14 +127,14 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
       })
   }
 
-  const search = () => {
+  const search = _.debounce(() => {
     videoSearch(searchText, { deepSearch: true, page: page.toString() })
       .then(handleVideos)
       .then(finishLoadingVideos)
       .catch(e => {
         finishLoadingVideos([])
       })
-  }
+  }, 500)
 
   const loadVideos = () => {
     if (pageState === PageState.NOT_LOADED) return
@@ -196,6 +197,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
       setPage(1)
     }
   }, [
+    searchText,
     pageState,
     selectStatesLoaded,
     videoTypesSelectState.selectedOptions,
@@ -304,7 +306,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
   const handleKeyDown = event => {
     if (event.keyCode === 13) {
       event.preventDefault()
-      setSearchText(event.target.value)
+      setShowSearchBubble(true)
     }
   }
 
@@ -356,7 +358,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
             <div className=" border-reelist-red mb-2 flex h-12 w-full flex-row items-baseline border-0 border-b border-solid ">
               <SearchIcon className="mr-4 h-full justify-center self-center text-3xl text-gray-300" />
 
-              {searchText ? (
+              {searchText && showSearchBubble ? (
                 <Button
                   className="font-inter bg-reelist-red group h-fit items-center rounded-full border px-3 text-xl text-black hover:text-white"
                   onClick={() => setSearchText('')}
@@ -382,6 +384,8 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
                   type="text"
                   autoComplete="off"
                   placeholder="Search"
+                  onBlur={() => setShowSearchBubble(true)}
+                  onChange={event => setSearchText(event.target.value)}
                   onKeyDown={handleKeyDown}
                 />
               )}
