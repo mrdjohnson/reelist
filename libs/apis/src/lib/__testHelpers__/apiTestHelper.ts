@@ -17,7 +17,9 @@ type UrlHandlerType = {
 const mockServer = {
   json: (path: Path, response: Object) => {
     server.use(
-      http.get(path, () => {
+      http.get(path, ({ request }) => {
+        requestSpy(request.url)
+
         return HttpResponse.json(response)
       }),
     )
@@ -33,6 +35,8 @@ const mockServer = {
       server.use(
         http.get('https://api.themoviedb.org/3*', async ({ request }) => {
           const { tableName, subType } = getTableName(request.url) || {}
+
+          requestSpy(request.url)
 
           let data = null
 
@@ -66,9 +70,14 @@ const mockServer = {
         const tableName = getTableName(request.url)
 
         let data = null
+        requestSpy(request.url)
 
-        // const body = await request.json()
-        // requestSpy(body)
+        try {
+          const body = await request.clone().json()
+          requestSpy(body)
+        } catch (e) {
+          console.error(e)
+        }
 
         switch (tableName) {
           case 'profiles':
@@ -111,13 +120,6 @@ const mockServer = {
   },
 }
 
-// todo: figure out how to add this in
-const expectMockServer = {
-  toHaveBeenCalledWith: async (data: Object) => {
-    await waitFor(() => expect(requestSpy).toHaveBeenCalledWith(data))
-  },
-}
-
-export { mockServer, expectMockServer }
+export { mockServer }
 
 export default server
