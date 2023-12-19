@@ -40,17 +40,23 @@ class UserStore {
   getUser = async (userId: string) => {
     if (!userId) return null
 
+    let user = this.userById[userId]
+
+    if (!_.isUndefined(user)) return user
+
     const { data: userJson, error } = await this.userApi.match({ id: userId }).single()
 
     if (userJson) {
-      return this.makeUiUser(userJson)
+      user = this.makeUiUser(userJson)
     }
+
+    this.userById[user.id] = user || null
 
     if (error) {
       console.error('failed to getUser:', error.message)
     }
 
-    return null
+    return user
   }
 
   getUsers = async (userIds: string[]) => {
