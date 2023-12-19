@@ -52,6 +52,7 @@ class UserShow extends Mixin(AbstractUserVideo, AbstractBaseShow) {
     }
   }
 
+  // TODO; make this based on the number of episodes left in the season + next season episodes
   _calculateUnwatchedEpisodes = () => {
     let episodesAfterLastAired = 0
     let lastEpisode = this.lastEpisodeToAir
@@ -65,41 +66,39 @@ class UserShow extends Mixin(AbstractUserVideo, AbstractBaseShow) {
   }
 
   _linkEpisodes = () => {
-    let season = this.seasonMap[1]
     let previousEpisode: TmdbTvEpisode
 
-    const assignPreviousAndNextEpisode = (nextEpisode: TmdbTvEpisode) => {
-      if (!previousEpisode) {
-        // this should only happen for the very first episode
-        previousEpisode = nextEpisode
-        return
+    const episodes = _.chain(this.seasonMap)
+      .values()
+      .orderBy('seasonNumber')
+      .flatMap(season => season?.episodes)
+      .compact()
+      .value()
+
+    episodes.forEach(episode => {
+      episode.previous = previousEpisode
+
+      if (previousEpisode) {
+        previousEpisode.next = episode
       }
 
-      if (
-        nextEpisode.episodeNumber === this.lastEpisodeToAir?.episodeNumber &&
-        nextEpisode.seasonNumber === this.lastEpisodeToAir?.seasonNumber
-      ) {
-        this.lastEpisodeToAir = nextEpisode
-      } else if (
-        nextEpisode.episodeNumber === this.nextEpisodeToAir?.episodeNumber &&
-        nextEpisode.seasonNumber === this.nextEpisodeToAir?.seasonNumber
-      ) {
-        this.nextEpisodeToAir = nextEpisode
-      }
+      previousEpisode = episode
+    })
 
-      nextEpisode.previous = previousEpisode
-      previousEpisode.next = nextEpisode
-      previousEpisode = nextEpisode
-    }
+    const lastEpisodeToAir = _.find(this.seasonMap[this.lastEpisodeToAir?.seasonNumber]?.episodes, {
+      episodeNumber: this.lastEpisodeToAir?.episodeNumber,
+    })
 
-    while (season) {
-      season.episodes?.forEach(assignPreviousAndNextEpisode)
-
-      season = this.seasonMap[season.seasonNumber + 1]
+    if (lastEpisodeToAir) {
+      this.lastEpisodeToAir = lastEpisodeToAir
+      this.nextEpisodeToAir = lastEpisodeToAir.next
     }
 
     // if the next episode airdate is before right now
-    if (this.nextEpisodeToAir && moment(this.nextEpisodeToAir.airDate).isBefore()) {
+    if (
+      this.nextEpisodeToAir &&
+      moment(this.nextEpisodeToAir.airDate).isBefore(moment().endOf('day'))
+    ) {
       this.lastEpisodeToAir = this.nextEpisodeToAir
       this.nextEpisodeToAir = this.nextEpisodeToAir.next
     }
@@ -300,9 +299,21 @@ class UserShow extends Mixin(AbstractUserVideo, AbstractBaseShow) {
     this._linkEpisodes()
   }
 
-  watchNextEpisode = () => {
+  override fetchSeason = async (seasonNumber: number) => {
+    if (this.hasSeason(seasonNumber)) return this.seasonMap[seasonNumber]
+
+    const season = await super.fetchSeason(seasonNumber)
+
+    if (season) {
+      this._linkEpisodes()
+    }
+
+    return season
+  }
+
+  watchNextEpisode = async () => {
     if (this.nextEpisode) {
-      this.toggleEpisodeWatched(this.nextEpisode)
+      await this.toggleEpisodeWatched(this.nextEpisode)
     }
   }
 

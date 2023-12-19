@@ -8,22 +8,26 @@ import moment from 'moment'
 export abstract class AbstractBaseShow extends classFromProps<
   TmdbVideoByIdType<TmdbShowByIdResponse>
 >() {
+  hasSeason = (seasonNumber: number) => {
+    const season = this.seasonMap[seasonNumber]
+
+    return season !== undefined
+  }
+
   fetchSeason = async (seasonNumber: number) => {
-    if (this.seasonMap[seasonNumber]) return this.seasonMap[seasonNumber]
+    if (this.hasSeason(seasonNumber)) return this.seasonMap[seasonNumber]
 
     const path = this.tmdbPath + '/season/' + seasonNumber
 
     let season: TmdbTvSeason | null = null
 
     try {
-      season = (await callTmdb(path).then(item => _.get(item, 'data.data'))) as TmdbTvSeason
+      season = (await callTmdb<TmdbTvSeason>(path).then(item => _.get(item, 'data.data'))) || null
     } catch (e) {
       console.error(e)
       throw e
     } finally {
-      if (season) {
-        this.seasonMap[seasonNumber] = season
-      }
+      this.seasonMap[seasonNumber] = season
     }
 
     return this.seasonMap[seasonNumber]
