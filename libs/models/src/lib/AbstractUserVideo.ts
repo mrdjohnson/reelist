@@ -1,7 +1,7 @@
 import { isObservable, makeAutoObservable, makeObservable } from 'mobx'
 import { sendNotifications, UpdateType } from '@reelist/apis/api'
 import { humanizedDuration } from '@reelist/utils/humanizedDuration'
-import VideoStore from './VideoStore'
+import VideoStore from '@reelist/models/VideoStore'
 import VideoApi from '@reelist/apis/VideoApi'
 import { VideoInfoType, VideoTableType } from 'libs/interfaces/src/lib/tables/VideoTable'
 import {
