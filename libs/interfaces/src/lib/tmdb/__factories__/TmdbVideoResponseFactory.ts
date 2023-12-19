@@ -1,6 +1,11 @@
 import { Factory } from 'fishery'
 import { faker } from '@faker-js/faker'
-import { TmdbShowEpisodeResponseType, TmdbShowByIdResponse } from '../TmdbShowResponse'
+import {
+  TmdbShowEpisodeResponseType,
+  TmdbShowByIdResponse,
+  TmdbShowSeasonPartialResponseType,
+  TmdbTvSeason,
+} from '@reelist/interfaces/tmdb/TmdbShowResponse'
 import { tmdbPersonCreditFactory } from '@reelist/interfaces/tmdb/__factories__/TmdbPersonResponseFactory'
 import {
   tmdbDiscoverMovieFactory,
@@ -15,27 +20,45 @@ import { TmdbVideoByIdFormatter } from '@reelist/utils/tmdbHelpers/TmdbVideoById
 import { mockServer } from '@reelist/apis/__testHelpers__/apiTestHelper'
 import inversionContainer from '@reelist/models/inversionContainer'
 import VideoStore from '@reelist/models/VideoStore'
+import { TmdbShowById } from '@reelist/models/tmdb/TmdbShowById'
+import _ from 'lodash'
 
-export const tmdbEpisodeFactory = Factory.define<TmdbShowEpisodeResponseType>(({ sequence }) => {
-  return {
-    id: sequence,
-    name: faker.lorem.words(3),
-    overview: faker.lorem.paragraph(),
-    voteAverage: faker.datatype.float({ min: 0, max: 10, precision: 0.1 }),
-    voteCount: faker.datatype.number({ min: 10, max: 10000 }),
-    airDate: faker.date.past().toISOString(),
-    episodeNumber: faker.datatype.number({ min: 10, max: 10000 }),
-    runtime: faker.datatype.number({ min: 10, max: 10000 }),
-    seasonNumber: faker.datatype.number({ min: 10, max: 10000 }),
-    stillPath: faker.image.imageUrl(),
-  }
-})
+export const tmdbEpisodeResponseFactory = Factory.define<TmdbShowEpisodeResponseType>(
+  ({ sequence }) => {
+    return {
+      id: sequence,
+      name: faker.lorem.words(3),
+      overview: faker.lorem.paragraph(),
+      voteAverage: faker.datatype.float({ min: 0, max: 10, precision: 0.1 }),
+      voteCount: faker.datatype.number({ min: 10, max: 10000 }),
+      airDate: faker.date.past().toISOString(),
+      episodeNumber: sequence,
+      runtime: faker.datatype.number({ min: 10, max: 10000 }),
+      seasonNumber: faker.datatype.number({ min: 10, max: 10000 }),
+      stillPath: faker.image.imageUrl(),
+    }
+  },
+)
+export const tmdbSeasonResponseFactory = Factory.define<TmdbShowSeasonPartialResponseType>(
+  ({ sequence }) => {
+    return {
+      id: sequence,
+      airDate: faker.date.past().toISOString(),
+      episodeCount: faker.datatype.number({ min: 10, max: 100 }),
+      name: faker.lorem.words(3),
+      overview: faker.lorem.paragraph(),
+      posterPath: faker.image.imageUrl(),
+      seasonNumber: sequence,
+      voteAverage: faker.datatype.float({ min: 0, max: 10, precision: 0.1 }),
+    }
+  },
+)
 
 export const tmdbShowFactory = Factory.define<
   TmdbShowByIdResponse,
-  null,
-  TmdbVideoByIdType<TmdbShowByIdResponse>
->(({ params, onCreate }) => {
+  { seasonPartialCount: number; buildSeasons: boolean },
+  TmdbShowById
+>(({ params, transientParams, onCreate }) => {
   onCreate(async showResponse => {
     mockServer.tmdb.db.createShow(showResponse)
 
@@ -56,12 +79,44 @@ export const tmdbShowFactory = Factory.define<
 
   const { genreIds, ...baseShow } = tmdbDiscoverShowFactory.build(params)
 
+  const seasonPartialCount = transientParams.seasonPartialCount || 3
+
+  tmdbSeasonResponseFactory.rewindSequence()
+
+  const seasons = tmdbSeasonResponseFactory.buildList(seasonPartialCount)
+
+  let lastEpisodeToAir: TmdbShowEpisodeResponseType | undefined
+  let customSeasons: Record<string, TmdbTvSeason> = {}
+  if (transientParams.buildSeasons) {
+    let episodeNumber = 1
+    seasons.map(seasonPartial => {
+      const episodes = tmdbEpisodeResponseFactory.buildList(seasonPartial.episodeCount)
+
+      episodes.forEach(episode => {
+        episode.episodeNumber = episodeNumber
+        episode.seasonNumber = seasonPartial.seasonNumber
+        episodeNumber += 1
+      })
+
+      customSeasons['season/' + seasonPartial.seasonNumber] = {
+        ...seasonPartial,
+        episodes,
+      }
+
+      lastEpisodeToAir = _.last(episodes)
+    })
+  }
+
+  lastEpisodeToAir ||= tmdbEpisodeResponseFactory.build()
+
   return {
     ...baseShow,
+    ...customSeasons,
+    'season/X': customSeasons['season/1'],
     adult: faker.datatype.boolean(),
     createdBy: creator,
     genres: [],
-    seasons: [],
+    seasons,
     episodeRunTimes: [],
     episodeRunTime: [],
     homepage: faker.internet.domainName(),
@@ -73,9 +128,9 @@ export const tmdbShowFactory = Factory.define<
     similar: { results: [] },
     credits: { cast: [] },
     aggregateCredits: { cast: [] },
-    numberOfSeasons: faker.datatype.number({ max: 10 }),
+    numberOfSeasons: seasonPartialCount,
     inProduction: faker.datatype.boolean(),
-    lastEpisodeToAir: tmdbEpisodeFactory.build(),
+    lastEpisodeToAir,
     'watch/providers': { results: {} },
   }
 })

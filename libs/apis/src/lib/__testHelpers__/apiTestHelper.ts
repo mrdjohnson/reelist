@@ -87,6 +87,10 @@ const mockServer = {
           case 'videoLists':
             data = await supabaseDb.handleVideoListUrl({ url: request.url, httpType, request })
             break
+
+          case 'videos':
+            data = await supabaseDb.handleVideoUrl({ url: request.url, httpType, request })
+            break
         }
 
         return HttpResponse.json(data)

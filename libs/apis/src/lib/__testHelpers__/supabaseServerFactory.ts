@@ -145,6 +145,59 @@ class SupabaseDb {
     return null
   }
 
+  findVideo(id?: string) {
+    return _.find(this.videos, { id })
+  }
+
+  findVideos(ids: string[]) {
+    const videoMap = _.keyBy(this.videos, 'id')
+    const videos = ids.map(id => videoMap[id])
+
+    return _.compact(videos)
+  }
+
+  // findVideosByAdminId(adminIds: string[]) {
+  //   // new list of video lists that are shared with the given admin ids
+  //   return _.reject(this.videos, video =>
+  //     _.chain([video.user_id]).intersection(adminIds).isEmpty().value(),
+  //   )
+  // }
+
+  async handleVideoUrl({ url, httpType, request }: UrlHandlerType) {
+    const id = getId(url)
+    const ids = getIds(url)
+    const adminIds = getUserIds(url)
+
+    switch (httpType) {
+      case 'get':
+        if (id) {
+          return this.findVideo(id)
+        } else if (ids) {
+          return this.findVideos(ids)
+        } else if (adminIds) {
+          // return this.findVideosByAdminId(adminIds)
+        }
+
+        break
+
+      case 'post':
+      case 'patch':
+        const body = await request.clone().json()
+
+        const video = this.findVideo(body.video_id) || body
+
+        if (!video) {
+          this.videos.push(video)
+        }
+
+        Object.assign(video, body)
+
+        return video
+    }
+
+    return null
+  }
+
   reset() {
     this.profiles = []
     this.videoLists = []
