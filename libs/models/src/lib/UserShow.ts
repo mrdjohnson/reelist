@@ -16,12 +16,15 @@ class UserShow extends Mixin(AbstractUserVideo, AbstractBaseShow) {
   override isTv: true = true
   override hasUser: true = true
 
+  version: number = 2
+
   unWatchableEpisodeCount = 0
 
   seasons?: TmdbTvSeason[] | undefined
 
   lastWatchedEpisode?: TmdbTvEpisode
-  firstEpisode?: TmdbTvEpisode
+  lastWatchedSeasonNumber?: number
+  lastWatchedEpisodeNumber?: number
 
   constructor(
     public override tmdbVideo: TmdbShowById,
@@ -36,8 +39,10 @@ class UserShow extends Mixin(AbstractUserVideo, AbstractBaseShow) {
   override _assignFromVideoTable(userVideoData?: VideoTableType) {
     super._assignFromVideoTable(userVideoData)
 
-    // this.lastWatchedSeasonNumber = userVideoData?.last_watched_season_number
-    // this.lastWatchedEpisodeNumber = userVideoData?.last_watched_episode_number
+    this.version = userVideoData?.version || 1
+
+    this.lastWatchedSeasonNumber = userVideoData?.last_watched_season_number || 1
+    this.lastWatchedEpisodeNumber = userVideoData?.last_watched_episode_number || 1
   }
 
   _lazyLoadVideoFromVideoTable = async () => {
@@ -65,6 +70,18 @@ class UserShow extends Mixin(AbstractUserVideo, AbstractBaseShow) {
     this.unWatchableEpisodeCount = episodesAfterLastAired
   }
 
+  _findEpisode = ({
+    episodeNumber,
+    seasonNumber,
+  }: {
+    episodeNumber: number
+    seasonNumber: number
+  }) => {
+    return _.find<TmdbTvEpisode>(this.seasonMap[seasonNumber]?.episodes, {
+      episodeNumber,
+    })
+  }
+
   _linkEpisodes = () => {
     let previousEpisode: TmdbTvEpisode
 
@@ -85,13 +102,20 @@ class UserShow extends Mixin(AbstractUserVideo, AbstractBaseShow) {
       previousEpisode = episode
     })
 
-    const lastEpisodeToAir = _.find(this.seasonMap[this.lastEpisodeToAir?.seasonNumber]?.episodes, {
-      episodeNumber: this.lastEpisodeToAir?.episodeNumber,
-    })
+    if (this.lastEpisodeToAir) {
+      const lastEpisodeToAir = this._findEpisode(this.lastEpisodeToAir)
 
-    if (lastEpisodeToAir) {
-      this.lastEpisodeToAir = lastEpisodeToAir
-      this.nextEpisodeToAir = lastEpisodeToAir.next
+      if (lastEpisodeToAir) {
+        this.lastEpisodeToAir = lastEpisodeToAir
+        this.nextEpisodeToAir = lastEpisodeToAir.next
+      }
+    }
+
+    if (this.lastWatchedSeasonNumber && this.lastWatchedEpisodeNumber) {
+      this.lastWatchedEpisode = this._findEpisode({
+        seasonNumber: this.lastWatchedSeasonNumber,
+        episodeNumber: this.lastWatchedEpisodeNumber,
+      })
     }
 
     // if the next episode airdate is before right now
@@ -415,61 +439,22 @@ class UserShow extends Mixin(AbstractUserVideo, AbstractBaseShow) {
   }
 
   get nextEpisode() {
-    const firstEpisode = this.seasonMap[1]?.episodes?.[0]
-
-    if (!this.lastWatchedSeasonNumber || !this.lastWatchedEpisodeNumber) return firstEpisode
-
-    let episodeToWatch = this.currentBaseEpisode?.next || firstEpisode
-
-    while (episodeToWatch && this.getIsEpisodeWatched(episodeToWatch)) {
-      episodeToWatch = episodeToWatch.next
-    }
-
-    return episodeToWatch
+    return this.lastWatchedEpisode?.next
   }
 
   get partiallyWatched() {
     return !_.isEmpty(this.videoInfo?.seasons)
   }
 
-  // previously these values will still be stored on the server for now
-  // but may just stick to the computed method entirely later
-  get lastWatchedSeasonNumber() {
-    return this.lastWatchedEpisodeFromEnd?.seasonNumber
-  }
-
-  get lastWatchedEpisodeNumber() {
-    return this.lastWatchedEpisodeFromEnd?.episodeNumber
-  }
-
   get lastWatchedEpisodeFromEnd() {
-    let lastEpisode: TmdbTvEpisode | undefined = this.lastEpisodeToAir
-
-    while (lastEpisode && !this.getIsEpisodeWatched(lastEpisode)) {
-      lastEpisode = lastEpisode.previous
-    }
-
-    return lastEpisode
+    return this.lastWatchedEpisode
   }
 
   get isLatestEpisodeWatched() {
-    if (!this.lastEpisodeToAir) return this.isWatched
-
-    if (!this.lastWatchedSeasonNumber && !this.lastWatchedEpisodeNumber) return false
-    if (!this.currentBaseEpisode) return false
-
-    const lastEpisodeNumber = this.lastEpisodeToAir.episodeNumber
-    const lastSeasonNumber = this.lastEpisodeToAir.seasonNumber
-
-    const currentEpisodeNumber = this.currentBaseEpisode.episodeNumber
-    const currentSeasonNumber = this.currentBaseEpisode.seasonNumber
-
-    return lastEpisodeNumber === currentEpisodeNumber && lastSeasonNumber === currentSeasonNumber
+    return this.lastEpisodeToAir === this.lastWatchedEpisode
   }
 
   override get isCompleted() {
-    if (!this.lastEpisodeToAir) return this.isWatched
-
     if (this.nextEpisodeToAir) return false
 
     return this.isLatestEpisodeWatched
