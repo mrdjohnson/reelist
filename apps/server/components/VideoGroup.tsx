@@ -54,7 +54,7 @@ const VideoGroup = ({
     <>
       {title && (
         <div
-          className="mb-2 mt-4 w-fit cursor-pointer text-3xl font-semibold text-white hover:font-bold hover:underline"
+          className="hover:decoration-reelist-red mb-2 mt-4 w-fit cursor-pointer text-3xl font-semibold text-white underline decoration-transparent underline-offset-8 transition-all duration-300 ease-in-out hover:font-bold hover:text-white"
           onClick={onViewMoreClicked}
         >
           {title}
@@ -83,10 +83,10 @@ const VideoGroup = ({
         <div className="flex justify-center">
           <Button
             onClick={onViewMoreClicked}
-            className="mb-1 h-fit cursor-pointer rounded-md border-2 border-solid border-transparent bg-transparent align-middle text-lg text-white hover:border-white"
+            className="hover:decoration-reelist-red mb-1 h-fit cursor-pointer bg-transparent align-middle text-lg text-white underline decoration-white/50 decoration-2 underline-offset-8 transition-all duration-300 ease-in-out hover:border-white"
             disableRipple
           >
-            <span className="border-0 border-b border-solid border-white">View More</span>
+            View More
           </Button>
         </div>
       )}
