@@ -91,6 +91,17 @@ class VideoStore {
   }
 
   getVideo = async (videoId: string, seasonNumber?: number | null) => {
+    if (this.tmdbJsonByVideoId[videoId]) {
+      const video = this.tmdbJsonByVideoId[videoId]
+      const number = seasonNumber ?? 1
+
+      if (video?.isTv && !video.hasSeason(number)) {
+        await video.fetchSeason(number)
+      }
+
+      return video
+    }
+
     const path = this.getVideoPath(videoId)
 
     if (!path) return null
