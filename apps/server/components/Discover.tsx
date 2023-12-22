@@ -546,7 +546,9 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
             />
           )}
 
-          {shouldShowFooter && <Footer />}
+          {shouldShowFooter && (
+            <Footer designerLink="http://ineshamadi.com" designerName="Ines Hamadi" />
+          )}
         </InfiniteScroll>
 
         {/* selected video dialog */}

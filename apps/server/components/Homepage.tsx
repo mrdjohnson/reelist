@@ -6,6 +6,7 @@ import { useRouter } from 'next/router'
 import useVideoTrending from '@reelist/utils/hooks/useVideoTrending'
 import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
 import EntityImage from './EntityImage'
+import Footer from './Footer'
 
 const Homepage = observer(() => {
   return (
@@ -17,7 +18,7 @@ const Homepage = observer(() => {
         <title>Reelist</title>
       </Head>
 
-      <div className="fixed top-[15%] flex w-full flex-col  justify-center pb-12 text-center text-white">
+      <div className="discover-md:top-[15%] fixed top-[5%] flex w-full flex-col  justify-center pb-12 text-center text-white">
         <div className="pb-9 text-5xl">Reelist</div>
 
         <a
@@ -33,11 +34,15 @@ const Homepage = observer(() => {
           <Banner />
         </div>
 
-        <div className="mt-12 text-xl ">
+        <div className="mb-6 mt-12 text-xl ">
           Mobile <span className="mx-1 text-base text-gray-500">(Coming soon)</span>
           <br />
           Manually Track watched shows and compare them with your friends
         </div>
+      </div>
+
+      <div className="fixed bottom-0 w-full">
+        <Footer hideHeader />
       </div>
     </div>
   )
