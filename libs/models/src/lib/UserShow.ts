@@ -10,6 +10,7 @@ import { flow } from 'mobx'
 import moment from 'moment'
 import { mix, Mixin } from 'ts-mixer'
 import { AbstractBaseShow, TmdbShowById } from '@reelist/models/tmdb/TmdbShowById'
+import { episodeIsAfter } from '@reelist/utils/tmdbHelpers/TmdbEpisodeHelpers'
 
 @mix(TmdbShowById, AbstractUserVideo)
 class UserShow extends Mixin(AbstractUserVideo, AbstractBaseShow) {
@@ -300,9 +301,32 @@ class UserShow extends Mixin(AbstractUserVideo, AbstractBaseShow) {
     await this.toggleEpisodeWatched(lastWatchedEpisode, true)
   }
 
+  // TODO this can avoid a full fetch if we calculate based on the videoInfo instead
+  calculateLastWatchedEpisode = async () => {
+    await this.fetchSeasons()
+
+    let episode = this.lastWatchedEpisode
+    let lastWatchedEpisode = undefined
+
+    while (episode) {
+      if (this.getIsEpisodeWatched(episode)) {
+        lastWatchedEpisode = episode
+        break
+      }
+
+      episode = episode.previous
+    }
+
+    return episodeToEpisodeWatchedData(lastWatchedEpisode)
+  }
+
   override updateWatched = async (type: string, upsertData: Partial<VideoTableType>) => {
+    // this is a work around to always have last watched episode data for a show
+    const episodeDataOverride = await this.calculateLastWatchedEpisode()
+
     const { data: videoJson, error } = await this.videoApi.updateVideo({
       ...upsertData,
+      ...episodeDataOverride,
       id: this.serverId,
       video_id: this.videoId,
     })
