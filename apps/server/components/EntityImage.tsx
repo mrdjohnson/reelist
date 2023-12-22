@@ -17,6 +17,7 @@ type VideoImageProps = {
   loading?: boolean
   className?: string
   isPerson?: boolean
+  homepageImage?: boolean
 }
 
 const TvIcon = () => (
@@ -79,6 +80,7 @@ const EntityImage = observer(
     isPoster,
     isPerson,
     className,
+    homepageImage = false,
   }: VideoImageProps) => {
     const { tmdbDiscover } = useStore()
 
@@ -131,6 +133,7 @@ const EntityImage = observer(
             'discover-md:h-[207px] aspect-backdrop group m-0 w-full': !isPoster,
             'discover-md:hover:my-0 discover-md:hover:h-[237px] my-4': hasBackdrop,
             'cursor-pointer': onPress,
+            'h-[207px] opacity-50 hover:opacity-80': homepageImage,
           },
         )}
         onClick={onPress}
@@ -145,6 +148,7 @@ const EntityImage = observer(
               'aspect-poster h-fit max-h-[609px] min-h-[400px] object-contain': isPoster,
               'discover-md:w-[307px] discover-md:object-cover discover-md:-mt-4 discover-md:h-[270px] discover-md:group-hover:mt-0 h-full w-full object-contain transition-[margin-top] duration-300  ease-in-out':
                 !isPoster,
+              '!object-cover': homepageImage,
             })}
           />
         ) : (
@@ -160,17 +164,29 @@ const EntityImage = observer(
 
         {!isPoster && (
           <div
-            className="transition-min-height absolute bottom-0 flex min-h-[70px] w-full flex-col justify-end pb-1 pt-3 duration-300 ease-in-out"
-            style={{
-              background:
-                'linear-gradient(180deg, rgba(0, 0, 0, 0.54) 0%, rgba(0, 0, 0, 0) 0.01%, rgba(0, 0, 0, 0.54) 33.85%)',
-            }}
+            className={classNames(
+              'bg-entity-image-overlay absolute bottom-0 flex min-h-[70px] w-full flex-col justify-end pb-1 pt-3 transition-all duration-300 ease-in-out',
+              {
+                'group-hover:bg-entity-image-overlay discover-md:bg-opacity-0 discover-md:bg-none group-hover:bg-opacity-100 ':
+                  homepageImage,
+              },
+            )}
           >
-            <div className="transition-margin-top discover-md:group-hover:mt-3 line-clamp-2 px-2 font-sans text-2xl  text-white duration-300 ease-in-out">
+            <div
+              className={classNames(
+                'transition-margin-top discover-md:group-hover:mt-3 line-clamp-2 px-2 font-sans text-2xl  text-white duration-300 ease-in-out',
+                { 'discover-md:opacity-0 group-hover:opacity-100': homepageImage },
+              )}
+            >
               {video.videoName}
             </div>
 
-            <div className="transition-max-height discover-md:roup-hover:max-h-0 line-clamp-2 flex max-h-16 flex-wrap overflow-hidden px-2 font-sans text-lg text-white duration-300 ease-in-out group-hover:max-h-0 ">
+            <div
+              className={classNames(
+                'transition-max-height discover-md:roup-hover:max-h-0 line-clamp-2 flex max-h-16 flex-wrap overflow-hidden px-2 font-sans text-lg text-white duration-300 ease-in-out group-hover:max-h-0 ',
+                { hidden: homepageImage },
+              )}
+            >
               {_.dropRight(genres).map(genre => (
                 <span key={genre}>{genre}/</span>
               ))}
