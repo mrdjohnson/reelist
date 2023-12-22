@@ -18,5 +18,19 @@
       .font-inter {
         font-family: Inter;
       }
+
+      .pause-animation {
+        animation-play-state: paused;
+      }
     }
   }
+
+@keyframes swipe {
+    0% {
+        transform: translate(0);
+    }
+
+    100% {
+        transform: translate(-100%);
+    }
+}
