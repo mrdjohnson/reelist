@@ -26,7 +26,9 @@ const NavBar = ({ logo, path, children, rightButton, onRightButtonPressed }: Nav
       >
         <div className="flex h-fit w-full justify-between">
           <a className="h-fit w-fit self-center text-slate-300 no-underline" href="/">
-            <span className="discover-md:block hidden text-4xl">Reelist</span>
+            <span className="discover-md:block hover:decoration-reelist-red hidden text-4xl underline decoration-transparent underline-offset-[6px] transition-all duration-300 ease-in-out">
+              Reelist
+            </span>
             <span className="discover-md:hidden flex h-fit">
               <Image src="/images/logo.png" width={40} height={40} alt="Reelist" priority />
             </span>
