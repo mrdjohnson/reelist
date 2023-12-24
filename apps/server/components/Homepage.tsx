@@ -35,9 +35,11 @@ const Homepage = observer(() => {
         </div>
 
         <div className="mb-6 mt-12 text-xl ">
-          Mobile <span className="mx-1 text-base text-gray-500">(Coming soon)</span>
+          <span className="text-3xl"> Mobile </span>
           <br />
           Manually Track watched shows and compare them with your friends
+          <br />
+          <span className="mx-1 text-base text-gray-500">(Coming soon)</span>
         </div>
       </div>
 
