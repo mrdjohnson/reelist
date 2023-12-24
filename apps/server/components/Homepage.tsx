@@ -12,7 +12,7 @@ const Homepage = observer(() => {
   return (
     <div
       suppressHydrationWarning
-      className="font-inter bg-reelist-gradient-green flex h-screen w-screen flex-col"
+      className="bg-reelist-gradient-green flex h-screen w-screen flex-col"
     >
       <Head>
         <title>Reelist</title>

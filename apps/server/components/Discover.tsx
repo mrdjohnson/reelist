@@ -360,7 +360,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
 
               {searchText && showSearchBubble ? (
                 <Button
-                  className="font-inter bg-reelist-red group h-fit items-center rounded-full border px-3 text-xl text-black hover:text-white"
+                  className="bg-reelist-red group h-fit items-center rounded-full border px-3 text-xl text-black hover:text-white"
                   onClick={() => setSearchText('')}
                 >
                   <div className="flex items-center justify-center">

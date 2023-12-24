@@ -15,10 +15,6 @@
           scrollbar-width: none;  /* Firefox */
       }
 
-      .font-inter {
-        font-family: Inter;
-      }
-
       .pause-animation {
         animation-play-state: paused;
       }

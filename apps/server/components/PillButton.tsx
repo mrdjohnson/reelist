@@ -27,7 +27,7 @@ const PillButton = ({
       ref={pillButtonRef}
       className={classNames(
         'group rounded-full border border-solid transition-all duration-200',
-        'font-inter text-lg font-semibold',
+        'text-lg font-semibold',
         'scale-95 hover:scale-100',
         'discover-md:py-1 mt-2 px-3 py-3',
         className,
