@@ -6,6 +6,8 @@ const rootElement = () => document.getElementById('__next')
 const theme = responsiveFontSizes(
   createTheme({
     typography: {
+      fontFamily: 'Inter',
+
       button: {
         textTransform: 'none',
       },

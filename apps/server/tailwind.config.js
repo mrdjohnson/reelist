@@ -35,6 +35,9 @@ module.exports = {
         'reelist-light-gray': '#2C2C2C',
         'reelist-dark': '#141414',
       },
+      fontFamily: {
+        sans: ['Inter', ...require('tailwindcss/defaultTheme').fontFamily.sans],
+      },
       spacing: {
         500: '500px',
         600: '600px',
