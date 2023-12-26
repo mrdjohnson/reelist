@@ -385,6 +385,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
                   autoComplete="off"
                   placeholder="Search"
                   onBlur={() => setShowSearchBubble(true)}
+                  onFocus={() => setShowSearchBubble(false)}
                   onChange={event => setSearchText(event.target.value)}
                   onKeyDown={handleKeyDown}
                 />
