@@ -10,14 +10,11 @@ import { flow } from 'mobx'
 import moment from 'moment'
 import { mix, Mixin } from 'ts-mixer'
 import { AbstractBaseShow, TmdbShowById } from '@reelist/models/tmdb/TmdbShowById'
-import { episodeIsAfter } from '@reelist/utils/tmdbHelpers/TmdbEpisodeHelpers'
 
 @mix(TmdbShowById, AbstractUserVideo)
 class UserShow extends Mixin(AbstractUserVideo, AbstractBaseShow) {
   override isTv: true = true
   override hasUser: true = true
-
-  version: number = 2
 
   unWatchableEpisodeCount = 0
 
@@ -39,8 +36,6 @@ class UserShow extends Mixin(AbstractUserVideo, AbstractBaseShow) {
 
   override _assignFromVideoTable(userVideoData?: VideoTableType) {
     super._assignFromVideoTable(userVideoData)
-
-    this.version = userVideoData?.version || 1
 
     this.lastWatchedSeasonNumber = userVideoData?.last_watched_season_number || 1
     this.lastWatchedEpisodeNumber = userVideoData?.last_watched_episode_number || 1
