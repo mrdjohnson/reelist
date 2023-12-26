@@ -36,7 +36,7 @@ const VideosModal = observer(({ route, navigation }: ReelistScreenFrom<'videosMo
 
   useEffect(() => {
     setSearchedVideos([])
-    videoSearch(filterText).then(setSearchedVideos)
+    videoSearch(filterText).then(searchResults => setSearchedVideos(searchResults.videos))
   }, [filterText])
 
   return (

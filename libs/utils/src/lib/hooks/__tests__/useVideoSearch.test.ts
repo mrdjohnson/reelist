@@ -23,7 +23,7 @@ describe('useVideoSearch', () => {
   it('should return empty array if no search text', async () => {
     const videos = await videoSearch('')
 
-    expect(videos).toEqual([])
+    expect(videos).toEqual({ videos: [] })
   })
 
   it('should call TMDB API and map results', async () => {
@@ -34,7 +34,8 @@ describe('useVideoSearch', () => {
       results: movieResponses.concat(showResponses),
     })
 
-    const videos = await videoSearch('any')
+    const searchResults = await videoSearch('any')
+    const { videos } = searchResults
 
     expect(videos.map(video => video.videoId)).toEqual(['mv1', 'mv2', 'tv3', 'tv4'])
   })
@@ -53,11 +54,14 @@ describe('useVideoSearch', () => {
       results: [showResponse, personResponse, movieResponse],
     })
 
-    const videos = await videoSearch('any', { deepSearch: false })
+    const searchResults = await videoSearch('any', { deepSearch: false })
+    const { videos } = searchResults
 
     expect(videos.map(video => video.videoId)).toEqual(['tv1', 'mv6'])
 
-    const deepSearchVideos = await videoSearch('any', { deepSearch: true })
+    const deepSearchResults = await videoSearch('any', { deepSearch: true })
+
+    const deepSearchVideos = deepSearchResults.videos
 
     expect(deepSearchVideos.map(video => video.videoId)).toEqual([
       'tv1',

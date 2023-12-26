@@ -28,7 +28,9 @@ const DiscoverScreen = observer(({ route }: ReelistScreenFrom<'discover'>) => {
 
   const [videos, search, loadingVideos] = useAsyncState([], async () => {
     try {
-      return await videoSearch(searchText)
+      const searchResult = await videoSearch(searchText)
+
+      return searchResult.videos
     } catch (e) {
       setSearchError(JSON.stringify(e))
 

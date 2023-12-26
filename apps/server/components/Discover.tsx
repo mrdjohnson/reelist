@@ -129,7 +129,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
 
   const search = _.debounce(() => {
     videoSearch(searchText, { deepSearch: true, page: page.toString() })
-      .then(handleVideos)
+      .then(searchResults => handleVideos(searchResults.videos))
       .then(finishLoadingVideos)
       .catch(e => {
         finishLoadingVideos([])

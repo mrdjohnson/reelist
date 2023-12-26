@@ -35,7 +35,7 @@ const TrackingScreen = observer(({ navigation }: ReelistScreen) => {
 
   useEffect(() => {
     setSearchedVideos([])
-    videoSearch(filterText).then(setSearchedVideos)
+    videoSearch(filterText).then(searchResults => setSearchedVideos(searchResults.videos))
   }, [filterText])
 
   if (!auth.loggedIn) {

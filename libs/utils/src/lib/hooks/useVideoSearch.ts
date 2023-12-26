@@ -17,8 +17,8 @@ const useVideoSearch = () => {
   const videoSearch = async (
     searchText: string,
     options: Record<string, string | boolean> = {},
-  ) => {
-    if (!searchText) return []
+  ): Promise<{ videos: TmdbVideoPartialType[] }> => {
+    if (!searchText) return { videos: [] }
 
     const { deepSearch = false, ...params } = options
 
@@ -29,7 +29,7 @@ const useVideoSearch = () => {
 
     const searchResults = _.get(searchResponse, 'data.data.results')
 
-    if (!searchResults) return []
+    if (!searchResults) return { videos: [] }
 
     if (deepSearch) {
       const videos: TmdbVideoPartialType[] = []
@@ -43,10 +43,12 @@ const useVideoSearch = () => {
         }
       })
 
-      return videos
+      return { videos }
     }
 
-    return _.filter(searchResults, isVideo).map(TmdbVideoPartialFormatter.fromTmdbSearchVideo)
+    return {
+      videos: _.filter(searchResults, isVideo).map(TmdbVideoPartialFormatter.fromTmdbSearchVideo),
+    }
   }
 
   return videoSearch
