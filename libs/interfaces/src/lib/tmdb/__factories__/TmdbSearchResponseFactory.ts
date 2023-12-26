@@ -8,7 +8,7 @@ import {
 } from '@reelist/interfaces/tmdb/TmdbSearchResponse'
 import { TmdbVideoPartialType } from '../TmdbVideoPartialType'
 import { TmdbVideoPartialFormatter } from '@reelist/utils/tmdbHelpers/TmdbVideoPartialFormatter'
-import { tmdbBaseVideoFactory } from './TmdbBaseVideoResponseFactory'
+import { tmdbBaseVideoFactory } from '@reelist/interfaces/tmdb/__factories__/TmdbBaseVideoResponseFactory'
 import moment from 'moment'
 
 export const tmdbSearchShowFactory = Factory.define<
@@ -58,7 +58,7 @@ export const tmdbSearchVideoFactory = Factory.define<
 >(({ sequence, params, onCreate, transientParams }) => {
   onCreate(TmdbVideoPartialFormatter.fromTmdbSearchVideo)
 
-  if (transientParams.isTv) return tmdbSearchShowFactory.build()
+  if (params.mediaType === 'tv' || transientParams.isTv) return tmdbSearchShowFactory.build()
 
   return tmdbSearchMovieFactory.build()
 })
