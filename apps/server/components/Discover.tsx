@@ -40,6 +40,13 @@ enum HomePageVideosState {
   NOT_LOADED = 'NOT_LOADED',
 }
 
+const MAX_PAGE = 11
+
+// in order to get true debounce for search, set up a variable outside of the component
+const searchDebouncer = _.debounce(cb => {
+  cb()
+}, 500)
+
 const useWindowWidth = () => {
   const [width, setWidth] = useState(window?.innerWidth)
   const handleResize = () => setWidth(window?.innerWidth)
@@ -105,36 +112,23 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
     setHomepageVideosState(HomePageVideosState.LOADED)
   }
 
-  const handleVideos = (nextVideos: TmdbVideoPartialType[]) => {
-    if (page === 1) {
-      console.log('making new videos')
-      return nextVideos
-    } else {
-      console.log('adding to current videos')
-
-      return _.uniqBy(videos.concat(nextVideos), 'videoId')
-    }
-  }
-
   const discover = () => {
     const result = getVideos(_.keys(genreSelectState.selectedOptions))
 
-    result
-      .then(handleVideos)
-      .then(finishLoadingVideos)
+    result.then(finishLoadingVideos).catch(e => {
+      finishLoadingVideos([])
+    })
+  }
+
+  const startSearch = () => {
+    videoSearch(searchText, { deepSearch: true, page: page.toString() })
+      .then(searchResults => finishLoadingVideos(searchResults.videos))
       .catch(e => {
         finishLoadingVideos([])
       })
   }
 
-  const search = _.debounce(() => {
-    videoSearch(searchText, { deepSearch: true, page: page.toString() })
-      .then(searchResults => handleVideos(searchResults.videos))
-      .then(finishLoadingVideos)
-      .catch(e => {
-        finishLoadingVideos([])
-      })
-  }, 500)
+  const search = () => searchDebouncer(startSearch)
 
   const loadVideos = () => {
     if (pageState === PageState.NOT_LOADED) return
@@ -168,13 +162,16 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
   }
 
   const finishLoadingVideos = (loadedVideos: TmdbVideoPartialType[]) => {
-    setVideos(loadedVideos)
-
-    if (_.isEmpty(loadedVideos)) {
-      setPage(page + 1)
+    if (page === 1) {
+      setVideos(loadedVideos)
+    } else if (_.isEmpty(loadedVideos)) {
+      setPage(MAX_PAGE)
     } else {
-      setIsLoadingVideos(false)
+      const nextVideos = _.uniqBy(videos.concat(loadedVideos), 'videoId')
+      setVideos(nextVideos)
     }
+
+    setIsLoadingVideos(false)
   }
 
   const pageState = useMemo(() => {
@@ -229,7 +226,9 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
       return
     }
 
-    setPage(page + 1)
+    if (page < MAX_PAGE) {
+      setPage(page + 1)
+    }
   }, [page, isLoadingVideos, pageState])
 
   useEffect(() => {
