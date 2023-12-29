@@ -24,6 +24,7 @@ const EntityModal = observer(
           <EntityImage
             video={video}
             person={person}
+            isPerson={!!person}
             className="discover-md:max-w-none max-w-full"
             isPoster
           />
