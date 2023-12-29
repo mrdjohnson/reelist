@@ -1,4 +1,4 @@
-import { Drawer, Toolbar, Dialog, DrawerProps } from '@mui/material'
+import { Drawer, Toolbar, Dialog, DrawerProps, CircularProgress } from '@mui/material'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
@@ -18,10 +18,18 @@ const DialogPaperProps = {
 type PopupProps = DrawerProps & {
   isOpen: boolean
   isMobile: boolean
+  isLoading?: boolean
   onClose?: () => void
 }
 
-const Popup = ({ children, isOpen = false, isMobile = false, onClose, ...props }: PopupProps) => {
+const Popup = ({
+  children,
+  isOpen = false,
+  isMobile = false,
+  onClose,
+  isLoading,
+  ...props
+}: PopupProps) => {
   const router = useRouter()
 
   const goToDiscoverHome = () => {
@@ -45,7 +53,7 @@ const Popup = ({ children, isOpen = false, isMobile = false, onClose, ...props }
       >
         <Toolbar />
 
-        {children}
+        {isLoading ? <CircularProgress size="40px" className="text-reelist-red m-12" /> : children}
       </Drawer>
     )
   }
@@ -81,7 +89,7 @@ const Popup = ({ children, isOpen = false, isMobile = false, onClose, ...props }
         </svg>
       </div>
 
-      {children}
+      {isLoading ? <CircularProgress size="60px" className="text-reelist-red m-12" /> : children}
     </Dialog>
   )
 }

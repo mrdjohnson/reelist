@@ -5,7 +5,14 @@ import { useRouter } from 'next/router'
 
 import SearchIcon from '@mui/icons-material/Search'
 import React, { ChangeEventHandler, useCallback, useEffect, useMemo, useState } from 'react'
-import { Autocomplete, Button, CircularProgress, TextField } from '@mui/material'
+import {
+  Autocomplete,
+  Button,
+  CircularProgress,
+  IconButton,
+  Snackbar,
+  TextField,
+} from '@mui/material'
 import _ from 'lodash'
 import { useStore } from '@reelist/utils/hooks/useStore'
 import useVideoDiscover from '@reelist/utils/hooks/useVideoDiscover'
@@ -94,11 +101,16 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
   const [searchText, setSearchText] = useState('')
   const [showSearchBubble, setShowSearchBubble] = useState(false)
 
+  const [popupErrorMessage, setPopupErrorMessage] = useState('')
+
   const [selectedPerson, setSelectedPerson] = useState<TmdbPersonType | null>(null)
   const [showSelectedPerson, setShowSelectedPerson] = useState(false)
+  const [isSelectedPersonLoading, setIsSelectedPersonLoading] = useState(false)
 
   const [selectedVideo, setSelectedVideo] = useState<TmdbVideoByIdType | null>(null)
   const [showSelectedVideo, setShowSelectedVideo] = useState(false)
+  const [isSelectedVideoLoading, setIsSelectedVideoLoading] = useState(false)
+
   const [showMobileFilterOptions, setShowMobileFilterOptions] = useState(false)
   const [mobileFilterText, setMobileFilterText] = useState('')
 
@@ -234,22 +246,44 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
   useEffect(() => {
     const { videoId, personId } = router.query
 
+    setPopupErrorMessage('')
+
     if (!videoId) {
       setShowSelectedVideo(false)
       setSelectedVideo(null)
+      setIsSelectedVideoLoading(false)
     } else if (!_.isArray(videoId)) {
-      videoStore.getVideo(videoId).then(setSelectedVideo)
-      // TODO: handle errors
       setShowSelectedVideo(true)
+      setIsSelectedVideoLoading(true)
+
+      videoStore.getVideo(videoId).then(video => {
+        setSelectedVideo(video)
+        setIsSelectedVideoLoading(false)
+
+        if (!video) {
+          setPopupErrorMessage('Unable to find video information')
+          setShowSelectedVideo(false)
+        }
+      })
     }
 
     if (!personId) {
       setShowSelectedPerson(false)
       setSelectedPerson(null)
+      setIsSelectedPersonLoading(false)
     } else if (!_.isArray(personId)) {
-      personStore.getPerson(personId).then(setSelectedPerson)
-      // TODO: handle errors
       setShowSelectedPerson(true)
+      setIsSelectedPersonLoading(true)
+
+      personStore.getPerson(personId).then(person => {
+        setSelectedPerson(person)
+        setIsSelectedPersonLoading(false)
+
+        if (!person) {
+          setPopupErrorMessage('Unable to find person information')
+          setShowSelectedPerson(false)
+        }
+      })
     }
   }, [router.query])
 
@@ -552,7 +586,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
         </InfiniteScroll>
 
         {/* selected video dialog */}
-        <Popup isOpen={showSelectedVideo} isMobile={isMobile}>
+        <Popup isOpen={showSelectedVideo} isMobile={isMobile} isLoading={isSelectedVideoLoading}>
           <div className="no-scrollbar relative overflow-scroll overscroll-none">
             {selectedVideo && (
               <VideoModal
@@ -563,7 +597,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
           </div>
         </Popup>
 
-        <Popup isOpen={showSelectedPerson} isMobile={isMobile}>
+        <Popup isOpen={showSelectedPerson} isMobile={isMobile} isLoading={isSelectedPersonLoading}>
           <div className="no-scrollbar relative overflow-scroll overscroll-none">
             {selectedPerson && <PersonModal person={selectedPerson} />}
           </div>
@@ -718,6 +752,17 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
             </ReelistAccordionSection>
           </ReelistAccordion>
         </Popup>
+
+        <Snackbar
+          open={!!popupErrorMessage}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          autoHideDuration={3000}
+          onClose={closePopup}
+          TransitionProps={{ onExited: closePopup }}
+          message={<div className="text-3xl text-white">{popupErrorMessage}</div>}
+          action={rightNavButton}
+          className="border-reelist-red/30 rounded-md border-2 border-solid"
+        />
       </div>
     </div>
   )
