@@ -11,6 +11,7 @@ import {
   TmdbWatchProviderData,
   TmdbWatchProviderResponse,
 } from '@reelist/interfaces/tmdb/TmdbWatchProviderResponse'
+import { TmdbPersonCreditResponse } from '@reelist/interfaces/tmdb/TmdbPersonResponse'
 
 const formatProviders = (
   tmdbWatchProviderResponse: TmdbWatchProviderResponse,
@@ -44,6 +45,10 @@ const formatProviders = (
   })
 
   return providersByRegion
+}
+
+const formatCast = (cast: TmdbPersonCreditResponse[]) => {
+  return _.take(cast, 200)
 }
 
 export class TmdbVideoByIdFormatter {
@@ -113,7 +118,7 @@ export class TmdbVideoByIdFormatter {
       episodeRunTimes: json.episodeRunTime,
       mediaType: 'tv',
       isTv: true,
-      cast: _.uniqBy(cast, 'id'),
+      cast: formatCast(_.uniqBy(cast, 'id')),
       seasonPartials,
       providers: formatProviders(json['watch/providers'].results),
       videoRuntime: seasonPartials.length === 1 ? '1 season' : `${seasonPartials.length} seasons`,
@@ -139,7 +144,7 @@ export class TmdbVideoByIdFormatter {
       similar,
       mediaType: 'mv',
       isTv: false,
-      cast: json.credits.cast,
+      cast: formatCast(json.credits.cast),
       providers: formatProviders(json['watch/providers'].results),
       videoRuntime: `${json.runtime} min`,
       lastVideoReleaseDate: moviePartial.videoReleaseDate,
