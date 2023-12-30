@@ -760,7 +760,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
           onClose={closePopup}
           TransitionProps={{ onExited: closePopup }}
           message={<div className="text-3xl text-white">{popupErrorMessage}</div>}
-          action={rightNavButton}
+          action={<div onClick={closePopup}>{rightNavButton}</div>}
           className="border-reelist-red/30 rounded-md border-2 border-solid"
         />
       </div>
