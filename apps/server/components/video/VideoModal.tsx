@@ -11,7 +11,6 @@ import EntityModal from '../EntityModal'
 import { TmdbPersonCreditResponse } from '@reelist/interfaces/tmdb/TmdbPersonResponse'
 import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
 import { TmdbVideoByIdType } from '@reelist/interfaces/tmdb/TmdbVideoByIdType'
-import { TmdbWatchProviderDataResponse } from '@reelist/interfaces/tmdb/TmdbWatchProviderResponse'
 
 const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
@@ -19,34 +18,13 @@ const VideoModal = observer(
   ({ video, selectedRegions }: { video: TmdbVideoByIdType; selectedRegions: string[] }) => {
     const router = useRouter()
 
-    const getProvidersByType = (type): TmdbWatchProviderDataResponse[] =>
-      _.chain(selectedRegions)
-        .flatMap(region => video.providers[region]?.[type])
+    const providers = useMemo(() => {
+      return _.chain(selectedRegions)
+        .flatMap(region => video.providers[region])
         .compact()
         .uniqBy('providerId')
         .value()
-
-    const providers: Array<
-      TmdbWatchProviderDataResponse & {
-        type: string
-      }
-    > = useMemo(() => {
-      const buyProviders = getProvidersByType('buy').map(provider => ({ ...provider, type: 'Buy' }))
-      const flatrateProviders = getProvidersByType('flatrate').map(provider => ({
-        ...provider,
-        type: 'Stream',
-      }))
-      const rentProviders = getProvidersByType('rent').map(provider => ({
-        ...provider,
-        type: 'Rent',
-      }))
-
-      return _.sortBy(
-        [...flatrateProviders, ...rentProviders, ...buyProviders],
-        'providerName',
-        'displayPriority',
-      )
-    }, [video.providers])
+    }, [video.providers, selectedRegions])
 
     const handleVideoSelection = (video: TmdbVideoPartialType) => {
       router.push(`/discover?videoId=${video.videoId}`, undefined, { shallow: true })
@@ -129,20 +107,24 @@ const VideoModal = observer(
 
           <SnapHoverGroup className="discover-lg:gap-x-8 gap-x-5 pb-2 pl-2">
             {providers.map(provider => (
-              <SnapHoverItem
-                className="flex flex-col justify-center text-center"
-                key={provider.providerId}
-              >
-                <img
-                  src={IMAGE_PATH + provider.logoPath}
-                  className="mb-3 rounded-md object-contain"
-                  alt={provider.providerName}
-                  width="50px"
-                  height="50px"
-                />
+              <a href={provider.link} className="text-white decoration-transparent">
+                <SnapHoverItem
+                  className="flex flex-col justify-center text-center"
+                  key={provider.providerId}
+                >
+                  <div className="discover-md:scale-95 transition-all duration-200 ease-in-out hover:scale-100 ">
+                    <img
+                      src={IMAGE_PATH + provider.logoPath}
+                      className="mb-2 rounded-md object-contain"
+                      alt={provider.providerName}
+                      width="50px"
+                      height="50px"
+                    />
 
-                <span>{provider.type}</span>
-              </SnapHoverItem>
+                    <span>{provider.type}</span>
+                  </div>
+                </SnapHoverItem>
+              </a>
             ))}
           </SnapHoverGroup>
         </div>
