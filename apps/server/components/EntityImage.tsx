@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
 
-import React, { useMemo, useState } from 'react'
+import React, { MouseEvent, useMemo, useState } from 'react'
 import _ from 'lodash'
 import classNames from 'classnames'
 import { useStore } from '@reelist/utils/hooks/useStore'
@@ -18,6 +18,7 @@ type VideoImageProps = {
   className?: string
   isPerson?: boolean
   homepageImage?: boolean
+  isLink?: boolean
 }
 
 const TvIcon = () => (
@@ -80,6 +81,7 @@ const EntityImage = observer(
     isPoster,
     isPerson,
     className,
+    isLink = true,
     homepageImage = false,
   }: VideoImageProps) => {
     const { tmdbDiscover } = useStore()
@@ -107,6 +109,14 @@ const EntityImage = observer(
       return tmdbDiscover.mapGenres(video)
     }, [video.genreIds, loading, tmdbDiscover.genreSelectState.optionsLoaded])
 
+    const href = useMemo(() => {
+      if (!isLink) return null
+
+      if (video.videoId) return '/discover?videoId=' + video.videoId
+
+      if (person.id) return '/discover?personId=' + person.id
+    }, [video, isLink, person])
+
     if (loading) {
       return (
         <div
@@ -124,19 +134,25 @@ const EntityImage = observer(
 
     const hasBackdrop = !isPoster && source
 
+    const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+      event.preventDefault()
+      onPress && onPress()
+    }
+
     return (
-      <div
+      <a
+        href={href}
         className={classNames(
           'relative my-4 flex justify-center overflow-hidden rounded-md transition-all duration-300 ease-in-out',
           {
             '!my-0 max-w-full': isPoster,
             'discover-md:h-[207px] aspect-backdrop group m-0 w-full': !isPoster,
             'discover-md:hover:my-0 discover-md:hover:h-[237px] my-4': hasBackdrop,
-            'cursor-pointer': onPress,
+            'cursor-pointer': onPress && href,
             'h-[207px] opacity-50 hover:opacity-80': homepageImage,
           },
         )}
-        onClick={onPress}
+        onClick={handleClick}
       >
         {source ? (
           <img
@@ -195,7 +211,7 @@ const EntityImage = observer(
             </div>
           </div>
         )}
-      </div>
+      </a>
     )
   },
 )
