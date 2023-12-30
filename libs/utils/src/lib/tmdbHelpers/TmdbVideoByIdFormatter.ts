@@ -7,6 +7,44 @@ import moment from 'moment'
 import { TmdbShowById } from '@reelist/models/tmdb/TmdbShowById'
 import { TmdbMovieById } from '@reelist/models/tmdb/TmdbMovieById'
 import { TmdbVideoType } from '@reelist/models/Video'
+import {
+  TmdbWatchProviderData,
+  TmdbWatchProviderResponse,
+} from '@reelist/interfaces/tmdb/TmdbWatchProviderResponse'
+
+const formatProviders = (
+  tmdbWatchProviderResponse: TmdbWatchProviderResponse,
+): Record<string, TmdbWatchProviderData[]> => {
+  const providerResponsesByRegion = _.mapKeys(tmdbWatchProviderResponse, (_value, key) =>
+    _.toUpper(key),
+  )
+
+  const providersByRegion = _.mapValues(providerResponsesByRegion, providerCountry => {
+    const link = providerCountry.link
+
+    const buys = _.map(providerCountry.buy, providerData => ({
+      ...providerData,
+      link,
+      type: 'Buy',
+    }))
+
+    const rents = _.map(providerCountry.rent, providerData => ({
+      ...providerData,
+      link,
+      type: 'Rent',
+    }))
+
+    const streams = _.map(providerCountry.flatrate, providerData => ({
+      ...providerData,
+      link,
+      type: 'Stream',
+    }))
+
+    return _.sortBy([...streams, ...rents, ...buys], 'providerName', 'displayPriority')
+  })
+
+  return providersByRegion
+}
 
 export class TmdbVideoByIdFormatter {
   static fromTmdbBaseVideo(json: TmdbShowByIdResponse, videoId: string): TmdbShowById
@@ -57,8 +95,6 @@ export class TmdbVideoByIdFormatter {
     // remove special seasons until we learn how to deal with them
     const seasonPartials = _.reject(seasons, { name: 'Specials' })
 
-    const providers = json['watch/providers'].results
-
     const seasonMap: Record<number, TmdbTvSeason> = {}
 
     // manually attach the season from the custom season appended request
@@ -79,7 +115,7 @@ export class TmdbVideoByIdFormatter {
       isTv: true,
       cast: _.uniqBy(cast, 'id'),
       seasonPartials,
-      providers: _.mapKeys(providers, (_value, key) => _.toUpper(key)),
+      providers: formatProviders(json['watch/providers'].results),
       videoRuntime: seasonPartials.length === 1 ? '1 season' : `${seasonPartials.length} seasons`,
       lastVideoReleaseDate: moment(json.lastAirDate),
       // deviation from the original Video implementation which removed the future episodes from the count
@@ -97,8 +133,6 @@ export class TmdbVideoByIdFormatter {
 
     const similar = json.similar.results.map(TmdbVideoPartialFormatter.fromTmdbMovie)
 
-    const providers = json['watch/providers'].results
-
     return {
       ...moviePartial,
       ...json,
@@ -106,7 +140,7 @@ export class TmdbVideoByIdFormatter {
       mediaType: 'mv',
       isTv: false,
       cast: json.credits.cast,
-      providers: _.mapKeys(providers, (_value, key) => _.toUpper(key)),
+      providers: formatProviders(json['watch/providers'].results),
       videoRuntime: `${json.runtime} min`,
       lastVideoReleaseDate: moviePartial.videoReleaseDate,
       totalDurationMinutes: json.runtime,

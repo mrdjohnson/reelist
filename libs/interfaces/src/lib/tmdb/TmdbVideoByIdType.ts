@@ -1,6 +1,6 @@
 import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
 import { TmdbPersonCreditResponse } from '@reelist/interfaces/tmdb/TmdbPersonResponse'
-import { TmdbWatchProviderResponse } from '@reelist/interfaces/tmdb/TmdbWatchProviderResponse'
+import { TmdbWatchProvidersByRegion } from '@reelist/interfaces/tmdb/TmdbWatchProviderResponse'
 import {
   TmdbShowEpisodeResponseType,
   TmdbShowByIdResponse,
@@ -40,7 +40,7 @@ export type TmdbShowOnlyFields = {
 }
 
 export type TmdbBaseVideoType = TmdbVideoPartialType & {
-  providers: TmdbWatchProviderResponse
+  providers: TmdbWatchProvidersByRegion
   genres: Array<{
     id: number
     name: string
