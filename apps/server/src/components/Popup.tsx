@@ -53,7 +53,11 @@ const Popup = ({
       >
         <Toolbar />
 
-        {isLoading ? <CircularProgress size="40px" className="text-reelist-red m-12" /> : children}
+        {isLoading ? (
+          <CircularProgress size="60px" className="text-reelist-red m-12 mt-40 self-center" />
+        ) : (
+          children
+        )}
       </Drawer>
     )
   }
