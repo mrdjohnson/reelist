@@ -31,18 +31,20 @@ const PersonModal = observer(({ person }: { person: TmdbPersonType }) => {
       <div className="no-scrollbar relative w-full overflow-x-auto overscroll-x-none">
         <div className="sticky left-0 z-20 w-full pb-3 text-2xl">Known For</div>
 
-        <SnapHoverGroup className="relative gap-x-3 pb-4 pl-2">
+        <SnapHoverGroup className="relative flex gap-x-3 pb-4 pl-2">
           {person.media.map(video => (
             <SnapHoverItem
-              className="discover-md:scale-90 flex cursor-pointer flex-col justify-center text-center transition-all duration-200 ease-in-out hover:scale-100"
+              className="flex cursor-pointer flex-col justify-center text-center"
               key={video.id}
               onClick={() => handleVideoSelection(video)}
             >
-              <EntityImage video={video} className="!h-[200px] !min-h-0 max-w-fit" isPoster />
+              <div className="discover-md:scale-95 transition-all duration-200 ease-in-out hover:scale-100 ">
+                <EntityImage video={video} className="!h-[200px] !min-h-0 max-w-fit" isPoster />
 
-              <span className="mt-2 line-clamp-4 h-[3rem] text-base font-semibold text-white">
-                {video.videoName}
-              </span>
+                <span className="mt-2 line-clamp-4 h-[3rem] text-base font-semibold text-white">
+                  {video.videoName}
+                </span>
+              </div>
             </SnapHoverItem>
           ))}
         </SnapHoverGroup>
