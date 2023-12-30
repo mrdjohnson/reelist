@@ -1,4 +1,5 @@
 import { Drawer, Toolbar, Dialog, DrawerProps, CircularProgress } from '@mui/material'
+import CloseIcon from 'apps/server/components/heroIcons/CloseIcon'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
@@ -80,17 +81,7 @@ const Popup = ({
         className="text-reelist-red absolute right-2 top-2 cursor-pointer lg:top-2"
         onClick={handleClose}
       >
-        {/* close icon */}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="h-8"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
+        <CloseIcon className="h-8" />
       </div>
 
       {isLoading ? <CircularProgress size="60px" className="text-reelist-red m-12" /> : children}

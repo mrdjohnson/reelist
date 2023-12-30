@@ -345,17 +345,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
 
   const rightNavButton = (
     <div className="flex h-full w-fit cursor-pointer items-center text-white">
-      {/* close icon */}
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth={1.5}
-        stroke="currentColor"
-        className="group-hover:text-reelist-red h-8 transition-colors duration-200"
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-      </svg>
+      <CloseIcon className="group-hover:text-reelist-red h-8 transition-colors duration-200" />
     </div>
   )
 
@@ -399,16 +389,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
                   <div className="flex items-center justify-center">
                     {searchText}
 
-                    {/* close icon */}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      className="h-5 justify-self-center stroke-2 pl-4 text-center align-baseline font-semibold"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <CloseIcon className="h-5 justify-self-center stroke-2 pl-4 text-center align-baseline font-semibold" />
                   </div>
                 </Button>
               ) : (
