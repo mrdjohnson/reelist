@@ -102,21 +102,19 @@ const ReelistAccordionSection = observer(
 
     return (
       <>
-        {label && (
-          <div
-            className={
-              'sticky z-10 m-0 w-full border-0 border-b border-solid border-gray-100 border-opacity-50 bg-black p-2 text-lg  ' +
-              (contentIsEmpty ? 'text-gray-500' : 'text-white')
-            }
-            style={{
-              bottom: (totalCount - (index + 1)) * HEADER_HEIGHT + 'px',
-              top: index * HEADER_HEIGHT + 'px',
-            }}
-            onClick={() => scrollToElement(labelRef.current, index)}
-          >
-            {label} {contentIsEmpty && ' (Empty)'}
-          </div>
-        )}
+        <div
+          className={
+            'sticky z-10 m-0 w-full border-0 border-b border-solid border-gray-100 border-opacity-50 bg-black p-2 text-lg  ' +
+            (contentIsEmpty ? 'text-gray-500' : 'text-white')
+          }
+          style={{
+            bottom: (totalCount - (index + 1)) * HEADER_HEIGHT + 'px',
+            top: index * HEADER_HEIGHT + 'px',
+          }}
+          onClick={() => scrollToElement(labelRef.current, index)}
+        >
+          {label} {contentIsEmpty && ' (Empty)'}
+        </div>
 
         {hasContent && (
           <div className="p-3" ref={labelRef}>
