@@ -72,7 +72,7 @@ const useWindowWidth = () => {
 const Discover = observer(({ beta }: { beta: boolean }) => {
   const router = useRouter()
 
-  const { videoStore, personStore } = useStore()
+  const { videoStore, personStore, appState } = useStore()
   const {
     getVideos,
     videoTypesSelectState,
@@ -100,8 +100,6 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
 
   const [searchText, setSearchText] = useState('')
   const [showSearchBubble, setShowSearchBubble] = useState(false)
-
-  const [popupErrorMessage, setPopupErrorMessage] = useState('')
 
   const [selectedPerson, setSelectedPerson] = useState<TmdbPersonType | null>(null)
   const [showSelectedPerson, setShowSelectedPerson] = useState(false)
@@ -246,7 +244,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
   useEffect(() => {
     const { videoId, personId } = router.query
 
-    setPopupErrorMessage('')
+    appState.clearErrorMessage()
 
     if (!videoId) {
       setShowSelectedVideo(false)
@@ -261,7 +259,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
         setIsSelectedVideoLoading(false)
 
         if (!video) {
-          setPopupErrorMessage('Unable to find video information')
+          appState.setErrorMessage('Unable to find video information')
           setShowSelectedVideo(false)
         }
       })
@@ -280,7 +278,7 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
         setIsSelectedPersonLoading(false)
 
         if (!person) {
-          setPopupErrorMessage('Unable to find person information')
+          appState.setErrorMessage('Unable to find person information')
           setShowSelectedPerson(false)
         }
       })
@@ -735,12 +733,12 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
         </Popup>
 
         <Snackbar
-          open={!!popupErrorMessage}
+          open={!!appState.errorMessage}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
           autoHideDuration={3000}
           onClose={closePopup}
           TransitionProps={{ onExited: closePopup }}
-          message={<div className="text-3xl text-white">{popupErrorMessage}</div>}
+          message={<div className="text-3xl text-white">{appState.errorMessage}</div>}
           action={<div onClick={closePopup}>{rightNavButton}</div>}
           className="border-reelist-red/30 rounded-md border-2 border-solid"
         />

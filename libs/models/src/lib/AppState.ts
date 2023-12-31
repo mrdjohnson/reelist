@@ -30,6 +30,7 @@ export default class AppState {
   } = {
     video: { isOpen: false },
   }
+  errorMessage?: string = ''
 
   constructor() {
     makeAutoObservable(this)
@@ -95,5 +96,13 @@ export default class AppState {
 
   clearActionSheetVideo = () => {
     this.actionSheets.video = { ...this.actionSheets.video, isOpen: false }
+  }
+
+  setErrorMessage = (errorMessage: string) => {
+    this.errorMessage = errorMessage
+  }
+
+  clearErrorMessage = () => {
+    this.errorMessage = undefined
   }
 }
