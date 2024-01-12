@@ -60,7 +60,7 @@ const Banner = () => {
   }
 
   return (
-    <div className="animate-slow-scroll hover:pause-animation flex flex-row gap-5">
+    <div className="animate-slow-scroll discover-md:hover:pause-animation flex flex-row gap-5">
       {videos.map(video => (
         <div className="max-w-[307px] flex-1 overflow-hidden">
           <EntityImage video={video} onPress={() => handleVideoSelection(video)} homepageImage />
