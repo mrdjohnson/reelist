@@ -18,7 +18,7 @@ const Homepage = observer(() => {
         <title>Reelist</title>
       </Head>
 
-      <div className="discover-md:top-[15%] fixed top-[5%] flex w-full flex-col  justify-center pb-12 text-center text-white">
+      <div className="discover-md:top-[15%] discover-md:fixed discover-md:justify-center flex max-h-fit w-full max-w-full flex-col  pb-12 pt-[5%] text-center text-white">
         <div className="pb-9 text-5xl">Reelist</div>
 
         <a
@@ -30,7 +30,7 @@ const Homepage = observer(() => {
         <div className="text-xl text-white">
           Discover Together: Merge Your Movie Desires with Friends' Picks!
         </div>
-        <div className="mt-2 flex h-fit w-full flex-row gap-x-5">
+        <div className="mt-2 flex h-fit w-full flex-row gap-x-5 overflow-hidden">
           <Banner />
         </div>
 
