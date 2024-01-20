@@ -43,7 +43,7 @@ const Homepage = observer(() => {
         </div>
       </div>
 
-      <div className="fixed bottom-0 w-full">
+      <div className="discover-md:fixed bottom-0 w-full">
         <Footer hideHeader />
       </div>
     </div>
