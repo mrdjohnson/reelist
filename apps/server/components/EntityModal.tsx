@@ -40,7 +40,7 @@ const EntityModal = observer(
 
           <div className="bg-reelist-red mb-6 mt-3 h-[1px]" />
 
-          <div className="min-h-20 max-h-72 overflow-scroll whitespace-normal break-words">
+          <div className="min-h-20 max-h-72 max-w-full overflow-auto whitespace-normal break-words">
             {description}
           </div>
 
