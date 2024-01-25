@@ -75,7 +75,9 @@ const VideoModal = observer(
         </div>
 
         <div className="no-scrollbar relative w-full overflow-x-auto overscroll-x-none">
-          <div className="sticky left-0 z-20 w-full pb-3 text-2xl">Related Videos</div>
+          <div className="sticky left-0 z-20 w-full pb-3 text-2xl">
+            {_.isEmpty(video.similar) ? 'No related videos' : 'Related Videos'}
+          </div>
 
           <SnapHoverGroup className="relative gap-x-3 pb-4 pl-2">
             {video.similar.map(relatedVideo => (
