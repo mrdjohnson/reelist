@@ -13,8 +13,11 @@ const Page = () => {
         <meta property="og:title" content="Reelist" />
         <meta property="og:site_name" content="Reelist" />
         <meta name="twitter:title" content="Unlock your next obsession" />
-        <meta name="twitter:side" content="https://reelist.app/discover" />
         <meta name="twitter:card" content="summary" />
+
+        <meta property="og:image" content="http://reelist.app/images/thumbnail.png" />
+        <meta property="og:image:width" content="150" />
+        <meta property="og:image:height" content="150" />
 
         <meta
           property="og:description"

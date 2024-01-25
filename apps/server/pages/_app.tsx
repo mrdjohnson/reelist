@@ -1,5 +1,4 @@
 import '../styles.css'
-import Head from 'next/head'
 
 import '~/setupServerEnv'
 
@@ -11,15 +10,6 @@ import muiTheme from '~/mui-theme'
 function MyApp({ Component, pageProps }) {
   return (
     <>
-      <Head>
-        <meta
-          property="og:image"
-          content={`${process.env.NEXT_PUBLIC_BASE_URL}/images/thumbnail.png`}
-        />
-        <meta property="og:image:width" content="150" />
-        <meta property="og:image:height" content="150" />
-      </Head>
-
       <StyledEngineProvider injectFirst>
         <ThemeProvider theme={muiTheme}>
           <CssBaseline />
