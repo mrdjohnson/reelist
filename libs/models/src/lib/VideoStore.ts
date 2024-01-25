@@ -2,19 +2,17 @@ import _ from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import Auth from '@reelist/models/Auth'
 import VideoList from '@reelist/models/VideoList'
-import { callTmdb } from '@reelist/apis/api'
 import User from '@reelist/models/User'
 import { inject, injectable } from 'inversify'
 import { SupabaseClient } from '@supabase/supabase-js'
 import VideoApi from '@reelist/apis/VideoApi'
 import { VideoTableType } from 'libs/interfaces/src/lib/tables/VideoTable'
-import { TmdbVideoByIdResponse } from '@reelist/interfaces/tmdb/TmdbVideoByIdType'
-import { TmdbVideoByIdFormatter } from '@reelist/utils/tmdbHelpers/TmdbVideoByIdFormatter'
 import UserStore from '@reelist/models/UserStore'
 import UserVideo, { UserVideoType } from '@reelist/models/UserVideo'
 import { settleAll } from '@reelist/utils/settleAll'
 import { TmdbTvSeason } from '@reelist/interfaces/tmdb/TmdbShowResponse'
 import { AnyVideoType, TmdbVideoType } from '@reelist/models/Video'
+import { TmdbClient } from '@reelist/utils/tmdbHelpers/TmdbClient'
 
 @injectable()
 class VideoStore {
@@ -102,33 +100,17 @@ class VideoStore {
       return video
     }
 
-    const path = this.getVideoPath(videoId)
-
-    if (!path) return null
-
-    const video = this.tmdbJsonByVideoId[videoId]
-    let videoResponse: TmdbVideoByIdResponse | null
-
     let seasonsStringToRequest = ',season/1'
 
     if (seasonNumber) {
       seasonsStringToRequest += `,season/${seasonNumber},season/${seasonNumber + 1}`
     }
 
-    if (_.isUndefined(video)) {
-      videoResponse = await callTmdb<TmdbVideoByIdResponse>(path, {
-        // TODO: images is never used; remove?
-        append_to_response:
-          'images,similar,aggregate_credits,credits,watch/providers' + seasonsStringToRequest,
-      }).then(item => _.get(item, 'data.data') || null)
+    const video = await TmdbClient.getVideoById(videoId, seasonsStringToRequest)
 
-      this.tmdbJsonByVideoId[videoId] = TmdbVideoByIdFormatter.fromTmdbBaseVideo(
-        videoResponse,
-        videoId,
-      )
-    }
+    this.tmdbJsonByVideoId[videoId] = video
 
-    return video || this.tmdbJsonByVideoId[videoId]
+    return video
   }
 
   getVideosForVideoList = async (videoList: VideoList) => {
