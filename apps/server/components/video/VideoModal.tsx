@@ -109,9 +109,13 @@ const VideoModal = observer(
 
           <SnapHoverGroup className="discover-lg:gap-x-8 gap-x-5 pb-2 pl-2">
             {providers.map(provider => (
-              <a href={provider.link} className="text-white decoration-transparent">
+              <a
+                href={provider.link}
+                className="text-white decoration-transparent"
+                key={provider.providerId}
+              >
                 <SnapHoverItem
-                  className="flex flex-col justify-center text-center"
+                  className="discover-md:scale-95 flex flex-col justify-center text-center transition-all duration-200 ease-in-out hover:scale-100 "
                   key={provider.providerId}
                 >
                   <div className="discover-md:scale-95 transition-all duration-200 ease-in-out hover:scale-100 ">
@@ -122,9 +126,9 @@ const VideoModal = observer(
                       width="50px"
                       height="50px"
                     />
-
-                    <span>{provider.type}</span>
                   </div>
+
+                  <span>{provider.type}</span>
                 </SnapHoverItem>
               </a>
             ))}
