@@ -30,12 +30,4 @@ const Page = () => {
   )
 }
 
-export const getStaticProps = async () => {
-  return {
-    props: {
-      path: process.env.NEXT_PUBLIC_BASE_URL,
-    },
-  }
-}
-
 export default Page
