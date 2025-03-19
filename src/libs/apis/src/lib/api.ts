@@ -1,9 +1,8 @@
-import secrets from '@reelist/apis/secrets/secrets-index.json'
 import axios from 'axios'
 import humps from 'humps'
 
 const base_url = 'https://api.themoviedb.org/3'
-const apiKey = secrets.TMDB_API_KEY
+const apiKey = import.meta.env.VITE_TMDB_API_KEY
 
 export const callTmdb = async <T>(path: string, queryParams: Record<string, string> = {}) => {
   // todo figure out how to get __DEV__ in the libraries

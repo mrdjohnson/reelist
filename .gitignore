@@ -5,6 +5,8 @@
 /tmp
 /out-tsc
 
+.env
+
 # dependencies
 node_modules
 .yarn/*
@@ -115,6 +117,3 @@ apps/reelist-e2e/artifacts
 apps/test-e2e/artifacts
 apps/mobile-e2e/artifacts
 apps/mobile2-e2e/artifacts
-
-
-secrets-*
