@@ -1,14 +1,7 @@
-import '~/setupServerEnv'
-
 import React from 'react'
-import ReactDOM from 'react-dom/client'
 import { CssBaseline, StyledEngineProvider, ThemeProvider } from '@mui/material'
 import { createTheme, responsiveFontSizes } from '@mui/material/styles'
 import App from './App.tsx'
-
-import { TmdbClient } from '~/utils/tmdbHelpers/TmdbClient'
-
-
 
 const rootElement = () => document.getElementById('__next')
 
@@ -48,17 +41,18 @@ const theme = responsiveFontSizes(
 )
 import './index.css'
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-
-<StyledEngineProvider injectFirst>
+export default function Main() {
+  return (
+    <React.StrictMode>
+      <StyledEngineProvider injectFirst>
         <ThemeProvider theme={theme}>
           <CssBaseline />
 
           {/* <StoreProvider> */}
-    <App />
+          <App />
           {/* </StoreProvider> */}
         </ThemeProvider>
       </StyledEngineProvider>
-  </React.StrictMode>,
-)
+    </React.StrictMode>
+  )
+}

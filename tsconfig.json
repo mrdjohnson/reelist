@@ -34,6 +34,5 @@
       "@reelist/utils/*": ["./src/libs/utils/src/lib/*"]
     }
   },
-  "include": ["src", "src/**/*"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["src", "src/**/*"]
 }
