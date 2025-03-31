@@ -7,6 +7,8 @@ import EntityImage from './EntityImage'
 import Footer from './Footer'
 
 const Homepage = observer(() => {
+  const navigate = useNavigate()
+
   return (
     <div
       suppressHydrationWarning
@@ -17,7 +19,7 @@ const Homepage = observer(() => {
 
         <a
           className="decoration-reelist-red/30 hover:decoration-reelist-red mb-3 w-fit self-center text-3xl text-white underline underline-offset-8 transition-colors duration-300 ease-in-out"
-          href="/discover"
+          onClick={() => navigate('/discover')}
         >
           Discover
         </a>
