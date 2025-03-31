@@ -18,7 +18,7 @@ const Head = () => {
 
   return (
     <>
-      <meta property="og:title" content={'reelist-title' + cardData.title} />
+      <meta property="og:title" content={cardData.title} />
       <meta name="twitter:title" content={cardData.twitterTitle} />
       <meta property="og:description" content={cardData.description} />
 
