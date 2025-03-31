@@ -28,8 +28,10 @@ export default defineConfig({
 
   server: {
     port: PORT,
+    allowedHosts: true,
   },
   preview: {
     port: PORT,
+    allowedHosts: true,
   },
 })
