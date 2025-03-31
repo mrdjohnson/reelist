@@ -5,7 +5,7 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 
 import tailwindcss from '@tailwindcss/vite'
 
-const PORT = Number(process.env.PORT || 5555)
+const PORT = process.env.NODE_ENV === 'production' ? 10000 : 5555
 
 export default defineConfig({
   plugins: [
