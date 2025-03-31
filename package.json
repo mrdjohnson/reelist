@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vike dev",
-    "start": "vike start",
+    "start": "vike preview",
     "build": "vike build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vike preview"
