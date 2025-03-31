@@ -2,10 +2,11 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import vike from 'vike/plugin'
 import tsconfigPaths from 'vite-tsconfig-paths'
+import vercel from 'vite-plugin-vercel'
 
 import tailwindcss from '@tailwindcss/vite'
 
-const PORT = process.env.NODE_ENV === 'production' ? 10000 : 5555
+const PORT = process.env.PORT ? Number(process.env.PORT) : 3000
 
 export default defineConfig({
   plugins: [
@@ -15,6 +16,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
     tsconfigPaths(),
+    vercel()
   ],
   resolve: {
     alias: {
@@ -29,9 +31,11 @@ export default defineConfig({
   server: {
     port: PORT,
     allowedHosts: true,
+    host: true,
   },
   preview: {
     port: PORT,
     allowedHosts: true,
+    host: true,
   },
 })

@@ -17,6 +17,8 @@ async function data(pageContext: PageContextServer) {
     graphData = await TmdbOpenGraphFormatter.fromPerson(person)
   }
 
+  console.log('graphData:', JSON.stringify(graphData, null, 2))
+
   return graphData
 }
 
