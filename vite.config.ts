@@ -1,10 +1,11 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import vercel from 'vite-plugin-vercel'
 import vike from 'vike/plugin'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
 import tailwindcss from '@tailwindcss/vite'
+
+const PORT = Number(process.env.PORT || 5555)
 
 export default defineConfig({
   plugins: [
@@ -12,7 +13,6 @@ export default defineConfig({
       prerender: true,
     }),
     react(),
-    vercel(),
     tailwindcss(),
     tsconfigPaths(),
   ],
@@ -24,5 +24,12 @@ export default defineConfig({
       '@reelist/models/*': './src/libs/models/src/lib/*',
       '@reelist/utils/*': './src/libs/utils/src/lib/*',
     },
+  },
+
+  server: {
+    port: PORT,
+  },
+  preview: {
+    port: PORT,
   },
 })
