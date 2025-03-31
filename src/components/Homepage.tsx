@@ -18,7 +18,7 @@ const Homepage = observer(() => {
         <div className="pb-9 text-5xl">Reelist</div>
 
         <a
-          className="decoration-reelist-red/30 hover:decoration-reelist-red mb-3 w-fit self-center text-3xl text-white underline underline-offset-8 transition-colors duration-300 ease-in-out"
+          className="cursor-pointer decoration-reelist-red/30 hover:decoration-reelist-red mb-3 w-fit self-center text-3xl text-white underline underline-offset-8 transition-colors duration-300 ease-in-out"
           onClick={() => navigate('/discover')}
         >
           Discover
