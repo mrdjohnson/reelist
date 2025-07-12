@@ -21,6 +21,7 @@
     ],
     "baseUrl": ".",
     "paths": {
+      "~/*": ["./app/*"],
       "@reelist/apis/*": ["libs/apis/src/lib/*"],
       "@reelist/interfaces/*": ["libs/interfaces/src/lib/*"],
       "@reelist/models/*": ["libs/models/src/lib/*"],
