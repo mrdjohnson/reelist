@@ -1,36 +1,36 @@
 {
-  "compileOnSave": false,
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "**/.server/**/*.ts",
+    "**/.server/**/*.tsx",
+    "**/.client/**/*.ts",
+    "**/.client/**/*.tsx"
+  ],
   "compilerOptions": {
-    "rootDir": ".",
-    "sourceMap": true,
-    "declaration": false,
-    "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
-    "resolveJsonModule": true,
-    "experimentalDecorators": true,
-    "importHelpers": true,
-    "target": "ES2017",
-    "module": "esnext",
-    "lib": ["es2017", "dom"],
-    "skipLibCheck": true,
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "types": ["@remix-run/node", "vite/client"],
+    "isolatedModules": true,
     "esModuleInterop": true,
-    "skipDefaultLibCheck": true,
-    "types": [
-      "reflect-metadata",
-      "jest"
-    ],
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "target": "ES2022",
+    "strict": true,
+    "allowJs": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./app/*"],
-      "@reelist/apis/*": ["libs/apis/src/lib/*"],
-      "@reelist/interfaces/*": ["libs/interfaces/src/lib/*"],
+      "~/*": ["app/*"],
       "@reelist/models/*": ["libs/models/src/lib/*"],
-      "@reelist/utils/*": ["libs/utils/src/lib/*"]
-    }
-  },
-  "include": [
-    "app/**/*",
-    "**/*.test.ts"
-  ],
-  "exclude": ["node_modules", "tmp"]
+      "@reelist/utils/*": ["libs/utils/src/lib/*"],
+      "@reelist/apis/*": ["libs/apis/src/lib/*"],
+      "@reelist/interfaces/*": ["libs/interfaces/src/lib/*"]
+    },
+
+    // Vite takes care of building everything, not tsc.
+    "noEmit": true
+  }
 }

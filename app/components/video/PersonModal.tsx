@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
+import { useNavigate } from 'react-router-dom'
 
 import React from 'react'
 import moment from 'moment'
@@ -12,10 +12,10 @@ import EntityModal from '../EntityModal'
 import { SnapHoverGroup, SnapHoverItem } from '../SnapHoverGroup'
 
 const PersonModal = observer(({ person }: { person: TmdbPersonType }) => {
-  const router = useRouter()
+  const router = useNavigate()
 
   const handleVideoSelection = (video: TmdbVideoPartialType) => {
-    router.push(`/discover?videoId=${video.videoId}`, undefined, { shallow: true })
+    router(`/discover?videoId=${video.videoId}`, { shallow: true })
   }
 
   const birthday = moment(person.birthday).format('MMM YYYY')

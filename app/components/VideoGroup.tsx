@@ -1,10 +1,11 @@
-import { useRouter } from 'next/router'
 import EntityImage from './EntityImage'
 import classNames from 'classnames'
 import _ from 'lodash'
 import { useMemo } from 'react'
 import { Button } from '@mui/material'
 import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
+import { useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 
 type PropsWithTitle = {
   title: string
@@ -34,10 +35,11 @@ const VideoGroup = ({
   onViewMoreClicked,
   isLoading,
 }: VideoGroupProps) => {
-  const router = useRouter()
+  const router = useNavigate()
+  const location = useLocation()
 
   const handleVideoSelection = (video: TmdbVideoPartialType) => {
-    router.push(`/discover?videoId=${video.videoId}`, undefined, { shallow: true })
+    router(`/discover?videoId=${video.videoId}`, { state: { from: location.pathname } })
   }
 
   const isClipped = title || clippedOverride

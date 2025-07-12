@@ -28,7 +28,8 @@
     }
   },
   "include": [
-    "app/**/*",
+    "src",
+    "src/**/*",
     "**/*.test.ts"
   ],
   "exclude": ["node_modules", "tmp"]

@@ -1,9 +1,9 @@
 import _ from 'lodash'
 import { makeAutoObservable } from 'mobx'
-import { injectable } from 'inversify'
+import { inject, injectable } from 'inversify'
 import { settleAll } from '@reelist/utils/settleAll'
 import { TmdbTvSeason } from '@reelist/interfaces/tmdb/TmdbShowResponse'
-import { TmdbVideoType } from '@reelist/models/Video'
+import { AnyVideoType, TmdbVideoType } from '@reelist/models/Video'
 import { TmdbClient } from '@reelist/utils/tmdbHelpers/TmdbClient'
 
 @injectable()
@@ -12,7 +12,6 @@ class VideoStore {
   // for partial video modals, do we have enough information?
   tmdbJsonByVideoId: Record<string, TmdbVideoType | null> = {}
   videoSeasonMapByVideoId: Record<string, Record<number, TmdbTvSeason | null>> = {}
-  userVideoById: Record<string, Record<string, unknown>> = {}
 
   constructor() {
     makeAutoObservable(this)
@@ -67,6 +66,12 @@ class VideoStore {
     this.tmdbJsonByVideoId[videoId] = video
 
     return video
+  }
+
+  getVideoOrUserVideo = async (videoId: string, userId?: string): Promise<AnyVideoType | null> => {
+    let video: AnyVideoType | null
+
+    return await this.getVideo(videoId)
   }
 }
 

@@ -1,6 +1,8 @@
 import { makeAutoObservable } from 'mobx'
 import _ from 'lodash'
+import User from '@reelist/models/User'
 import { injectable } from 'inversify'
+import { UserVideoType } from '@reelist/models/UserVideo'
 import { AnyVideoType } from '@reelist/models/Video'
 
 type UpdateType = {
@@ -10,7 +12,7 @@ type UpdateType = {
 }
 
 type ProfileScreenType = {
-  user: any | null
+  user: User | null
   editing: boolean
 }
 
@@ -72,7 +74,7 @@ export default class AppState {
     this.videoListShareId = videoListShareId
   }
 
-  setProfileScreenUser = (user: any | null) => {
+  setProfileScreenUser = (user: User | null) => {
     this.profileScreen.user = user
   }
 

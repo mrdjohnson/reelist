@@ -1,7 +1,7 @@
 'use client'
 
 import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
+import { useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom'
 
 import SearchIcon from '@mui/icons-material/Search'
 import React, { ChangeEventHandler, useCallback, useEffect, useMemo, useState } from 'react'
@@ -69,8 +69,10 @@ const useWindowWidth = () => {
   return width
 }
 
-const Discover = observer(({ beta }: { beta: boolean }) => {
-  const router = useRouter()
+const Discover = observer(({ beta = false }: { beta?: boolean }) => {
+  const router = useNavigate()
+  const location = useLocation()
+  const [params, setParams] = useSearchParams()
 
   const { videoStore, personStore, appState } = useStore()
   const {
@@ -242,7 +244,10 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
   }, [page, isLoadingVideos, pageState])
 
   useEffect(() => {
-    const { videoId, personId } = router.query
+    const videoId = params.get('videoId')
+    const personId = params.get('personId')
+
+    console.log('params: ', videoId, personId)
 
     appState.clearErrorMessage()
 
@@ -283,14 +288,14 @@ const Discover = observer(({ beta }: { beta: boolean }) => {
         }
       })
     }
-  }, [router.query])
+  }, [params])
 
   const handleVideoSelection = (video: TmdbVideoPartialType) => {
-    router.push(`/discover?videoId=${video.videoId}`, undefined, { shallow: true })
+    router(`/discover?videoId=${video.videoId}`, { shallow: true })
   }
 
   const closePopup = () => {
-    router.replace('/discover', undefined, { shallow: true })
+    router('/discover', { shallow: true })
   }
 
   const containerPadding = 20

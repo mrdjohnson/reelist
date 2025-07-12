@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { useRouter } from 'next/router'
+import { useNavigate, useLocation, useParams } from 'react-router-dom'
 
 import React, { useMemo } from 'react'
 import _ from 'lodash'
@@ -16,7 +16,7 @@ const IMAGE_PATH = 'https://image.tmdb.org/t/p/w500'
 
 const VideoModal = observer(
   ({ video, selectedRegions }: { video: TmdbVideoByIdType; selectedRegions: string[] }) => {
-    const router = useRouter()
+    const router = useNavigate()
 
     const providers = useMemo(() => {
       return _.chain(selectedRegions)
@@ -27,11 +27,11 @@ const VideoModal = observer(
     }, [video.providers, selectedRegions])
 
     const handleVideoSelection = (video: TmdbVideoPartialType) => {
-      router.push(`/discover?videoId=${video.videoId}`, undefined, { shallow: true })
+      router(`/discover?videoId=${video.videoId}`, { shallow: true })
     }
 
     const handlePersonSelection = (person: TmdbPersonCreditResponse) => {
-      router.push(`/discover?personId=${person.id}`, undefined, { shallow: true })
+      router(`/discover?personId=${person.id}`, { shallow: true })
     }
 
     return (

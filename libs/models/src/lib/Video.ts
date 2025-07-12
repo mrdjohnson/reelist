@@ -3,6 +3,6 @@ import { TmdbMovieById } from '@reelist/models/tmdb/TmdbMovieById'
 
 export type TmdbVideoType = TmdbShowById | TmdbMovieById
 
-export type AnyVideoType = TmdbVideoType
+export type AnyVideoType = TmdbVideoType 
 
-export type AnyShowType = TmdbShowById
+export type AnyShowType =  TmdbShowById
