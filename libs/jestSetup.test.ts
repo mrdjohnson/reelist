@@ -2,25 +2,13 @@ import 'reflect-metadata'
 
 process.env = Object.assign(process.env, {
   NEXT_PUBLIC_TMDB_API_KEY: 'tmdb_api_key',
-  NEXT_PUBLIC_SUPABASE_URL: 'http://supabase.url',
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: 'supabase_anon_key',
   NEXT_PUBLIC_BASE_URL: 'http://test:3000',
 })
 
 import inversionContainer, { bindShared } from '@reelist/models/inversionContainer'
 
-import { SupabaseClient } from '@supabase/supabase-js'
-import { createClient } from '@supabase/supabase-js'
-
 import IStorage, { StorageInversionKey } from '@reelist/utils/storage/storage.interface'
 import { injectable } from 'inversify'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-
-const supbaseClient = createClient(supabaseUrl, supabaseAnonKey)
-
-inversionContainer.bind<SupabaseClient>(SupabaseClient).toConstantValue(supbaseClient)
 
 @injectable()
 class MockStorage implements IStorage {
@@ -57,7 +45,6 @@ beforeEach(() => {
   tmdbShowFactory.rewindSequence()
 
   inversionContainer.unbindAll()
-  inversionContainer.bind<SupabaseClient>(SupabaseClient).toConstantValue(supbaseClient)
   inversionContainer.bind<IStorage>(StorageInversionKey).to(MockStorage).inSingletonScope()
   bindShared()
 })
