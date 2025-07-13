@@ -6,3 +6,6 @@ node_modules
 
 .yarn
 .vscode
+.vercel
+
+public/build

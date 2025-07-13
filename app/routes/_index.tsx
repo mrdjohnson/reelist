@@ -20,9 +20,9 @@ export const meta: MetaFunction = () => {
   ]
 }
 
-export const loader: LoaderFunction = () => {
-  return { path: import.meta.env.BASE_URL }
-}
+// export const loader: LoaderFunction = () => {
+//   return { path: import.meta.env.BASE_URL }
+// }
 
 console.log('hello world')
 
