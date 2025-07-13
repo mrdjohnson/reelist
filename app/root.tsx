@@ -2,6 +2,7 @@ import { Links, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/reac
 import type { LinksFunction } from '@remix-run/node'
 import { CssBaseline, StyledEngineProvider, ThemeProvider } from '@mui/material'
 import muiTheme from '~/mui-theme'
+import { Analytics } from '@vercel/analytics/remix'
 
 import inversionContainer from '../libs/models/src/lib/inversionContainer'
 
@@ -40,6 +41,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
         <ScrollRestoration />
         <Scripts />
+        <Analytics />
       </body>
     </html>
   )
