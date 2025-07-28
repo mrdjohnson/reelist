@@ -361,7 +361,7 @@ const Discover = observer(({ beta = false }: { beta?: boolean }) => {
   return (
     <div
       suppressHydrationWarning
-      className="bg-reelist-gradient-green flex min-h-screen w-screen flex-col "
+      className="bg-reelist-gradient-green flex min-h-svh max-h-svh w-screen flex-col "
     >
       <NavBar
         path="/discover"

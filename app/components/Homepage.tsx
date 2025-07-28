@@ -11,7 +11,7 @@ const Homepage = observer(() => {
   return (
     <div
       suppressHydrationWarning
-      className="bg-reelist-gradient-green flex h-screen w-screen flex-col"
+      className="bg-reelist-gradient-green flex h-svh w-screen flex-col max-h-svh"
     >
       <div className="discover-md:top-[15%] discover-md:fixed discover-md:justify-center flex max-h-fit w-full max-w-full flex-col  pb-12 pt-[5%] text-center text-white">
         <div className="pb-9 text-5xl">Reelist</div>

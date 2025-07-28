@@ -72,9 +72,9 @@ const Popup = ({
       PaperProps={DialogPaperProps}
       classes={{
         paper:
-          'discover-md:p-[38px] discover-md:pr-[60px] discover-md:my-0 discover-md:mx-8 discover-md:h-auto discover-md:w-auto absolute top-0 left-0 h-screen w-screen p-3 m-2',
+          'discover-md:p-[38px] discover-md:pr-[60px] discover-md:my-0 discover-md:mx-8 discover-md:h-auto discover-md:w-auto absolute top-0 left-0 h-svh w-screen p-3 m-2',
       }}
-      className="bg-transparent-dark h-screen w-screen cursor-pointer backdrop-blur-md"
+      className="bg-transparent-dark h-dvh w-screen cursor-pointer backdrop-blur-md"
       transitionDuration={{ exit: 50 }}
       hideBackdrop
       {...props}

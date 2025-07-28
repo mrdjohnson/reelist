@@ -62,7 +62,7 @@ export default function App() {
 
   if (!ClientApp) {
     return (
-      <div className="w-screen h-screen flex bg-white">
+      <div className="w-screen h-svh flex bg-white">
         <CircularProgress size="3rem" className="mt-[30%] mx-auto mb-6" />
       </div>
     )
