@@ -20,7 +20,7 @@ const Footer = ({
 }) => (
   <div className="flex flex-col justify-center gap-3 py-8 text-center text-gray-500 ">
     {!hideHeader && <span className="text-reelist-red pb-3 text-3xl">Reelist</span>}
-    Copyright @2023 All rights reserved
+    Copyright @2025 All rights reserved
     <div>
       Video Source:
       <FooterLink href="https://www.themoviedb.org/">TMDB</FooterLink>
