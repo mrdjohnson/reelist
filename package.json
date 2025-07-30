@@ -42,6 +42,7 @@
     "morgan": "^1.10.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-fast-marquee": "^1.6.5",
     "reflect-metadata": "^0.1.13",
     "short-unique-id": "^4.4.4",
     "ts-mixer": "^6.0.3",

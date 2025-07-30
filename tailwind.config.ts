@@ -7,9 +7,6 @@ export default {
   },
   theme: {
     extend: {
-      animation: {
-        'slow-scroll': 'swipe 500000ms linear infinite backwards',
-      },
       aspectRatio: {
         poster: '2 / 3',
         backdrop: '16 / 9',

@@ -6,6 +6,7 @@ import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialT
 import EntityImage from './EntityImage'
 import Footer from './Footer'
 import { useNavigate } from 'react-router-dom'
+import Marquee from 'react-fast-marquee'
 
 const Homepage = observer(() => {
   return (
@@ -47,18 +48,15 @@ const Banner = () => {
   }
 
   return (
-    <div className="animate-slow-scroll discover-md:hover:pause-animation flex flex-row gap-5">
-      {videos.map(video => (
-        <div className="max-w-[307px] flex-1 overflow-hidden" key={video.id}>
-          <EntityImage video={video} onPress={() => handleVideoSelection(video)} homepageImage />
-        </div>
-      ))}
-      {videos.map(video => (
-        <div className="max-w-[307px] flex-1 overflow-hidden" key={video.id}>
-          <EntityImage video={video} onPress={() => handleVideoSelection(video)} homepageImage />
-        </div>
-      ))}
-    </div>
+    <Marquee pauseOnHover speed={30}>
+      <div className="flex flex-row gap-5 mr-5">
+        {videos.map(video => (
+          <div className="max-w-[307px] flex-1 overflow-hidden" key={video.id}>
+            <EntityImage video={video} onPress={() => handleVideoSelection(video)} homepageImage />
+          </div>
+        ))}
+      </div>
+    </Marquee>
   )
 }
 

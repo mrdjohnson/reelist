@@ -14,10 +14,6 @@
           -ms-overflow-style: none;  /* IE and Edge */
           scrollbar-width: none;  /* Firefox */
       }
-
-      .pause-animation {
-        animation-play-state: paused;
-      }
     }
   }
 
@@ -49,8 +45,6 @@
 
   --spacing-500: 500px;
   --spacing-600: 600px;
-
-  --animate-slow-scroll: swipe 500000ms linear infinite backwards;
 }
 
 .bg-reelist-gradient-green {
@@ -75,10 +69,6 @@
 .no-scrollbar {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
-}
-
-@utility pause-animation {
-  animation-play-state: paused;
 }
 
 @keyframes swipe {
