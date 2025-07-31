@@ -1,9 +1,9 @@
 import { CircularProgress } from '@mui/material'
 import { type LoaderFunction, type MetaFunction } from '@remix-run/node'
 import { useEffect, useState } from 'react'
-import { useLoaderData } from '@remix-run/react'
-import { TmdbClient } from '../../libs/utils/src/lib/tmdbHelpers/TmdbClient'
-import { TmdbOpenGraphFormatter } from '../../libs/utils/src/lib/tmdbHelpers/TmdbOpenGraphFormatter'
+
+import { TmdbClient } from '@reelist/utils/tmdbHelpers/TmdbClient'
+import { TmdbOpenGraphFormatter } from '@reelist/utils/tmdbHelpers/TmdbOpenGraphFormatter'
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   const graphData = data?.graphData || {}
@@ -52,7 +52,6 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export default function App() {
   const [ClientApp, setClientApp] = useState<React.FC | null>(null)
-  useLoaderData<typeof loader>() // ensure loader runs for meta
 
   useEffect(() => {
     import('~/components/Discover').then(mod => {
