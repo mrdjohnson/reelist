@@ -1,12 +1,12 @@
-'use client'
-
 import { observer } from 'mobx-react-lite'
-import useVideoTrending from '@reelist/utils/hooks/useVideoTrending'
-import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
-import EntityImage from './EntityImage'
-import Footer from './Footer'
 import { useNavigate } from 'react-router-dom'
 import Marquee from 'react-fast-marquee'
+
+import useVideoTrending from '@reelist/utils/hooks/useVideoTrending'
+import { TmdbVideoPartialType } from '@reelist/interfaces/tmdb/TmdbVideoPartialType'
+
+import EntityImage from '~/components/EntityImage'
+import Footer from '~/components/Footer'
 
 const Homepage = observer(() => {
   return (
@@ -44,7 +44,7 @@ const Banner = () => {
   const videos = useVideoTrending()
 
   const handleVideoSelection = (video: TmdbVideoPartialType) => {
-    router(`/discover?videoId=${video.videoId}`, { shallow: true })
+    router(`/discover?videoId=${video.videoId}`)
   }
 
   return (
