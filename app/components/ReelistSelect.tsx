@@ -31,14 +31,6 @@ const ReelistSelect = observer(
       setFilterText('')
     }
 
-    useEffect(() => {
-      if (isOpen) {
-        document.body.style.overflow = 'hidden'
-      } else {
-        document.body.style.overflow = 'unset'
-      }
-    }, [isOpen])
-
     const renderOption = (option: T, isChecked) => {
       let icon: ReactNode
 

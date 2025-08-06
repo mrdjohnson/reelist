@@ -219,16 +219,6 @@ const Discover = observer(({ beta = false }: { beta?: boolean }) => {
     regionSeparationType,
   ])
 
-  const shouldHideOverflow = showSelectedVideo || showMobileFilterOptions || showSelectedPerson
-
-  useEffect(() => {
-    if (shouldHideOverflow) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'unset'
-    }
-  }, [shouldHideOverflow])
-
   useEffect(() => {
     loadVideos()
   }, [page])
