@@ -1,6 +1,8 @@
 import { AppBar, Button, Drawer, Popover, Toolbar } from '@mui/material'
 import { PropsWithChildren, ReactNode, useRef, useState } from 'react'
 
+import logo from '~/assets/logo.png'
+
 const activeButton = 'border-red-400 border-1'
 const defaultStyle = 'text-lg text-slate-300 px-5 rounded-l-full rounded-r-full '
 
@@ -16,7 +18,7 @@ type NavBarProps = PropsWithChildren<{
   onRightButtonPressed: () => void
 }>
 
-const NavBar = ({ logo, path, children, rightButton, onRightButtonPressed }: NavBarProps) => {
+const NavBar = ({ path, children, rightButton, onRightButtonPressed }: NavBarProps) => {
   return (
     <>
       <AppBar
@@ -29,7 +31,7 @@ const NavBar = ({ logo, path, children, rightButton, onRightButtonPressed }: Nav
               Reelist
             </span>
             <span className="discover-md:hidden flex h-fit">
-              <img src="/images/logo.png" width={40} height={40} alt="Reelist" />
+              <img src={logo} width={40} height={40} alt="Reelist" />
             </span>
           </a>
 
